@@ -1,0 +1,30 @@
+# -*- Mode: Sh; -*-
+
+# Reload alias and function definitions
+#
+alias realias=". ~/.aliases"
+alias refunc=". ~/.functions"
+
+# Shortcut ls aliases
+#
+alias ll="ls -CFl"
+alias llh="ls -CFlh"
+
+# Show only processes associated with my user ID.
+#
+alias psme='ps -U ${USER} -o "pid,command" -ww'
+
+# Show matches taken from shell history. NOTE: should be able to use 'fc -l -m'?
+#
+alias hgrep='history 1 | grep'
+
+# SHow matches taken from environment settings
+#
+alias envgrep='env | grep'
+
+alias sf="cd ${HOME}/src/Mine/SoundFonts"
+
+alias ec="emacsclient -c -n"
+
+alias ztart="ztar t"
+alias ztarx="ztar x"

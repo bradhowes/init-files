@@ -1,0 +1,35 @@
+# -*- Mode: Sh; -*-
+
+echo "BEGIN .profile" 1>&2
+
+export PROFILE_LOADED="Y"
+export BRH_INIT_FILES="${HOME}/src/Mine/init-files/shells"
+export BRH_ARCH="$(uname)"
+export ENV="${BRH_INIT_FILES}/bashrc"
+
+export USER
+[ -z "${USER}" ] && USER="${USERNAME}"
+[ -z "${USER}" ] && USER="${LOGNAME}"
+
+. "${BRH_INIT_FILES}/functions"
+
+export PATH
+PathAdd PATH \
+        /Applications/Emacs.app/Contents/MacOS/bin \
+        /opt/homebrew/bin \
+        /opt/homebrew/bin/opt/ruby/bin \
+        /opt/homebrew/bin/lib/ruby/gems/3.1.0/bin \
+        "${HOME}/bin"
+
+# !!! Important to get rid of encoding errors in Python
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+export DOCKER_USER="b.howes"
+export WORKON_HOME=${HOME}/venvs
+
+[[ "${BRH_ARCH}" = "Darwin" ]] && ulimit -n 8096
+
+[ -n "${PS1}" -a -z "${BASHRC_LOADED}" ] && . ${ENV}
+
+echo "END .profile" 1>&2
