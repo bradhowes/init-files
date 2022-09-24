@@ -1,11 +1,22 @@
-;;; -*- Mode: Emacs-Lisp; -*-
+;;; init --- -*- Mode: Emacs-Lisp; -*-
+;;; Commentary:
+;;; Code:
 
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://stable.melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "http://stable.melpa.org/packages/"))
 (package-initialize)
 
 ;; (setq mac-command-modifier 'alt)
+
+(setenv "PATH" (concat (expand-file-name "~/bin") ":/opt/homebrew/bin:" (getenv "PATH")))
+
+(setq exec-path
+      (append
+       (list
+	(expand-file-name "~/bin")
+	"/opt/homebrew/bin"
+	)
+       exec-path))
 
 (setq load-path
       (append
@@ -24,6 +35,9 @@
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
  '(case-fold-search t)
+ '(company-auto-complete ''company-explicit-action-p)
+ '(company-idle-delay 0.2)
+ '(company-tooltip-idle-delay 0.2)
  '(confirm-kill-emacs 'y-or-n-p)
  '(copyright-update-any-year t)
  '(current-language-environment "English")
@@ -37,8 +51,7 @@
  '(elpy-rpc-virtualenv-path "/Users/howes/venvs/notebooks")
  '(emacs-pager-delete-file-after-load t)
  '(fci-rule-color "#37474f")
- '(ff-search-directories
-   '("." ".." "$HOME/sidecar/trunk" "/usr/include" "/usr/local/include"))
+ '(ff-search-directories '("." ".." "/usr/include"))
  '(flymake-no-changes-timeout 0.2)
  '(global-subword-mode nil)
  '(hl-sexp-background-color "#1c1f26")
@@ -48,8 +61,7 @@
  '(ns-alternate-modifier 'none)
  '(ns-command-modifier 'meta)
  '(package-selected-packages
-   '(eglot ggtags mode-line-bell swift-mode material-theme flymake-markdownlint markdown-mode helm-lsp lsp-jedi lsp-mode lsp-pyright lsp-treemacs lsp-ui highlight-indentation projectile helm-projectile helm-git-grep helm-ls-git grandshell-theme flymake-shell flymake exec-path-from-shell elpy company-fuzzy company-jedi company-shell session flymake-python-pyflakes company use-package async))
- '(python-flymake-command '("/Users/howes/venvs/notebooks/bin/pyflakes"))
+   '(diff-hl smartparens js2-mode flycheck eglot ggtags mode-line-bell swift-mode material-theme flymake-markdownlint markdown-mode helm-lsp lsp-jedi lsp-mode lsp-pyright lsp-treemacs lsp-ui highlight-indentation projectile helm-projectile helm-git-grep helm-ls-git grandshell-theme flymake-shell flymake exec-path-from-shell elpy company-fuzzy company-jedi company-shell session company use-package async))
  '(ring-bell-function 'ignore)
  '(session-use-package t nil (session))
  '(subword-mode nil t)
@@ -76,6 +88,7 @@
      (340 . "#fff59d")
      (360 . "#8bc34a")))
  '(vc-annotate-very-old-color nil)
+ '(vc-follow-symlinks t)
  '(visible-bell t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -84,3 +97,6 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:height 140 :family "Inconsolata" :foundry "nil" :slant normal :weight normal :width normal))))
  '(fixed-pitch ((t (:family "Inconsolata")))))
+
+(provide 'emacs)
+;;; emacs ends here

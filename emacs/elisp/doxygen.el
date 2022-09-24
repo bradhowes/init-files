@@ -1,7 +1,10 @@
-;;
-;; doxygen.el
-;;
+;;; package -- doxygen -*- Mode: Emacs-Lisp -*-
+;;; Commentary:
+;;; Code:
+
 (defun my-split-string (string &optional sep omit)
+  "Split STRING at SEP.
+If OMIT then remove any empty strings."
   (let ((result (split-string string sep)))
     (if omit
 	(delete "" result)
@@ -41,26 +44,25 @@
     python-mode
     (("^[ \t]*def[ \t]+\\([^(]+\\)(\\(.*\\))[ \t]*:"
       doxygen-process-python-function-match)))
-  "")
+  "Regular epxression to use to locate function declarations.")
 
 (defconst doxygen-locate-c-function-pointer-spec-re
   "([^)]*\\*[ \t\n]*\\([a-zA-Z0-9_]+\\)[ \t\n]*)"
-  "Regular expression that matches part of a function pointer spec found in an
-argument list.")
+  "Regular expression that matches function pointer in argument list.")
 
 (defvar doxygen-insert-summary nil
-  "*If TRUE insert a short summary in the start of the comment block.")
+  "If TRUE insert a short summary in the start of the comment block.")
 
-(defvar doxygen-marks nil
-  "A list of marks to jump to with `\\[doxygen-forward-mark]' and
-`\\[doxygen-backward-mark]'.")
+(defvar doxygen-markers nil
+  "A list of markers in a comment template.")
 
 (defvar doxygen-group-history nil
-  "")
+  "Group history.")
 
 (defun doxygen-toggle-insert-summary (arg)
-  "Change the setting of the `doxygen-insert-summary' variable. If prefix
-argument is 1, the value is toggled. If <= 0, then the value is nil. Otherwise,
+  "Change the setting of the `doxygen-insert-summary' variable.
+If prefix ARG is 1, the value is toggled. If <= 0, then the value is nil.
+ Otherwise,
 the value is set to t."
   (interactive "p")
   (setq doxygen-insert-summary (cond
@@ -69,25 +71,25 @@ the value is set to t."
 				(t t)))
   (message "doxygen-insert-summary is %s" doxygen-insert-summary))
 
-(defun doxygen-clear-marks()
-  "Remove all marks from the `doxygen-marks' variable for the current buffer."
+(defun doxygen-clear-marker()
+  "Remove all doxygen markers for the current buffer."
   (interactive)
-  (setq doxygen-marks nil))
+  (setq doxygen-markers nil))
 
-(defun doxygen-push-mark ()
-  "Add a mark to the start of `doxygen-marks'."
+(defun doxygen-push-marker ()
+  "Add  marker to the start of `doxygen-markers'."
   (let ((pm (point-marker)))
-    (unless (member pm doxygen-marks)
-      (setq doxygen-marks (cons pm doxygen-marks)))))
+    (unless (member pm doxygen-markers)
+      (setq doxygen-markers (cons pm doxygen-markers)))))
 
-(defun doxygen-update-marks ()
-  "Rearrange contents of `doxygen-marks' so that its contents is in ascending
-order, and no duplicate values exist."
-  (when doxygen-marks
-    (setq doxygen-marks (sort doxygen-marks '<)))
-  (if (and (length doxygen-marks)
-	   (equal (point-min) (marker-position (nth 0 doxygen-marks))))
-      (setq doxygen-marks (cdr doxygen-marks))))
+(defun doxygen-update-markers ()
+  "Rearrange contents of `doxygen-markers' so it is in ascending order.
+Also removes duplicates."
+  (when doxygen-markers
+    (setq doxygen-markers (sort doxygen-markers '<)))
+  (if (and (length doxygen-markers)
+	   (equal (point-min) (marker-position (nth 0 doxygen-markers))))
+      (setq doxygen-markers (cdr doxygen-markers))))
 
 (defun doxygen-line-prefix ()
   "Return the white-space found at the start of the current line."
@@ -98,8 +100,8 @@ order, and no duplicate values exist."
       "")))
 
 (defun doxygen-get-c-arg-name (scrap)
-  "Return the argument name from a fragment of an argument list."
-  ;;
+  "Return the argument name from a SCRAP of an argument list."
+
   ;; Strip off any default assignment values.
   ;;
   (when (string-match "=" scrap)
@@ -118,15 +120,14 @@ order, and no duplicate values exist."
     scrap))
 
 (defun doxygen-locate-c-function-pointer-specs (clause offset)
-  "Return string positions if the regular expression
-`doxygen-locate-function-pointer-spec-re' is found in CLAUSE. The search will
-start at OFFSET. Returns nil if not found."
+  "Return location of function in CLAUSE.
+The search will start at OFFSET. Returns nil if not found."
   (and (string-match doxygen-locate-c-function-pointer-spec-re clause offset)
        (match-data)))
 
 (defun doxygen-rewrite-c-arg-clause (clause match)
-  "Remove any function pointer specifications found in the argument list CLAUSE
-and replace with just the argument name. If MATCH is a list, recursively call
+  "Remove any function pointer specs found CLAUSE.
+Replace with just the argument name. If MATCH is a list, recursively call
 `doxygen-rewrite-arg-clause' with the CDR of MATCH before doing our own
 rewrite on CLAUSE. Returns the changed CLAUSE value"
   (cond
@@ -143,10 +144,8 @@ rewrite on CLAUSE. Returns the changed CLAUSE value"
    (t clause)))
 
 (defun doxygen-clean-c-arg-clause (clause)
-  "Scan the arguments CLAUSE and replace any function pointer specifications
-with the variable name contained in the specification. Returns the potentially
-changed CLAUSE value."
-  ;;
+  "Scan CLAUSE and replace any function pointer specs.
+Returns the potentially changed CLAUSE value."
   ;; Strip off the initialization clause for a C++ constructor if present.
   ;;
   (when (string-match "\\()[^:]*:[^:]\\)" clause)
@@ -162,8 +161,8 @@ changed CLAUSE value."
     clause))
 
 (defun doxygen-process-c-container-match (kind name)
-  "Convert raw match data into a list of values used to fill in a Doxygen
-comment block for a C/C++ structure or C++ namespace."
+  "Convert raw match data into a list of values to fill Doxygen comment.
+Operates on KIND expressions with NAME."
   (let ((beg (match-beginning 0))
 	(end (match-end 0))
 	(tag (mapconcat 'identity
@@ -179,7 +178,7 @@ comment block for a C/C++ structure or C++ namespace."
 		nil))))
 
 (defun doxygen-clean-name+return (clause)
-  ""
+  "Obtain the name and return value of a CLAUSE."
   (let ((info nil)
 	(items nil)
 	(first nil)
@@ -218,7 +217,7 @@ comment block for a C/C++ structure or C++ namespace."
 	      info))))
 
 (defun doxygen-process-python-function-match ()
-  "Convert raw match data into a list of values used to fill in a Doxygen
+  "Convert match data into a list of values for Python comments.
 comment block for a Python function or method. The returned list will contain
 \( BEG END RETURN NAME ARGS ),where BEG is the buffer position of the start of
 the function declaration being documented, END is the buffer position of the
@@ -233,7 +232,7 @@ it is a list of argument names."
       (list beg end (list t name args))))
 
 (defun doxygen-process-c-function-match ()
-  "Convert raw match data into a list of values used to fill in a Doxygen
+  "Convert match data into a list of values for C comments.
 comment block for a C/C++ function or method. The returned list will contain
 \( BEG END RETURN NAME ARGS ),where BEG is the buffer position of the start of
 the function declaration being documented, END is the buffer position of the
@@ -275,7 +274,7 @@ it is a list of argument names."
 								   t))))))
 
 (defun doxygen-process-obj-function-match ()
-  "Convert raw match data into a list of values used to fill in a Doxygen
+  "Convert match data into a list of values for Obj-C comments.
 comment block for an ObjC method. The returned list will contain
 \( BEG END RETURN NAME ARGS ),where BEG is the buffer position of the start of
 the function declaration being documented, END is the buffer position of the
@@ -315,8 +314,8 @@ it is a list of argument names."
 		  args))))
 
 (defun doxygen-find-declaration-here ()
-  "Identify any interesting C/C++/ObjC object on the current line and possibly
-return a list to use in filling out a Doxygen comment block."
+  "Locate interesting C/C++/ObjC object on the current line.
+Returns a list to use in filling out a Doxygen comment block."
   (let ((configs (plist-get doxygen-find-declaration-configs major-mode)))
     (while (and configs
 		(not (looking-at (car (car configs)))))
@@ -325,8 +324,8 @@ return a list to use in filling out a Doxygen comment block."
       (apply (car (cdr (car configs))) (cdr (cdr (car configs)))))))
 
 (defun doxygen-find-declaration ()
-  "Identify any interesting C/C++ object following the current point. Skips
-forward over white-space before calling `doxygen-find-declaration-here'."
+  "Identify any interesting C/C++ object following the current point.
+Skips forward over white-space before calling `doxygen-find-declaration-here'."
   (save-excursion
     (skip-chars-forward " \t\n")
     (beginning-of-line)
@@ -340,40 +339,42 @@ forward over white-space before calling `doxygen-find-declaration-here'."
 	nil)))))
 
 (defun doxygen-insert-prepped-comment (prefix found)
-  "Insert a Doxygen comment block and fill it with some tags to represent the
-data contained in FOUND. The comment and its contents are indented with the
-value PREFIX. Places point at the end of the first line of the comment block."
+  "Insert a Doxygen comment block and fill it with some tags.
+Uses the data contained in FOUND. The comment and its contents are indented
+with the value PREFIX. Places point at the end of the first line of the comment
+block."
   (let ((begin (nth 0 found))
 	(end (nth 1 found))
 	(info (nth 2 found)))
     (goto-char begin)
     (insert prefix "/** ")
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (when doxygen-insert-summary
       (insert (nth 1 info))
-      (doxygen-push-mark))
+      (doxygen-push-marker))
     (save-excursion
       (insert "\n")
       (when (nth 2 info)
 	(mapc (function (lambda (a)
 			  (insert prefix "    \\param " a " ")
-			  (doxygen-push-mark)
+			  (doxygen-push-marker)
 			  (insert "\n\n")))
 	      (nth 2 info)))
       (when (nth 0 info)
 	(insert prefix "    \\return " )
-	(doxygen-push-mark)
+	(doxygen-push-marker)
 	(insert "\n"))
       (insert prefix "*/\n"))))
 
 (defun doxygen-insert-empty-comment ()
-  "Insert an empty Doxygen comment block. The point is left at the end of the
+  "Insert an empty Doxygen comment block.
+The point is left at the end of the
 first line. The comment is indented with PREFIX."
   (indent-according-to-mode)
   (let ((prefix (doxygen-line-prefix)))
     (beginning-of-line)
     (insert prefix "/** ")
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (save-excursion (insert "\n" prefix "*/\n"))))
 
 (defun doxygen-insert-block-comment ()
@@ -386,10 +387,11 @@ first line. The comment is indented with PREFIX."
 					  (doxygen-line-prefix))
 					found)
       (doxygen-insert-empty-comment))
-    (doxygen-update-marks)))
+    (doxygen-update-markers)))
 
 (defun doxygen-insert-group (name &optional from to)
-  "Insert Doxygen comments to define a Doxygen group. The group NAME is read
+  "Insert Doxygen comments to define a Doxygen group.
+The group NAME is read
 from the minibuffer. The group will enclose the region FROM TO unless a prefix
 argument is present, in which case an empty group is inserted at the point."
   (interactive
@@ -398,43 +400,46 @@ argument is present, in which case an empty group is inserted at the point."
 	 (list name (point) (point))
        (list name (region-beginning) (region-end)))))
   (goto-char to)			; insert group close first
-  (doxygen-push-mark)
+  (doxygen-push-marker)
   (insert "\n//@}\n")
   (goto-char from)
   (insert "#pragma mark " (upcase name)
 	  "\n/** \\name " (capitalize name))
-  (doxygen-push-mark)
+  (doxygen-push-marker)
   (insert "\n*/\n//@{\n\n" )
-  (doxygen-push-mark)
-  (doxygen-update-marks))
+  (doxygen-push-marker)
+  (doxygen-update-markers))
 
-(defun doxygen-first-mark-greater-than (point marks)
-  (cond ((null marks) nil)
-	((> (car marks) point) (car marks))
-	(t (doxygen-first-mark-greater-than point (cdr marks)))))
+(defun doxygen-first-marker-greater-than (point markers)
+  "Obtain first item in MARKERS greater than POINT."
+  (cond ((null markers) nil)
+	((> (car markers) point) (car markers))
+	(t (doxygen-first-marker-greater-than point (cdr markers)))))
 
-(defun doxygen-forward-mark ()
-  "Jump to the next mark in `doxygen-marks'."
+(defun doxygen-forward-marker ()
+  "Jump to the next mark in `doxygen-markers'."
   (interactive)
-  (let ((mark (doxygen-first-mark-greater-than (point) doxygen-marks)))
-    (if mark (goto-char mark)
-      (if doxygen-marks (goto-char (car doxygen-marks))))))
+  (let ((marker (doxygen-first-marker-greater-than (point) doxygen-markers)))
+    (if marker (goto-char marker)
+      (if doxygen-markers (goto-char (car doxygen-markers))))))
 
-(defun doxygen-first-mark-lesser-than (point marks)
-  (cond ((null marks) nil)
-	((< (car marks) point)
-	 (or (doxygen-first-mark-lesser-than point (cdr marks)) (car marks)))
+(defun doxygen-first-marker-lesser-than (point markers)
+  "Jump to the first marker in MARKERS before POINT."
+  (cond ((null markers) nil)
+	((< (car markers) point)
+	 (or (doxygen-first-marker-lesser-than point (cdr markers)) (car markers)))
 	(t nil)))
 
-(defun doxygen-backward-mark ()
-  "Jump to the previous mark in `doxygen-marks'."
+(defun doxygen-backward-marker ()
+  "Jump to the previous mark in `doxygen-markers'."
   (interactive)
-  (let ((mark (doxygen-first-mark-lesser-than (point) doxygen-marks)))
-    (if mark (goto-char mark)
-      (if doxygen-marks (goto-char (car (last doxygen-marks)))))))
+  (let ((marker (doxygen-first-marker-lesser-than (point) doxygen-markers)))
+    (if marker (goto-char marker)
+      (if doxygen-markers (goto-char (car (last doxygen-markers)))))))
 
 (defun doxygen-insert-inline-comment ()
-  "Insert an inline Doxygen comment. This probably only works for C/C++/ObjC
+  "Insert an inline Doxygen comment.
+This probably only works for C/C++/ObjC
 comments. Maybe Java too."
   (interactive "*")
   (comment-dwim nil)
@@ -453,8 +458,8 @@ comments. Maybe Java too."
       (forward-char 1)))))
 
 (defun doxygen-comment-file ()
-  "Look for all interesting objects in the current buffer and insert a Doxygen
-comment block before them."
+  "Look for all interesting objects in the current buffer.
+Insert a Doxygen comment block before each."
   (interactive)
   (let ((found nil)
 	(marker (make-marker)))
@@ -484,3 +489,4 @@ comment block before them."
 (make-variable-buffer-local 'doxygen-marks)
 
 (provide 'doxygen)
+;;; doxygen.el ends here

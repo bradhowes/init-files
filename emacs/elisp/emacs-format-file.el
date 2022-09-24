@@ -1,8 +1,11 @@
-;;; File: emacs-format-file
-;; http://www.cslab.pepperdine.edu/warford/BatchIndentationEmacs.html
-;; to be run as --
-;; emacs -batch *.[ch] -l ~/src/scripts/emacs-format-file -f emacs-format-function
+;;; emacs-format-file --- Summary:
+;;; Commentary:
+;;; Code:
 
 (defun emacs-format-function ()
+  "Format the buffer."
   (untabify (point-min) (point-max))
   (save-buffer))
+
+(provide 'emacs-format-file)
+;;; emacs-format-file.el ends here

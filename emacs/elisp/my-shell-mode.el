@@ -1,10 +1,15 @@
+;;; package -- my-shell-mode -*- Mode: Emacs-Lisp -*-
+;;; Commentary:
+;;; Code:
+
 (require 'shell)
 
 (defvar my-shell-home-root nil
   "Value to prepend to a directory.")
 
 (defun my-shell-filter-job-control-messages (&optional string)
-  "Strip out some initial warnings from Bash when running under Msys2."
+  "Strip out some warnings from Bash when running under Msys2.
+STRING is something."
   (save-excursion
     ;; (message "my-shell-filter-job-control-messages")
     (goto-char (point-min))
@@ -12,15 +17,13 @@
       (replace-match "")
       (remove-hook 'comint-output-filter-functions (function my-shell-filter-job-control-messages) t))))
 
-(defun my-shell-get-dir (&optional string)
-  "Detect control sequence that announces directory changes and strip from output. The format
-is
+(defun my-shell-get-dir (&optional STRING)
+  "Detect control sequence that announces directory change, and strip from output.
+STRING is something. The format is ^[]0;USER:PATH^G
 
-^[]0;USER:PATH^G
-
-where '^[' is the ESC character and ^G is the Control-G character. The user name is found in USER and the
-path of the current directory of the shell follows after a ':' character.
-"
+where '^[' is the ESC character and ^G is the Control-G character.
+The user name is found in USER and the
+path of the current directory of the shell follows after a ':' character."
   (save-excursion
     ;; (message "my-shell-get-dir")
     (let* ((pmark (process-mark (get-buffer-process (current-buffer))))
@@ -65,14 +68,13 @@ path of the current directory of the shell follows after a ':' character.
 		(force-mode-line-update))
 	    (error nil)))))))
 
-(defun my-remove-command-echo (&optional string)
-  "Detect control sequence that highlight commands. The format
-is
+(defun my-remove-command-echo (&optional STRING)
+  "Detect control sequence that highlight commands.
+STRING is something. The format is
 
 ^[]2;...^G^[]1;...^G
 
-where '^[' is the ESC character and ^G is the Control-G character.
-"
+where '^[' is the ESC character and ^G is the Control-G character."
   (save-excursion
     (let ((start-marker (if (and (markerp comint-last-output-start)
                                  (eq (marker-buffer comint-last-output-start)
@@ -88,8 +90,10 @@ where '^[' is the ESC character and ^G is the Control-G character.
         (replace-match "")))))
 
 (defun my-shell-strip-trailing-empty-line (&optional string)
-  "Remove duplicate prompt lines. This is a hack -- should figure out *why* there are duplicate prompt lines in the
-first place."
+  "Remove duplicate prompt lines.
+STRING is something. This is a hack --
+should figure out *why* there are duplicate
+prompt lines in the first place."
   (save-excursion
     ;; (message "my-shell-strip-trailing-empty-line")
     (let* ((pmark (process-mark (get-buffer-process (current-buffer))))
@@ -105,12 +109,14 @@ first place."
         (delete-region (match-beginning 1) (match-end 4))))))
 
 (defun my-shell-set-home-root ()
+  "Locate home root."
   (make-local-variable 'my-shell-home-root)
   (setq my-shell-home-root
         (cond ((> (length (getenv "MSYSTEM")) 0) "C:/msys64")
               (t ""))))
 
 (defun my-shell-mode-hook ()
+  "Custom shell mode."
   ;; (setq ansi-color-names-vector ; better contrast colors
   ;;       ["black" "red4" "green4" "yellow4"
   ;;        "blue3" "magenta4" "cyan4" "white"])
@@ -119,7 +125,8 @@ first place."
         ["black" "red3" "green3" "yellow3" "blue2" "magenta3" "cyan3" "gray90"])
 
   (ansi-color-for-comint-mode-on)
-  (set-buffer-process-coding-system 'utf-8 'utf-8)
+  (set-process-coding-system (get-buffer-process (current-buffer)) 'utf-8 'utf-8)
+
   (setq shell-dirtrackp nil
         comint-process-echoes t
 	comint-buffer-maximum-size (* 1024 100)
@@ -133,7 +140,7 @@ first place."
   (add-hook 'comint-output-filter-functions (function comint-truncate-buffer) t)
   (add-hook 'comint-output-filter-functions (function comint-postoutput-scroll-to-bottom) t)
 
-  (when is-windows
+  (when (string-equal "windows-nt" system-type)
     (add-hook 'comint-output-filter-functions (function my-shell-filter-job-control-messages) t)
     (add-hook 'comint-output-filter-functions (function my-shell-strip-trailing-empty-line) t))
 
@@ -168,3 +175,6 @@ first place."
   ;; (local-set-key [(control c)(control a)] 'beginning-of-line)
   ;; (local-set-key [(control a)] 'comint-bol)
   )
+
+(provide 'my-shell-mode)
+;;; my-shell-model.el ends here

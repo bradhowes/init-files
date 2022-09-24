@@ -1,9 +1,13 @@
-(require 'font-lock)
-(require 'my-cc-block-comment)
-(require 'doxygen)
-(require 'flyspell)
+;;; package -- my-c-mode-common -*- Mode: Emacs-Lisp -*-
+;;; Commentary:
+;;; Code:
 
-;;
+(require 'font-lock)
+(require 'doxygen)
+(require 'projectile)
+
+;; (require 'flyspell)
+
 ;; Hilight parentheses and braces
 ;;
 (font-lock-add-keywords 'c-mode '(("[][(){}]" . font-lock-brace-face)))
@@ -15,7 +19,8 @@
                         '(("\\<\\(constexpr\\|final\\|noexcept\\|nullptr\\)\\>" . 'font-lock-keyword-face)))
 
 (define-skeleton my-c-include-statement
-  "Sekeleton C/C++/ObjC include statement. Inserts #include\"\" and leaves
+  "Sekeleton C/C++/ObjC include statement.
+Inserts #include\"\" and leaves
 the insertion point between the double-quotation marks. Use a PREFIx to insert
 <> instead of \"\"."
   nil
@@ -43,17 +48,15 @@ the insertion point between the double-quotation marks. Use a PREFIx to insert
   ;;             (setq tmp (concat (match-string 1) (match-string 2))))))
   ;;   (kill-buffer "*foo*")
   ;;  tmp)
-  "Determine the location of the standard include files for the systems C++
-compiler.")
+  "Determine the location of the standard include files.")
 
 (defconst my-c-on-include-line-re
   "#\\(import\\|include\\)[^\"<]+[\"<]\\([^>\"]+\\)[>\"]"
-  "Regular expression that matches a lines containing a C/C++/ObjC include
-directive.")
+  "Regular expression that matches a lines containing a C/C++/ObjC include.")
 
 (defconst my-c-locate-include-file-re
   "\\(\\(.*\\)/\\)*\\([^/]+\\)"
-  "Regular expression that separates an include statement path into directory and file components.
+  "Regular expression that separates include path into directory and file.
 Group 1: directory + '/'
 Group 2: directory sans trailing '/'
 Group 3: file sans any directory prefix")
@@ -61,19 +64,18 @@ Group 3: file sans any directory prefix")
 (defvar my-c-locate-include-dirs
   (list
    "./\\1\\3"				; Locate file in local directory
-   "~/src/sidecar/\\1\\3"               ; In SideCar source tree
-   "/usr/local/opt/qt/include/\\1\\3.h"        ; Handle Qt '#include "DIR/File"'
-   "/usr/local/include/\\1\\3.h"        ; Handle Qt '#include "DIR/File"'
-   "/usr/local/include/\\1\\3"          ; Handle above if '.h' is already part of pattern
+   "~/src/Mine/sidecar/\\1\\3"          ; In SideCar source tree
+   "/opt/homebrew/include/\\1\\3"
+   "/opt/homebrew/Cellar/qt@5/5.15.5_3/include/\\1\\3.h"        ; Handle Qt '#include "DIR/File"'
    "/System/Library/Frameworks/\\2.framework/Headers/\\3" ; In MacOS X framewks
    (concat my-c++-include-dir "/\\1\\3")		  ; in toolchain installation
    "/usr/include/\\1\\3")				  ; in OS includes
-  "List of replacement patterns used by my-c-locate-include-file method to build potential filenames when
-looking for an include file.")
+  "List of replacement patterns.")
 
 (defun my-c-locate-include-file (tail proc)
-  "Attempt to locate an include file with path ending in TAIL. If found, invoke
-the PROC method in order to show it. Relies on my-c-locate-include-dirs
+  "Attempt to locate an include file with path ending in TAIL.
+If found, invoke
+the PROC method in order to show it. Relies on `my-c-locate-include-dirs'
 variable to build complete paths."
   (let ((dirs my-c-locate-include-dirs)
         ;; Group 1: directory + '/'
@@ -89,9 +91,7 @@ variable to build complete paths."
       (error "Unable to locate file for '%s'" tail ))))
 
 (defun my-c-expand-include-file (proc)
-  "If POINT is on a line with a C/C++/ObjC include statement, attempt to locate
-the file in a new buffer. If not on an include statement, move to the first on
-after POINT."
+  "Locate include file using PROC."
   (let ((p nil))
     (save-excursion
       (beginning-of-line)
@@ -101,7 +101,7 @@ after POINT."
     (when p (goto-char p))))
 
 (defun my-c-find-include-file ()
-  "If POINT is on an empty line, insert the my-c-include-statement skeleton.
+  "If on an empty line, insert the `my-c-include-statement' skeleton.
 Otherwise, attempt to open the an include file."
   (interactive)
   (if (looking-at "^[ \t]*$")
@@ -119,7 +119,8 @@ Otherwise, attempt to open the an include file."
   (my-c-expand-include-file (function find-file-other-frame)))
 
 (defun my-c-find-file-with-extension (base extensions default)
-  "Attempt to locate a file called BASE with an extension found in the list of
+  "Attempt to locate a file called BASE.
+Look for files with an extension found in the list of
 EXTENSIONS. If the list is empty, use DEFAULT as the extension."
   (if (null extensions)
       (concat base "." default)
@@ -129,14 +130,14 @@ EXTENSIONS. If the list is empty, use DEFAULT as the extension."
 	(my-c-find-file-with-extension base (cdr extensions) default)))))
 
 (defun my-c-make-twin-file ()
-  "Locate the 'twin' of the current source file. For instance, if the current
+  "Locate the 'twin' of the current source file.
+For instance, if the current
 file has 'cc' for its extension, attempt to locate and edit a file with the
 same name but with an extension of 'h'. Support C/C++/ObjC file extensions."
   (let ((extension (file-name-extension (buffer-file-name)))
 	(sans (file-name-sans-extension (buffer-file-name))))
     (if (string-match "[hH][xp]*" extension)
 
-	;;
 	;; Apparently the current source file is an include file. Use the
 	;; file's mode to define the suffixes that the implementation file may
 	;; have.
@@ -155,11 +156,12 @@ same name but with an extension of 'h'. Support C/C++/ObjC file extensions."
       ;;
       (my-c-find-file-with-extension sans '("h" "hxx" "hpp" "H") "h"))))
 
-(setq my-make-next-file-name-generator (function my-c-make-twin-file))
+(defvar my-make-next-file-name-generator
+  (function my-c-make-twin-file)
+  "Ha.")
 
 (defun my-c-twin-file ()
-  "Locate another file with the same basename as the current one, differing
-only by the extension."
+  "Locate another file with the same basename as the current one."
   (let* ((sans (file-name-sans-extension (buffer-file-name)))
 	 (files (directory-files (file-name-directory (buffer-file-name)) t
 				 (concat "^" (file-name-nondirectory sans)
@@ -224,25 +226,25 @@ only by the extension."
     (composition-open after)
     (inexpr-class-open after)
     (inexpr-class-close before))
-  "My Objective C hanging braces alist")
+  "My Objective C hanging braces alist.")
 
 (defconst my-c-hanging-braces-alist
   (assq-delete-all 'defun-open (copy-alist my-objc-hanging-braces-alist))
-  "My C/C++ hanging braces alist")
+  "My C/C++ hanging braces alist.")
 
 (defconst my-base-style
   '("stroustrup")
-  "My base style")
+  "My base style.")
 
 (defconst my-c-style
   (append (copy-alist my-base-style)
 	  (list (cons 'c-hanging-braces-alist my-c-hanging-braces-alist)))
-  "My C/C++ style")
+  "My C/C++ style.")
 
 (defconst my-objc-style
   (append (copy-alist my-base-style)
 	  (list (cons 'c-hanging-braces-alist my-objc-hanging-braces-alist)))
-  "My Objective C style")
+  "My Objective C style.")
 
 (defun view-qt-doc-default (&optional pos)
   "Make a guess at a default Qt document entry based on the text at POS.
@@ -270,6 +272,7 @@ If POS is nil, the current point is used."
 (defvar view-qt-doc-history nil "Qt doc read history.")
 
 (defun view-qt-doc (class)
+  "Show the Qt documentation for CLASS."
   (interactive
    (list (let* ((default-entry (view-qt-doc-default))
 		(input (read-string
@@ -285,10 +288,10 @@ If POS is nil, the current point is used."
 			 (downcase class)
 			 ".html")))
 
-(defvar my-oob-directory-name "build" "The name of the directory to look for")
+(defvar my-oob-directory-name "build" "The name of the directory to look for.")
 
 (defun my-get-build-directory (file-name)
-  ""
+  "Locate the build directory for FILE-NAME."
   (let* ((dir (file-name-directory (expand-file-name file-name)))
 	 (build (concat dir my-oob-directory-name))
 	 (found nil)
@@ -339,12 +342,31 @@ If POS is nil, the current point is used."
 
     found))
 
+(defun my-open-block-c-mode (id action context)
+  "Add new line after inserting pair of braces."
+  (when (eq action 'insert)
+    (newline)
+    (newline)
+    (indent-according-to-mode)
+    (forward-line -1)
+    (indent-according-to-mode)))
+
+(defun my-create-newline-and-enter-sexp (&rest _ignored)
+  "Open a new brace or bracket expression, with relevant newlines and indent."
+  (newline)
+  (indent-according-to-mode)
+  (forward-line -1)
+  (indent-according-to-mode))
+
 (defun my-c-mode-common ()
-  (setq c-backspace-function 'backward-delete-char-untabify
-        c-block-comment-prefix "   "
+  "Common hook for C/C++ modes."
+  (setq ;; c-backspace-function 'backward-delete-char-untabify
+        ;; c-block-comment-prefix "   "
 	;; c-basic-offset 4
 	;; c-tab-always-indent nil
         )
+
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
   (unless (boundp 'my-c-c-c-4-keymap)
     (define-prefix-command 'my-c-c-c-4-keymap))
@@ -404,8 +426,13 @@ If POS is nil, the current point is used."
   (unless (string-equal (file-name-extension (buffer-name)) "idl")
     (imenu-add-menubar-index))
 
+
+  (sp-local-pair 'c-mode "{" nil :post-handlers '(:add my-open-block-c-mode))
+  (sp-local-pair 'c++-mode "{" nil :post-handlers '(:add my-create-newline-and-enter-sexp))
+
   (auto-fill-mode 1)
   (font-lock-mode 1)
   (show-paren-mode t))
 
 (provide 'my-c-mode-common)
+;;; my-c-mode-common.el ends here

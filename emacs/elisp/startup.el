@@ -8,6 +8,7 @@
 (defconst is-macosx (string-equal "darwin" system-type))
 (defconst is-windows (string-equal "windows-nt" system-type))
 (defconst my-user (user-login-name))
+(defconst my-python-command (expand-file-name "~/bin/python3"))
 (defconst my-hostname
   (let ((v (or (getenv "HOSTNAME")
 	       (when (shell-command "hostname" "*foo*")
@@ -21,8 +22,6 @@
 (let ((config (concat "config-" my-hostname)))
    (load config t))
 
-(add-to-list 'exec-path "/usr/local/bin")
-
 (setenv "WORKON_HOME" (expand-file-name "~/venvs"))
 
 (use-package mode-line-bell
@@ -34,11 +33,14 @@
 
 (use-package company
   :config
-  (setq company-minimum-prefix-length 2)
+  (setq company-minimum-prefix-length 2
+        company-tooltip-idle-delay 0.2
+        company-backends '(company-capf company-dabbrev-code company-keywords)
+        )
   :hook (after-init . global-company-mode)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
-              ("C-p" . company-select-prev)))
+              ("C-p" . company-select-previous)))
 
 (use-package company-native-complete
   :config
@@ -67,10 +69,19 @@
          ("C-x c o" . helm-occur)
          ("C-x C-f" . helm-find-files)))
 
+;; (use-package flycheck
+;;   :functions global-flycheck-mode
+;;   :ensure t
+;;   :init (global-flycheck-mode))
+
 (use-package flymake
   :config
-  (setq elisp-flymake-byte-compile-load-path load-path)
-  :hook (emacs-lisp-mode . flymake-mode)
+  (setq elisp-flymake-byte-compile-load-path load-path
+        flymake-no-changes-timeout 0.5
+        flymake-start-on-flymake-mode t
+        )
+  :hook ((emacs-lisp-mode . flymake-mode)
+         (python-mode . flymake-mode))
   :bind (:map
          flymake-mode-map
          ("M-n" . flymake-goto-next-error)
@@ -79,21 +90,13 @@
 ;; (add-hook 'emacs-lisp-mode-hook #'flymake-mode)
 
 (use-package eglot
-  :defines eglot-server-programs
-  :config
-  (setq eglot-server-programs '((c++-mode c-mode) "clangd"))
-  :hook ((c-mode . eglot-ensure)
-         (c++-mode . eglot-ensure))
-  )
+  :ensure t)
 
 (use-package elpy
-  :commands elpy-enable
-  :config
-  (setq elpy-rpc-virtualenv-path (expand-file-name "~/venvs/notebooks")
-        elpy-rpc-python-command "python3")
+  :ensure nil
+  :defer t
   :init
-  (elpy-enable)
-  :hook ((python-mode . elpy-mode)))
+  (advice-add 'python-mode :before 'elpy-enable))
 
 (when (not window-system)
   (require 'xterm-title)
@@ -128,7 +131,22 @@
   (or (getenv "PROJECT") "")
   "Name of the development environment this Emacs represents.")
 
+(use-package diff-hl
+  :init
+  (global-diff-hl-mode))
+
 (use-package info)
+(use-package smartparens-config
+  :ensure smartparens
+  :config (progn (show-smartparens-global-mode t)))
+(add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+(add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
+
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map ("M-P" . projectile-command-map)))
 
 (setq frame-title-format
       (list (if (> (string-bytes my-project-name) 0)
@@ -179,21 +197,7 @@
 
 ;; --- FUNCTIONS ---
 ;;
-(defun my-insert-block-comment (newlineAndIndent commentBegin commentMiddle commentEnd)
-  "Insert comment block in code.
-NEWLINEANDINDENT -- method to call to create a newline and indent it
-COMMENTBEGIN -- the string to insert to start the comment
-COMMENTMIDDLE -- the string to insert for each line insdie the comment
-COMMENTEND -- the string to insert to close the comment block"
-  (interactive)
-  (insert commentBegin)
-  (funcall newlineAndIndent)
-  (insert commentMiddle)
-  (funcall newlineAndIndent)
-  (insert commentEnd)
-  (forward-line -1)
-  (end-of-line)
-  (insert " "))
+(require 'my-insert-block-comment)
 
 (defun my-reset-framewidth ()
   "Reset the current frame width to 132."

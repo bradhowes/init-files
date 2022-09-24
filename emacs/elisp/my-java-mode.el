@@ -1,9 +1,15 @@
+;;; package -- my-java-mode -*- Mode: Emacs-Lisp -*-
+;;; Commentary:
+;;; Code:
+
+(require 'cc-mode)
 (require 'font-lock)
-(require 'flyspell)
+;; (require 'flyspell)
 
 (font-lock-add-keywords 'java-mode '(("[][(){}]" . font-lock-brace-face)))
 
 (defun my-java-mode-hook ()
+  "Custom Java mode hook."
   (setq c-default-style "stroustrup"
 	c-backspace-function 'backward-delete-char
 	c-basic-offset 4
@@ -15,3 +21,6 @@
   (font-lock-mode t)
   (show-paren-mode t)
   (flyspell-prog-mode))
+
+(provide 'my-java-mode)
+;;; my-java-mode.el ends here

@@ -1,6 +1,11 @@
+;;; package -- my-python-mode -*- Mode: Emacs-Lisp -*-
+;;; Commentary:
+
 (require 'python)
 (require 'font-lock)
 (require 'doxygen)
+
+;;; Code:
 
 (font-lock-add-keywords 'python-mode '(("[][(){}]" . font-lock-brace-face)))
 
@@ -26,9 +31,10 @@
   (replace-regexp-in-string "\\(^[ \t]*\\|[ \t]*$\\)" "" string))
 
 (defun my-python-doxygen-insert-prepped-comment (prefix found)
-  "Insert a Doxygen comment block and fill it with some tags to represent the
-data contained in FOUND. The comment and its contents are indented with the
-value PREFIX. Places point at the end of the first line of the comment block."
+  "Insert a Doxygen comment block and fill it with some tags.
+Thiss will represent the data contained in FOUND. The comment and its
+contents are indented with the value PREFIX. Places point at the
+end of the first line of the comment block."
   (let ((begin (nth 0 found))
 	(end (nth 1 found))
 	(info (nth 2 found)))
@@ -57,8 +63,9 @@ value PREFIX. Places point at the end of the first line of the comment block."
       (insert prefix "#\n"))))
 
 (defun my-python-doxygen-insert-empty-comment ()
-  "Insert an empty Doxygen comment block. The point is left at the end of the
-first line. The comment is indented with PREFIX."
+  "Insert an empty Doxygen comment block.
+The point is left at the end of the first line.
+The comment is indented with PREFIX."
   (indent-according-to-mode)
   (let ((prefix (doxygen-line-prefix)))
     (beginning-of-line)
@@ -79,15 +86,12 @@ first line. The comment is indented with PREFIX."
     (doxygen-update-marks)))
 
 (defun my-python-mode-hook ()
+  "Custom hook for Python moode."
   (font-lock-mode t)
   (auto-fill-mode 1)
-  ;; (show-paren-mode t)
   (local-set-key [(meta control \;)] 'my-python-insert-block-comment)
-  (local-set-key [(control c)(control meta f)] 'c-forward-into-nomenclature)
-  (local-set-key [(control c)(control meta b)] 'c-backward-into-nomenclature)
-  (local-set-key [(control c)(control meta u)] 'my-capitalize-nomenclature)
-  (local-set-key [(control c)(control meta d)] 'my-forward-delete-nomenclature)
-  (local-set-key [(control c)(meta control \;)]
-		 'my-python-doxygen-insert-block-comment)
-  ;; (local-set-key [(return)] 'my-python-newline)
-  )
+  (local-set-key [(control c)(meta control \;)] 'my-python-doxygen-insert-block-comment))
+
+(provide 'my-python-mode)
+
+;;; my-python-mode.el ends here

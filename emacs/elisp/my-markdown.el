@@ -1,10 +1,16 @@
+;;; package -- my-markdown-mode -*- Mode: Emacs-Lisp -*-
+;;; Commentary:
+;;; Code:
+
+(require 'font-lock)
 (require 'flyspell)
 
 (defconst my-markdown-skip-spellcheck-properties
   (list 'markdown-code-face 'markdown-url-face 'markdown-inline-code-face)
-  "List of text properties to ignore when spell checking")
+  "List of text properties to ignore when spell checking.")
 
 (defun my-markdown-is-spellcheckable (p)
+  "Determine if element P is spellcheckable."
   (if (consp p)
       (eq (seq-count 'my-markdown-is-spellcheckable p) (seq-length p))
     (or (null p)
@@ -18,7 +24,7 @@
     s))
 
 (defun brh-make-link ()
-  ""
+  "Make a link."
   (interactive)
   (let* ((bounds (bounds-of-thing-at-point 'symbol))
          (pos1 (car bounds))
@@ -28,6 +34,10 @@
     (insert "[" tag "](" tag ")")))
 
 (defun my-markdown-mode-hook ()
+  "Custom Markdown mode."
   ;; (flyspell-mode t)
   ;; (setq flyspell-generic-check-word-predicate 'my-markdown-generic-textmode-verify)
   (local-set-key [(f8)] 'brh-make-link))
+
+(provide 'my-markdown)
+;;; my-markdown.el ends here

@@ -50,7 +50,7 @@ ZSH_THEME="robbyrussell"
 autoload -U add-zsh-hook
 add-zsh-hook -Uz chpwd (){ spewpwd; }
 
-export LESS="-XF"
+export LESS="-FRX"
 export PAGER="less ${LESS}"
 export CLICOLOR=yes
 

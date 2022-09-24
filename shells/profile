@@ -17,6 +17,7 @@ export PATH
 PathAdd PATH \
         /Applications/Emacs.app/Contents/MacOS/bin \
         /opt/homebrew/bin \
+        /opt/homebrew/sbin \
         /opt/homebrew/bin/opt/ruby/bin \
         /opt/homebrew/bin/lib/ruby/gems/3.1.0/bin \
         "${HOME}/bin"

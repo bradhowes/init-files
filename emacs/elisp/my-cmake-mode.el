@@ -1,8 +1,15 @@
+;;; package -- my-cmake-mode -*- Mode: Emacs-Lisp -*-
+;;; Commentary:
+;;; Code:
+
+(require 'cmake-mode)
 (require 'font-lock)
+(require 'my-insert-block-comment)
 
 ;;(font-lock-add-keywords 'cmake-mode '(("[][(){}]" . font-lock-brace-face)))
 
 (defun my-cmake-insert-block-comment ()
+  "Insert block comment."
   (interactive)
   (my-insert-block-comment 'newline-and-indent "#" "#" "#"))
 
@@ -12,6 +19,7 @@
    [?\M-< ?\M-x ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p ?\C-m ?\\ ?\( ?\[ ?A ?- ?Z ?0 ?- ?9 ?_ ?\] ?+ ?\\ ?\) ?\( ?  ?\\ ?\( ?\[ ?^ ?\\ ?\) ?\] ?* ?\\ ?\) ?  ?\) ?\C-m ?\\ ?, ?\( ?d ?o ?w ?n ?c ?a ?s ?e ?  ?\\ ?1 ?\) ?\( ?\\ ?2 ?\) ?\C-m])
 
 (defun my-cmake-reformat ()
+  "Reformat file."
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -39,7 +47,7 @@
     ))
 
 (define-skeleton my-cmake-header
-  ""
+  "Insert header for file."
   (read-string "Name: "
                (file-name-nondirectory (directory-file-name (file-name-directory (buffer-file-name)))))
   "# -*- Mode: CMake -*-\n"
@@ -54,10 +62,14 @@
 (define-abbrev cmake-mode-abbrev-table "hh" "" 'my-cmake-header)
 
 (defun my-cmake-mode-hook ()
+  "CMake mode hook."
   (font-lock-mode t)
   (auto-fill-mode)
   (setq tab-width 4)
   (local-set-key [(return)] 'newline-and-indent)
-  (local-set-key [(meta control \;)] 'my-makefile-insert-block-comment)
+  (local-set-key [(meta control \;)] 'my-cmake-insert-block-comment)
   (local-set-key [(f3)] 'my-cmake-reformat-lowercase)
   (show-paren-mode t))
+
+(provide 'my-cmake-mode)
+;;; my-cmake-mode.el ends here

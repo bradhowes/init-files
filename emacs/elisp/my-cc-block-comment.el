@@ -1,3 +1,5 @@
+;;; package -- my-cc-block-comment -*- Mode: Emacs-Lisp -*-
+;;; Commentary:
 ;;;
 ;;; Functions/Settings that provide "good" C block comment editing
 ;;;
@@ -48,10 +50,13 @@
 ;;;     main (int argc, char **argv)
 ;;;     {
 ;;;
+;;; Code:
+
 (require 'cc-mode)
 
 (defun my-cc-inside-comment ()
-  "Decides if the current point is inside of a C or C++ comment, and if it is
+  "Decides if the current point is inside of a C or C++ comment.
+If it is
 returns a prefix string that can be used to continue the comment properly.
 Returns nil if not inside a comment"
   (let ((here (point))
@@ -105,7 +110,8 @@ Returns nil if not inside a comment"
     prefix))
 
 (defun my-cc-newline-and-indent ()
-  "Front-end to usual newline-and-indent function for use in C/C++ code with
+  "Front-end to usual `newline-and-indent' function.
+For use in C/C++ code with
 block-style comments. It properly adds whatever prefix it finds in previous
 lines of a comment block whenever a new line is created."
   (interactive)
@@ -125,7 +131,8 @@ lines of a comment block whenever a new line is created."
       (newline-and-indent))))
 
 (defun my-cc-refill-block-comment ()
-  "Routine to refill a C block comment. This leaves alone the '/*' and '*/'
+  "Routine to refill a C block comment.
+This leaves alone the '/*' and '*/'
 comment delimiters if they exist on a line by themselves."
   (interactive)
   (save-excursion
@@ -251,7 +258,8 @@ comment delimiters if they exist on a line by themselves."
                  (set-marker mark nil)))))))
 
 (defun my-cc-get-proc-name (arg)
-  "Extracts the name of the function the point is currently in, or ARG previous
+  "Extracts the name of the function.
+The point is currently in, or ARG previous
 functions. Name is returned as a string. Returns NIL if function not found."
   (save-excursion
 
@@ -263,8 +271,8 @@ functions. Name is returned as a string. Returns NIL if function not found."
          (buffer-substring (match-beginning 1) (match-end 1)))))
 
 (defun my-cc-get-proc-args ()
-  "Extracts arguments to function the point is current in or ARG previous
-functions. Returns the argument names as a list."
+  "Extracts arguments to function the point is current in.
+Returns the argument names as a list."
   (save-excursion
     (let ((plist nil)
           (count 0)
@@ -328,22 +336,20 @@ functions. Returns the argument names as a list."
       plist)))
 
 (defvar my-cc-header-comment-fields nil
-  "Variable containing the field locations for the last defined header
- comment.
-"
+  "Variable containing the field locations for the last comment."
   )
 
 (defvar my-cc-header-comment-field-index 0
-  "Variable indicating which field is current"
+  "Variable indicating which field is current."
   )
 
 (make-variable-buffer-local 'my-cc-header-comment-fields)
 (make-variable-buffer-local 'my-cc-header-comment-field-index)
 
 (defun my-cc-new-header-comment ()
-  "Simple routine for inserting a new C function header comment. Inserts the
-function's name it precedes, and individual lines for each argument it takes.
-"
+  "Simple routine for inserting a new C function header comment.
+Inserts the function's name it precedes, and individual lines for
+each argument it takes."
   (interactive)
   (let (
         (plist (my-cc-get-proc-args))
@@ -422,6 +428,7 @@ function's name it precedes, and individual lines for each argument it takes.
   )
 
 (defun my-cc-header-comment-next-field ()
+  "Go to next header field."
   (interactive)
   (let (
         (next (nth (1+ my-cc-header-comment-field-index)
@@ -436,6 +443,7 @@ function's name it precedes, and individual lines for each argument it takes.
     ))
 
 (defun my-cc-header-comment-prev-field ()
+  "Go to prev header field."
   (interactive)
   (let (
         prev
@@ -453,7 +461,8 @@ function's name it precedes, and individual lines for each argument it takes.
     ))
 
 (defun my-cc-new-block-comment ()
-  "Simple function for inserting a new C block comment. I originally had a macro, but that was sloooow."
+  "Simple function for inserting a new C block comment.
+I originally had a macro, but that was sloooow."
   (interactive)
   (let (here)
     (cond
@@ -478,7 +487,7 @@ function's name it precedes, and individual lines for each argument it takes.
     ))
 
 (defun my-cc-block-comment-install ()
-  "Sets up current C/C++ mode to use block comment formatting functions."
+  "Set up current C/C++ mode to use block comment functions."
 
   (auto-fill-mode 1)
   (setq auto-fill-function 'my-cc-do-auto-fill)
@@ -488,3 +497,4 @@ function's name it precedes, and individual lines for each argument it takes.
   (local-set-key [(meta q)] 'my-cc-refill-block-comment))
 
 (provide 'my-cc-block-comment)
+;;; my-cc-block-comment.el ends here

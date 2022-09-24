@@ -1,7 +1,15 @@
+;;; package -- my-c++-mode -*- Mode: Emacs-Lisp -*-
+;;; Commentary:
+;;; Code:
+
+(require 'cc-mode)
+(require 'doxygen)
 (require 'my-c-mode-common)
+(require 'my-insert-block-comment)
+(require 'eglot)
 
 (define-skeleton my-c++-class-skeleton
-  "Insert a C++ class skeleton"
+  "Insert a C++ class skeleton."
   (read-string "Name: "
 	       (file-name-sans-extension
 		(file-name-nondirectory (buffer-file-name))))
@@ -12,7 +20,7 @@
 (define-abbrev c++-mode-abbrev-table "cc" "" 'my-c++-class-skeleton)
 
 (define-skeleton my-c++-copyright-skeleton
-  "Insert a C++ copyright comment"
+  "Insert a C++ copyright comment."
   nil
   "//\n"
   "// (C) Copyright 2018 Brad Howes. All rights reserved.\n"
@@ -22,6 +30,8 @@
 (define-abbrev c++-mode-abbrev-table "cr" "" 'my-c++-copyright-skeleton)
 
 (defun my-c++-include-tag (&optional namespace)
+  "Insert an include statement.
+If NAMESPACE is present, so something."
   (let* ((file (file-name-nondirectory (buffer-file-name)))
 	 (name (file-name-sans-extension file))
 	 (tag (concat name "_" (file-name-extension file))))
@@ -30,10 +40,12 @@
 	      tag))))
 
 (defun my-c++-class-name ()
+  "Obtain a C++ class name from the buffer's file name."
   (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
 
 (defun my-c++-source-header (&optional namespace)
-  ""
+  "Insert the basics of a C++ source header.
+Setup a namespace with NAMESPACE name if non-nil."
   (interactive)
   (let ((name (my-c++-class-name)))
     (insert "// -*= C++ -*-\n//\n")
@@ -42,13 +54,13 @@
     (when (and namespace (> (length namespace) 0))
       (insert "using namespace " namespace ";\n\n" ))
     (insert name "::" name "(")
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (insert ")")
     (newline-and-indent)
     (insert "{")
     (indent-according-to-mode)
     (newline-and-indent)
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (newline-and-indent)
     (insert "}")
     (indent-according-to-mode)
@@ -59,20 +71,20 @@
     (insert "{")
     (indent-according-to-mode)
     (newline-and-indent)
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (newline-and-indent)
     (insert "}")
     (indent-according-to-mode)
     (newline-and-indent)
     (newline-and-indent)
-    (doxygen-update-marks)))
+    (doxygen-update-markers)))
 
 (defun my-c++-new-class (name)
-  ""
+  "Insert a new C++ class template with NAME."
   (interactive "MName: ")
   (when (length name)
     (insert "class " name)
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (newline-and-indent)
     (insert "{")
     (newline-and-indent)
@@ -80,24 +92,24 @@
     (indent-according-to-mode)
     (newline-and-indent)
     (insert name "(")
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (insert ");")
     (newline-and-indent)
     (insert "~" name "();")
     (newline-and-indent)
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (insert "\nprivate:")
     (indent-according-to-mode)
     (end-of-line)
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (newline-and-indent)
     (insert "};")
     (indent-according-to-mode)
     (newline-and-indent)
-    (doxygen-update-marks)))
+    (doxygen-update-markers)))
 
 (defun my-c++-full-include-header (namespace)
-  ""
+  "Insert C++ header with NAMESPACE namespace."
   (interactive "MNamespace: ")
   (let ((tag (my-c++-include-tag namespace)))
     (insert "#ifndef " tag " // -*- C++ -*-")
@@ -115,6 +127,7 @@
     (insert "\n#endif\n")))
 
 (defun my-c++-insert-header (namespace)
+  "Insert new header for NAMESPACE."
   (interactive "MNamespace: ")
   (goto-char (point-min))
   (let ((extension (file-name-extension (buffer-file-name))))
@@ -125,14 +138,18 @@
     (goto-char (nth 0 doxygen-marks))))
 
 (defun my-c++-insert-block-comment ()
+  "Insert block comment."
   (interactive)
   (if (assq 'topmost-intro (c-guess-basic-syntax))
       (doxygen-insert-block-comment)
     (my-insert-block-comment 'newline-and-indent "//" "//" "//")))
 
-(defun my-c++-vsemi-status-unknown-p () nil)
+(defun my-c++-vsemi-status-unknown-p()
+  "Unknown what this does."
+  nil)
 
 (defun my-c++-at-vsemi-p (&optional pos)
+  "Who knows what POS this is."
   (unless pos (setq pos (point)))
   (and (> pos (+ (point-min) 8))
        (string-equal (buffer-substring-no-properties (- pos 8) pos)
@@ -145,6 +162,7 @@
   (defvar c-syntactic-context))
 
 (defun my-c++-indent-topmost-intro (langelem)
+  "Control the indentation for the LANGELEM."
   (when (assq 'innamespace c-syntactic-context)
     (save-excursion
       (back-to-indentation)
@@ -153,6 +171,7 @@
         [0]))))
 
 (defun my-c++-kill-copyright ()
+  "Remove the copyright message."
   (interactive)
   (goto-char (point-min))
   (when (re-search-forward "(C) Copyright" nil t)
@@ -170,13 +189,14 @@
       (kill-line 1))))
 
 (defun my-c++-cleanup ()
+  "Perform various cleanups."
   (interactive)
   (save-excursion
 
     ;; Remove any previous copyright comment
     ;;
     (my-c++-kill-copyright)
-    
+
     ;; Detect Doxygen tags (param, return) and make sure that they have a blank line before them so that
     ;; comment refill works properly. Also, if the tag starts with an '@' replace with a '\'
     (goto-char (point-min))
@@ -212,20 +232,21 @@
           (replace-match (substring found 0 1)))))
 
     ;; Convert system #include <...> statments for non-systemm libraries to be #include "..." instead
-    (goto-char (point-min)) 
+    (goto-char (point-min))
     (while (re-search-forward "#include <\\(\\(Qt\\|boost\\|ace\\).*\\)>" nil t)
       (replace-match "#include \"\\1\""))
     (indent-region (point-min) (point-max) nil))
   (basic-save-buffer))
 
 (defun my-c++-cleanup-file (path)
-  "Reformat the file PATH"
+  "Reformat the file PATH."
   (interactive "fFile: ")
   (find-file path)
   (my-c++-cleanup)
   (kill-buffer (current-buffer)))
 
 (defun my-c++-mode-hook ()
+  "Custom C++ mode hook."
   (abbrev-mode 1)
   (c-add-style "My C++ Style" my-c-style t)
   (c-set-offset 'innamespace 0)
@@ -237,5 +258,7 @@
   (local-set-key [(f7)] 'compile)
   (local-set-key [(control c)(control i)] 'my-c++-copyright-skeleton)
   (local-set-key [(control meta \;)] 'my-c++-insert-block-comment)
-  (local-set-key [(control c)(?c)] 'my-c++-cleanup)
-  )
+  (local-set-key [(control c)(?c)] 'my-c++-cleanup))
+
+(provide 'my-c++-mode)
+;;; my-c++-mode.el ends here
