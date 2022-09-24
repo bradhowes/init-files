@@ -133,7 +133,8 @@
 
 (use-package diff-hl
   :init
-  (global-diff-hl-mode))
+  (diff-hl-flydiff-mode t)
+  (global-diff-hl-mode t))
 
 (use-package info)
 (use-package smartparens-config
