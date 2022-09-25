@@ -22,8 +22,7 @@
 (define-skeleton my-c++-copyright-skeleton
   "Insert a C++ copyright comment."
   nil
-  "//\n"
-  "// (C) Copyright 2018 Brad Howes. All rights reserved.\n"
+  "// (C) Copyright 2022 Brad Howes. All rights reserved.\n"
   "//\n\n"
 )
 

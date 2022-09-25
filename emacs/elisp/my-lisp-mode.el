@@ -6,6 +6,7 @@
 (require 'my-insert-block-comment)
 
 (font-lock-add-keywords 'lisp-mode '(("[][(){}]" . font-lock-brace-face)))
+(font-lock-add-keywords 'lisp-data-mode '(("[][(){}]" . font-lock-brace-face)))
 (font-lock-add-keywords 'scheme-mode '(("[][(){}]" . font-lock-brace-face)))
 (font-lock-add-keywords 'emacs-lisp-mode '(("[][(){}]" . font-lock-brace-face)))
 
@@ -20,6 +21,11 @@
   (save-excursion
     (end-of-defun)
     (eval-last-sexp arg)))
+
+(defun my-lisp-data-mode-hook ()
+  "Custom Lisp-Data mode."
+  (font-lock-mode t)
+  (show-paren-mode t))
 
 (defun my-lisp-mode-hook ()
   "Custom Lisp mode."

@@ -29,6 +29,9 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'company))
+
 (require 'cl-lib)
 (require 'subr-x)
 (require 'shell)
@@ -114,7 +117,7 @@ See `native-complete-style-suffix-alist'."
       (alist-get 'default native-complete-style-suffix-alist)))
 
 (defun native-complete--at-prompt-p (regex)
-  "Point matches the end of a prompt defined by REGEX"
+  "Point matches the end of a prompt defined by REGEX."
   ;; `inhibit-field-text-motion' alows `line-beginning-position' to move past
   ;; the process mark, which has a special text property marking it as a
   ;; different field.
@@ -146,7 +149,7 @@ See `native-complete-style-suffix-alist'."
 (advice-add 'comint-send-input :before #'native-complete-abort)
 
 (defun native-complete--split-command (cmd)
-  "Split the command into the common and prefix sections"
+  "Split the CMD command into the common and prefix sections."
   (let* ((word-start (or (cl-search " " cmd :from-end t) -1))
          (env-start (or (cl-search "$" cmd :from-end t) -1))
          (path-start (or (cl-search "/" cmd :from-end t) -1))
@@ -251,7 +254,7 @@ emulator."
           (native-complete--get-completions))))
 
 (defun native-complete-tree-assoc (key tree)
-  "Search a list tree structure for key."
+  "Search a list TREE structure for KEY."
   (when (consp tree)
     (if (eq (car tree) key)
         t
@@ -260,6 +263,7 @@ emulator."
 
 ;;;###autoload
 (defun native-complete-check-config ()
+  "Check the configuration."
   (interactive)
   "Check the setup of native complete and look for common problems."
   (unless (memq major-mode native-complete-major-modes)
@@ -272,7 +276,7 @@ emulator."
       (user-error "error: `comint-prompt-regexp' has not been updated. See README for details.\n"))
     (unless (cl-letf (((point) prompt-point))
               (native-complete--at-prompt-p comint-prompt-regexp))
-      (user-error "error: current prompt does not match `comint-prompt-regex'.\nprompt -> '%s'\nregex -> %s"
+      (user-error "error: Current prompt does not match `comint-prompt-regex'.\nprompt -> '%s'\nregex -> %s"
                   (buffer-substring (line-beginning-position) prompt-point)comint-prompt-regexp))
     (when (eq 'bash completion-style)
       (when (equal comint-terminfo-terminal "dumb")

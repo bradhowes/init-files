@@ -10,6 +10,7 @@
 (font-lock-add-keywords 'python-mode '(("[][(){}]" . font-lock-brace-face)))
 
 (defun my-python-insert-block-comment ()
+  "Insert block comment."
   (interactive)
   (insert "#")
   (newline-and-indent)
@@ -23,11 +24,13 @@
   (insert " "))
 
 (defun my-python-newline ()
+  "Really?"
   (interactive)
   (newline)
   (indent-for-tab-command))
 
 (defun my-string-trim (string)
+  "Trim STRING."
   (replace-regexp-in-string "\\(^[ \t]*\\|[ \t]*$\\)" "" string))
 
 (defun my-python-doxygen-insert-prepped-comment (prefix found)
@@ -40,10 +43,10 @@ end of the first line of the comment block."
 	(info (nth 2 found)))
     (goto-char begin)
     (insert prefix "## ")
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (when doxygen-insert-summary
       (insert (nth 1 info))
-      (doxygen-push-mark))
+      (doxygen-push-marker))
     (save-excursion
       (insert "\n")
       (let ((args (mapcar 'my-string-trim (nth 2 info))))
@@ -53,12 +56,12 @@ end of the first line of the comment block."
 	      (setq args (cdr args)))
 	  (mapc (function (lambda (a)
                             (insert prefix "# \\param " a " ")
-                            (doxygen-push-mark)
+                            (doxygen-push-marker)
                             (insert "\n")))
                 args)))
       (when (nth 0 info)
 	(insert prefix "# \\return " )
-	(doxygen-push-mark)
+	(doxygen-push-marker)
 	(insert "\n"))
       (insert prefix "#\n"))))
 
@@ -70,7 +73,7 @@ The comment is indented with PREFIX."
   (let ((prefix (doxygen-line-prefix)))
     (beginning-of-line)
     (insert prefix "## ")
-    (doxygen-push-mark)
+    (doxygen-push-marker)
     (save-excursion (insert "\n" prefix "#\n"))))
 
 (defun my-python-doxygen-insert-block-comment ()
@@ -83,7 +86,7 @@ The comment is indented with PREFIX."
 						    (doxygen-line-prefix))
 						  found)
       (my-python-doxygen-insert-empty-comment))
-    (doxygen-update-marks)))
+    (doxygen-update-markers)))
 
 (defun my-python-mode-hook ()
   "Custom hook for Python moode."

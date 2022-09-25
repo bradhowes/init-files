@@ -31,20 +31,88 @@
   (setq visible-bell nil
         ring-bell-function 'mode-line-bell-flash))
 
+(require 'company)
+(defun my-company-number ()
+  "Forward to `company-complete-number'.
+
+Unless the number is potentially part of the candidate.
+In that case, insert the number."
+  (interactive)
+  (let* ((k (this-command-keys))
+         (re (concat "^" company-prefix k)))
+    (if (cl-find-if (lambda (s) (string-match re s))
+                    company-candidates)
+        (self-insert-command 1)
+      (company-complete-number (string-to-number k)))))
+
 (use-package company
   :config
   (setq company-minimum-prefix-length 2
+        company-require-match nil
+        company-tooltip-align-annotations t
         company-tooltip-idle-delay 0.2
-        company-backends '(company-capf company-dabbrev-code company-keywords)
-        )
+        company-show-numbers t
+        company-backends '(company-capf company-dabbrev-code company-keywords))
   :hook (after-init . global-company-mode)
   :bind (:map company-active-map
-              ("C-n" . company-select-next)
-              ("C-p" . company-select-previous)))
+              ("C-n" . company-select-next-or-abort)
+              ("C-p" . company-select-previous-or-abort)
+              ("1" . my-company-number)
+              ("2" . my-company-number)
+              ("3" . my-company-number)
+              ("4" . my-company-number)
+              ("5" . my-company-number)
+              ("6" . my-company-number)
+              ("7" . my-company-number)
+              ("8" . my-company-number)
+              ("9" . my-company-number)
+              ))
 
 (use-package company-native-complete
   :config
   (add-to-list 'company-backends 'company-native-complete))
+
+(use-package company-fuzzy
+  :disabled
+  :commands (global-company-fuzzy-mode)
+  :config
+  (progn (setq company-fuzzy-sorting-backend 'alphabetic
+               company-fuzzy-prefix-on-top nil
+               company-fuzzy-trigger-symbols '("." "->" "<" "\"" "'" "@"))
+         (global-company-fuzzy-mode 1))
+  :hook (company-mode . company-fuzzy-mode))
+
+(use-package magit
+  :bind ("C-c g" . magit-file-dispatch))
+
+(use-package wucuo
+  :hook ((prog-mode . wucuo-start)
+         (text-mode . wucuo-start)))
+
+;; (require 'company-ispell)
+
+;; (defun my-in-comment-p (&optional pos)
+;;   "Test if character at POS is comment.
+;; If POS is nil, character at `(point)' is tested."
+;;   (interactive)
+;;   (unless pos (setq pos (point)))
+;;   (let* ((fontfaces (get-text-property pos 'face)))
+;;     (when (not (listp fontfaces))
+;;       (setf fontfaces (list fontfaces)))
+;;     (or (member 'font-lock-comment-face fontfaces)
+;;         (member 'font-lock-comment-delimiter-face fontfaces))))
+
+;; (defun my-company-ispell-available (orig-func &rest args)
+;;   (cond
+;;    ((and (derived-mode-p 'prog-mode)
+;;          (or (not (company-in-string-or-comment))     ;; respect advice in `company-in-string-or-comment'
+;;              (not (my-in-comment-p (point))))) ; auto-complete in comment only
+;;     nil)
+;;    (t
+;;     (apply orig-func args))))
+
+;; (with-eval-after-load 'company-ispell
+;;   (advice-add 'company-ispell-available :around #'my-company-ispell-available))
 
 (unless (daemonp)
   (use-package session
@@ -98,11 +166,13 @@
   :init
   (advice-add 'python-mode :before 'elpy-enable))
 
+(use-package flyspell-popup)
+(add-hook 'flyspell-mode-hook #'flyspell-popup-auto-correct-mode)
+
 (when (not window-system)
   (require 'xterm-title)
   (if (fboundp 'xterm-title-mode)
       (xterm-title-mode 1)))
-
 
 ;; Use Emacs 'ls' routine, not native Mac OS X 'ls'
 ;;
@@ -121,7 +191,7 @@
 
 ;; --- GLOBAL VARIABLE SETTINGS ---
 ;;
-(setq-default fill-column 112
+(setq-default fill-column 120
 	      indent-tabs-mode nil
 	      tab-width 8
 	      save-place t
@@ -132,22 +202,28 @@
   "Name of the development environment this Emacs represents.")
 
 (use-package diff-hl
+  :commands (diff-hl-flydiff-mode global-diff-hl-mode)
   :init
   (diff-hl-flydiff-mode t)
   (global-diff-hl-mode t))
 
 (use-package info)
+
 (use-package smartparens-config
+  :disabled
+  :commands (show-smartparens-global-mode)
   :ensure smartparens
+  :init
+  (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+  (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
   :config (progn (show-smartparens-global-mode t)))
-(add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
-(add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
 
 (use-package projectile
+  :commands (projectile-mode)
   :ensure t
   :init
   (projectile-mode +1)
-  :bind (:map projectile-mode-map ("M-P" . projectile-command-map)))
+  :bind (:map projectile-mode-map ("C-." . projectile-command-map)))
 
 (setq frame-title-format
       (list (if (> (string-bytes my-project-name) 0)
@@ -351,11 +427,15 @@ Current buffer should be visiting an Emacs Lisp file."
 ;; (add-hook 'write-file-functions (lambda () (copyright-update nil nil)))
 (autoload 'my-python-mode-hook "my-python-mode")
 (add-hook 'python-mode-hook 'my-python-mode-hook)
+(autoload 'my-lisp-data-mode-hook "my-lisp-mode")
+(add-hook 'lisp-data-mode-hook 'my-lisp-data-mode-hook)
+
 (autoload 'my-lisp-mode-hook "my-lisp-mode")
 (add-hook 'lisp-mode-hook 'my-lisp-mode-hook)
 (add-hook 'emacs-lisp-mode-hook 'my-lisp-mode-hook)
 (add-hook 'lisp-interaction-mode-hook 'my-lisp-mode-hook)
 (add-hook 'scheme-mode-hook 'my-lisp-mode-hook)
+
 (autoload 'my-sh-mode-hook "my-sh-mode")
 (add-hook 'sh-mode-hook 'my-sh-mode-hook)
 (autoload 'my-shell-mode-hook "my-shell-mode")
@@ -415,6 +495,9 @@ Current buffer should be visiting an Emacs Lisp file."
 (global-set-key [(control meta left)] 'c-backward-into-nomenclature)
 (global-set-key [(control c)(control f)] 'ff-find-other-file)
 (global-set-key [(control x)(g)] 'magit-status)
+
+(when is-macosx
+  (define-key key-translation-map (kbd "<C-S-mouse-1>") (kbd "<mouse-2>")))
 
 ;; (require 'flyspell)
 ;; (define-key flyspell-mouse-map (kbd "<mouse-2>") #'flyspell-correct-word)

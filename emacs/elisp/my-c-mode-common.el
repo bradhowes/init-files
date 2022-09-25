@@ -5,6 +5,7 @@
 (require 'font-lock)
 (require 'doxygen)
 (require 'projectile)
+(require 'eglot)
 
 ;; (require 'flyspell)
 
@@ -343,7 +344,8 @@ If POS is nil, the current point is used."
     found))
 
 (defun my-open-block-c-mode (id action context)
-  "Add new line after inserting pair of braces."
+  "Add new line after inserting pair of braces.
+ID ACTION CONTEXT."
   (when (eq action 'insert)
     (newline)
     (newline)
@@ -360,13 +362,13 @@ If POS is nil, the current point is used."
 
 (defun my-c-mode-common ()
   "Common hook for C/C++ modes."
-  (setq ;; c-backspace-function 'backward-delete-char-untabify
-        ;; c-block-comment-prefix "   "
-	;; c-basic-offset 4
-	;; c-tab-always-indent nil
-        )
+  ;; (setq c-backspace-function 'backward-delete-char-untabify
+  ;; c-block-comment-prefix "   "
+  ;; c-basic-offset 4
+  ;; c-tab-always-indent nil
+  ;; )
 
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
   (unless (boundp 'my-c-c-c-4-keymap)
     (define-prefix-command 'my-c-c-c-4-keymap))
@@ -427,9 +429,9 @@ If POS is nil, the current point is used."
     (imenu-add-menubar-index))
 
 
-  (sp-local-pair 'c-mode "{" nil :post-handlers '(:add my-open-block-c-mode))
-  (sp-local-pair 'c++-mode "{" nil :post-handlers '(:add my-create-newline-and-enter-sexp))
-
+  ;; (sp-local-pair 'c-mode "{" nil :post-handlers '(:add my-open-block-c-mode))
+  ;; (sp-local-pair 'c++-mode "{" nil :post-handlers '(:add my-create-newline-and-enter-sexp))
+  (eglot-ensure)
   (auto-fill-mode 1)
   (font-lock-mode 1)
   (show-paren-mode t))
