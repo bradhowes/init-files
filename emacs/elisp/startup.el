@@ -166,9 +166,6 @@ In that case, insert the number."
   :init
   (advice-add 'python-mode :before 'elpy-enable))
 
-(use-package flyspell-popup)
-(add-hook 'flyspell-mode-hook #'flyspell-popup-auto-correct-mode)
-
 (when (not window-system)
   (require 'xterm-title)
   (if (fboundp 'xterm-title-mode)
