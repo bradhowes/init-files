@@ -89,31 +89,6 @@ In that case, insert the number."
   :hook ((prog-mode . wucuo-start)
          (text-mode . wucuo-start)))
 
-;; (require 'company-ispell)
-
-;; (defun my-in-comment-p (&optional pos)
-;;   "Test if character at POS is comment.
-;; If POS is nil, character at `(point)' is tested."
-;;   (interactive)
-;;   (unless pos (setq pos (point)))
-;;   (let* ((fontfaces (get-text-property pos 'face)))
-;;     (when (not (listp fontfaces))
-;;       (setf fontfaces (list fontfaces)))
-;;     (or (member 'font-lock-comment-face fontfaces)
-;;         (member 'font-lock-comment-delimiter-face fontfaces))))
-
-;; (defun my-company-ispell-available (orig-func &rest args)
-;;   (cond
-;;    ((and (derived-mode-p 'prog-mode)
-;;          (or (not (company-in-string-or-comment))     ;; respect advice in `company-in-string-or-comment'
-;;              (not (my-in-comment-p (point))))) ; auto-complete in comment only
-;;     nil)
-;;    (t
-;;     (apply orig-func args))))
-
-;; (with-eval-after-load 'company-ispell
-;;   (advice-add 'company-ispell-available :around #'my-company-ispell-available))
-
 (unless (daemonp)
   (use-package session
     :hook (after-init . session-initialize))
@@ -227,6 +202,12 @@ In that case, insert the number."
 		(concat my-project-name "-")
 	      "") my-user "@" my-hostname ":"
               '(:eval (abbreviate-file-name default-directory)))
+
+      ispell-program-name "aspell"
+      ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16" "--camel-case")
+      wucuo-flyspell-start-mode "normal"
+      wucuo-spell-check-buffer-predicate nil ;; (lambda () (or (derived-mode-p prog-mode)
+                                             ;;            (derived-mode-p text-mode)))
 
       split-width-threshold nil
       ;; copyright-query nil
@@ -495,9 +476,6 @@ Current buffer should be visiting an Emacs Lisp file."
 
 (when is-macosx
   (define-key key-translation-map (kbd "<C-S-mouse-1>") (kbd "<mouse-2>")))
-
-;; (require 'flyspell)
-;; (define-key flyspell-mouse-map (kbd "<mouse-2>") #'flyspell-correct-word)
 
 (display-time)
 

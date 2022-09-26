@@ -4,7 +4,6 @@
 
 (require 'cc-mode)
 (require 'font-lock)
-;; (require 'flyspell)
 
 (font-lock-add-keywords 'java-mode '(("[][(){}]" . font-lock-brace-face)))
 
@@ -19,8 +18,7 @@
   (local-set-key [(control j)] 'newline)
   (c-toggle-auto-newline 1)
   (font-lock-mode t)
-  (show-paren-mode t)
-  (flyspell-prog-mode))
+  (show-paren-mode t))
 
 (provide 'my-java-mode)
 ;;; my-java-mode.el ends here

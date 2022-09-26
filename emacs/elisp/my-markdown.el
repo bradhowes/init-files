@@ -3,7 +3,6 @@
 ;;; Code:
 
 (require 'font-lock)
-(require 'flyspell)
 
 (defconst my-markdown-skip-spellcheck-properties
   (list 'markdown-code-face 'markdown-url-face 'markdown-inline-code-face)

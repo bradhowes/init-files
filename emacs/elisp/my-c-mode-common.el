@@ -4,10 +4,7 @@
 
 (require 'font-lock)
 (require 'doxygen)
-(require 'projectile)
 (require 'eglot)
-
-;; (require 'flyspell)
 
 ;; Hilight parentheses and braces
 ;;
@@ -368,12 +365,8 @@ ID ACTION CONTEXT."
   ;; c-tab-always-indent nil
   ;; )
 
-  ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-
   (unless (boundp 'my-c-c-c-4-keymap)
     (define-prefix-command 'my-c-c-c-4-keymap))
-
-  (flyspell-prog-mode)
 
   (local-set-key [(control c)(control f)] 'my-c-find-twin)
 
