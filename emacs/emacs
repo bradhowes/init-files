@@ -8,11 +8,15 @@
 
 ;; (setq mac-command-modifier 'alt)
 
-(setenv "PATH" (concat (expand-file-name "~/bin") ":/opt/homebrew/bin:" (getenv "PATH")))
+(setenv "PATH" (concat (expand-file-name "~/venvs/notebooks/bin")
+                       (expand-file-name "~/bin")
+                       ":/opt/homebrew/bin:"
+                       (getenv "PATH")))
 
 (setq exec-path
       (append
        (list
+	(expand-file-name "~/venvs/notebooks/bin")
 	(expand-file-name "~/bin")
 	"/opt/homebrew/bin"
 	)
@@ -52,10 +56,11 @@
  '(indicate-empty-lines t)
  '(initial-frame-alist '((width . 132) (height . 77) (top . 10) (left . 10)))
  '(line-move-visual nil)
- '(ns-alternate-modifier 'none)
+ '(ns-alternate-modifier 'alt)
  '(ns-command-modifier 'meta)
+ '(ns-right-alternate-modifier 'super)
  '(package-selected-packages
-   '(wucuo company-statistics org magit diff-hl js2-mode eglot ggtags mode-line-bell swift-mode material-theme flymake-markdownlint markdown-mode highlight-indentation projectile helm-git-grep helm-ls-git grandshell-theme flymake-shell flymake exec-path-from-shell elpy company-fuzzy company-jedi company-shell session company use-package async))
+   '(diminish smartparens which-key wucuo company-statistics org magit diff-hl js2-mode eglot ggtags mode-line-bell swift-mode material-theme flymake-markdownlint markdown-mode highlight-indentation projectile helm-git-grep helm-ls-git grandshell-theme flymake-shell flymake exec-path-from-shell elpy company-fuzzy company-jedi company-shell session company use-package async))
  '(projectile-completion-system 'helm)
  '(projectile-switch-project-action 'helm-find-files)
  '(ring-bell-function 'ignore)

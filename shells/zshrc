@@ -81,11 +81,18 @@ GIT_PAGER="${PAGER}"
 
 [[ -x /usr/bin/dircolors ]] && eval $(TERM=xterm-color dircolors)
 
-# Simple prompt - green color, show user name
-#
-# export PS1="\e]0;\u@\h:\w\007[\e[1;32m\]$(parse_git_branch)\u%\[\033[0m\] "
-export PS1="%B%F{green}%n%#%f%b "
+# Simple prompt - green color, show user name, Git branch
 
-# Set the titlebar with the current directory.
-#
+# Setup GIT branch info in prompt
+autoload -Uz vcs_info
+precmd() { vcs_info }
+zstyle ':vcs_info:git:*' formats '%b|'
+setopt PROMPT_SUBST
+
+export PROMPT='${vcs_info_msg_0_}%B%F{green}%n%#%f%b '
+
+# export PS1="\e]0;\u@\h:\w\007[\e[1;32m\]$(parse_git_branch)\u%\[\033[0m\] "
+# export PS1="%B%F{green}%n%#%f%b "
+# export PROMPT="${vcs_info_msg_0_}%B%F{green}%n%#%f%b "
+
 cd "${PWD}"

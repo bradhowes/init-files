@@ -5,8 +5,8 @@
 
 ;;; Code:
 
-(defconst is-macosx (string-equal "darwin" system-type))
-(defconst is-windows (string-equal "windows-nt" system-type))
+(defconst is-macosx (eq system-type 'darwin))
+(defconst is-windows (eq system-type 'windows-nt))
 (defconst my-user (user-login-name))
 (defconst my-python-command (expand-file-name "~/bin/python3"))
 (defconst my-hostname
@@ -19,10 +19,38 @@
 	       "???")))
     (nth 0 (split-string v "[.]" t))))
 
-(let ((config (concat "config-" my-hostname)))
-   (load config t))
+(when is-macosx
+  (custom-set-variables
+   '(mac-command-modifier 'meta)
+   '(mac-option-modifier 'alt)
+   '(mac-right-option-modifier 'super)))
 
-(setenv "WORKON_HOME" (expand-file-name "~/venvs"))
+(setenv "WORKON_HOME" (expand-file-name "~/venvs/notebooks"))
+
+(use-package uniquify
+  :disabled
+  :defer 1
+  :ensure nil
+  :custom
+  (setq
+   uniquify-after-kill-buffer-p t
+   uniquify-buffer-name-style 'post-forward-angle-brackets'
+   uniquify-strip-common-suffix t))
+
+(use-package exec-path-from-shell
+  :disabled
+  :defer nil
+  :config
+  (exec-path-from-shell-initialize))
+
+;; Show key options for a prefix sequence(s)
+(use-package which-key
+  :disabled
+  :ensure t
+  :defer nil
+  ;; :diminish which-key-mode
+  :config
+  (which-key-mode))
 
 (use-package mode-line-bell
   :custom
@@ -69,6 +97,7 @@ In that case, insert the number."
               ))
 
 (use-package company-native-complete
+  :disabled
   :config
   (add-to-list 'company-backends 'company-native-complete))
 
@@ -95,22 +124,36 @@ In that case, insert the number."
   (save-place-mode 1)
   (savehist-mode 1))
 
+(require 'helm-files)
 (use-package helm
-  :functions helm-mode
+  :defer 1
+  ;; :diminish helm-mode
+  :bind (("M-y" . helm-show-kill-ring)
+         ("C-x C-f" . helm-find-files)
+         ("C-x C-b" . helm-buffers-list)
+         ("C-x b" . helm-multi-files)
+         ("C-x c o" . helm-occur)
+         ("M-x" . helm-M-x)
+         :map helm-find-files-map
+         ("C-<backspace>" . helm-find-files-up-one-level)
+         ("C-f" . helm-execute-persistent-action)
+         ([tab] . helm-ff-RET))
+  :custom
+  (helm-autoresize-max-height 0)
+  (helm-autoresize-min-height 40)
+  (helm-buffers-fuzzy-matching t)
+  (helm-recentf-fuzzy-match t)
+  (helm-semantic-fuzzy-match t)
+  (helm-apropos-fuzzy-match t)
+  (helm-M-x-fuzzy-match t)
+  (helm-ff-search-library-in-sexp t)
+  (helm-echo-input-in-header-line nil)
   :config
   (require 'helm-config)
   (helm-mode 1)
-  :custom
-  (helm-buffers-fuzzy-matching t)
-  (helm-recentf-fuzzy-match t)
-  (helm-apropos-fuzzy-match t)
-  (helm-M-x-fuzzy-match t)
   (helm-autoresize-mode 1)
-  :bind (("M-x" . helm-M-x)
-         ("M-y" . helm-show-kill-ring)
-         ("C-x b" . helm-mini)
-         ("C-x c o" . helm-occur)
-         ("C-x C-f" . helm-find-files)))
+  :hook
+  (helm-mode . (lambda () (setq completion-styles 'flex))))
 
 ;; (use-package flycheck
 ;;   :functions global-flycheck-mode
@@ -180,15 +223,6 @@ In that case, insert the number."
   (global-diff-hl-mode t))
 
 (use-package info)
-
-(use-package smartparens-config
-  :disabled
-  :commands (show-smartparens-global-mode)
-  :ensure smartparens
-  :init
-  (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
-  (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
-  :config (progn (show-smartparens-global-mode t)))
 
 (use-package projectile
   :commands (projectile-mode)
@@ -457,22 +491,22 @@ Current buffer should be visiting an Emacs Lisp file."
 
 ;; --- KEYBOARD SETTINGS ---
 ;;
-(global-set-key [(control x)(?4)(k)] 'my-shell-other-window)
-(global-set-key [(?%)] 'my-matching-paren)
-(global-set-key [(control x)(control j)] 'goto-line)
-(global-set-key [(control x)(?5)(i)] 'my-info-other-frame)
-(global-set-key [(control x)(?5)(k)] 'my-shell-other-frame)
-(global-set-key [(control c)(control k)] 'my-kill-buffer)
-(global-set-key [(f3)] 'eval-last-sexp)
-(global-set-key [(control meta ?\\)] 'my-indent-buffer)
-(global-set-key [(home)] 'beginning-of-buffer)
-(global-set-key [(end)] 'end-of-buffer)
+(global-set-key [(control x)(?4)(k)] #'my-shell-other-window)
+(global-set-key [(?%)] #'my-matching-paren)
+(global-set-key [(control x)(control j)] #'goto-line)
+(global-set-key [(control x)(?5)(i)] #'my-info-other-frame)
+(global-set-key [(control x)(?5)(k)] #'my-shell-other-frame)
+(global-set-key [(control c)(control k)] #'my-kill-buffer)
+(global-set-key [(f3)] #'eval-last-sexp)
+(global-set-key [(control meta ?\\)] #'my-indent-buffer)
+(global-set-key [(home)] #'beginning-of-buffer)
+(global-set-key [(end)] #'end-of-buffer)
 (global-unset-key [(control z)])
-(global-set-key [delete] 'delete-char)
-(global-set-key [(control meta right)] 'c-forward-into-nomenclature)
-(global-set-key [(control meta left)] 'c-backward-into-nomenclature)
-(global-set-key [(control c)(control f)] 'ff-find-other-file)
-(global-set-key [(control x)(g)] 'magit-status)
+(global-set-key [delete] #'delete-char)
+;; (global-set-key [(control meta right)] #'c-forward-into-nomenclature)
+;; (global-set-key [(control meta left)] #'c-backward-into-nomenclature)
+(global-set-key [(control c)(control f)] #'ff-find-other-file)
+(global-set-key [(control x)(g)] #'magit-status)
 
 (when is-macosx
   (define-key key-translation-map (kbd "<C-S-mouse-1>") (kbd "<mouse-2>")))
