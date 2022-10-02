@@ -1,11 +1,12 @@
 ;;; package -- .emacs  -*- lexical-binding: t; -*-
 ;;; Commentary:
+
 ;;; Code:
+
 (require 'benchmark-init)
 
-(setq load-path (cons (expand-file-name "~/src/helm") (cons (expand-file-name "~/.emacs.d/lisp") load-path)))
-
-(setq custom-file "~/.emacs.d/custom.el")
+(setq load-path (cons (expand-file-name "~/src/helm") (cons (expand-file-name "~/.emacs.d/lisp") load-path))
+      custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
 (require 'package)
@@ -104,18 +105,18 @@
   :bind (("C-c g" . magit-file-dispatch)
          ("C-x g" . magit-status)))
 
+;;; Use packages -- all custom settings are in `'custom.el`'
+
 (use-package mode-line-bell
-  :ensure t
-  :config
-  (setq visible-bell nil
-	ring-bell-function 'mode-line-bell-flash))
+  :ensure t)
 
 (use-package helm
+  :ensure nil
   :commands helm-mode helm-autoresize-mode helm-projectile
   :config
   (require 'helm-config)
-  (set-face-foreground 'helm-mark-prefix "Gold1")
-  (add-to-list 'helm-sources-using-default-as-input 'helm-source-info-bash)
+  :custom-face
+  (helm-mark-prefix ((t (:foreground "Gold1"))))
   :bind (("C-x C-f" . helm-find-files)
 	 ("C-x C-b" . helm-buffers-list)
          ("C-x C-d" . helm-browse-project)
@@ -125,6 +126,7 @@
          ("M-y" . helm-show-kill-ring)))
 
 (use-package helm-mode
+  :ensure nil
   :defer
   :diminish
   :after helm
@@ -144,18 +146,15 @@
   :functions flymake--mode-line-format
   :config
   (setq elisp-flymake-byte-compile-load-path load-path
-        flymake-no-changes-timeout 0.5
-        flymake-start-on-flymake-mode t
-        flymake-mode-line-title "FM"
-        )
+        flymake-mode-line-title "FM")
   :hook ((emacs-lisp-mode . flymake-mode)
          (python-mode . flymake-mode))
-  :bind (:map
-         flymake-mode-map
+  :bind (:map flymake-mode-map
          ("M-n" . flymake-goto-next-error)
          ("M-p" . flymake-goto-prev-error)))
 
 (use-package diff-hl
+  :ensure t
   :commands diff-hl-flydiff-mode
   :init
   (diff-hl-flydiff-mode t)
@@ -180,9 +179,6 @@ In that case, insert the number."
 (use-package yasnippet
   :ensure t
   :defer
-  :custom
-  (yas-snippet-dirs (list (expand-file-name "~/.emacs.d/snippets")
-                          (expand-file-name "~/.emacs.d/elpa/yasnippet-snippets-1.0/snippets")))
   :hook (after-init . yas-global-mode))
 
 ;; (use-package yasnippet-snippets
@@ -190,25 +186,8 @@ In that case, insert the number."
 ;;   :hook (after-init . yasnippet-snippets-initialize))
 
 (use-package company
+  :ensure t
   :defines company-ispell-dictionary
-  :config
-  (setq company-minimum-prefix-length 2
-        company-require-match nil
-        company-tooltip-align-annotations t
-        company-tooltip-idle-delay 0.2
-        company-show-numbers t
-        company-ispell-dictionary "/usr/share/dict/web2"
-        company-backends '(company-capf
-                           company-keywords
-                           company-semantic
-                           company-files
-                           company-etags
-                           company-elisp
-                           company-clang
-                           company-dabbrev-code
-                           company-cmake
-                           company-ispell
-                           company-yasnippet))
   :hook ((after-init . global-company-mode))
   :bind (("C-c ." . company-complete)
          ("C-c C-." . company-complete)
@@ -239,11 +218,11 @@ In that case, insert the number."
   :ensure t)
 
 (use-package org-edna
-  :config
-  (setq org-edna-use-inheritance t)
+  :ensure t
   :hook (after-init . org-edna-mode))
 
 (use-package org-gtd
+  :ensure t
   :after org-edna
   :config
   (require 'org-gtd-inbox-processing)
@@ -256,25 +235,28 @@ In that case, insert the number."
               ("i" . org-gtd-process-inbox)))
 
 (use-package eglot
+  :ensure t
   :defer
-  :commands (eglot-ensure)
-  :hook (c-mode-common . (lambda () (eglot-ensure)))
-  :ensure t)
+  :commands eglot-ensure
+  :hook (c-mode-common . (lambda () (eglot-ensure))))
 
 (use-package projectile
-  :commands (projectile-mode)
+  :ensure t
+  :commands projectile-mode
   :defer
   :bind-keymap
   ("C-x p" . projectile-command-map)
   :hook (prog-mode . projectile-mode))
 
-(use-package cmake-mode)
+(use-package cmake-mode
+  :ensure t)
 
-(require 'flyspell-correct-helm)
 (use-package flyspell-correct-helm
-  :bind ("<f8>" . flyspell-correct-wrapper)
+  :ensure t
+  :commands flyspell-correct-wrapper
   :init
-  (setq flyspell-correct-interface #'flyspell-correct-helm))
+  (setq flyspell-correct-interface #'flyspell-correct-helm)
+  :bind ("<f8>" . flyspell-correct-wrapper))
 
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 

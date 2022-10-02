@@ -10,6 +10,14 @@
  '(auto-save-list-file-prefix nil)
  '(backup-directory-alist '(("." . ".~")))
  '(case-fold-search t)
+ '(company-backends
+   '(company-capf company-keywords company-semantic company-files company-etags company-elisp company-clang company-dabbrev-code company-cmake company-ispell company-yasnippet))
+ '(company-ispell-dictionary "/usr/share/dict/web2")
+ '(company-minimum-prefix-length 2)
+ '(company-require-match nil)
+ '(company-show-numbers t)
+ '(company-tooltip-align-annotations t)
+ '(company-tooltip-idle-delay 0.2)
  '(completion-styles '(basic partial-completion emacs22 flex))
  '(confirm-kill-emacs 'y-or-n-p)
  '(custom-enabled-themes '(modus-vivendi))
@@ -29,6 +37,8 @@
  '(helm-ff-search-library-in-sexp t)
  '(helm-follow-mode-persistent t)
  '(helm-imenu-fuzzy-match t)
+ '(helm-sources-using-default-as-input
+   '(helm-source-info-bash helm-source-imenu helm-source-imenu-all helm-source-info-elisp helm-source-etags-select helm-source-man-pages helm-source-occur helm-source-moccur helm-source-grep-ag helm-source-grep-git helm-source-grep))
  '(helm-visible-mark-prefix "✓")
  '(indent-tabs-mode nil)
  '(indicate-empty-lines t)
@@ -44,10 +54,11 @@
  '(ns-alternate-modifier 'alt)
  '(ns-command-modifier 'meta)
  '(ns-right-alternate-modifier 'super)
+ '(org-edna-use-inheritance t)
  '(package-selected-packages
-   '(org-gtd org helm-ls-git helm-projectile flyspell-correct-helm helm flyspell-correct-popup popup benchmark-init yasnippet-snippets yasnippet markdown-mode eglot cmake-mode diff-hl company projectile async diminish zerodark-theme modus-vivendi-theme session highlight-indentation mode-line-bell magit use-package))
+   '(flyspell-correct-helm org-gtd org helm-ls-git helm-projectile flyspell-correct-popup popup benchmark-init yasnippet-snippets yasnippet markdown-mode eglot cmake-mode diff-hl company projectile async diminish zerodark-theme modus-vivendi-theme session highlight-indentation mode-line-bell magit use-package))
  '(projectile-mode-line-prefix " P")
- '(ring-bell-function 'ignore)
+ '(ring-bell-function 'mode-line-bell-flash)
  '(save-place-mode t)
  '(savehist-mode t)
  '(sentence-end "[.?!][]\"')]*\\($\\|	\\| \\)[
@@ -59,7 +70,7 @@
  '(tool-bar-mode nil)
  '(vc-follow-symlinks t)
  '(version-control t)
- '(visible-bell t)
+ '(visible-bell nil)
  '(warning-suppress-types '(((flymake flymake)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -69,6 +80,7 @@
  '(default ((((type tty))) (t (:height 140 :family "Inconsolata" :foundry "nil" :slant normal :weight normal :width normal))))
  '(fixed-pitch ((t (:family "Inconsolata"))))
  '(font-lock-brace-face ((t (:foreground "tomato"))))
+ '(helm-mark-prefix ((t (:foreground "Gold1"))))
  '(makefile-space ((t (:background "gray46")))))
 
 ;;; custom.el ends here.
