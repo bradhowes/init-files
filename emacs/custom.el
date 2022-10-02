@@ -20,6 +20,7 @@
  '(display-time-mode t)
  '(fill-column 120)
  '(global-subword-mode t)
+ '(helm-ff-DEL-up-one-level-maybe t)
  '(indent-tabs-mode nil)
  '(indicate-empty-lines t)
  '(inhibit-startup-screen t)
@@ -34,7 +35,7 @@
  '(ns-command-modifier 'meta)
  '(ns-right-alternate-modifier 'super)
  '(package-selected-packages
-   '(flyspell-correct-helm helm-ls-git flyspell-correct-popup popup benchmark-init yasnippet-snippets yasnippet markdown-mode eglot cmake-mode diff-hl company projectile async diminish zerodark-theme modus-vivendi-theme session highlight-indentation mode-line-bell magit use-package))
+   '(flyspell-correct-helm helm flyspell-correct-popup popup benchmark-init yasnippet-snippets yasnippet markdown-mode eglot cmake-mode diff-hl company projectile async diminish zerodark-theme modus-vivendi-theme session highlight-indentation mode-line-bell magit use-package))
  '(ring-bell-function 'ignore)
  '(save-place-mode t)
  '(savehist-mode t)

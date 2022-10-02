@@ -3,7 +3,7 @@
 ;;; Code:
 (require 'benchmark-init)
 
-(setq load-path (cons (expand-file-name "~/.emacs.d/lisp") load-path))
+(setq load-path (cons (expand-file-name "~/src/helm") (cons (expand-file-name "~/.emacs.d/lisp") load-path)))
 
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
@@ -99,6 +99,8 @@
 (use-package magit
   :ensure t
   :defer
+  :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
+         (magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-c g" . magit-file-dispatch)
          ("C-x g" . magit-status)))
 
@@ -111,7 +113,6 @@
 	ring-bell-function 'mode-line-bell-flash))
 
 (use-package helm
-  :ensure t
   :commands helm-mode helm-autoresize-mode
   :config
   (require 'helm-config)
@@ -131,7 +132,6 @@
   (helm-ff-search-library-in-sexp t)
   (helm-echo-input-in-header-line nil)
   :bind (("C-x C-f" . helm-find-files)
-	 ("C-x b" . helm-multi-files)
 	 ("C-x C-b" . helm-buffers-list)
 	 ("C-x c o" . helm-occur)
 	 ("M-x" . helm-M-x)
@@ -142,15 +142,6 @@
   :diminish
   :hook ((after-init . helm-mode)
          (after-init . helm-autoresize-mode)))
-
-;; (use-package helm-ls-git)
-
-;; (use-package wucuo
-;;   :defines wucuo-personal-font-faces-to-check
-;;   :hook ((prog-mode . (lambda ()
-;;                         (setq wucuo-personal-font-faces-to-check '(font-lock-comment-face))
-;;                         (wucuo-start 1)))
-;;          (text-mode . wucuo-start)))
 
 (use-package flymake
   :functions flymake--mode-line-format
