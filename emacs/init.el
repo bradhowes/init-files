@@ -106,42 +106,39 @@
 
 (use-package mode-line-bell
   :ensure t
-  :custom
-  (mode-line-bell-flash-time 0.08)
   :config
   (setq visible-bell nil
 	ring-bell-function 'mode-line-bell-flash))
 
 (use-package helm
-  :commands helm-mode helm-autoresize-mode
+  :commands helm-mode helm-autoresize-mode helm-projectile
   :config
   (require 'helm-config)
   (set-face-foreground 'helm-mark-prefix "Gold1")
   (add-to-list 'helm-sources-using-default-as-input 'helm-source-info-bash)
-  :custom
-  (helm-autoresize-max-height 40)
-  (helm-autoresize-min-height 20)
-  (helm-follow-mode-persistent t)
-  (helm-candidate-number-limit 500)
-  (helm-visible-mark-prefix "✓")
-  (helm-buffers-fuzzy-matching t)
-  (helm-recentf-fuzzy-match t)
-  (helm-semantic-fuzzy-match t)
-  (helm-apropos-fuzzy-match t)
-  (helm-M-x-fuzzy-match t)
-  (helm-ff-search-library-in-sexp t)
-  (helm-echo-input-in-header-line nil)
   :bind (("C-x C-f" . helm-find-files)
 	 ("C-x C-b" . helm-buffers-list)
-	 ("C-x c o" . helm-occur)
+         ("C-x C-d" . helm-browse-project)
+         ("C-x b" . helm-mini)
+         ("M-h" . helm-command-prefix)
 	 ("M-x" . helm-M-x)
          ("M-y" . helm-show-kill-ring)))
 
 (use-package helm-mode
   :defer
   :diminish
+  :after helm
   :hook ((after-init . helm-mode)
          (after-init . helm-autoresize-mode)))
+
+(use-package helm-projectile
+  :ensure t
+  :after helm-mode
+  :bind ("M-h p" . helm-projectile))
+
+(use-package helm-ls-git
+  :ensure t
+  :after helm-projectile)
 
 (use-package flymake
   :functions flymake--mode-line-format
@@ -164,11 +161,11 @@
   (diff-hl-flydiff-mode t)
   :hook (after-init . global-diff-hl-mode))
 
-(require 'company)
+(eval-when-compile
+  (require 'company))
 
 (defun my-company-number ()
   "Forward to `company-complete-number'.
-
 Unless the number is potentially part of the candidate.
 In that case, insert the number."
   (interactive)
@@ -241,6 +238,23 @@ In that case, insert the number."
   :defer
   :ensure t)
 
+(use-package org-edna
+  :config
+  (setq org-edna-use-inheritance t)
+  :hook (after-init . org-edna-mode))
+
+(use-package org-gtd
+  :after org-edna
+  :config
+  (require 'org-gtd-inbox-processing)
+  :hook (after-init . org-gtd-mode)
+  :bind-keymap ("C-c d" . org-gtd-process-map)
+  :bind (:map org-gtd-process-map
+              ("C-c c" . org-gtd-choose)
+              ("d" . org-gtd-capture)
+              ("e" . org-gtd-engage)
+              ("i" . org-gtd-process-inbox)))
+
 (use-package eglot
   :defer
   :commands (eglot-ensure)
@@ -250,8 +264,6 @@ In that case, insert the number."
 (use-package projectile
   :commands (projectile-mode)
   :defer
-  :custom
-  (projectile-mode-line-prefix " P")
   :bind-keymap
   ("C-x p" . projectile-command-map)
   :hook (prog-mode . projectile-mode))
@@ -349,6 +361,10 @@ In that case, insert the number."
 (global-set-key [(home)] #'beginning-of-buffer)
 (global-set-key [(end)] #'end-of-buffer)
 (global-unset-key [(control z)])
+(global-unset-key [(control x) h])
+
+;; (global-set-key (kbd "C-x h") 'helm-command-prefix)
+
 (global-set-key [delete] #'delete-char)
 
 ;; Disable font size changing based on mouse/trackpad changes
