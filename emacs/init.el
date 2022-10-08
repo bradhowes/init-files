@@ -3,12 +3,18 @@
 
 ;;; Code:
 
-(require 'benchmark-init)
+;; (require 'benchmark-init)
 
-(setq load-path (cons (expand-file-name "~/src/helm") (cons (expand-file-name "~/.emacs.d/lisp") load-path))
+;; (require 'exec-path-from-shell)
+;; (exec-path-from-shell-initialize)
+
+(setq load-path (cons (expand-file-name "~/src/helm")
+                      (cons (expand-file-name "~/.emacs.d/lisp")
+                            load-path))
       custom-file "~/.emacs.d/custom.el")
-(load custom-file)
+(load custom-file t)
 
+(require 'cl-seq)
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://stable.melpa.org/packages/"))
 ;; (package-initialize)
@@ -39,19 +45,18 @@
      '(mac-option-modifier 'alt)
      '(mac-right-option-modifier 'super))))
 
-;; We do this when starting up as an app.
-(setenv "PATH" (mapconcat 'identity
-			  (list (expand-file-name "~/venvs/notebooks/bin")
-				(expand-file-name "~/bin")
-				"/opt/homebrew/bin"
-				(getenv "PATH")) ":"))
+(let ((additional-paths (seq-filter #'file-exists-p
+                                    (list (expand-file-name "~/venvs/notebooks/bin")
+                                          (expand-file-name "~/bin")
+                                          "/opt/homebrew/opt/sqlite/bin"
+                                          "/opt/homebrew/opt/grep/libexec/gnubin"
+                                          "/opt/homebrew/bin"))))
+  ;; Set exec-path to contain the above paths
+  (setq exec-path (append additional-paths exec-path))
+  ;; Same for PATH environment variable
+  (setenv "PATH" (concat (mapconcat 'identity (append additional-paths (list (getenv "PATH"))) ":"))))
 
-;; We do the same for Emacs
-(setq exec-path
-      (append (list (expand-file-name "~/venvs/notebooks/bin")
-		    (expand-file-name "~/bin")
-		    "/opt/homebrew/bin")
-	      exec-path))
+(setenv "WORKON_HOME" (expand-file-name "~/venvs/notebooks"))
 
 (setq frame-title-format
       (list  my-user "@" my-hostname ":" '(:eval (abbreviate-file-name default-directory))))
@@ -62,9 +67,10 @@
 (defvar font-lock-brace-face
   (defface font-lock-brace-face
     '((((class color) (background light))
-       (:foreground "yellow"))
+       (:foreground "red"))
       (((class color) (background dark))
-       (:foreground "deep pink")))
+       (:foreground "red")))
+    ;; (:foreground "deep pink")))
     "Font Lock mode face used to highlight parentheses, braces, and brackets."
     :group 'font-lock-faces)
     "Font Lock mode face used to highlight parentheses, braces, and brackets.")
@@ -94,12 +100,38 @@
 
 (unless (daemonp)
   (use-package session
-    :ensure t
     :hook (after-init . session-initialize)))
 
+(when (display-graphic-p)
+  (use-package doom-themes
+    :defer t
+    :functions (doom-themes-visual-bell-config
+                doom-themes-neotree-config)
+    :custom
+    ((doom-themes-enable-bold t)
+     (doom-themes-enable-italic t))
+  ;; (load-theme 'doom-acario-dark t)
+  ;; (load-theme 'doom-ayu-dark t)
+  ;; (load-;TODO: heme 'doom-ir-black t)
+  ;; (load-theme 'doom-material-dark t)
+  ;; (load-theme 'doom-tokyo-night t)
+    :init
+    (load-theme 'doom-tomorrow-night t)
+    (doom-themes-visual-bell-config)
+    (doom-themes-neotree-config))
+  ;; (load-theme 'doom-vibrant t)
+  ;; (load-theme 'doom-xcode t)
+  ;; (load-theme 'doom-zenburn t)
+
+  (use-package all-the-icons
+    :defer t)
+
+  (use-package doom-modeline
+    :defer t
+    :hook (after-init . doom-modeline-mode)))
+
 (use-package magit
-  :ensure t
-  :defer
+  :defer t
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-c g" . magit-file-dispatch)
@@ -107,11 +139,10 @@
 
 ;;; Use packages -- all custom settings are in `'custom.el`'
 
-(use-package mode-line-bell
-  :ensure t)
+;; (use-package mode-line-bell)
 
 (use-package helm
-  :ensure nil
+  :defer t
   :commands helm-mode helm-autoresize-mode helm-projectile
   :config
   (require 'helm-config)
@@ -119,30 +150,34 @@
   (helm-mark-prefix ((t (:foreground "Gold1"))))
   :bind (("C-x C-f" . helm-find-files)
 	 ("C-x C-b" . helm-buffers-list)
-         ("C-x C-d" . helm-browse-project)
+         ("C-x C-p" . helm-browse-project)
          ("C-x b" . helm-mini)
          ("M-h" . helm-command-prefix)
 	 ("M-x" . helm-M-x)
-         ("M-y" . helm-show-kill-ring)))
+         ("M-y" . helm-show-kill-ring)
+         ("C-h v" . helm-apropos)
+         ("C-h f" . helm-apropos)))
+
+(use-package helm-files)
 
 (use-package helm-mode
-  :ensure nil
-  :defer
+  :defer t
   :diminish
   :after helm
   :hook ((after-init . helm-mode)
          (after-init . helm-autoresize-mode)))
 
 (use-package helm-projectile
-  :ensure t
+  :defer t
   :after helm-mode
   :bind ("M-h p" . helm-projectile))
 
 (use-package helm-ls-git
-  :ensure t
+  :defer t
   :after helm-projectile)
 
 (use-package flymake
+  :defer t
   :functions flymake--mode-line-format
   :config
   (setq elisp-flymake-byte-compile-load-path load-path
@@ -154,7 +189,7 @@
          ("M-p" . flymake-goto-prev-error)))
 
 (use-package diff-hl
-  :ensure t
+  :defer
   :commands diff-hl-flydiff-mode
   :init
   (diff-hl-flydiff-mode t)
@@ -177,8 +212,7 @@ In that case, insert the number."
       (company-complete-number (if (string-equal "0" k) 10 (string-to-number k))))))
 
 (use-package yasnippet
-  :ensure t
-  :defer
+  :defer t
   :hook (after-init . yas-global-mode))
 
 ;; (use-package yasnippet-snippets
@@ -186,7 +220,7 @@ In that case, insert the number."
 ;;   :hook (after-init . yasnippet-snippets-initialize))
 
 (use-package company
-  :ensure t
+  :defer t
   :defines company-ispell-dictionary
   :hook ((after-init . global-company-mode))
   :bind (("C-c ." . company-complete)
@@ -209,20 +243,19 @@ In that case, insert the number."
          ("0" . my-company-number)
          ))
 
-(use-package elec-pair
-  :init
-  (electric-pair-mode 1))
+;; (use-package elec-pair
+;;   :init
+;;   (electric-pair-mode 1))
 
 (use-package markdown-mode
-  :defer
-  :ensure t)
+  :defer t)
 
 (use-package org-edna
-  :ensure t
+  :defer t
   :hook (after-init . org-edna-mode))
 
 (use-package org-gtd
-  :ensure t
+  :defer t
   :after org-edna
   :config
   (require 'org-gtd-inbox-processing)
@@ -234,42 +267,61 @@ In that case, insert the number."
               ("e" . org-gtd-engage)
               ("i" . org-gtd-process-inbox)))
 
+;; (use-package emacssql-sqlite3)
+
+;; (use-package org-roam
+;;   :after org
+;;   :init
+;;   (setq org-roam-v2-ack t)
+;;   :custom
+;;   (org-roam-database-connector 'sqlite3)
+;;   (org-roam-directory (expand-file-name "~/org-roam"))
+;;   (org-roam-completion-everywhere t)
+;;   (org-roam-completion-system 'helm)
+;;   :config
+;;   (org-roam-db-autosync-mode 1)
+;;   (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+;;   :bind (("C-c n f" . org-roam-node-find)
+;;          ("C-c n i" . org-roam-node-insert)
+;;          ("C-c n c" . org-roam-capture)
+;;          (:map org-mode-map
+;;                (("C-c n i" . org-roam-node-insert)
+;;                 ("C-c n o" . org-id-get-create)
+;;                 ("C-c n t" . org-roam-tag-add)
+;;                 ("C-c n a" . org-roam-alias-add)
+;;                 ("C-c n l" . org-roam-buffer-toggle)))))
+
+;; (require 'fancy-compilation)
+;; (fancy-compilation-mode)
+
 (use-package eglot
-  :ensure t
-  :defer
+  :defer t
   :commands eglot-ensure
   :hook (c-mode-common . (lambda () (eglot-ensure))))
 
 (use-package projectile
-  :ensure t
   :commands projectile-mode
-  :defer
+  :defer t
   :bind-keymap
   ("C-x p" . projectile-command-map)
   :hook (prog-mode . projectile-mode))
 
 (use-package cmake-mode
-  :ensure t)
+  :defer t)
 
-(use-package flyspell-correct-helm
-  :ensure t
-  :commands flyspell-correct-wrapper
-  :init
-  (setq flyspell-correct-interface #'flyspell-correct-helm)
-  :bind ("<f8>" . flyspell-correct-wrapper))
+;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
-
-(require 'diminish)
-(diminish 'abbrev-mode "A")
-(diminish 'company-mode "C")
-(diminish 'eldoc-mode "D")
-(diminish 'auto-fill-function "F")
-(diminish 'subword-mode "S")
-(diminish 'yas-minor-mode "Y")
+;; (require 'diminish)
+;; (diminish 'abbrev-mode "A")
+;; (diminish 'company-mode "C")
+;; (diminish 'eldoc-mode "D")
+;; (diminish 'auto-fill-function "F")
+;; (diminish 'subword-mode "S")
+;; (diminish 'yas-minor-mode "Y")
 
 (put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
 (put 'narrow-to-region 'disabled nil)
+(fset 'yes-or-no-p 'y-or-n-p)
 
 ;;; Custom functions
 
@@ -361,6 +413,7 @@ In that case, insert the number."
 ;; (global-set-key [(control c)(control f)] #'ff-find-other-file)
 
 (use-package server
+  :defer t
   :commands server-running-p
   :config
   (unless (server-running-p)
