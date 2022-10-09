@@ -253,6 +253,7 @@ Setup a namespace with NAMESPACE name if non-nil."
   (setq c-at-vsemi-p-fn 'my-c++-at-vsemi-p
 	c-vsemi-status-unknown-p-fn 'my-c++-vsemi-status-unknown-p
         c-block-comment-prefix ""
+        c-doc-comment-style 'doxygen
         )
 
   (local-set-key [(f7)] 'compile)

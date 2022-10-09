@@ -4,6 +4,7 @@
 
 (require 'font-lock)
 (require 'doxygen)
+(require 'cc-vars)
 
 ;; Hilight parentheses and braces
 ;;
@@ -363,6 +364,8 @@ ID ACTION CONTEXT."
   ;; c-basic-offset 4
   ;; c-tab-always-indent nil
   ;; )
+
+  (setq c-doc-comment-style 'doxygen)
 
   (unless (boundp 'my-c-c-c-4-keymap)
     (define-prefix-command 'my-c-c-c-4-keymap))

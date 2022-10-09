@@ -34,6 +34,7 @@
  '(eldoc-echo-area-prefer-doc-buffer nil)
  '(eldoc-echo-area-use-multiline-p t)
  '(eldoc-idle-delay 0.2)
+ '(elpy-autodoc-delay 0.2)
  '(fill-column 120)
  '(global-subword-mode t)
  '(helm-apropos-fuzzy-match nil)
@@ -74,9 +75,10 @@
  '(org-roam-directory "/Users/howes/org-roam")
  '(package-quickstart t)
  '(package-selected-packages
-   '(eldoc-box projectile-ripgrep ripgrep treemacs-projectile all-the-icons-dired all-the-icons-ibuffer mode-icons treemacs-all-the-icons treemacs-icons-dired neotree doom-modeline doom-themes elpy flyspell-correct-helm org-gtd org helm-ls-git helm-projectile flyspell-correct-popup benchmark-init yasnippet-snippets yasnippet markdown-mode eglot cmake-mode diff-hl company projectile async diminish zerodark-theme modus-vivendi-theme session highlight-indentation mode-line-bell magit use-package))
+   '(company-jedi jedi jedi-core projectile-ripgrep ripgrep all-the-icons-dired all-the-icons-ibuffer mode-icons doom-modeline doom-themes flyspell-correct-helm org-gtd org helm-ls-git helm-projectile flyspell-correct-popup benchmark-init yasnippet-snippets yasnippet markdown-mode eglot cmake-mode diff-hl company projectile async diminish modus-vivendi-theme session highlight-indentation mode-line-bell magit use-package))
  '(projectile-mode t nil (projectile))
  '(projectile-mode-line-prefix " P")
+ '(pyvenv-workon ".")
  '(ring-bell-function 'mode-line-bell-flash)
  '(save-place-mode t)
  '(savehist-mode t)
@@ -102,6 +104,8 @@
  '(fixed-pitch ((t (:family "Inconsolata"))))
  '(font-lock-brace-face ((t (:foreground "tomato"))))
  '(helm-mark-prefix ((t (:foreground "Gold1"))))
+ '(highlight-indentation-current-column-face ((t nil)))
+ '(hl-line ((t (:background "gray14" :extend t :inherit modus-themes-hl-line))))
  '(makefile-space ((t (:background "gray46"))))
  '(show-paren-match ((t (:background "#0d0d0d" :foreground "spring green" :underline nil :weight ultra-bold)))))
 

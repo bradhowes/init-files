@@ -9,18 +9,20 @@
 ;; (exec-path-from-shell-initialize)
 
 (require 'cl-seq)
-(require 'company)
+;; (require 'company)
 (require 'hl-line)
 (require 'package)
 (require 'server)
 
 (setq load-path (cons (expand-file-name "~/src/helm")
-                      (cons (expand-file-name "~/.emacs.d/lisp")
-                            load-path))
+                      (cons (expand-file-name "~/src/elpy")
+                            (cons (expand-file-name "~/.emacs.d/lisp")
+                            load-path)))
       custom-file "~/.emacs.d/custom.el")
 (load custom-file t)
 
 (add-to-list 'package-archives '("melpa" . "http://stable.melpa.org/packages/"))
+
 ;; (package-initialize)
 
 (require 'use-package)
@@ -104,11 +106,19 @@
 
 (unless (daemonp)
   (use-package session
+    :pin manual
     :hook (after-init . session-initialize)))
 
 (when (display-graphic-p)
   (use-package doom-themes
     :defer t
+
+    :hook (after-init . session-initialize)))
+
+(when (display-graphic-p)
+  (use-package doom-themes
+    :defer t
+    :pin manual
     :functions (doom-themes-visual-bell-config
                 doom-themes-neotree-config)
     :custom
@@ -128,14 +138,17 @@
   ;; (load-theme 'doom-zenburn t)
 
   (use-package all-the-icons
-    :defer t)
+    :defer t
+    :pin manual)
 
   (use-package doom-modeline
     :defer t
+    :pin manual
     :hook (after-init . doom-modeline-mode)))
 
 (use-package magit
   :defer t
+  :pin manual
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-c g" . magit-file-dispatch)
@@ -147,6 +160,7 @@
 
 (use-package helm
   :defer t
+  :pin manual
   :commands helm-mode helm-autoresize-mode helm-projectile
   :defines helm-find-files-map
   :config
@@ -169,6 +183,7 @@
 
 (use-package helm-mode
   :defer t
+  :pin manual
   :diminish
   :after helm
   :hook ((after-init . helm-mode)
@@ -176,15 +191,18 @@
 
 (use-package helm-projectile
   :defer t
+  :pin manual
   :after helm-mode
   :bind ("M-h p" . helm-projectile))
 
 (use-package helm-ls-git
   :defer t
+  :pin manual
   :after helm-projectile)
 
 (use-package flymake
   :defer t
+  :pin manual
   :functions flymake--mode-line-format
   :config
   (setq elisp-flymake-byte-compile-load-path load-path
@@ -197,6 +215,7 @@
 
 (use-package diff-hl
   :defer
+  :pin manual
   :commands diff-hl-flydiff-mode
   :init
   (diff-hl-flydiff-mode t)
@@ -218,6 +237,7 @@ In that case, insert the number."
 
 (use-package yasnippet
   :defer t
+  :pin manual
   :hook (after-init . yas-global-mode))
 
 ;; (use-package yasnippet-snippets
@@ -226,6 +246,7 @@ In that case, insert the number."
 
 (use-package company
   :defer t
+  :pin manual
   :defines company-ispell-dictionary
   :hook ((after-init . global-company-mode))
   :bind (("C-c ." . company-complete)
@@ -253,19 +274,17 @@ In that case, insert the number."
 ;;   (electric-pair-mode 1))
 
 (use-package markdown-mode
-  :defer t)
-
-(use-package eldoc-box
-  :commands eldoc-box-hover-mode eldoc-box-hover-at-point-mode
-  :hook ((prog-mode . eldoc-box-hover-at-point-mode)
-         (prog-mode . eldoc-box-hover-mode)))
+  :defer t
+  :pin manual)
 
 (use-package org-edna
   :defer t
+  :pin manual
   :hook (after-init . org-edna-mode))
 
 (use-package org-gtd
   :defer t
+  :pin manual
   :after org-edna
   :config
   (require 'org-gtd-inbox-processing)
@@ -306,21 +325,30 @@ In that case, insert the number."
 
 (use-package eglot
   :defer t
+  :pin manual
   :commands eglot-ensure
   :hook (c-mode-common . (lambda () (eglot-ensure))))
 
-(use-package projectile
-  :commands projectile-mode
+(use-package elpy
   :defer t
+  :pin manual
+  :hook (after-init . elpy-enable))
+
+(use-package projectile
+  :defer t
+  :pin manual
+  :commands projectile-mode
   :bind-keymap
   ("C-x p" . projectile-command-map)
   :hook (prog-mode . projectile-mode))
 
 (use-package cmake-mode
-  :defer t)
+  :defer t
+  :pin manual)
 
 (use-package server
-  :defer t)
+  :defer t
+  :pin manual)
 
 (defun my-emacs-startup-hook ()
   "My custom startup hook."
