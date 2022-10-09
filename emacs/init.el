@@ -8,14 +8,18 @@
 ;; (require 'exec-path-from-shell)
 ;; (exec-path-from-shell-initialize)
 
+(require 'cl-seq)
+(require 'company)
+(require 'hl-line)
+(require 'package)
+(require 'server)
+
 (setq load-path (cons (expand-file-name "~/src/helm")
                       (cons (expand-file-name "~/.emacs.d/lisp")
                             load-path))
       custom-file "~/.emacs.d/custom.el")
 (load custom-file t)
 
-(require 'cl-seq)
-(require 'package)
 (add-to-list 'package-archives '("melpa" . "http://stable.melpa.org/packages/"))
 ;; (package-initialize)
 
@@ -144,8 +148,10 @@
 (use-package helm
   :defer t
   :commands helm-mode helm-autoresize-mode helm-projectile
+  :defines helm-find-files-map
   :config
   (require 'helm-config)
+  (require 'helm-files)
   :custom-face
   (helm-mark-prefix ((t (:foreground "Gold1"))))
   :bind (("C-x C-f" . helm-find-files)
@@ -156,9 +162,10 @@
 	 ("M-x" . helm-M-x)
          ("M-y" . helm-show-kill-ring)
          ("C-h v" . helm-apropos)
-         ("C-h f" . helm-apropos)))
-
-(use-package helm-files)
+         ("C-h f" . helm-apropos)
+         :map helm-find-files-map
+         ("M-4" . helm-ff-run-switch-other-window)
+         ("M-5" . helm-ff-run-switch-other-frame)))
 
 (use-package helm-mode
   :defer t
@@ -195,8 +202,6 @@
   (diff-hl-flydiff-mode t)
   :hook (after-init . global-diff-hl-mode))
 
-(eval-when-compile
-  (require 'company))
 
 (defun my-company-number ()
   "Forward to `company-complete-number'.
@@ -249,6 +254,11 @@ In that case, insert the number."
 
 (use-package markdown-mode
   :defer t)
+
+(use-package eldoc-box
+  :commands eldoc-box-hover-mode eldoc-box-hover-at-point-mode
+  :hook ((prog-mode . eldoc-box-hover-at-point-mode)
+         (prog-mode . eldoc-box-hover-mode)))
 
 (use-package org-edna
   :defer t
@@ -309,6 +319,17 @@ In that case, insert the number."
 (use-package cmake-mode
   :defer t)
 
+(use-package server
+  :defer t)
+
+(defun my-emacs-startup-hook ()
+  "My custom startup hook."
+  (unless (server-running-p)
+    (server-start))
+  (global-hl-line-mode))
+
+(add-hook 'emacs-startup-hook #'my-emacs-startup-hook)
+
 ;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
 ;; (require 'diminish)
@@ -337,19 +358,6 @@ In that case, insert the number."
     (switch-to-buffer tmp nil t)
     (shell tmp)))
 
-(defun my-kill-buffer ()
-  "Kill the current buffer."
-  (interactive)
-  (kill-buffer (current-buffer)))
-
-(defun my-info-other-frame ()
-  "Show Info in a new frame."
-  (interactive)
-  (let ((tmp (get-buffer-create "*info*")))
-    (set-buffer tmp)
-    (select-frame (make-frame))
-    (info nil tmp)))
-
 (defun my-shell-other-window ()
   "Start a new shell in another window."
   (interactive)
@@ -362,6 +370,34 @@ In that case, insert the number."
   (interactive)
   (select-frame (make-frame))
   (ksh))
+
+(defun my-kill-buffer ()
+  "Kill the current buffer without asking."
+  (interactive)
+  (kill-buffer (current-buffer)))
+
+(defun my-info-other-frame ()
+  "Show Info in a new frame."
+  (interactive)
+  (let ((tmp (get-buffer-create "*info*")))
+    (set-buffer tmp)
+    (select-frame (make-frame))
+    (info nil tmp)))
+
+(defun my-customize-other-window ()
+  "Show Customize in a new frame."
+  (interactive)
+  (let ((tmp (get-buffer-create "*Customize Group: Emacs*")))
+    (switch-to-buffer-other-window tmp)
+    (customize)))
+
+(defun my-customize-other-frame ()
+  "Show Customize in a new frame."
+  (interactive)
+  (let ((tmp (get-buffer-create "*Customize Group: Emacs*")))
+    (set-buffer tmp)
+    (select-frame (make-frame))
+    (customize)))
 
 (defun my-matching-paren (arg)
   "Locate the matching ARG paren."
@@ -385,8 +421,10 @@ In that case, insert the number."
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 (add-hook 'before-save-hook #'copyright-update)
 
+(global-set-key [(control x)(?4)(c)] #'my-customize-other-window)
 (global-set-key [(control x)(?4)(k)] #'my-shell-other-window)
-(global-set-key [(?%)] #'my-matching-paren)
+;; (global-set-key [(?%)] #'my-matching-paren)
+(global-set-key [(control x)(?5)(c)] #'my-customize-other-frame)
 (global-set-key [(control x)(?5)(i)] #'my-info-other-frame)
 (global-set-key [(control x)(?5)(k)] #'my-shell-other-frame)
 (global-set-key [(control c)(control k)] #'my-kill-buffer)
@@ -394,8 +432,9 @@ In that case, insert the number."
 (global-set-key [(control meta ?\\)] #'my-indent-buffer)
 (global-set-key [(home)] #'beginning-of-buffer)
 (global-set-key [(end)] #'end-of-buffer)
+
 (global-unset-key [(control z)])
-(global-unset-key [(control x) h])
+(global-unset-key [(control x)(h)])
 
 ;; (global-set-key (kbd "C-x h") 'helm-command-prefix)
 
@@ -411,12 +450,5 @@ In that case, insert the number."
 ;; (global-set-key [(control meta right)] #'c-forward-into-nomenclature)
 ;; (global-set-key [(control meta left)] #'c-backward-into-nomenclature)
 ;; (global-set-key [(control c)(control f)] #'ff-find-other-file)
-
-(use-package server
-  :defer t
-  :commands server-running-p
-  :config
-  (unless (server-running-p)
-    (server-start)))
 
 ;;; init.el ends here.
