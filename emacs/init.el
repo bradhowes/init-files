@@ -14,10 +14,11 @@
 (require 'package)
 (require 'server)
 
-(setq load-path (cons (expand-file-name "~/src/helm")
-                      (cons (expand-file-name "~/src/elpy")
-                            (cons (expand-file-name "~/.emacs.d/lisp")
-                            load-path)))
+(setq load-path (cons (expand-file-name "~/src/pos-tip")
+                      (cons (expand-file-name "~/src/helm")
+                            (cons (expand-file-name "~/src/elpy")
+                                  (cons (expand-file-name "~/.emacs.d/lisp")
+                                        load-path))))
       custom-file "~/.emacs.d/custom.el")
 (load custom-file t)
 
@@ -244,6 +245,11 @@ In that case, insert the number."
 ;;   :ensure t
 ;;   :hook (after-init . yasnippet-snippets-initialize))
 
+(use-package company-quickhelp
+  :defer t
+  :pin manual
+  :hook ((after-init . company-quickhelp-mode)))
+
 (use-package company
   :defer t
   :pin manual
@@ -256,6 +262,7 @@ In that case, insert the number."
          ("C-n" . company-select-next-or-abort)
          ("C-p" . company-select-previous-or-abort)
          ("C-d" . company-show-doc-buffer)
+         ("C-c h" . company-quickhelp-manual-begin)
          ("M-." . company-show-location)
          ("1" . my-company-number)
          ("2" . my-company-number)
@@ -268,6 +275,9 @@ In that case, insert the number."
          ("9" . my-company-number)
          ("0" . my-company-number)
          ))
+
+(eval-after-load 'company
+  '(define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
 
 ;; (use-package elec-pair
 ;;   :init

@@ -75,7 +75,7 @@
  '(org-roam-directory "/Users/howes/org-roam")
  '(package-quickstart t)
  '(package-selected-packages
-   '(company-jedi jedi jedi-core projectile-ripgrep ripgrep all-the-icons-dired all-the-icons-ibuffer mode-icons doom-modeline doom-themes flyspell-correct-helm org-gtd org helm-ls-git helm-projectile flyspell-correct-popup benchmark-init yasnippet-snippets yasnippet markdown-mode eglot cmake-mode diff-hl company projectile async diminish modus-vivendi-theme session highlight-indentation mode-line-bell magit use-package))
+   '(company-quickhelp company-jedi jedi jedi-core projectile-ripgrep ripgrep all-the-icons-dired all-the-icons-ibuffer mode-icons doom-modeline doom-themes flyspell-correct-helm org-gtd org helm-ls-git helm-projectile flyspell-correct-popup benchmark-init yasnippet-snippets yasnippet markdown-mode eglot cmake-mode diff-hl company projectile async diminish modus-vivendi-theme session highlight-indentation mode-line-bell magit use-package))
  '(projectile-mode t nil (projectile))
  '(projectile-mode-line-prefix " P")
  '(pyvenv-workon ".")
