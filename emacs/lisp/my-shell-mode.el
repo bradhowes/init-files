@@ -3,6 +3,8 @@
 ;;; Code:
 
 (require 'shell)
+(require 'company)
+(require 'native-complete)
 
 (defvar my-shell-home-root nil
   "Value to prepend to a directory.")
@@ -15,7 +17,7 @@ STRING is something."
     (goto-char (point-min))
     (when (looking-at "bash: .*\nbash: .*\n")
       (replace-match "")
-      (remove-hook 'comint-output-filter-functions (function my-shell-filter-job-control-messages) t))))
+      (remove-hook 'comint-output-filter-functions #'my-shell-filter-job-control-messages t))))
 
 (defun my-shell-get-dir (&optional STRING)
   "Detect control sequence that announces directory change, and strip from output.
@@ -133,16 +135,18 @@ prompt lines in the first place."
         comint-completion-addsuffix t
 	comint-eol-on-send t
         comint-output-filter-functions nil)
+  (setq-local company-backends #'((company-files company-native-complete)))
 
-  (add-hook 'comint-output-filter-functions (function my-shell-get-dir) t)
-  ;; (add-hook 'comint-output-filter-functions (function my-remove-command-echo) t)
-  (add-hook 'comint-output-filter-functions (function ansi-color-process-output) t)
-  (add-hook 'comint-output-filter-functions (function comint-truncate-buffer) t)
-  (add-hook 'comint-output-filter-functions (function comint-postoutput-scroll-to-bottom) t)
+  (add-hook 'completion-at-point-functions #'native-complete-at-point nil t)
+
+  (add-hook 'comint-output-filter-functions #'my-shell-get-dir nil t)
+  (add-hook 'comint-output-filter-functions #'ansi-color-process-output nil t)
+  (add-hook 'comint-output-filter-functions #'comint-truncate-buffer nil t)
+  (add-hook 'comint-output-filter-functions #'comint-postoutput-scroll-to-bottom nil t)
 
   (when (string-equal "windows-nt" system-type)
-    (add-hook 'comint-output-filter-functions (function my-shell-filter-job-control-messages) t)
-    (add-hook 'comint-output-filter-functions (function my-shell-strip-trailing-empty-line) t))
+    (add-hook 'comint-output-filter-functions #'my-shell-filter-job-control-messages nil t)
+    (add-hook 'comint-output-filter-functions #'my-shell-strip-trailing-empty-line nil t))
 
   ;; (add-hook 'comint-output-filter-functions (function comint-watch-for-password-prompt) t t)
 

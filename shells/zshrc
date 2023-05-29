@@ -55,7 +55,7 @@ export PAGER="less ${LESS}"
 export CLICOLOR=yes
 
 export EDITOR="emacs"
-if [[ "${INSIDE_EMACS}" == "t" ]]; then
+if [[ -n "${INSIDE_EMACS}" ]]; then
     if [[ -x $(whence emacsclient) ]]; then
         EDITOR="$(whence emacsclient)"
         function man
@@ -63,6 +63,8 @@ if [[ "${INSIDE_EMACS}" == "t" ]]; then
             ${EDITOR} --eval "(manual-entry \"${@}\")"
         }
     fi
+    export TERM=xterm-256color
+    export PAGER="${HOME}/bin/emacs-pager"
 fi
 
 case "${TERM}" in

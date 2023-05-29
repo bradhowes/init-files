@@ -2,44 +2,53 @@
 ;;; Commentary:
 
 ;;; Code:
+;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3--
 
 ;; (require 'benchmark-init)
-
 ;; (require 'exec-path-from-shell)
 ;; (exec-path-from-shell-initialize)
 
 (require 'cl-seq)
-;; (require 'company)
 (require 'hl-line)
 (require 'package)
 (require 'server)
+(require 'seq)
+(require 'filenotify)
+(require 'use-package)
 
-(setq load-path (cons (expand-file-name "~/src/pos-tip")
+(defconst my-venv (expand-file-name "~/venv"))
+(defconst my-venv-python (concat my-venv "/bin/python"))
+(defconst is-macosx (eq system-type 'darwin))
+(defconst is-terminal (eq window-system nil))
+(setenv "WORKON_HOME" my-venv)
+
+(setq file-notify-debug nil)
+
+(defconst my-rows
+  (cond
+   ((eq (display-pixel-height) 2160) 100)
+   (t 60)))
+
+(defconst my-cols
+  (cond
+   ((eq (display-pixel-height) 3840) 132)
+   (t 124)))
+
+;; We use source for helm and elpy due to packaging issues
+(setq custom-file "~/.emacs.d/custom.el"
+      frame-title-format (list  (system-name) ":" '(:eval (abbreviate-file-name default-directory)))
+      load-path (cons (expand-file-name "~/src/pos-tip")
                       (cons (expand-file-name "~/src/helm")
                             (cons (expand-file-name "~/src/elpy")
                                   (cons (expand-file-name "~/.emacs.d/lisp")
-                                        load-path))))
-      custom-file "~/.emacs.d/custom.el")
+                                        load-path)))))
+
+(setq default-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . 1024))
+      initial-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . 0)))
+
 (load custom-file t)
 
-(add-to-list 'package-archives '("melpa" . "http://stable.melpa.org/packages/"))
-
 ;; (package-initialize)
-
-(require 'use-package)
-
-(defconst is-macosx (eq system-type 'darwin))
-(defconst is-terminal (eq window-system nil))
-(defconst my-user (user-login-name))
-(defconst my-hostname
-  (let ((v (or (getenv "HOSTNAME")
-	       (when (shell-command "hostname" "*foo*")
-		 (with-current-buffer "*foo*"
-		   (goto-char (point-min))
-		   (end-of-line 1)
-		   (buffer-substring-no-properties (point-min) (point))))
-	       "???")))
-    (nth 0 (split-string v "[.]" t))))
 
 (when is-macosx
   (eval-when-compile
@@ -63,11 +72,6 @@
   ;; Same for PATH environment variable
   (setenv "PATH" (concat (mapconcat 'identity (append additional-paths (list (getenv "PATH"))) ":"))))
 
-(setenv "WORKON_HOME" (expand-file-name "~/venvs/notebooks"))
-
-(setq frame-title-format
-      (list  my-user "@" my-hostname ":" '(:eval (abbreviate-file-name default-directory))))
-
 (when (eq window-system nil)
   (set-face-background 'default "undefined"))
 
@@ -80,8 +84,9 @@
     ;; (:foreground "deep pink")))
     "Font Lock mode face used to highlight parentheses, braces, and brackets."
     :group 'font-lock-faces)
-    "Font Lock mode face used to highlight parentheses, braces, and brackets.")
+  "Font Lock mode face used to highlight parentheses, braces, and brackets.")
 
+(autoload 'emacs-pager "emacs-pager")
 (autoload 'my-lisp-mode-hook "my-lisp-mode")
 (add-hook 'lisp-mode-hook 'my-lisp-mode-hook)
 (add-hook 'emacs-lisp-mode-hook 'my-lisp-mode-hook)
@@ -89,19 +94,14 @@
 (add-hook 'scheme-mode-hook 'my-lisp-mode-hook)
 (autoload 'my-lisp-data-mode-hook "my-lisp-mode")
 (add-hook 'lisp-data-mode-hook 'my-lisp-data-mode-hook)
-
 (autoload 'my-cmake-mode-hook "my-cmake-mode")
 (add-hook 'cmake-mode-hook 'my-cmake-mode-hook)
-
 (autoload 'my-c++-mode-hook "my-c++-mode")
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
-
 (autoload 'my-sh-mode-hook "my-sh-mode")
 (add-hook 'sh-mode-hook 'my-sh-mode-hook)
-
 (autoload 'my-shell-mode-hook "my-shell-mode")
 (add-hook 'shell-mode-hook 'my-shell-mode-hook)
-
 (autoload 'my-makefile-mode-hook "my-makefile-mode")
 (add-hook 'makefile-mode-hook 'my-makefile-mode-hook)
 
@@ -113,15 +113,12 @@
 (when (display-graphic-p)
   (use-package doom-themes
     :defer t
-
-    :hook (after-init . session-initialize)))
-
-(when (display-graphic-p)
-  (use-package doom-themes
-    :defer t
     :pin manual
+    :hook (after-init . session-initialize)
+
     :functions (doom-themes-visual-bell-config
                 doom-themes-neotree-config)
+
     :custom
     ((doom-themes-enable-bold t)
      (doom-themes-enable-italic t))
@@ -162,24 +159,27 @@
 (use-package helm
   :defer t
   :pin manual
-  :commands helm-mode helm-autoresize-mode helm-projectile
-  :defines helm-find-files-map
   :config
   (require 'helm-config)
   (require 'helm-files)
+  (require 'helm-projectile)
   :custom-face
   (helm-mark-prefix ((t (:foreground "Gold1"))))
   :bind (("C-x C-f" . helm-find-files)
-	 ("C-x C-b" . helm-buffers-list)
+         ("<f12>" . helm-find-files)
          ("C-x C-p" . helm-browse-project)
+         ("M-<f12>" . helm-browse-project)
          ("C-x b" . helm-mini)
          ("M-h" . helm-command-prefix)
 	 ("M-x" . helm-M-x)
          ("M-y" . helm-show-kill-ring)
          ("C-h v" . helm-apropos)
          ("C-h f" . helm-apropos)
-         :map helm-find-files-map
-         ("M-4" . helm-ff-run-switch-other-window)
+         :map helm-command-map
+         ("<tab>" . helm-execute-persistent-action)
+         ("C-i" . helm-execute-persistent-action)
+         ("C-z" . helm-select-action)
+         ("M-o" . helm-ff-run-switch-other-window)
          ("M-5" . helm-ff-run-switch-other-frame)))
 
 (use-package helm-mode
@@ -194,7 +194,8 @@
   :defer t
   :pin manual
   :after helm-mode
-  :bind ("M-h p" . helm-projectile))
+  :bind ("M-h p" . helm-projectile)
+  :hook ((after-init . helm-projectile-on)))
 
 (use-package helm-ls-git
   :defer t
@@ -222,6 +223,7 @@
   (diff-hl-flydiff-mode t)
   :hook (after-init . global-diff-hl-mode))
 
+(require 'company)
 
 (defun my-company-number ()
   "Forward to `company-complete-number'.
@@ -236,15 +238,6 @@ In that case, insert the number."
         (self-insert-command 1)
       (company-complete-number (if (string-equal "0" k) 10 (string-to-number k))))))
 
-(use-package yasnippet
-  :defer t
-  :pin manual
-  :hook (after-init . yas-global-mode))
-
-;; (use-package yasnippet-snippets
-;;   :ensure t
-;;   :hook (after-init . yasnippet-snippets-initialize))
-
 (use-package company-quickhelp
   :defer t
   :pin manual
@@ -257,7 +250,6 @@ In that case, insert the number."
   :hook ((after-init . global-company-mode))
   :bind (("C-c ." . company-complete)
          ("C-c C-." . company-complete)
-         ("C-c y" . company-yasnippet)
          :map company-active-map
          ("C-n" . company-select-next-or-abort)
          ("C-p" . company-select-previous-or-abort)
@@ -306,33 +298,6 @@ In that case, insert the number."
               ("e" . org-gtd-engage)
               ("i" . org-gtd-process-inbox)))
 
-;; (use-package emacssql-sqlite3)
-
-;; (use-package org-roam
-;;   :after org
-;;   :init
-;;   (setq org-roam-v2-ack t)
-;;   :custom
-;;   (org-roam-database-connector 'sqlite3)
-;;   (org-roam-directory (expand-file-name "~/org-roam"))
-;;   (org-roam-completion-everywhere t)
-;;   (org-roam-completion-system 'helm)
-;;   :config
-;;   (org-roam-db-autosync-mode 1)
-;;   (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-;;   :bind (("C-c n f" . org-roam-node-find)
-;;          ("C-c n i" . org-roam-node-insert)
-;;          ("C-c n c" . org-roam-capture)
-;;          (:map org-mode-map
-;;                (("C-c n i" . org-roam-node-insert)
-;;                 ("C-c n o" . org-id-get-create)
-;;                 ("C-c n t" . org-roam-tag-add)
-;;                 ("C-c n a" . org-roam-alias-add)
-;;                 ("C-c n l" . org-roam-buffer-toggle)))))
-
-;; (require 'fancy-compilation)
-;; (fancy-compilation-mode)
-
 (use-package eglot
   :defer t
   :pin manual
@@ -348,6 +313,8 @@ In that case, insert the number."
   :defer t
   :pin manual
   :commands projectile-mode
+  :config
+  (setq projectile-completion-system 'helm)
   :bind-keymap
   ("C-x p" . projectile-command-map)
   :hook (prog-mode . projectile-mode))
@@ -368,15 +335,11 @@ In that case, insert the number."
 
 (add-hook 'emacs-startup-hook #'my-emacs-startup-hook)
 
-;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+(require 'native-complete)
 
-;; (require 'diminish)
-;; (diminish 'abbrev-mode "A")
-;; (diminish 'company-mode "C")
-;; (diminish 'eldoc-mode "D")
-;; (diminish 'auto-fill-function "F")
-;; (diminish 'subword-mode "S")
-;; (diminish 'yas-minor-mode "Y")
+(with-eval-after-load 'shell
+  (message "Loading native-complete-setup-bash")
+  (native-complete-setup-bash))
 
 (put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
 (put 'narrow-to-region 'disabled nil)
@@ -384,10 +347,20 @@ In that case, insert the number."
 
 ;;; Custom functions
 
-(defun my-reset-framewidth ()
-  "Reset the current frame width to 132."
+(defun my-reset-frame-left ()
+  "Reset frame size and position for left frame."
   (interactive)
-  (set-frame-width (window-frame (get-buffer-window)) 132))
+  (modify-frame-parameters (window-frame (get-buffer-window)) initial-frame-alist))
+
+(defun my-reset-frame-right ()
+  "Reset frame size and position for right frame."
+  (interactive)
+  (modify-frame-parameters (window-frame (get-buffer-window)) default-frame-alist))
+
+(defun my-reset-framewidth ()
+  "Reset the current frame width to 120."
+  (interactive)
+  (set-frame-width (window-frame (get-buffer-window)) 124))
 
 (defun ksh ()
   "Start a new shell."
@@ -459,28 +432,36 @@ In that case, insert the number."
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 (add-hook 'before-save-hook #'copyright-update)
 
-(global-set-key [(control x)(?4)(c)] #'my-customize-other-window)
-(global-set-key [(control x)(?4)(k)] #'my-shell-other-window)
+(global-set-key (kbd "M-<f1>") #'my-reset-frame-left)
+(global-set-key (kbd "M-<f2>") #'my-reset-frame-right)
+
+(global-set-key (kbd "C-x 4 c") #'my-customize-other-window)
+(global-set-key (kbd "C-x 4 k") #'my-shell-other-window)
+
 ;; (global-set-key [(?%)] #'my-matching-paren)
-(global-set-key [(control x)(?5)(c)] #'my-customize-other-frame)
-(global-set-key [(control x)(?5)(i)] #'my-info-other-frame)
-(global-set-key [(control x)(?5)(k)] #'my-shell-other-frame)
-(global-set-key [(control c)(control k)] #'my-kill-buffer)
-(global-set-key [(f3)] #'eval-last-sexp)
-(global-set-key [(control meta ?\\)] #'my-indent-buffer)
-(global-set-key [(home)] #'beginning-of-buffer)
-(global-set-key [(end)] #'end-of-buffer)
+(global-set-key (kbd "C-x 5 c") #'my-customize-other-frame)
+(global-set-key (kbd "C-x 5 i") #'my-info-other-frame)
+(global-set-key (kbd "C-x 5 k") #'my-shell-other-frame)
 
-(global-unset-key [(control z)])
-(global-unset-key [(control x)(h)])
+(global-set-key (kbd "C-c C-k") #'my-kill-buffer)
+(global-set-key (kbd "<f3>") #'eval-last-sexp)
+(global-set-key (kbd "C-M-\\") #'my-indent-buffer)
+(global-set-key (kbd "<home>") #'beginning-of-buffer)
+(global-set-key (kbd "<end>") #'end-of-buffer)
 
-;; (global-set-key (kbd "C-x h") 'helm-command-prefix)
+(global-unset-key (kbd "C-z"))          ; suspend-frame
+(global-unset-key (kbd "C-x C-z"))      ; suspend-frame
+(global-unset-key (kbd "C-x h"))        ; mark-whole-bufferk
 
-(global-set-key [delete] #'delete-char)
+(global-set-key (kbd "<delete>") #'delete-char)
 
 ;; Disable font size changing based on mouse/trackpad changes
-(global-unset-key [(control wheel-down)])
-(global-unset-key [(control wheel-up)])
+(global-unset-key (kbd "C-<mouse-4>"))
+(global-unset-key (kbd "C-<mouse-5>"))
+(global-unset-key (kbd "C-<double-mouse-4>"))
+(global-unset-key (kbd "C-<double-mouse-5>"))
+(global-unset-key (kbd "C-<triple-mouse-4>"))
+(global-unset-key (kbd "C-<triple-mouse-5>"))
 
 ;; (global-unset-key (kbd "M-<mouse-1>"))
 ;; (global-unset-key (kbd "M-<down-mouse-1>"))
