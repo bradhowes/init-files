@@ -29,6 +29,10 @@ export LANG=en_US.UTF-8
 export DOCKER_USER="b.howes"
 export WORKON_HOME=${HOME}/venvs
 
+# RubyGems env
+export GEM_HOME=${HOME}/.gem
+PathAdd PATH "${GEM_HOME}/bin"
+
 [[ "${BRH_ARCH}" = "Darwin" ]] && ulimit -n 8096
 
 [ -n "${PS1}" -a -z "${BASHRC_LOADED}" ] && . ${ENV}

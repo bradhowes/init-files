@@ -1,54 +1,73 @@
-;;; package -- .emacs  -*- lexical-binding: t; -*-
-;;; Commentary:
-
-;;; Code:
+;;; init.el --- load the full configuration -*- lexical-binding: t; -*-
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3--
+;;; Commentary:
+;;; Code:
 
-;; (require 'benchmark-init)
-;; (require 'exec-path-from-shell)
-;; (exec-path-from-shell-initialize)
+(condition-case nil
+    (require 'use-package)
+  (file-error
+   (require 'package)
+   (package-initialize)
+   (package-refresh-contents)
+   (package-install 'use-package)
+   (require 'use-package)))
 
-(require 'cl-seq)
-(require 'hl-line)
-(require 'package)
-(require 'server)
 (require 'seq)
-(require 'filenotify)
-(require 'use-package)
 
-(defconst my-venv (expand-file-name "~/venv"))
-(defconst my-venv-python (concat my-venv "/bin/python"))
-(defconst is-macosx (eq system-type 'darwin))
-(defconst is-terminal (eq window-system nil))
+;; Set this to `t` to debug issue involving the filenotify package
+(when nil
+  (require 'filenotify)
+  (setq file-notify-debug nil))
+
+;; (debug-on-entry 'file-notify-add-watch)
+
+(defconst my-venv (expand-file-name "~/venv")
+  "The Python virtual environment to use for elpy.")
+(defconst my-venv-python (concat my-venv "/bin/python")
+  "The path to the Python eexecutable to use for elpy.")
+(defconst is-macosx (eq system-type 'darwin)
+  "T if running on macOS.")
+(defconst is-terminal (eq window-system nil)
+  "T if running in a terminal.")
+(defconst is-laptop (eq (display-pixel-height nil) 1329)
+  "T if the current display is on laptop display.")
+(defconst is-4k (eq (display-pixel-height nil) 2160)
+  "T if the current display is 4K.")
+(defconst my-rows (if (or is-4k is-laptop) 88 40)
+  "The number of rows to show in a frame based on display height.")
+(defconst my-cols (if (or is-4k is-laptop) 132 80)
+  "The number of columns to show in a frame based on display height.")
+(defconst my-window-offset 960
+  "The offset to the `alt' window based on display height.")
+(defconst my-window-right-offset (- (display-pixel-width) my-window-offset)
+  "The offset to the `alt' window based on display height.")
+(defconst my-font-name "Berkeley Mono"
+  "The name of the font to use.")
+(defconst my-font-size 12
+  "The font size to use based on the display height.")
+(defvar my-align-right-frame-alist
+  `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . ,my-window-right-offset))
+  "The alist to use to place a frame aligned to the right size of the display.")
+
 (setenv "WORKON_HOME" my-venv)
 
-(setq file-notify-debug nil)
+(defun my-setup-font ()
+  "Install the desired font in the default face."
+  (set-face-attribute 'default nil :font (font-spec :family my-font-name :size my-font-size)))
 
-(defconst my-rows
-  (cond
-   ((eq (display-pixel-height) 2160) 100)
-   (t 60)))
+(add-hook 'after-init-hook #'my-setup-font)
 
-(defconst my-cols
-  (cond
-   ((eq (display-pixel-height) 3840) 132)
-   (t 124)))
+(setq read-process-output-max (* 1024 1024)
+      custom-file (expand-file-name "~/.emacs.d/custom.el")
+      load-path (append (list (expand-file-name "~/.emacs.d/lisp")) load-path)
 
-;; We use source for helm and elpy due to packaging issues
-(setq custom-file "~/.emacs.d/custom.el"
-      frame-title-format (list  (system-name) ":" '(:eval (abbreviate-file-name default-directory)))
-      load-path (cons (expand-file-name "~/src/pos-tip")
-                      (cons (expand-file-name "~/src/helm")
-                            (cons (expand-file-name "~/src/elpy")
-                                  (cons (expand-file-name "~/.emacs.d/lisp")
-                                        load-path)))))
+      default-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . ,my-window-offset))
+      initial-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . 0))
 
-(setq default-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . 1024))
-      initial-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . 0)))
+      frame-title-format (list  '(:eval (abbreviate-file-name default-directory)))
 
-(load custom-file t)
-
-;; (package-initialize)
+      scroll-conservatively 101
+      scroll-margin 2)
 
 (when is-macosx
   (eval-when-compile
@@ -56,17 +75,20 @@
   (custom-set-variables
    '(ls-lisp-use-insert-directory-program nil))
   (when (not is-terminal)
+    (setq frame-resize-pixelwise t)
     (custom-set-variables
      '(mac-command-modifier 'meta)
      '(mac-option-modifier 'alt)
      '(mac-right-option-modifier 'super))))
 
-(let ((additional-paths (seq-filter #'file-exists-p
-                                    (list (expand-file-name "~/venvs/notebooks/bin")
-                                          (expand-file-name "~/bin")
-                                          "/opt/homebrew/opt/sqlite/bin"
-                                          "/opt/homebrew/opt/grep/libexec/gnubin"
-                                          "/opt/homebrew/bin"))))
+(let* ((common-paths (list (expand-file-name "~/bin")
+                           (concat my-venv "/bin")))
+       (macosx-paths (if is-macosx
+                         (list "/opt/homebrew/sqlite/bin"
+                               "/opt/homebrew/opt/grep/libexec/gnubin"
+                               "/opt/homebrew/bin")
+                       '()))
+       (additional-paths (seq-filter #'file-directory-p (append common-paths macosx-paths))))
   ;; Set exec-path to contain the above paths
   (setq exec-path (append additional-paths exec-path))
   ;; Same for PATH environment variable
@@ -105,213 +127,154 @@
 (autoload 'my-makefile-mode-hook "my-makefile-mode")
 (add-hook 'makefile-mode-hook 'my-makefile-mode-hook)
 
+(use-package ediff
+  :defer t
+  :config
+  (setq-default ediff-window-setup-function 'ediff-setup-windows-plain
+                ediff-split-window-function 'split-window-horizontally
+                ediff-merge-split-window-function 'split-window-horizontally))
+
 (unless (daemonp)
   (use-package session
-    :pin manual
     :hook (after-init . session-initialize)))
 
 (when (display-graphic-p)
   (use-package doom-themes
     :defer t
-    :pin manual
-    :hook (after-init . session-initialize)
-
+    ;; :hook (after-init . session-initialize)
     :functions (doom-themes-visual-bell-config
                 doom-themes-neotree-config)
-
     :custom
     ((doom-themes-enable-bold t)
      (doom-themes-enable-italic t))
-  ;; (load-theme 'doom-acario-dark t)
-  ;; (load-theme 'doom-ayu-dark t)
-  ;; (load-;TODO: heme 'doom-ir-black t)
-  ;; (load-theme 'doom-material-dark t)
-  ;; (load-theme 'doom-tokyo-night t)
+
     :init
     (load-theme 'doom-tomorrow-night t)
     (doom-themes-visual-bell-config)
     (doom-themes-neotree-config))
-  ;; (load-theme 'doom-vibrant t)
-  ;; (load-theme 'doom-xcode t)
-  ;; (load-theme 'doom-zenburn t)
 
-  (use-package all-the-icons
-    :defer t
-    :pin manual)
+  (use-package all-the-icons)
 
   (use-package doom-modeline
-    :defer t
-    :pin manual
     :hook (after-init . doom-modeline-mode)))
 
-(use-package magit
-  :defer t
-  :pin manual
-  :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
-         (magit-post-refresh . diff-hl-magit-post-refresh))
-  :bind (("C-c g" . magit-file-dispatch)
-         ("C-x g" . magit-status)))
-
-;;; Use packages -- all custom settings are in `'custom.el`'
-
-;; (use-package mode-line-bell)
-
 (use-package helm
-  :defer t
-  :pin manual
+  :ensure t
   :config
-  (require 'helm-config)
+  (require 'helm-autoloads)
+  (require 'helm-bookmark)
+  (require 'helm-buffers)
   (require 'helm-files)
-  (require 'helm-projectile)
+  :defines helm-find-files-map helm-buffer-map helm-bookmark-map
   :custom-face
   (helm-mark-prefix ((t (:foreground "Gold1"))))
   :bind (("C-x C-f" . helm-find-files)
          ("<f12>" . helm-find-files)
-         ("C-x C-p" . helm-browse-project)
+         ("C-x C-p" . helm-projectile)
          ("M-<f12>" . helm-browse-project)
-         ("C-x b" . helm-mini)
-         ("M-h" . helm-command-prefix)
-	 ("M-x" . helm-M-x)
-         ("M-y" . helm-show-kill-ring)
-         ("C-h v" . helm-apropos)
-         ("C-h f" . helm-apropos)
-         :map helm-command-map
-         ("<tab>" . helm-execute-persistent-action)
-         ("C-i" . helm-execute-persistent-action)
-         ("C-z" . helm-select-action)
-         ("M-o" . helm-ff-run-switch-other-window)
-         ("M-5" . helm-ff-run-switch-other-frame)))
+         ("C-x C-b" . helm-filtered-bookmarks)
+         ("C-x r b" . helm-filtered-bookmarks)
+         ("C-x b"   . helm-mini)
+         ("M-h"     . helm-command-prefix)
+	 ("M-x"     . helm-M-x)
+         ("M-y"     . helm-show-kill-ring)
+         ("C-h f"   . helm-apropos)
+         ("C-h v"   . helm-apropos)
+         ("C-h i"   . helm-info)
+         :map helm-find-files-map
+         ("M-w" . helm-ff-run-switch-other-window)
+         ("M-f" . helm-ff-run-switch-other-frame)
+         :map helm-buffer-map
+         ("M-w" . helm-buffer-switch-other-window)
+         ("M-f" . helm-buffer-switch-other-frame)
+         :map helm-bookmark-map
+         ("M-w" . helm-bookmark-run-jump-other-window)
+         ("M-f" . helm-bookmark-run-jump-other-frame)
+         ))
 
 (use-package helm-mode
-  :defer t
-  :pin manual
   :diminish
+  :defer t
   :after helm
   :hook ((after-init . helm-mode)
          (after-init . helm-autoresize-mode)))
 
 (use-package helm-projectile
+  :ensure t
   :defer t
-  :pin manual
   :after helm-mode
-  :bind ("M-h p" . helm-projectile)
   :hook ((after-init . helm-projectile-on)))
 
-(use-package helm-ls-git
+;; (use-package helm-ls-git
+;;   :ensure t
+;;   :defer t
+;;   :after helm-projectile)
+
+(use-package magit
+  :ensure t
   :defer t
-  :pin manual
-  :after helm-projectile)
+  :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
+         (magit-post-refresh . diff-hl-magit-post-refresh)
+         (magit-mode . helm-mode))
+  :bind (("C-c g" . magit-file-dispatch)
+         ("C-x g" . magit-status)))
+
+;; (use-package mode-line-bell)
+
+(use-package eglot
+  :ensure t
+  :defer t
+  :commands eglot-ensure
+  :hook ((python-mode . eglot-ensure)))
 
 (use-package flymake
+  :ensure t
   :defer t
-  :pin manual
-  :functions flymake--mode-line-format
   :config
   (setq elisp-flymake-byte-compile-load-path load-path
         flymake-mode-line-title "FM")
   :hook ((emacs-lisp-mode . flymake-mode)
          (python-mode . flymake-mode))
   :bind (:map flymake-mode-map
-         ("M-n" . flymake-goto-next-error)
-         ("M-p" . flymake-goto-prev-error)))
+              ("M-n" . flymake-goto-next-error)
+              ("M-p" . flymake-goto-prev-error)))
 
 (use-package diff-hl
-  :defer
-  :pin manual
+  :ensure t
+  :defer t
   :commands diff-hl-flydiff-mode
   :init
   (diff-hl-flydiff-mode t)
   :hook (after-init . global-diff-hl-mode))
 
-(require 'company)
-
-(defun my-company-number ()
-  "Forward to `company-complete-number'.
-Unless the number is potentially part of the candidate.
-In that case, insert the number."
-  (interactive)
-  (let* ((k (this-command-keys))
-         (re (concat "^" company-prefix k)))
-    ;; (message "Command-key: %s" k)
-    (if (cl-find-if (lambda (s) (string-match re s))
-                    company-candidates)
-        (self-insert-command 1)
-      (company-complete-number (if (string-equal "0" k) 10 (string-to-number k))))))
+(use-package company
+  :ensure t
+  :hook ((text-mode . company-mode)
+         (prog-mode . company-mode)))
 
 (use-package company-quickhelp
-  :defer t
-  :pin manual
+  :ensure t
+  :commands commpany-quickhelp-manual-begin
   :hook ((after-init . company-quickhelp-mode)))
 
-(use-package company
-  :defer t
-  :pin manual
-  :defines company-ispell-dictionary
-  :hook ((after-init . global-company-mode))
-  :bind (("C-c ." . company-complete)
-         ("C-c C-." . company-complete)
-         :map company-active-map
-         ("C-n" . company-select-next-or-abort)
-         ("C-p" . company-select-previous-or-abort)
-         ("C-d" . company-show-doc-buffer)
-         ("C-c h" . company-quickhelp-manual-begin)
-         ("M-." . company-show-location)
-         ("1" . my-company-number)
-         ("2" . my-company-number)
-         ("3" . my-company-number)
-         ("4" . my-company-number)
-         ("5" . my-company-number)
-         ("6" . my-company-number)
-         ("7" . my-company-number)
-         ("8" . my-company-number)
-         ("9" . my-company-number)
-         ("0" . my-company-number)
-         ))
-
-(eval-after-load 'company
-  '(define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
+;; (eval-after-load 'company
+;;  '(define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
 
 ;; (use-package elec-pair
+;;   :ensure t
 ;;   :init
 ;;   (electric-pair-mode 1))
 
 (use-package markdown-mode
-  :defer t
-  :pin manual)
+  :ensure t
+  :defer t)
 
-(use-package org-edna
-  :defer t
-  :pin manual
-  :hook (after-init . org-edna-mode))
-
-(use-package org-gtd
-  :defer t
-  :pin manual
-  :after org-edna
-  :config
-  (require 'org-gtd-inbox-processing)
-  :hook (after-init . org-gtd-mode)
-  :bind-keymap ("C-c d" . org-gtd-process-map)
-  :bind (:map org-gtd-process-map
-              ("C-c c" . org-gtd-choose)
-              ("d" . org-gtd-capture)
-              ("e" . org-gtd-engage)
-              ("i" . org-gtd-process-inbox)))
-
-(use-package eglot
-  :defer t
-  :pin manual
-  :commands eglot-ensure
-  :hook (c-mode-common . (lambda () (eglot-ensure))))
-
-(use-package elpy
-  :defer t
-  :pin manual
-  :hook (after-init . elpy-enable))
+(use-package winner
+  :hook (after-init . winner-mode))
 
 (use-package projectile
+  :ensure t
   :defer t
-  :pin manual
   :commands projectile-mode
   :config
   (setq projectile-completion-system 'helm)
@@ -320,26 +283,43 @@ In that case, insert the number."
   :hook (prog-mode . projectile-mode))
 
 (use-package cmake-mode
-  :defer t
-  :pin manual)
+  :ensure t
+  :defer t)
 
 (use-package server
-  :defer t
-  :pin manual)
+  :commands (server-running-p)
+  :hook (emacs-startup . (lambda () (unless (server-running-p) (server-start)))))
 
-(defun my-emacs-startup-hook ()
-  "My custom startup hook."
-  (unless (server-running-p)
-    (server-start))
-  (global-hl-line-mode))
+(use-package which-key
+  :ensure t
+  :commands which-key-mode
+  :config
+  (which-key-mode t))
 
-(add-hook 'emacs-startup-hook #'my-emacs-startup-hook)
+(use-package hl-line
+  :commands global-hl-line-mode
+  :hook (emacs-startup . global-hl-line-mode))
 
-(require 'native-complete)
+(use-package marginalia
+  :ensure t
+  :hook (emacs-startup . marginalia-mode))
 
+(global-prettify-symbols-mode t)
+
+(autoload 'native-complete-setup-bash "native-complete")
 (with-eval-after-load 'shell
   (message "Loading native-complete-setup-bash")
   (native-complete-setup-bash))
+
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
+(use-package diminish
+  :ensure t
+  :commands diminish
+  :config
+  (diminish 'abbrev-mode "A")
+  (diminish 'auto-fill-function "F")
+  (diminish 'subword-mode "S"))
 
 (put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
 (put 'narrow-to-region 'disabled nil)
@@ -357,10 +337,15 @@ In that case, insert the number."
   (interactive)
   (modify-frame-parameters (window-frame (get-buffer-window)) default-frame-alist))
 
-(defun my-reset-framewidth ()
-  "Reset the current frame width to 120."
+(defun my-reset-frame-right-display ()
+  "Reset frame size and position for right side of display frame."
   (interactive)
-  (set-frame-width (window-frame (get-buffer-window)) 124))
+  (modify-frame-parameters (window-frame (get-buffer-window)) my-align-right-frame-alist))
+
+(defun my-reset-framewidth ()
+  "Reset the current frame width to `my-cols'."
+  (interactive)
+  (set-frame-width (window-frame (get-buffer-window)) my-cols))
 
 (defun ksh ()
   "Start a new shell."
@@ -432,8 +417,12 @@ In that case, insert the number."
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 (add-hook 'before-save-hook #'copyright-update)
 
+(global-set-key (kbd "C-x O") #'other-frame)
+(global-set-key (kbd "C-x C-o") #'other-frame)
+
 (global-set-key (kbd "M-<f1>") #'my-reset-frame-left)
 (global-set-key (kbd "M-<f2>") #'my-reset-frame-right)
+(global-set-key (kbd "M-<f3>") #'my-reset-frame-right-display)
 
 (global-set-key (kbd "C-x 4 c") #'my-customize-other-window)
 (global-set-key (kbd "C-x 4 k") #'my-shell-other-window)
@@ -448,12 +437,12 @@ In that case, insert the number."
 (global-set-key (kbd "C-M-\\") #'my-indent-buffer)
 (global-set-key (kbd "<home>") #'beginning-of-buffer)
 (global-set-key (kbd "<end>") #'end-of-buffer)
+(global-set-key (kbd "<delete>") #'delete-char)
+(global-set-key (kbd "S-<f12>") #'package-list-packages)
 
 (global-unset-key (kbd "C-z"))          ; suspend-frame
 (global-unset-key (kbd "C-x C-z"))      ; suspend-frame
 (global-unset-key (kbd "C-x h"))        ; mark-whole-bufferk
-
-(global-set-key (kbd "<delete>") #'delete-char)
 
 ;; Disable font size changing based on mouse/trackpad changes
 (global-unset-key (kbd "C-<mouse-4>"))
@@ -463,11 +452,17 @@ In that case, insert the number."
 (global-unset-key (kbd "C-<triple-mouse-4>"))
 (global-unset-key (kbd "C-<triple-mouse-5>"))
 
+(global-set-key (kbd "M-[") #'previous-buffer)
+(global-set-key (kbd "M-]") #'next-buffer)
+
 ;; (global-unset-key (kbd "M-<mouse-1>"))
 ;; (global-unset-key (kbd "M-<down-mouse-1>"))
 
-;; (global-set-key [(control meta right)] #'c-forward-into-nomenclature)
-;; (global-set-key [(control meta left)] #'c-backward-into-nomenclature)
 ;; (global-set-key [(control c)(control f)] #'ff-find-other-file)
+
+(when (file-exists-p custom-file)
+  (load custom-file 'noerror))
+
+(provide 'init)
 
 ;;; init.el ends here.

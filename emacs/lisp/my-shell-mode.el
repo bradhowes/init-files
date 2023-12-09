@@ -131,13 +131,14 @@ prompt lines in the first place."
 
   (setq shell-dirtrackp nil
         comint-process-echoes t
-	comint-buffer-maximum-size (* 1024 100)
+	comint-buffer-maximum-size (* 1024 5)
         comint-completion-addsuffix t
 	comint-eol-on-send t
         comint-output-filter-functions nil)
-  (setq-local company-backends #'((company-files company-native-complete)))
+  ;; (setq-local company-backends #'((company-files company-native-complete)))
 
-  (add-hook 'completion-at-point-functions #'native-complete-at-point nil t)
+  ;; (add-hook 'completion-at-point-functions #'native-complete-at-point nil t)
+  (native-complete-setup-bash)
 
   (add-hook 'comint-output-filter-functions #'my-shell-get-dir nil t)
   (add-hook 'comint-output-filter-functions #'ansi-color-process-output nil t)
