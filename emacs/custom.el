@@ -8,6 +8,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ace-window-display-mode t)
  '(auto-revert-buffer-list-filter 'magit-auto-revert-repository-buffer-p)
  '(auto-revert-use-notify nil)
  '(auto-save-list-file-prefix nil)
@@ -27,8 +28,6 @@
  '(company-tooltip-idle-delay 0.2)
  '(compilation-auto-jump-to-first-error t)
  '(compilation-scroll-output t)
- '(completion-auto-select 'second-tab)
- '(completion-styles '(basic partial-completion emacs22 flex))
  '(confirm-kill-emacs 'y-or-n-p)
  '(current-language-environment "UTF-8")
  '(custom-enabled-themes '(modus-vivendi))
@@ -56,20 +55,6 @@
  '(fill-column 120)
  '(find-file-visit-truename t)
  '(global-subword-mode t)
- '(helm-apropos-fuzzy-match nil)
- '(helm-autoresize-min-height 20)
- '(helm-buffers-fuzzy-matching nil)
- '(helm-candidate-number-limit 500)
- '(helm-completion-styles-alist
-   '((gud-mode . helm)
-     (mu4e-compose-mode . helm)
-     (buffer . helm)))
- '(helm-ff-DEL-up-one-level-maybe nil)
- '(helm-ff-file-name-history-use-recentf t)
- '(helm-ff-search-library-in-sexp t)
- '(helm-ff-use-notify nil)
- '(helm-follow-mode-persistent t)
- '(helm-visible-mark-prefix "✓")
  '(indent-tabs-mode nil)
  '(indicate-empty-lines t)
  '(inhibit-startup-echo-area-message "howes")
@@ -96,7 +81,7 @@
      ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
  '(package-quickstart t)
  '(package-selected-packages
-   '(helm-projectile markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation helm flycheck-indentation flycheck doom-themes doom-modeline diminish diff-hl company-quickhelp company-jedi company cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
+   '(consult-dir orderless vertico consult embark-consult embark helm-projectile markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation helm flycheck-indentation flycheck doom-themes doom-modeline diminish diff-hl company-quickhelp company-jedi company cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
  '(projectile-generic-command "rg --files --hidden -0")
  '(projectile-globally-ignored-directoriesx
    '(".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".tox" ".svn" ".cache" ".clangd" "./build" "./cmake"))
@@ -124,6 +109,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "Berkeley Mono" :foundry "nil" :slant normal :weight regular :height 130 :width normal))))
+ '(aw-leading-char-face ((t (:inherit (bold modus-themes-reset-soft) :foreground "light green" :height 1.5))))
  '(doom-modeline-bar-inactive ((t nil)))
  '(eglot-highlight-symbol-face ((t (:background "orchid4" :inherit bold))))
  '(fixed-pitch ((t (:family "Berkeley Mono"))))

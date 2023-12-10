@@ -1,4 +1,4 @@
-;;; init.el --- load the full configuration -*- lexical-binding: t; -*-
+;; init.el --- load the full configuration -*- lexical-binding: t; -*-
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3--
 ;;; Commentary:
 ;;; Code:
@@ -69,6 +69,8 @@
       scroll-conservatively 101
       scroll-margin 2)
 
+(recentf-mode t)
+
 (when is-macosx
   (eval-when-compile
     (require 'ls-lisp))
@@ -127,13 +129,6 @@
 (autoload 'my-makefile-mode-hook "my-makefile-mode")
 (add-hook 'makefile-mode-hook 'my-makefile-mode-hook)
 
-(use-package ediff
-  :defer t
-  :config
-  (setq-default ediff-window-setup-function 'ediff-setup-windows-plain
-                ediff-split-window-function 'split-window-horizontally
-                ediff-merge-split-window-function 'split-window-horizontally))
-
 (unless (daemonp)
   (use-package session
     :hook (after-init . session-initialize)))
@@ -158,68 +153,158 @@
   (use-package doom-modeline
     :hook (after-init . doom-modeline-mode)))
 
-(use-package helm
-  :ensure t
+(use-package ediff
+  :defer t
   :config
-  (require 'helm-autoloads)
-  (require 'helm-bookmark)
-  (require 'helm-buffers)
-  (require 'helm-files)
-  :defines helm-find-files-map helm-buffer-map helm-bookmark-map
-  :custom-face
-  (helm-mark-prefix ((t (:foreground "Gold1"))))
-  :bind (("C-x C-f" . helm-find-files)
-         ("<f12>" . helm-find-files)
-         ("C-x C-p" . helm-projectile)
-         ("M-<f12>" . helm-browse-project)
-         ("C-x C-b" . helm-filtered-bookmarks)
-         ("C-x r b" . helm-filtered-bookmarks)
-         ("C-x b"   . helm-mini)
-         ("M-h"     . helm-command-prefix)
-	 ("M-x"     . helm-M-x)
-         ("M-y"     . helm-show-kill-ring)
-         ("C-h f"   . helm-apropos)
-         ("C-h v"   . helm-apropos)
-         ("C-h i"   . helm-info)
-         :map helm-find-files-map
-         ("M-w" . helm-ff-run-switch-other-window)
-         ("M-f" . helm-ff-run-switch-other-frame)
-         :map helm-buffer-map
-         ("M-w" . helm-buffer-switch-other-window)
-         ("M-f" . helm-buffer-switch-other-frame)
-         :map helm-bookmark-map
-         ("M-w" . helm-bookmark-run-jump-other-window)
-         ("M-f" . helm-bookmark-run-jump-other-frame)
-         ))
+  (setq-default ediff-window-setup-function 'ediff-setup-windows-plain
+                ediff-split-window-function 'split-window-horizontally
+                ediff-merge-split-window-function 'split-window-horizontally))
 
-(use-package helm-mode
-  :diminish
-  :defer t
-  :after helm
-  :hook ((after-init . helm-mode)
-         (after-init . helm-autoresize-mode)))
-
-(use-package helm-projectile
+(use-package ace-window
   :ensure t
-  :defer t
-  :after helm-mode
-  :hook ((after-init . helm-projectile-on)))
+  :bind (("M-o" . ace-window)))
 
-;; (use-package helm-ls-git
+(use-package embark
+  :ensure t
+  :commands (embark-prefix-help-command)
+  :bind (("C-." . embark-act)
+         ("C-;" . embark-dwim)
+         ("C-h B" . embark-bindings))
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  :config
+  (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                                       nil
+                                       (window-parameters (mode-line-format . none)))))
+
+(use-package consult
+  :ensure t
+  :bind (("C-c M-x" . consult-mode-command)
+         ("C-c h" . consult-history)
+         ("C-c k" . consult-kmacro)
+         ("C-c m" . consult-man)
+
+         ("C-x b" . consult-buffer)
+         ("C-x 4 b" . consult-buffer-other-window)
+         ("C-x 5 b" . consult-buffer-other-frame)
+
+         ("M-y" . consult-yank-replace)
+         ("C-x M-b" . consult-bookmark)
+         ("M-g g" . consult-goto-line)
+         ("C-s" . consult-line)
+         ("C-c i" . consult-info))
+  ;; :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  :init
+  (setq register-preview-delay 0.5
+        register-preview-function #'consult-register-format)
+
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  :config
+  (consult-customize
+   consult-theme :review-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   :preview-key '(:debounce 0.4 any))
+  (setq consult-narry-wky "<")
+  (setq consult-project-function (lambda (_) (projectile-project-root)))
+  )
+
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode)
+  (setq vertico-count 20
+        vertico-resize t
+        vertico-cycle t))
+
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+
+(use-package emacs
+  :init
+  (require 'crm)
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*]\\*\\'" "" crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+  (setq enable-recursive-minibuffers t))
+
+;; (use-package helm
+;;   :ensure t
+;;   :config
+;;   (require 'helm-autoloads)
+;;   (require 'helm-bookmark)
+;;   (require 'helm-buffers)
+;;   (require 'helm-files)
+;;   :defines helm-find-files-map helm-buffer-map helm-bookmark-map
+;;   :custom-face
+;;   (helm-mark-prefix ((t (:foreground "Gold1"))))
+;;   :bind (("C-x C-f" . helm-find-files)
+;;          ("<f12>" . helm-find-files)
+;;          ("C-x C-p" . helm-projectile)
+;;          ("M-<f12>" . helm-browse-project)
+;;          ("C-x C-b" . helm-filtered-bookmarks)
+;;          ("C-x r b" . helm-filtered-bookmarks)
+;;          ("C-x b"   . helm-mini)
+;;          ("M-h"     . helm-command-prefix)
+;; 	 ("M-x"     . helm-M-x)
+;;          ("M-y"     . helm-show-kill-ring)
+;;          ("C-h f"   . helm-apropos)
+;;          ("C-h v"   . helm-apropos)
+;;          ("C-h i"   . helm-info)
+;;          :map helm-find-files-map
+;;          ("M-w" . helm-ff-run-switch-other-window)
+;;          ("M-f" . helm-ff-run-switch-other-frame)
+;;          :map helm-buffer-map
+;;          ("M-w" . helm-buffer-switch-other-window)
+;;          ("M-f" . helm-buffer-switch-other-frame)
+;;          :map helm-bookmark-map
+;;          ("M-w" . helm-bookmark-run-jump-other-window)
+;;          ("M-f" . helm-bookmark-run-jump-other-frame)
+;;          ))
+
+;; (use-package helm-mode
+;;   :diminish
+;;   :defer t
+;;   :after helm
+;;   :hook ((after-init . helm-mode)
+;;          (after-init . helm-autoresize-mode)))
+
+;; (use-package helm-projectile
 ;;   :ensure t
 ;;   :defer t
-;;   :after helm-projectile)
+;;   :after helm-mode
+;;   :hook ((after-init . helm-projectile-on)))
 
 (use-package magit
   :ensure t
   :defer t
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh)
-         (magit-mode . helm-mode))
+         ;; (magit-mode . helm-mode)
+         )
   :bind (("C-c g" . magit-file-dispatch)
          ("C-x g" . magit-status)))
 
-;; (use-package mode-line-bell)
+(use-package mode-line-bell
+  :ensure t)
 
 (use-package eglot
   :ensure t
@@ -249,21 +334,14 @@
 
 (use-package company
   :ensure t
+  :commands company-complete
   :hook ((text-mode . company-mode)
-         (prog-mode . company-mode)))
+         (prog-mode . company-mode))
+  :bind (("C-c C-c" . #'company-complete)))
 
 (use-package company-quickhelp
   :ensure t
-  :commands commpany-quickhelp-manual-begin
   :hook ((after-init . company-quickhelp-mode)))
-
-;; (eval-after-load 'company
-;;  '(define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
-
-;; (use-package elec-pair
-;;   :ensure t
-;;   :init
-;;   (electric-pair-mode 1))
 
 (use-package markdown-mode
   :ensure t
@@ -276,8 +354,8 @@
   :ensure t
   :defer t
   :commands projectile-mode
-  :config
-  (setq projectile-completion-system 'helm)
+  ;; :config
+  ;; (setq projectile-completion-system 'helm)
   :bind-keymap
   ("C-x p" . projectile-command-map)
   :hook (prog-mode . projectile-mode))
