@@ -37,13 +37,13 @@
   "The number of rows to show in a frame based on display height.")
 (defconst my-cols (if (or is-4k is-laptop) 132 80)
   "The number of columns to show in a frame based on display height.")
-(defconst my-window-offset 960
+(defconst my-window-offset (if is-4k (+ 960 264) 960)
   "The offset to the `alt' window based on display height.")
-(defconst my-window-right-offset (- (display-pixel-width) my-window-offset)
+(defconst my-window-right-offset (if is-4k (* my-window-offset 2) (- (display-pixel-width) my-window-offset))
   "The offset to the `alt' window based on display height.")
 (defconst my-font-name "Berkeley Mono"
   "The name of the font to use.")
-(defconst my-font-size 12
+(defconst my-font-size (if is-4k 15 12)
   "The font size to use based on the display height.")
 (defvar my-align-right-frame-alist
   `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . ,my-window-right-offset))
@@ -153,6 +153,31 @@
   (use-package doom-modeline
     :hook (after-init . doom-modeline-mode)))
 
+(use-package denote
+  :ensure t
+  :config
+  (setq denote-directory (expand-file-name "~/Documents/notes/")
+        denote-infer-keywords t
+        denote-sort-keywords t
+        denote-file-types (cons
+                           '(markdown-brh
+                             :extension ".md"
+                             :date-function (lambda (date) (format-time-string "%F %T"))
+                             :front-matter denote-yaml-front-matter
+                             :title-key-regexp "^title\\s-*:"
+                             :title-value-function denote-trim-whitespace
+                             :title-value-reverse-function denote-trim-whitespace
+                             :keywords-key-regexp "^tags\\s-*:"
+                             :keywords-value-function denote-format-keywords-for-text-front-matter
+                             :keywords-value-reverse-function denote-extract-keywords-from-front-matter
+                             :link denote-md-link-format
+                             :link-in-context-regexp denote-md-link-in-context-regexp)
+                           denote-file-types)
+        denote-file-type 'markdown-brh
+      )
+  (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+  :bind (("C-c n n" . denote)))
+
 (use-package ediff
   :defer t
   :config
@@ -178,23 +203,62 @@
                                        nil
                                        (window-parameters (mode-line-format . none)))))
 
+(use-package projectile)
+
 (use-package consult
   :ensure t
-  :bind (("C-c M-x" . consult-mode-command)
+  :bind (;; C-c bindings in `mode-specific-map`
+         ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
+         ("C-c i" . consult-info)
          ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
-
+         ([remap Info-search] . consult-info)
+         ;; C-x bindings in `ctl-x-map`
+         ("C-x M-:" . consult-complex-command)
          ("C-x b" . consult-buffer)
          ("C-x 4 b" . consult-buffer-other-window)
          ("C-x 5 b" . consult-buffer-other-frame)
+         ("C-x t b" . consult-buffer-other-tab)
+         ("C-x r b" . consult-bookmark)
 
-         ("M-y" . consult-yank-replace)
-         ("C-x M-b" . consult-bookmark)
+         ;; ("C-x p b" . consult-project-bookmark)
+
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)
+         ("C-M-#" . consult-register)
+
+         ("M-y" . consult-yank-pop)
          ("M-g g" . consult-goto-line)
-         ("C-s" . consult-line)
-         ("C-c i" . consult-info))
-  ;; :hook (completion-list-mode . consult-preview-at-point-mode)
+         ("M-g M-g" . consult-goto-line)
+         ("M-g o" . consult-outline)
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings in `search-map`
+         ("M-s c" . consult-locate)
+         ("M-s d" . consult-find)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s k" . consult-keep-lines)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s r" . consult-ripgrep)
+         ("M-s u" . consult-focus-lines)
+
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)
+         ("M-s e" . consult-isearch-history)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         :map minibuffer-local-map
+         ("M-s" . consult-history)
+         ("M-r" . consult-history))
+
+  :hook (completion-list-mode . consult-preview-at-point-mode)
 
   :init
   (setq register-preview-delay 0.5
@@ -213,7 +277,7 @@
    consult--source-bookmark consult--source-file-register
    consult--source-recent-file consult--source-project-recent-file
    :preview-key '(:debounce 0.4 any))
-  (setq consult-narry-wky "<")
+  (setq consult-narrow-key "<")
   (setq consult-project-function (lambda (_) (projectile-project-root)))
   )
 
@@ -245,53 +309,6 @@
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
   (setq enable-recursive-minibuffers t))
-
-;; (use-package helm
-;;   :ensure t
-;;   :config
-;;   (require 'helm-autoloads)
-;;   (require 'helm-bookmark)
-;;   (require 'helm-buffers)
-;;   (require 'helm-files)
-;;   :defines helm-find-files-map helm-buffer-map helm-bookmark-map
-;;   :custom-face
-;;   (helm-mark-prefix ((t (:foreground "Gold1"))))
-;;   :bind (("C-x C-f" . helm-find-files)
-;;          ("<f12>" . helm-find-files)
-;;          ("C-x C-p" . helm-projectile)
-;;          ("M-<f12>" . helm-browse-project)
-;;          ("C-x C-b" . helm-filtered-bookmarks)
-;;          ("C-x r b" . helm-filtered-bookmarks)
-;;          ("C-x b"   . helm-mini)
-;;          ("M-h"     . helm-command-prefix)
-;; 	 ("M-x"     . helm-M-x)
-;;          ("M-y"     . helm-show-kill-ring)
-;;          ("C-h f"   . helm-apropos)
-;;          ("C-h v"   . helm-apropos)
-;;          ("C-h i"   . helm-info)
-;;          :map helm-find-files-map
-;;          ("M-w" . helm-ff-run-switch-other-window)
-;;          ("M-f" . helm-ff-run-switch-other-frame)
-;;          :map helm-buffer-map
-;;          ("M-w" . helm-buffer-switch-other-window)
-;;          ("M-f" . helm-buffer-switch-other-frame)
-;;          :map helm-bookmark-map
-;;          ("M-w" . helm-bookmark-run-jump-other-window)
-;;          ("M-f" . helm-bookmark-run-jump-other-frame)
-;;          ))
-
-;; (use-package helm-mode
-;;   :diminish
-;;   :defer t
-;;   :after helm
-;;   :hook ((after-init . helm-mode)
-;;          (after-init . helm-autoresize-mode)))
-
-;; (use-package helm-projectile
-;;   :ensure t
-;;   :defer t
-;;   :after helm-mode
-;;   :hook ((after-init . helm-projectile-on)))
 
 (use-package magit
   :ensure t

@@ -15,6 +15,7 @@
  '(backup-directory-alist '(("." . ".~")))
  '(byte-compile-verbose nil)
  '(case-fold-search t)
+ '(column-number-mode t)
  '(comint-buffer-maximum-size 8192)
  '(company-backends
    '(company-capf company-keywords company-semantic company-files company-etags company-elisp company-clang company-dabbrev-code company-cmake company-ispell company-native-complete))
@@ -81,7 +82,7 @@
      ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
  '(package-quickstart t)
  '(package-selected-packages
-   '(consult-dir orderless vertico consult embark-consult embark helm-projectile markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation helm flycheck-indentation flycheck doom-themes doom-modeline diminish diff-hl company-quickhelp company-jedi company cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
+   '(ef-themes denote consult-dir orderless vertico consult embark-consult embark markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation flycheck-indentation flycheck doom-themes doom-modeline diminish diff-hl company-quickhelp company-jedi company cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
  '(projectile-generic-command "rg --files --hidden -0")
  '(projectile-globally-ignored-directoriesx
    '(".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".tox" ".svn" ".cache" ".clangd" "./build" "./cmake"))
