@@ -155,6 +155,9 @@
 
 (use-package denote
   :ensure t
+  :commands (denote-dired-mode-in-directories)
+  :hook ((dired-mode . denote-dired-mode-in-directories))
+  :bind (("C-c n n" . denote))
   :config
   (setq denote-directory (expand-file-name "~/Documents/notes/")
         denote-infer-keywords t
@@ -173,10 +176,7 @@
                              :link denote-md-link-format
                              :link-in-context-regexp denote-md-link-in-context-regexp)
                            denote-file-types)
-        denote-file-type 'markdown-brh
-      )
-  (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
-  :bind (("C-c n n" . denote)))
+        denote-file-type 'markdown-brh))
 
 (use-package ediff
   :defer t
@@ -203,7 +203,8 @@
                                        nil
                                        (window-parameters (mode-line-format . none)))))
 
-(use-package projectile)
+(use-package projectile
+  :commands (projectile-project-root))
 
 (use-package consult
   :ensure t
@@ -221,9 +222,7 @@
          ("C-x 5 b" . consult-buffer-other-frame)
          ("C-x t b" . consult-buffer-other-tab)
          ("C-x r b" . consult-bookmark)
-
          ;; ("C-x p b" . consult-project-bookmark)
-
          ("M-#" . consult-register-load)
          ("M-'" . consult-register-store)
          ("C-M-#" . consult-register)
@@ -246,7 +245,6 @@
          ("M-s L" . consult-line-multi)
          ("M-s r" . consult-ripgrep)
          ("M-s u" . consult-focus-lines)
-
          ;; Isearch integration
          ("M-s e" . consult-isearch-history)
          :map isearch-mode-map
@@ -259,7 +257,7 @@
          ("M-r" . consult-history))
 
   :hook (completion-list-mode . consult-preview-at-point-mode)
-
+  :commands (consult-register-format consult-register-window consult-xref)
   :init
   (setq register-preview-delay 0.5
         register-preview-function #'consult-register-format)
@@ -278,11 +276,11 @@
    consult--source-recent-file consult--source-project-recent-file
    :preview-key '(:debounce 0.4 any))
   (setq consult-narrow-key "<")
-  (setq consult-project-function (lambda (_) (projectile-project-root)))
-  )
+  (setq consult-project-function (lambda (_) (projectile-project-root))))
 
 (use-package vertico
   :ensure t
+  :commands (vertico-mode)
   :init
   (vertico-mode)
   (setq vertico-count 20
@@ -290,33 +288,24 @@
         vertico-cycle t))
 
 (use-package orderless
-  :init
-  (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+  :ensure t
+  :commands (orderless-escapable-split-on-space)
+  :init (icomplete-mode)
+  :custom ((completion-styles '(orderless basic))
+           (completion-category-defaults nil)
+           (completion-category-overrides '((file (styles partial-completion))))))
 
 (use-package emacs
-  :init
-  (require 'crm)
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*]\\*\\'" "" crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-  (setq enable-recursive-minibuffers t))
+  :ensure t
+  :custom ((minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+           (enable-recursive-minibuffers t))
+  :hook ((minibuffer-setup . cursor-intangible-mode)))
 
 (use-package magit
   :ensure t
   :defer t
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
-         (magit-post-refresh . diff-hl-magit-post-refresh)
-         ;; (magit-mode . helm-mode)
-         )
+         (magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-c g" . magit-file-dispatch)
          ("C-x g" . magit-status)))
 
@@ -326,7 +315,7 @@
 (use-package eglot
   :ensure t
   :defer t
-  :commands eglot-ensure
+  :commands (eglot-ensure)
   :hook ((python-mode . eglot-ensure)))
 
 (use-package flymake
@@ -344,14 +333,13 @@
 (use-package diff-hl
   :ensure t
   :defer t
-  :commands diff-hl-flydiff-mode
-  :init
-  (diff-hl-flydiff-mode t)
+  :commands (diff-hl-flydiff-mode)
+  :init (diff-hl-flydiff-mode t)
   :hook (after-init . global-diff-hl-mode))
 
 (use-package company
   :ensure t
-  :commands company-complete
+  :commands (company-complete)
   :hook ((text-mode . company-mode)
          (prog-mode . company-mode))
   :bind (("C-c C-c" . #'company-complete)))
@@ -370,7 +358,7 @@
 (use-package projectile
   :ensure t
   :defer t
-  :commands projectile-mode
+  :commands (projectile-mode)
   ;; :config
   ;; (setq projectile-completion-system 'helm)
   :bind-keymap
@@ -387,12 +375,12 @@
 
 (use-package which-key
   :ensure t
-  :commands which-key-mode
+  :commands (which-key-mode)
   :config
   (which-key-mode t))
 
 (use-package hl-line
-  :commands global-hl-line-mode
+  :commands (global-hl-line-mode)
   :hook (emacs-startup . global-hl-line-mode))
 
 (use-package marginalia
@@ -410,7 +398,7 @@
 
 (use-package diminish
   :ensure t
-  :commands diminish
+  :commands (diminish)
   :config
   (diminish 'abbrev-mode "A")
   (diminish 'auto-fill-function "F")
@@ -557,6 +545,8 @@
 
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))
+
+(setq gc-cons-threshold my-gc-cons-threshold)
 
 (provide 'init)
 
