@@ -33,20 +33,28 @@
   "T if the current display is on laptop display.")
 (defconst is-4k (eq (display-pixel-height nil) 2160)
   "T if the current display is 4K.")
-(defconst my-rows (if (or is-4k is-laptop) 88 40)
+(defconst is-double-monitor (eq (display-pixel-width nil) 7680)
+  "Set to T if we have two 4K monitors showing one desktop.")
+(defconst my-rows (if is-4k 102 (if is-laptop 88 40))
   "The number of rows to show in a frame based on display height.")
 (defconst my-cols (if (or is-4k is-laptop) 132 80)
   "The number of columns to show in a frame based on display height.")
+(defconst my-window-left (if is-double-monitor (/ (display-pixel-width nil) 2) 0)
+  "Number of pixels to use for the `left' part of the `initial-frame-alist'.")
 (defconst my-window-offset (if is-4k (+ 960 264) 960)
   "The offset to the `alt' window based on display height.")
 (defconst my-window-right-offset (if is-4k (* my-window-offset 2) (- (display-pixel-width) my-window-offset))
   "The offset to the `alt' window based on display height.")
 (defconst my-font-name "Berkeley Mono"
   "The name of the font to use.")
-(defconst my-font-size (if is-4k 15 12)
+(defconst my-font-size (if is-4k 16 12)
   "The font size to use based on the display height.")
-(defvar my-align-right-frame-alist
-  `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . ,my-window-right-offset))
+(defconst my-window-titlebar-height 0
+  "The size in pixels of the window title bar.")
+(defvar my-align-right-frame-alist `((width . ,my-cols)
+                                     (height . ,my-rows)
+                                     (top . ,my-window-titlebar-height)
+                                     (left . ,my-window-right-offset))
   "The alist to use to place a frame aligned to the right size of the display.")
 
 (setenv "WORKON_HOME" my-venv)
@@ -61,8 +69,8 @@
       custom-file (expand-file-name "~/.emacs.d/custom.el")
       load-path (append (list (expand-file-name "~/.emacs.d/lisp")) load-path)
 
-      default-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . ,my-window-offset))
-      initial-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . 0) (left . 0))
+      default-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . ,my-window-titlebar-height) (left . ,my-window-offset))
+      initial-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . ,my-window-titlebar-height) (left . ,my-window-left))
 
       frame-title-format (list  '(:eval (abbreviate-file-name default-directory)))
 
@@ -129,29 +137,83 @@
 (autoload 'my-makefile-mode-hook "my-makefile-mode")
 (add-hook 'makefile-mode-hook 'my-makefile-mode-hook)
 
-(unless (daemonp)
-  (use-package session
-    :hook (after-init . session-initialize)))
+;; (unless (daemonp)
+;;   (use-package session
+;;     :ensure t
+;;     :hook (after-init . session-initialize)))
 
 (when (display-graphic-p)
   (use-package doom-themes
+    :ensure t
     :defer t
-    ;; :hook (after-init . session-initialize)
     :functions (doom-themes-visual-bell-config
                 doom-themes-neotree-config)
-    :custom
-    ((doom-themes-enable-bold t)
-     (doom-themes-enable-italic t))
-
-    :init
+    :config
     (load-theme 'doom-tomorrow-night t)
     (doom-themes-visual-bell-config)
     (doom-themes-neotree-config))
 
-  (use-package all-the-icons)
+  (use-package all-the-icons
+    :ensure t)
+
+  (use-package all-the-icons-completion
+    :ensure t
+    :commands (all-the-icons-completion-mode)
+    :after (marginalia all-the-icons)
+    :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+    :config (all-the-icons-completion-mode))
+
+  (use-package nerd-icons
+    :ensure t)
 
   (use-package doom-modeline
+    :ensure t
     :hook (after-init . doom-modeline-mode)))
+
+(use-package ediff
+  :defer t
+  :config
+  (setq-default ediff-window-setup-function 'ediff-setup-windows-plain
+                ediff-split-window-function 'split-window-horizontally
+                ediff-merge-split-window-function 'split-window-horizontally))
+
+(use-package ediff
+  :defer t
+  :config
+  (setq-default ediff-window-setup-function 'ediff-setup-windows-plain
+                ediff-split-window-function 'split-window-horizontally
+                ediff-merge-split-window-function 'split-window-horizontally))
+
+(use-package diff-hl
+  :ensure t
+  :defer t
+  :commands (diff-hl-flydiff-mode)
+  :init (diff-hl-flydiff-mode t)
+  :hook (after-init . global-diff-hl-mode))
+
+(use-package magit
+  :ensure t
+  :defer t
+  :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
+         (magit-post-refresh . diff-hl-magit-post-refresh))
+  :bind (("C-c g" . magit-file-dispatch)
+         ("C-x g" . magit-status)))
+
+(use-package projectile
+  :ensure t
+  :defer t
+  :commands (projectile-mode projectile-project-root projectile-register-project-type)
+  :bind-keymap ("C-x p" . projectile-command-map)
+  :hook (prog-mode . projectile-mode)
+  :config
+  (projectile-register-project-type 'swift '("Package.swift")
+                                    :project-file "Package.swift"
+                                    :src-dir "Sources"
+                                    :test-dir "Tests"
+                                    :compile "swift build"
+                                    :test "swift test"
+                                    :run "swift run"
+                                    :test-suffix ""))
 
 (use-package denote
   :ensure t
@@ -178,13 +240,6 @@
                            denote-file-types)
         denote-file-type 'markdown-brh))
 
-(use-package ediff
-  :defer t
-  :config
-  (setq-default ediff-window-setup-function 'ediff-setup-windows-plain
-                ediff-split-window-function 'split-window-horizontally
-                ediff-merge-split-window-function 'split-window-horizontally))
-
 (use-package ace-window
   :ensure t
   :bind (("M-o" . ace-window)))
@@ -197,14 +252,10 @@
          ("C-h B" . embark-bindings))
   :init
   (setq prefix-help-command #'embark-prefix-help-command)
-
   :config
   (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                                        nil
                                        (window-parameters (mode-line-format . none)))))
-
-(use-package projectile
-  :commands (projectile-project-root))
 
 (use-package consult
   :ensure t
@@ -278,75 +329,76 @@
   (setq consult-narrow-key "<")
   (setq consult-project-function (lambda (_) (projectile-project-root))))
 
+(use-package marginalia
+  :ensure t
+  :commands (marginalia-mode)
+  :bind (:map minibuffer-local-map
+              ("M-a" . marginalia-cycle))
+  :init (marginalia-mode))
+
 (use-package vertico
   :ensure t
   :commands (vertico-mode)
-  :init
-  (vertico-mode)
-  (setq vertico-count 20
-        vertico-resize t
-        vertico-cycle t))
-
-(use-package orderless
-  :ensure t
-  :commands (orderless-escapable-split-on-space)
-  :init (icomplete-mode)
-  :custom ((completion-styles '(orderless basic))
-           (completion-category-defaults nil)
-           (completion-category-overrides '((file (styles partial-completion))))))
-
-(use-package emacs
-  :ensure t
-  :custom ((minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
-           (enable-recursive-minibuffers t))
-  :hook ((minibuffer-setup . cursor-intangible-mode)))
-
-(use-package magit
-  :ensure t
-  :defer t
-  :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
-         (magit-post-refresh . diff-hl-magit-post-refresh))
-  :bind (("C-c g" . magit-file-dispatch)
-         ("C-x g" . magit-status)))
+  :init (vertico-mode))
 
 (use-package mode-line-bell
   :ensure t)
 
 (use-package eglot
   :ensure t
-  :defer t
   :commands (eglot-ensure)
-  :hook ((python-mode . eglot-ensure)))
+  :hook ((swift-mode . eglot-ensure)
+         (python-mode . eglot-ensure))
+  :config (add-to-list 'eglot-server-programs '(swift-mode . ("xcrun" "sourcekit-lsp"))))
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles basic partial-completion)))))
+
+;; (orderless-define-completion-style orderless+initialism
+;;   (orderless-matching-styles '(orderless-initialism
+;;                                orderless-literal
+;;                                orderless-regexp)))
+;; (setq completion-category-overrides
+;;       '((command (styles orderless+initialism))
+;;         (symbol (styles orderless+initialism))
+;;         (variable (styles orderless+initialism)))
+;;       orderless-component-separator "[ &]")
+
+(use-package swift-mode
+  :ensure t
+  :defer t
+  :custom ((swift-mode:basic-offset 2))
+  :hook (swift-mode . (lambda () (set (make-local-variable 'compile-command) "swift build"))))
 
 (use-package flymake
   :ensure t
   :defer t
-  :config
-  (setq elisp-flymake-byte-compile-load-path load-path
-        flymake-mode-line-title "FM")
+  :config (setq elisp-flymake-byte-compile-load-path load-path
+                flymake-mode-line-title "FM")
   :hook ((emacs-lisp-mode . flymake-mode)
          (python-mode . flymake-mode))
   :bind (:map flymake-mode-map
               ("M-n" . flymake-goto-next-error)
               ("M-p" . flymake-goto-prev-error)))
 
-(use-package diff-hl
+(use-package corfu
   :ensure t
-  :defer t
-  :commands (diff-hl-flydiff-mode)
-  :init (diff-hl-flydiff-mode t)
-  :hook (after-init . global-diff-hl-mode))
+  :commands (global-corfu-mode)
+  :init
+  :bind (:map corfu-map
+              ("<return>" . corfu-complete))
+  :custom ((corfu-cycle t)
+           (corfu-auto t)
+           (corfu-preselect 'directory))
+  :config
+  (global-corfu-mode))
 
-(use-package company
-  :ensure t
-  :commands (company-complete)
-  :hook ((text-mode . company-mode)
-         (prog-mode . company-mode))
-  :bind (("C-c C-c" . #'company-complete)))
-
-(use-package company-quickhelp
-  :ensure t
-  :hook ((after-init . company-quickhelp-mode)))
+(require 'corfu-popupinfo)
+(corfu-popupinfo-mode)
 
 (use-package markdown-mode
   :ensure t
@@ -354,16 +406,6 @@
 
 (use-package winner
   :hook (after-init . winner-mode))
-
-(use-package projectile
-  :ensure t
-  :defer t
-  :commands (projectile-mode)
-  ;; :config
-  ;; (setq projectile-completion-system 'helm)
-  :bind-keymap
-  ("C-x p" . projectile-command-map)
-  :hook (prog-mode . projectile-mode))
 
 (use-package cmake-mode
   :ensure t
@@ -376,16 +418,16 @@
 (use-package which-key
   :ensure t
   :commands (which-key-mode)
-  :config
-  (which-key-mode t))
+  :init (which-key-mode t))
 
 (use-package hl-line
   :commands (global-hl-line-mode)
   :hook (emacs-startup . global-hl-line-mode))
 
-(use-package marginalia
-  :ensure t
-  :hook (emacs-startup . marginalia-mode))
+(use-package emacs
+  ;; :config
+  ;; (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+  :hook ((minibuffer-setup . cursor-intangible-mode)))
 
 (global-prettify-symbols-mode t)
 
@@ -545,8 +587,6 @@
 
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))
-
-(setq gc-cons-threshold my-gc-cons-threshold)
 
 (provide 'init)
 
