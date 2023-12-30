@@ -9,6 +9,6 @@
 
 (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold my-gc-cons-threshold)))
 
-;; (set-face-attribute 'default nil :background "#282c34" :foreground "#bbc2cf")
+(set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")
 
 ;;; early-init.el ends here.

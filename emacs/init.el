@@ -41,7 +41,7 @@
   "The number of columns to show in a frame based on display height.")
 (defconst my-window-left (if is-double-monitor (/ (display-pixel-width nil) 2) 0)
   "Number of pixels to use for the `left' part of the `initial-frame-alist'.")
-(defconst my-window-offset (if is-4k (+ 960 264) 960)
+(defconst my-window-offset (+ (if is-4k 1354 960) my-window-left)
   "The offset to the `alt' window based on display height.")
 (defconst my-window-right-offset (if is-4k (* my-window-offset 2) (- (display-pixel-width) my-window-offset))
   "The offset to the `alt' window based on display height.")
@@ -76,8 +76,6 @@
 
       scroll-conservatively 101
       scroll-margin 2)
-
-(recentf-mode t)
 
 (when is-macosx
   (eval-when-compile
@@ -120,22 +118,22 @@
 
 (autoload 'emacs-pager "emacs-pager")
 (autoload 'my-lisp-mode-hook "my-lisp-mode")
-(add-hook 'lisp-mode-hook 'my-lisp-mode-hook)
-(add-hook 'emacs-lisp-mode-hook 'my-lisp-mode-hook)
-(add-hook 'lisp-interaction-mode-hook 'my-lisp-mode-hook)
-(add-hook 'scheme-mode-hook 'my-lisp-mode-hook)
+(add-hook 'lisp-mode-hook #'my-lisp-mode-hook)
+(add-hook 'emacs-lisp-mode-hook #'my-lisp-mode-hook)
+(add-hook 'lisp-interaction-mode-hook #'my-lisp-mode-hook)
+(add-hook 'scheme-mode-hook #'my-lisp-mode-hook)
 (autoload 'my-lisp-data-mode-hook "my-lisp-mode")
-(add-hook 'lisp-data-mode-hook 'my-lisp-data-mode-hook)
+(add-hook 'lisp-data-mode-hook #'my-lisp-data-mode-hook)
 (autoload 'my-cmake-mode-hook "my-cmake-mode")
-(add-hook 'cmake-mode-hook 'my-cmake-mode-hook)
+(add-hook 'cmake-mode-hook #'my-cmake-mode-hook)
 (autoload 'my-c++-mode-hook "my-c++-mode")
-(add-hook 'c++-mode-hook 'my-c++-mode-hook)
+(add-hook 'c++-mode-hook #'my-c++-mode-hook)
 (autoload 'my-sh-mode-hook "my-sh-mode")
-(add-hook 'sh-mode-hook 'my-sh-mode-hook)
+(add-hook 'sh-mode-hook #'my-sh-mode-hook)
 (autoload 'my-shell-mode-hook "my-shell-mode")
-(add-hook 'shell-mode-hook 'my-shell-mode-hook)
+(add-hook 'shell-mode-hook #'my-shell-mode-hook)
 (autoload 'my-makefile-mode-hook "my-makefile-mode")
-(add-hook 'makefile-mode-hook 'my-makefile-mode-hook)
+(add-hook 'makefile-mode-hook #'my-makefile-mode-hook)
 
 ;; (unless (daemonp)
 ;;   (use-package session
@@ -169,6 +167,18 @@
   (use-package doom-modeline
     :ensure t
     :hook (after-init . doom-modeline-mode)))
+
+(auto-save-visited-mode t)
+
+(use-package dired
+  :config
+  (setq dired-recursive-copies 'always
+        dired-recursive-deletes 'always
+        dired-listing-switches "-AGFhlv --group-directories-first --time-style=long-iso"))
+
+(use-package savehist
+  :init
+  (savehist-mode t))
 
 (use-package ediff
   :defer t
@@ -253,6 +263,34 @@
   :init
   (setq prefix-help-command #'embark-prefix-help-command)
   :config
+  (defmacro my-embark-ace-action (fn)
+    `(defun ,(intern (concat "my-embark-ace-" (symbol-name fn))) ()
+       (interactive)
+       (with-demoted-errors "%s"
+         (require 'ace-window)
+         (let ((aw-dispatch-always t))
+           (aw-switch-to-window (aw-select nil))
+           (call-interactively (symbol-function ',fn))))))
+
+  (defmacro my-embark-split-action (fn split-type)
+    `(defun ,(intern (concat "my-embark-" (symbol-name fn) "-"
+                             (car (last (split-string (symbol-name split-type) "-"))))) ()
+       (interactive)
+       (funcall #',split-type)
+       (call-interactively #',fn)))
+
+  (define-key embark-file-map (kbd "o") (my-embark-ace-action find-file))
+  (define-key embark-buffer-map (kbd "o") (my-embark-ace-action switch-to-buffer))
+  (define-key embark-bookmark-map (kbd "o") (my-embark-ace-action bookmark-jump))
+
+  (define-key embark-file-map (kbd "2") (my-embark-split-action find-file split-window-below))
+  (define-key embark-buffer-map (kbd "2") (my-embark-split-action switch-to-buffer split-window-below))
+  (define-key embark-bookmark-map (kbd "2") (my-embark-split-action bookmark-jump split-window-below))
+
+  (define-key embark-file-map (kbd "3") (my-embark-split-action find-file split-window-right))
+  (define-key embark-buffer-map (kbd "3") (my-embark-split-action switch-to-buffer split-window-right))
+  (define-key embark-bookmark-map (kbd "3") (my-embark-split-action bookmark-jump split-window-right))
+
   (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                                        nil
                                        (window-parameters (mode-line-format . none)))))
@@ -287,12 +325,12 @@
          ("M-g i" . consult-imenu)
          ("M-g I" . consult-imenu-multi)
          ;; M-s bindings in `search-map`
-         ("M-s c" . consult-locate)
          ("M-s d" . consult-find)
          ("M-s g" . consult-grep)
          ("M-s G" . consult-git-grep)
          ("M-s k" . consult-keep-lines)
          ("M-s l" . consult-line)
+         ("M-s M-l" . my-consult-line-symbol-at-point)
          ("M-s L" . consult-line-multi)
          ("M-s r" . consult-ripgrep)
          ("M-s u" . consult-focus-lines)
@@ -304,8 +342,7 @@
          ("M-s l" . consult-line)
          ("M-s L" . consult-line-multi)
          :map minibuffer-local-map
-         ("M-s" . consult-history)
-         ("M-r" . consult-history))
+         ("C-s" . consult-history))
 
   :hook (completion-list-mode . consult-preview-at-point-mode)
   :commands (consult-register-format consult-register-window consult-xref)
@@ -319,6 +356,10 @@
         xref-show-definitions-function #'consult-xref)
 
   :config
+  (defun my-consult-line-symbol-at-point ()
+    "Start `consult-line' with symbol at point."
+    (interactive)
+    (consult-line (thing-at-point 'symbol)))
   (consult-customize
    consult-theme :review-key '(:debounce 0.2 any)
    consult-ripgrep consult-git-grep consult-grep
@@ -328,6 +369,10 @@
    :preview-key '(:debounce 0.4 any))
   (setq consult-narrow-key "<")
   (setq consult-project-function (lambda (_) (projectile-project-root))))
+
+(use-package embark-consult
+  :ensure t
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package marginalia
   :ensure t
@@ -339,6 +384,7 @@
 (use-package vertico
   :ensure t
   :commands (vertico-mode)
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
   :init (vertico-mode))
 
 (use-package mode-line-bell
@@ -393,9 +439,11 @@
               ("<return>" . corfu-complete))
   :custom ((corfu-cycle t)
            (corfu-auto t)
+           (corfu-popupinfo-mode t)
            (corfu-preselect 'directory))
   :config
-  (global-corfu-mode))
+  (global-corfu-mode)
+  (corfu-history-mode))
 
 (require 'corfu-popupinfo)
 (corfu-popupinfo-mode)
@@ -424,9 +472,21 @@
   :commands (global-hl-line-mode)
   :hook (emacs-startup . global-hl-line-mode))
 
+(use-package recentf
+  :init (recentf-mode t))
+
 (use-package emacs
-  ;; :config
-  ;; (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+  :init
+  (defun my-crm-indicator(args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'my-crm-indicator)
+
+  :config
+  (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+
   :hook ((minibuffer-setup . cursor-intangible-mode)))
 
 (global-prettify-symbols-mode t)
@@ -436,7 +496,7 @@
   (message "Loading native-complete-setup-bash")
   (native-complete-setup-bash))
 
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+(add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
 (use-package diminish
   :ensure t
@@ -539,51 +599,79 @@
   (interactive)
   (indent-region (point-min) (point-max) nil))
 
+(defmacro my-emacs-keybind (keymap &rest definitions)
+  "Expand key binding DEFINITIONS for the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs."
+  (declare (indent 1))
+  (unless (zerop (% (length definitions) 2))
+    (error "Uneven number of key+command pairs"))
+  (let ((keys (seq-filter #'stringp definitions))
+        ;; We do accept nil as a definition: it unsets the given key.
+        (commands (seq-remove #'stringp definitions)))
+    `(when-let (((keymapp ,keymap))
+                (map ,keymap))
+       ,@(mapcar
+          (lambda (pair)
+            (let* ((key (car pair))
+                   (command (cdr pair)))
+              (unless (and (null key) (null command))
+                `(define-key map (kbd ,key) ,command))))
+          (cl-mapcar #'cons keys commands)))))
+
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 (add-hook 'before-save-hook #'copyright-update)
 
-(global-set-key (kbd "C-x O") #'other-frame)
-(global-set-key (kbd "C-x C-o") #'other-frame)
+(my-emacs-keybind global-map
+  "<insert>" nil
+  "C-z" nil
+  "C-x C-z" nil
+  "C-x h" nil
+  "C-h h" nil
+  "M-`" nil
+  "C-h K" #'describe-keymap
+  "C-h u" #'apropos-user-option
+  "C-h F" #'apropos-function
+  "C-h V" #'apropos-variable
+  "C-h L" #'apropos-library
+  "C-h c" #'describe-char
 
-(global-set-key (kbd "M-<f1>") #'my-reset-frame-left)
-(global-set-key (kbd "M-<f2>") #'my-reset-frame-right)
-(global-set-key (kbd "M-<f3>") #'my-reset-frame-right-display)
+  "C-x O" #'other-frame
+  "C-x C-o" #'other-frame
 
-(global-set-key (kbd "C-x 4 c") #'my-customize-other-window)
-(global-set-key (kbd "C-x 4 k") #'my-shell-other-window)
+  "M-<f1>" #'my-reset-frame-left
+  "M-<f2>" #'my-reset-frame-right
+  "M-<f3>" #'my-reset-frame-right-display
 
-;; (global-set-key [(?%)] #'my-matching-paren)
-(global-set-key (kbd "C-x 5 c") #'my-customize-other-frame)
-(global-set-key (kbd "C-x 5 i") #'my-info-other-frame)
-(global-set-key (kbd "C-x 5 k") #'my-shell-other-frame)
+  "C-x 4 c" #'my-customize-other-window
+  "C-x 4 k" #'my-shell-other-window
 
-(global-set-key (kbd "C-c C-k") #'my-kill-buffer)
-(global-set-key (kbd "<f3>") #'eval-last-sexp)
-(global-set-key (kbd "C-M-\\") #'my-indent-buffer)
-(global-set-key (kbd "<home>") #'beginning-of-buffer)
-(global-set-key (kbd "<end>") #'end-of-buffer)
-(global-set-key (kbd "<delete>") #'delete-char)
-(global-set-key (kbd "S-<f12>") #'package-list-packages)
+  "C-x 5 c" #'my-customize-other-frame
+  "C-x 5 i" #'my-info-other-frame
+  "C-x 5 k" #'my-shell-other-frame
 
-(global-unset-key (kbd "C-z"))          ; suspend-frame
-(global-unset-key (kbd "C-x C-z"))      ; suspend-frame
-(global-unset-key (kbd "C-x h"))        ; mark-whole-bufferk
+  "C-c C-k" #'my-kill-buffer
 
-;; Disable font size changing based on mouse/trackpad changes
-(global-unset-key (kbd "C-<mouse-4>"))
-(global-unset-key (kbd "C-<mouse-5>"))
-(global-unset-key (kbd "C-<double-mouse-4>"))
-(global-unset-key (kbd "C-<double-mouse-5>"))
-(global-unset-key (kbd "C-<triple-mouse-4>"))
-(global-unset-key (kbd "C-<triple-mouse-5>"))
+  "<f3>" #'eval-last-sexp
 
-(global-set-key (kbd "M-[") #'previous-buffer)
-(global-set-key (kbd "M-]") #'next-buffer)
+  "C-M-\\" #'my-indent-buffer
 
-;; (global-unset-key (kbd "M-<mouse-1>"))
-;; (global-unset-key (kbd "M-<down-mouse-1>"))
+  "<home>" #'beginning-of-buffer
+  "<end>" #'end-of-buffer
+  "<delete>" #'delete-char
+  "S-<f12>" #'package-list-packages
 
-;; (global-set-key [(control c)(control f)] #'ff-find-other-file)
+  "C-<mouse-4>" nil
+  "C-<mouse-5>" nil
+
+  "C-<double-mouse-4>" nil
+  "C-<double-mouse-5>" nil
+
+  "C-<triple-mouse-4>" nil
+  "C-<triple-mouse-5>" nil
+
+  "M-[" #'previous-buffer
+  "M-]" #'next-buffer
+  )
 
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))

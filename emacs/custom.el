@@ -13,6 +13,7 @@
  '(auto-revert-use-notify nil)
  '(auto-save-list-file-prefix nil)
  '(backup-directory-alist '(("." . ".~")))
+ '(bookmark-save-flag 1)
  '(byte-compile-verbose nil)
  '(case-fold-search t)
  '(column-number-mode t)
@@ -25,6 +26,7 @@
  '(custom-enabled-themes '(modus-vivendi))
  '(custom-safe-themes
    '("69f7e8101867cfac410e88140f8c51b4433b93680901bb0b52014144366a08c8" "183dfa34e360f5bc2ee4a6b3f4236e6664f4cfce40de1d43c984e0e8fc5b51ae" default))
+ '(delete-by-moving-to-trash t)
  '(delete-old-versions t)
  '(dired-auto-revert-buffer t)
  '(dired-isearch-filenames t)
@@ -50,10 +52,13 @@
  '(fill-column 120)
  '(find-file-visit-truename t)
  '(global-subword-mode t)
+ '(grep-save-buffers t)
+ '(history-delete-duplicates t)
  '(indent-tabs-mode nil)
  '(indicate-empty-lines t)
  '(inhibit-startup-echo-area-message "howes")
  '(inhibit-startup-screen t)
+ '(isearch-lazy-count t)
  '(ispell-extra-args
    '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16" "--camel-case"))
  '(kept-old-versions 10)
@@ -88,11 +93,13 @@
  '(read-extended-command-predicate 'command-completion-default-include-p)
  '(ring-bell-function 'mode-line-bell-flash)
  '(save-place-mode t)
+ '(savehist-additional-variables
+   '(register-alist kill-ring projectile-project-command-history corfu-history))
  '(savehist-mode t)
  '(sentence-end "[.?!][]\"')]*\\($\\|\11\\| \\)[\12]*")
  '(sentence-end-double-space nil)
- '(session-use-package t nil (session))
- '(split-width-threshold nil)
+ '(switch-to-buffer-in-dedicated-window 'pop)
+ '(switch-to-buffer-obey-display-actions t)
  '(tab-always-indent 'complete)
  '(tool-bar-mode nil)
  '(use-package-always-defer t)
@@ -103,7 +110,8 @@
  '(vertico-resize t)
  '(visible-bell nil)
  '(warning-suppress-log-types '((comp) ((flymake flymake))))
- '(warning-suppress-types '((emacs) (comp) ((flymake flymake)))))
+ '(warning-suppress-types '((emacs) (comp) ((flymake flymake))))
+ '(which-key-idle-delay 0.2))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
