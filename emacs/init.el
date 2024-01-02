@@ -39,22 +39,24 @@
   "The number of rows to show in a frame based on display height.")
 (defconst my-cols (if (or is-4k is-laptop) 132 80)
   "The number of columns to show in a frame based on display height.")
-(defconst my-window-left (if is-double-monitor (/ (display-pixel-width nil) 2) 0)
+(defconst my-frame-pixel-width (if is-4k 1338 944)
+  "Width in pixels of a normal frame.")
+(defconst my-frame-left0 (if is-double-monitor (/ (display-pixel-width nil) 2) 0)
   "Number of pixels to use for the `left' part of the `initial-frame-alist'.")
-(defconst my-window-offset (+ (if is-4k 1354 960) my-window-left)
-  "The offset to the `alt' window based on display height.")
-(defconst my-window-right-offset (if is-4k (* my-window-offset 2) (- (display-pixel-width) my-window-offset))
+(defconst my-frame-left1 (+ my-frame-left0 my-frame-pixel-width)
+  "Number of pixels to use for the `left' part of the `default-frame-alist'.")
+(defconst my-frame-left2 (- (display-pixel-width nil) my-frame-pixel-width)
   "The offset to the `alt' window based on display height.")
 (defconst my-font-name "Berkeley Mono"
   "The name of the font to use.")
 (defconst my-font-size (if is-4k 16 12)
   "The font size to use based on the display height.")
-(defconst my-window-titlebar-height 0
+(defconst my-frame-titlebar-height 0
   "The size in pixels of the window title bar.")
 (defvar my-align-right-frame-alist `((width . ,my-cols)
                                      (height . ,my-rows)
-                                     (top . ,my-window-titlebar-height)
-                                     (left . ,my-window-right-offset))
+                                     (top . ,my-frame-titlebar-height)
+                                     (left . ,my-frame-left2))
   "The alist to use to place a frame aligned to the right size of the display.")
 
 (setenv "WORKON_HOME" my-venv)
@@ -69,13 +71,16 @@
       custom-file (expand-file-name "~/.emacs.d/custom.el")
       load-path (append (list (expand-file-name "~/.emacs.d/lisp")) load-path)
 
-      default-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . ,my-window-titlebar-height) (left . ,my-window-offset))
-      initial-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . ,my-window-titlebar-height) (left . ,my-window-left))
+      initial-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . ,my-frame-titlebar-height) (left . ,my-frame-left0))
+      default-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . ,my-frame-titlebar-height) (left . ,my-frame-left1))
 
       frame-title-format (list  '(:eval (abbreviate-file-name default-directory)))
 
       scroll-conservatively 101
       scroll-margin 2)
+
+(when scroll-bar-mode
+  (scroll-bar-mode -1))
 
 (when is-macosx
   (eval-when-compile
@@ -87,7 +92,8 @@
     (custom-set-variables
      '(mac-command-modifier 'meta)
      '(mac-option-modifier 'alt)
-     '(mac-right-option-modifier 'super))))
+     '(mac-right-command-modifier 'super)
+     '(mac-right-option-modifier 'hyper))))
 
 (let* ((common-paths (list (expand-file-name "~/bin")
                            (concat my-venv "/bin")))
@@ -170,22 +176,25 @@
 
 (auto-save-visited-mode t)
 
+(use-package eldoc
+  :init
+  (global-eldoc-mode))
+
 (use-package dired
+  :init
+  (autoload 'my-dired-mode-hook "my-dired-mode")
   :config
   (setq dired-recursive-copies 'always
         dired-recursive-deletes 'always
-        dired-listing-switches "-AGFhlv --group-directories-first --time-style=long-iso"))
+        dired-listing-switches "-aGFhlv --group-directories-first --time-style=long-iso")
+  :bind (("C-<up>" . dired-tree-up)
+         ("M-u" . dired-tree-up))
+  :hook
+  (dired-mode . my-dired-mode-hook))
 
 (use-package savehist
   :init
   (savehist-mode t))
-
-(use-package ediff
-  :defer t
-  :config
-  (setq-default ediff-window-setup-function 'ediff-setup-windows-plain
-                ediff-split-window-function 'split-window-horizontally
-                ediff-merge-split-window-function 'split-window-horizontally))
 
 (use-package ediff
   :defer t
@@ -256,7 +265,7 @@
 
 (use-package embark
   :ensure t
-  :commands (embark-prefix-help-command)
+  :commands (embark-prefix-help-command my-embark-ace-action my-embark-split-action)
   :bind (("C-." . embark-act)
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
@@ -279,17 +288,17 @@
        (funcall #',split-type)
        (call-interactively #',fn)))
 
-  (define-key embark-file-map (kbd "o") (my-embark-ace-action find-file))
-  (define-key embark-buffer-map (kbd "o") (my-embark-ace-action switch-to-buffer))
-  (define-key embark-bookmark-map (kbd "o") (my-embark-ace-action bookmark-jump))
+  (define-key embark-file-map (kbd "o") (my-embark-ace-action #'find-file))
+  (define-key embark-buffer-map (kbd "o") (my-embark-ace-action #'switch-to-buffer))
+  (define-key embark-bookmark-map (kbd "o") (my-embark-ace-action #'bookmark-jump))
 
-  (define-key embark-file-map (kbd "2") (my-embark-split-action find-file split-window-below))
-  (define-key embark-buffer-map (kbd "2") (my-embark-split-action switch-to-buffer split-window-below))
-  (define-key embark-bookmark-map (kbd "2") (my-embark-split-action bookmark-jump split-window-below))
+  (define-key embark-file-map (kbd "2") (my-embark-split-action #'find-file #'split-window-below))
+  (define-key embark-buffer-map (kbd "2") (my-embark-split-action #'switch-to-buffer #'split-window-below))
+  (define-key embark-bookmark-map (kbd "2") (my-embark-split-action #'bookmark-jump #'split-window-below))
 
-  (define-key embark-file-map (kbd "3") (my-embark-split-action find-file split-window-right))
-  (define-key embark-buffer-map (kbd "3") (my-embark-split-action switch-to-buffer split-window-right))
-  (define-key embark-bookmark-map (kbd "3") (my-embark-split-action bookmark-jump split-window-right))
+  (define-key embark-file-map (kbd "3") (my-embark-split-action #'find-file #'split-window-right))
+  (define-key embark-buffer-map (kbd "3") (my-embark-split-action #'switch-to-buffer #'split-window-right))
+  (define-key embark-bookmark-map (kbd "3") (my-embark-split-action #'bookmark-jump #'split-window-right))
 
   (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                                        nil
@@ -394,8 +403,14 @@
   :ensure t
   :commands (eglot-ensure)
   :hook ((swift-mode . eglot-ensure)
+         (cc-mode . eglot-ensure)
          (python-mode . eglot-ensure))
-  :config (add-to-list 'eglot-server-programs '(swift-mode . ("xcrun" "sourcekit-lsp"))))
+  :config (add-to-list 'eglot-server-programs '(swift-mode . ("xcrun" "sourcekit-lsp")))
+  :bind (:map eglot-mode-map
+              ("C-c c a" . eglot-code-actions)
+              ("C-c c o" . eglot-code-action-organize-imports)
+              ("C-c c r" . eglot-rename)
+              ("C-c c f" . eglot-format)))
 
 (use-package orderless
   :ensure t
@@ -433,7 +448,7 @@
 
 (use-package corfu
   :ensure t
-  :commands (global-corfu-mode)
+  :commands (global-corfu-mode corfu-history-mode)
   :init
   :bind (:map corfu-map
               ("<return>" . corfu-complete))
@@ -475,7 +490,15 @@
 (use-package recentf
   :init (recentf-mode t))
 
+(use-package treesit
+  :config
+  (setq treesit-language-source-alist '((python "https://github.com/tree-sitter/tree-sitter-python")
+                                        (c "https://github.com/tree-sitter/tree-sitter-c")
+                                        (c++ "https://github.com/tree-sitter/tree-sitter-cpp")
+                                        (swift "https://github.com/alex-pinkus/tree-sitter-swift"))))
+
 (use-package emacs
+  :commands (my-crm-indicator)
   :init
   (defun my-crm-indicator(args)
     (cons (format "[CRM%s] %s"
@@ -486,8 +509,8 @@
 
   :config
   (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
-
   :hook ((minibuffer-setup . cursor-intangible-mode)))
+
 
 (global-prettify-symbols-mode t)
 
@@ -634,6 +657,8 @@ DEFINITIONS is a sequence of string and command pairs."
   "C-h V" #'apropos-variable
   "C-h L" #'apropos-library
   "C-h c" #'describe-char
+
+  "M-g d" #'dired-jump
 
   "C-x O" #'other-frame
   "C-x C-o" #'other-frame

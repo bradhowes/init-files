@@ -22,6 +22,8 @@
  '(compilation-scroll-output t)
  '(completion-cycle-threshold 3)
  '(confirm-kill-emacs 'y-or-n-p)
+ '(copyright-query nil)
+ '(copyright-year-ranges t)
  '(current-language-environment "UTF-8")
  '(custom-enabled-themes '(modus-vivendi))
  '(custom-safe-themes
@@ -74,6 +76,7 @@
  '(ns-alternate-modifier 'alt)
  '(ns-command-modifier 'meta)
  '(ns-right-alternate-modifier 'super)
+ '(ns-right-command-modifier 'super)
  '(org-edna-use-inheritance t)
  '(org-roam-db-autosync-mode t)
  '(org-roam-directory "/Users/howes/org-roam")
@@ -111,7 +114,7 @@
  '(visible-bell nil)
  '(warning-suppress-log-types '((comp) ((flymake flymake))))
  '(warning-suppress-types '((emacs) (comp) ((flymake flymake))))
- '(which-key-idle-delay 0.2))
+ '(which-key-idle-delay 1.0))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

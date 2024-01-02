@@ -21,7 +21,7 @@
 (define-skeleton my-c++-copyright-skeleton
   "Insert a C++ copyright comment."
   nil
-  "// (C) Copyright 2022 Brad Howes. All rights reserved.\n"
+  "// (C) Copyright 2022, 2023 Brad Howes. All rights reserved.\n"
   "//\n\n"
 )
 
@@ -243,6 +243,22 @@ Setup a namespace with NAMESPACE name if non-nil."
   (my-c++-cleanup)
   (kill-buffer (current-buffer)))
 
+(defun my-c++-cleanup-include ()
+  "Toggle quote character surrounding path."
+  (interactive)
+  (save-excursion
+    ;; Convert system #include <...> statments for non-systemm libraries to be #include "..." instead
+    (goto-char (point-min))
+    (while (re-search-forward "#include \"\\(\\(Qt\\|boost\\|ace\\).*\\)\"" nil t)
+      (replace-match "#include <\\1\>")))
+  (basic-save-buffer))
+
+    ;; (when (looking-at "#include \\([\"<]\\)\\(.*\\)\\([\">]\\)")
+    ;;   (let ((quote (match-string-no-properties 1)))
+    ;;     (if (string= quote "<")
+    ;;         (replace-match "#include \"\\2\"")
+    ;;       (replace-match "#include <\\2>"))))))
+
 ;;;###autoload
 (defun my-c++-mode-hook ()
   "Custom C++ mode hook."
@@ -253,13 +269,12 @@ Setup a namespace with NAMESPACE name if non-nil."
   (setq c-at-vsemi-p-fn 'my-c++-at-vsemi-p
 	c-vsemi-status-unknown-p-fn 'my-c++-vsemi-status-unknown-p
         c-block-comment-prefix ""
-        c-doc-comment-style 'doxygen
-        )
+        c-doc-comment-style 'doxygenf)
 
-  (local-set-key [(f7)] 'compile)
-  (local-set-key [(control c)(control i)] 'my-c++-copyright-skeleton)
-  (local-set-key [(control meta \;)] 'my-c++-insert-block-comment)
-  (local-set-key [(control c)(?c)] 'my-c++-cleanup))
+  (local-set-key [(f7)] #'compile)
+  (local-set-key [(control c)(control i)] #'my-c++-copyright-skeleton)
+  (local-set-key [(control meta \;)] #'my-c++-insert-block-comment)
+  (local-set-key [(f1)] #'my-c++-cleanup-include))
 
 (provide 'my-c++-mode)
 ;;; my-c++-mode.el ends here

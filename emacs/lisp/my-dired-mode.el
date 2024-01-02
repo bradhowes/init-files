@@ -16,8 +16,7 @@
 
 (defun my-dired-load-hook ()
   "Custom hook for `dired' loading."
-  (load "dired-x")
-  (global-set-key [(control x)(control j)] 'goto-line))
+  (load "dired-x"))
 
 (defun my-dired-mode-hook ()
   "Custom hook for `dired' mode."
