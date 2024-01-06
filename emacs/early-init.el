@@ -1,14 +1,14 @@
-;;; package --- Summary
+;;; package --- Summary  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
-(defconst my-gc-cons-threshold gc-cons-threshold
-  "Original value from start of Emacs.")
+(tool-bar-mode -1)
 
-(setq gc-cons-threshold most-positive-fixnum)
-
-(add-hook 'after-init-hook (lambda () (setq gc-cons-threshold my-gc-cons-threshold)))
+(let ((threshold gc-cons-threshold)
+      (gc-cons-threshold most-positive-fixnum))
+  (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold threshold))))
 
 (set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")
+
 
 ;;; early-init.el ends here.

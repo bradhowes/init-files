@@ -118,6 +118,26 @@ prompt lines in the first place."
               (t ""))))
 
 (defun my-shell-mode-hook ()
+  "Customize `shell-mode'."
+
+  (rename-uniquely)
+
+  (set-process-coding-system (get-buffer-process (current-buffer)) 'utf-8 'utf-8)
+
+  (setq ansi-color-names-vector ["black" "red3" "green3" "yellow3" "blue2" "magenta3" "cyan3" "gray90"]
+        shell-dirtrackp nil
+        comint-process-echoes t
+	comint-buffer-maximum-size (* 1024 5)
+        comint-completion-addsuffix t
+	comint-eol-on-send t)
+
+  (ansi-color-for-comint-mode-on)
+  (add-hook 'comint-output-filter-functions #'comint-osc-process-output)
+  (add-hook 'comint-output-filter-functions #'ansi-color-process-output)
+  (add-hook 'comint-output-filter-functions #'comint-truncate-buffer)
+  (add-hook 'comint-output-filter-functions #'comint-postoutput-scroll-to-bottom))
+
+(defun my-shell-mode-hook-legacy ()
   "Custom shell mode."
   ;; (setq ansi-color-names-vector ; better contrast colors
   ;;       ["black" "red4" "green4" "yellow4"

@@ -33,11 +33,16 @@ setopt HIST_SAVE_NO_DUPS
 setopt HIST_REDUCE_BLANKS
 setopt HIST_VERIFY
 
-HISTORY_IGNORE="(ls|ps|history|exit)"
+HISTORY_IGNORE="(cd|ls|ps|pwd|history|exit)"
+
 ZSH_THEME="robbyrussell"
 
+osc7_cwd() {
+    print -P "\e]7;file://%M${PWD}\e\\"
+}
+
 autoload -U add-zsh-hook
-add-zsh-hook -Uz chpwd (){ spewpwd; }
+add-zsh-hook -Uz chpwd (){ osc7_cwd }
 
 export LESS="-FRX"
 export PAGER="less ${LESS}"

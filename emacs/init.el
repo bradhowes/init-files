@@ -23,61 +23,167 @@
 
 (defconst my-venv (expand-file-name "~/venv")
   "The Python virtual environment to use for elpy.")
+
 (defconst my-venv-python (concat my-venv "/bin/python")
   "The path to the Python eexecutable to use for elpy.")
 (defconst is-macosx (eq system-type 'darwin)
   "T if running on macOS.")
 (defconst is-terminal (eq window-system nil)
   "T if running in a terminal.")
-(defconst is-laptop (eq (display-pixel-height nil) 1329)
-  "T if the current display is on laptop display.")
-(defconst is-4k (eq (display-pixel-height nil) 2160)
-  "T if the current display is 4K.")
-(defconst is-double-monitor (eq (display-pixel-width nil) 7680)
-  "Set to T if we have two 4K monitors showing one desktop.")
-(defconst my-rows (if is-4k 102 (if is-laptop 88 40))
-  "The number of rows to show in a frame based on display height.")
-(defconst my-cols (if (or is-4k is-laptop) 132 80)
-  "The number of columns to show in a frame based on display height.")
-(defconst my-frame-pixel-width (if is-4k 1338 944)
-  "Width in pixels of a normal frame.")
-(defconst my-frame-left0 (if is-double-monitor (/ (display-pixel-width nil) 2) 0)
-  "Number of pixels to use for the `left' part of the `initial-frame-alist'.")
-(defconst my-frame-left1 (+ my-frame-left0 my-frame-pixel-width)
-  "Number of pixels to use for the `left' part of the `default-frame-alist'.")
-(defconst my-frame-left2 (- (display-pixel-width nil) my-frame-pixel-width)
-  "The offset to the `alt' window based on display height.")
-(defconst my-font-name "Berkeley Mono"
-  "The name of the font to use.")
-(defconst my-font-size (if is-4k 16 12)
-  "The font size to use based on the display height.")
-(defconst my-frame-titlebar-height 0
-  "The size in pixels of the window title bar.")
-(defvar my-align-right-frame-alist `((width . ,my-cols)
-                                     (height . ,my-rows)
-                                     (top . ,my-frame-titlebar-height)
-                                     (left . ,my-frame-left2))
-  "The alist to use to place a frame aligned to the right size of the display.")
 
 (setenv "WORKON_HOME" my-venv)
-
-(defun my-setup-font ()
-  "Install the desired font in the default face."
-  (set-face-attribute 'default nil :font (font-spec :family my-font-name :size my-font-size)))
-
-(add-hook 'after-init-hook #'my-setup-font)
 
 (setq read-process-output-max (* 1024 1024)
       custom-file (expand-file-name "~/.emacs.d/custom.el")
       load-path (append (list (expand-file-name "~/.emacs.d/lisp")) load-path)
-
-      initial-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . ,my-frame-titlebar-height) (left . ,my-frame-left0))
-      default-frame-alist `((width . ,my-cols) (height . ,my-rows) (top . ,my-frame-titlebar-height) (left . ,my-frame-left1))
-
       frame-title-format (list  '(:eval (abbreviate-file-name default-directory)))
-
       scroll-conservatively 101
       scroll-margin 2)
+
+(defconst my-screen-laptop (intern "my-screen-laptop")
+  "Symbol for laptop screen width.")
+
+(defconst my-screen-4k (intern "my-screen-4k")
+  "Symbol for 4K screen width.")
+
+(defconst my-screen-laptop-4k (intern "my-screen-laptop-4k")
+  "Symbol for laptop + 4K screen width.")
+
+(defconst my-screen-4k-4k (intern "my-screen-4k-4k")
+  "Symbol for 4K + 4K screen width.")
+
+(defconst my-screen-laptop-4k-4k (intern "my-screen-laptop-4k-4k")
+  "Symbol for laptop + 4K + 4K screen width.")
+
+(defconst my-screen-terminal (intern "my-screen-terminal")
+  "Symbol for terminal screen width.")
+
+(defvar my-right-frame-alist default-frame-alist
+  "Definition for a frame aligned on right side of display.")
+
+(defun my-screen-layout ()
+  "Identify current screen layout.
+Uses result from `display-pixel-width' to determine what monitors
+there are. Better would be to use `display-monitor-attributes-list'
+like done in `my-frame-top'.
+
+Returns one of the follow symbols based on width:
+
+- `my-screen-laptop' -- only laptop screen
+- `my-screen-4k' -- only 4K monitor.
+- `my-screen-laptop-4k' -- laptop screen + 4K monitor.
+- `my-screen-4k-4k' -- two 4K monitors.
+- `my-screen-laptop-4k-4k' -- laptop screen + 2 4K monitors.
+- `my-screen-terminal' -- unknown screen."
+  (let* ((laptop-width 2056)
+         (4k-width 3840)
+         (width (display-pixel-width nil))
+         (value (cond ((= width laptop-width) my-screen-laptop)
+                      ((= width 4k-width) my-screen-4k)
+                      ((= width (+ laptop-width 4k-width)) my-screen-laptop-4k)
+                      ((= width (+ 4k-width 4k-width)) my-screen-4k-4k)
+                      ((= width (+ laptop-width 4k-width 4k-width) my-screen-laptop-4k-4k))
+                      (t my-screen-terminal))))
+    (message "my-screen-layout: %s" value)
+    value))
+
+(defun my-is-laptop (layout)
+  "T if LAYOUT is laptop."
+  (eq layout my-screen-laptop))
+
+(defun my-is-4k (layout)
+  "T if LAYOUT is kind with at least 4K area."
+  (let ((value (or (eq layout my-screen-4k)
+                   (eq layout my-screen-laptop-4k)
+                   (eq layout my-screen-4k-4k)
+                   (eq layout my-screen-laptop-4k-4k))))
+    (message "my-is-4k: %s" value)
+    value))
+
+(defun my-font-size (layout)
+  "The font size to use based on the LAYOUT."
+  (if (my-is-4k layout) 16 12))
+
+(defun my-rows (layout)
+  "The number of rows to show in a frame shown on LAYOUT."
+  (if (my-is-4k layout) 102 (if (my-is-laptop layout) 88 40)))
+
+(defun my-cols (layout)
+  "The number of columns to show in a frame shown on LAYOUT."
+  (if (or (my-is-4k layout) (my-is-laptop layout)) 132 80))
+
+(defun my-frame-pixel-width (layout)
+  "Width in pixels of a normal frame shown on LAYOUT."
+  (if (my-is-4k layout) 1338 944))
+
+(defun my-frame-initial-left (layout)
+  "Pixels to use for the `left' of a frame on LAYOUT."
+  (if (or (eq layout my-screen-laptop-4k) (eq layout my-screen-laptop-4k-4k)) 2056 0))
+
+(defun my-frame-default-left (layout)
+  "Pixels to use for the `left' of a frame on LAYOUT."
+  (+ (my-frame-initial-left layout) (my-frame-pixel-width layout)))
+
+(defun my-frame-third-left (layout)
+  "The offset to the `alt' window based on LAYOUT."
+  (- (display-pixel-width nil) (my-frame-pixel-width layout)))
+
+(defconst my-font-name "Berkeley Mono"
+  "The name of the font to use.")
+
+(defun my-frame-top ()
+  "The top of the display area.
+NOTE: this assumes that the laptop display if present is al"
+  (let ((settings (display-monitor-attributes-list)))
+    (nth 2 (if (eq (length settings) 1)
+               (car (car settings))
+             (car (car (cdr settings)))))))
+
+(defun my-initial-frame-alist (layout)
+  "Make alist to use for the initial frame on LAYOUT."
+  (list (cons 'width (my-cols layout))
+        (cons 'height (my-rows layout))
+        (cons 'top (my-frame-top))
+        (cons 'left (my-frame-initial-left layout))))
+
+(defun my-default-frame-alist (layout)
+  "Make alist to use for the default frame on LAYOUT."
+  (list (cons 'width (my-cols layout))
+        (cons 'height (my-rows layout))
+        (cons 'top (my-frame-top))
+        (cons 'left (my-frame-default-left layout))))
+
+(defun my-align-right-frame-alist (layout)
+  "The alist to use extra frame on LAYOUT.
+The frame will appear on the far right of the display area."
+  (list (cons 'width (my-cols layout))
+        (cons 'height (my-rows layout))
+        (cons 'top (my-frame-top))
+        (cons 'left (my-frame-third-left layout))))
+
+(defun my-setup-font (layout)
+  "Install the desired font in the default face for LAYOUT."
+  (set-face-attribute 'default nil :font (font-spec :family my-font-name :size (my-font-size layout))))
+
+(defun my-update-screen-frame-alists (layout)
+  "Update frame alists for current LAYOUT."
+  (setq initial-frame-alist (my-initial-frame-alist layout)
+        default-frame-alist (my-default-frame-alist layout)
+        my-right-frame-alist (my-align-right-frame-alist layout))
+  (message "initial-frame: %s" initial-frame-alist)
+  (message "default-frame: %s" default-frame-alist)
+  (message "  right-frame: %s" my-right-frame-alist))
+
+(defun my-screen-layout-changed ()
+  "Recalculate values based on screen layout."
+  (let ((layout (my-screen-layout)))
+    (message "screen layout: %s" layout)
+    (my-setup-font layout)
+    (my-update-screen-frame-alists layout)))
+
+(my-update-screen-frame-alists (my-screen-layout))
+
+(add-hook 'after-init-hook (lambda () (my-screen-layout-changed)))
 
 (when scroll-bar-mode
   (scroll-bar-mode -1))
@@ -538,22 +644,26 @@
 (defun my-reset-frame-left ()
   "Reset frame size and position for left frame."
   (interactive)
-  (modify-frame-parameters (window-frame (get-buffer-window)) initial-frame-alist))
+  (let ((layout (my-screen-layout)))
+    (modify-frame-parameters (window-frame (get-buffer-window)) (my-initial-frame-alist layout))))
 
 (defun my-reset-frame-right ()
   "Reset frame size and position for right frame."
   (interactive)
-  (modify-frame-parameters (window-frame (get-buffer-window)) default-frame-alist))
+  (let ((layout (my-screen-layout)))
+    (modify-frame-parameters (window-frame (get-buffer-window)) (my-default-frame-alist layout))))
 
 (defun my-reset-frame-right-display ()
   "Reset frame size and position for right side of display frame."
   (interactive)
-  (modify-frame-parameters (window-frame (get-buffer-window)) my-align-right-frame-alist))
+  (let ((layout (my-screen-layout)))
+    (modify-frame-parameters (window-frame (get-buffer-window)) (my-align-right-frame-alist layout))))
 
 (defun my-reset-framewidth ()
-  "Reset the current frame width to `my-cols'."
+  "Reset the current frame width to function `my-cols'."
   (interactive)
-  (set-frame-width (window-frame (get-buffer-window)) my-cols))
+  (let ((layout (my-screen-layout)))
+    (set-frame-width (window-frame (get-buffer-window)) (my-cols layout))))
 
 (defun ksh ()
   "Start a new shell."
