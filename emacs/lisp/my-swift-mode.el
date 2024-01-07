@@ -7,7 +7,7 @@
 
 (font-lock-add-keywords 'swift-mode '(("[][(){}]" . font-lock-brace-face)))
 
-(defun my-swift-mode-hook ()
+(defun my/swift-mode-hook ()
   "Custom Swift mode."
   (font-lock-mode t)
   (show-paren-mode t))

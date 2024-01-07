@@ -3,6 +3,8 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'seq)
+
 (condition-case nil
     (require 'use-package)
   (file-error
@@ -12,8 +14,6 @@
    (package-install 'use-package)
    (require 'use-package)))
 
-(require 'seq)
-
 ;; Set this to `t` to debug issue involving the filenotify package
 (when nil
   (require 'filenotify)
@@ -21,17 +21,17 @@
 
 ;; (debug-on-entry 'file-notify-add-watch)
 
-(defconst my-venv (expand-file-name "~/venv")
+(defconst my/venv (expand-file-name "~/venv")
   "The Python virtual environment to use for elpy.")
 
-(defconst my-venv-python (concat my-venv "/bin/python")
+(defconst my/venv-python (concat my/venv "/bin/python")
   "The path to the Python eexecutable to use for elpy.")
 (defconst is-macosx (eq system-type 'darwin)
   "T if running on macOS.")
 (defconst is-terminal (eq window-system nil)
   "T if running in a terminal.")
 
-(setenv "WORKON_HOME" my-venv)
+(setenv "WORKON_HOME" my/venv)
 
 (setq read-process-output-max (* 1024 1024)
       custom-file (expand-file-name "~/.emacs.d/custom.el")
@@ -40,98 +40,98 @@
       scroll-conservatively 101
       scroll-margin 2)
 
-(defconst my-screen-laptop (intern "my-screen-laptop")
+(defconst my/screen-laptop (intern "my/screen-laptop")
   "Symbol for laptop screen width.")
 
-(defconst my-screen-4k (intern "my-screen-4k")
+(defconst my/screen-4k (intern "my/screen-4k")
   "Symbol for 4K screen width.")
 
-(defconst my-screen-laptop-4k (intern "my-screen-laptop-4k")
+(defconst my/screen-laptop-4k (intern "my/screen-laptop-4k")
   "Symbol for laptop + 4K screen width.")
 
-(defconst my-screen-4k-4k (intern "my-screen-4k-4k")
+(defconst my/screen-4k-4k (intern "my/screen-4k-4k")
   "Symbol for 4K + 4K screen width.")
 
-(defconst my-screen-laptop-4k-4k (intern "my-screen-laptop-4k-4k")
+(defconst my/screen-laptop-4k-4k (intern "my/screen-laptop-4k-4k")
   "Symbol for laptop + 4K + 4K screen width.")
 
-(defconst my-screen-terminal (intern "my-screen-terminal")
+(defconst my/screen-terminal (intern "my/screen-terminal")
   "Symbol for terminal screen width.")
 
-(defvar my-right-frame-alist default-frame-alist
+(defvar my/right-frame-alist default-frame-alist
   "Definition for a frame aligned on right side of display.")
 
-(defun my-screen-layout ()
+(defun my/screen-layout ()
   "Identify current screen layout.
 Uses result from `display-pixel-width' to determine what monitors
 there are. Better would be to use `display-monitor-attributes-list'
-like done in `my-frame-top'.
+like done in `my/frame-top'.
 
 Returns one of the follow symbols based on width:
 
-- `my-screen-laptop' -- only laptop screen
-- `my-screen-4k' -- only 4K monitor.
-- `my-screen-laptop-4k' -- laptop screen + 4K monitor.
-- `my-screen-4k-4k' -- two 4K monitors.
-- `my-screen-laptop-4k-4k' -- laptop screen + 2 4K monitors.
-- `my-screen-terminal' -- unknown screen."
+- `my/screen-laptop' -- only laptop screen
+- `my/screen-4k' -- only 4K monitor.
+- `my/screen-laptop-4k' -- laptop screen + 4K monitor.
+- `my/screen-4k-4k' -- two 4K monitors.
+- `my/screen-laptop-4k-4k' -- laptop screen + 2 4K monitors.
+- `my/screen-terminal' -- unknown screen."
   (let* ((laptop-width 2056)
          (4k-width 3840)
          (width (display-pixel-width nil))
-         (value (cond ((= width laptop-width) my-screen-laptop)
-                      ((= width 4k-width) my-screen-4k)
-                      ((= width (+ laptop-width 4k-width)) my-screen-laptop-4k)
-                      ((= width (+ 4k-width 4k-width)) my-screen-4k-4k)
-                      ((= width (+ laptop-width 4k-width 4k-width) my-screen-laptop-4k-4k))
-                      (t my-screen-terminal))))
-    (message "my-screen-layout: %s" value)
+         (value (cond ((= width laptop-width) my/screen-laptop)
+                      ((= width 4k-width) my/screen-4k)
+                      ((= width (+ laptop-width 4k-width)) my/screen-laptop-4k)
+                      ((= width (+ 4k-width 4k-width)) my/screen-4k-4k)
+                      ((= width (+ laptop-width 4k-width 4k-width) my/screen-laptop-4k-4k))
+                      (t my/screen-terminal))))
+    (message "my/screen-layout: %s" value)
     value))
 
-(defun my-is-laptop (layout)
+(defun my/is-laptop (layout)
   "T if LAYOUT is laptop."
-  (eq layout my-screen-laptop))
+  (eq layout my/screen-laptop))
 
-(defun my-is-4k (layout)
+(defun my/is-4k (layout)
   "T if LAYOUT is kind with at least 4K area."
-  (let ((value (or (eq layout my-screen-4k)
-                   (eq layout my-screen-laptop-4k)
-                   (eq layout my-screen-4k-4k)
-                   (eq layout my-screen-laptop-4k-4k))))
-    (message "my-is-4k: %s" value)
+  (let ((value (or (eq layout my/screen-4k)
+                   (eq layout my/screen-laptop-4k)
+                   (eq layout my/screen-4k-4k)
+                   (eq layout my/screen-laptop-4k-4k))))
+    (message "my/is-4k: %s" value)
     value))
 
-(defun my-font-size (layout)
+(defun my/font-size (layout)
   "The font size to use based on the LAYOUT."
-  (if (my-is-4k layout) 16 12))
+  (if (my/is-4k layout) 16 12))
 
-(defun my-rows (layout)
+(defun my/rows (layout)
   "The number of rows to show in a frame shown on LAYOUT."
-  (if (my-is-4k layout) 102 (if (my-is-laptop layout) 88 40)))
+  (if (my/is-4k layout) 102 (if (my/is-laptop layout) 88 40)))
 
-(defun my-cols (layout)
+(defun my/cols (layout)
   "The number of columns to show in a frame shown on LAYOUT."
-  (if (or (my-is-4k layout) (my-is-laptop layout)) 132 80))
+  (if (or (my/is-4k layout) (my/is-laptop layout)) 132 80))
 
-(defun my-frame-pixel-width (layout)
+(defun my/frame-pixel-width (layout)
   "Width in pixels of a normal frame shown on LAYOUT."
-  (if (my-is-4k layout) 1338 944))
+  (if (my/is-4k layout) 1338 944))
 
-(defun my-frame-initial-left (layout)
+(defun my/frame-initial-left (layout)
   "Pixels to use for the `left' of a frame on LAYOUT."
-  (if (or (eq layout my-screen-laptop-4k) (eq layout my-screen-laptop-4k-4k)) 2056 0))
+  (if (or (eq layout my/screen-laptop-4k) (eq layout my/screen-laptop-4k-4k)) 2056 0))
 
-(defun my-frame-default-left (layout)
+(defun my/frame-default-left (layout)
   "Pixels to use for the `left' of a frame on LAYOUT."
-  (+ (my-frame-initial-left layout) (my-frame-pixel-width layout)))
+  (+ (my/frame-initial-left layout) (my/frame-pixel-width layout)))
 
-(defun my-frame-third-left (layout)
+(defun my/frame-third-left (layout)
   "The offset to the `alt' window based on LAYOUT."
-  (- (display-pixel-width nil) (my-frame-pixel-width layout)))
+  (- (display-pixel-width nil) (my/frame-pixel-width layout)))
 
-(defconst my-font-name "Berkeley Mono"
+(defconst my/font-name "Berkeley Mono"
   "The name of the font to use.")
 
-(defun my-frame-top ()
+(defun my/frame-top ()
   "The top of the display area.
 NOTE: this assumes that the laptop display if present is al"
   (let ((settings (display-monitor-attributes-list)))
@@ -139,51 +139,51 @@ NOTE: this assumes that the laptop display if present is al"
                (car (car settings))
              (car (car (cdr settings)))))))
 
-(defun my-initial-frame-alist (layout)
+(defun my/initial-frame-alist (layout)
   "Make alist to use for the initial frame on LAYOUT."
-  (list (cons 'width (my-cols layout))
-        (cons 'height (my-rows layout))
-        (cons 'top (my-frame-top))
-        (cons 'left (my-frame-initial-left layout))))
+  (list (cons 'width (my/cols layout))
+        (cons 'height (my/rows layout))
+        (cons 'top (my/frame-top))
+        (cons 'left (my/frame-initial-left layout))))
 
-(defun my-default-frame-alist (layout)
+(defun my/default-frame-alist (layout)
   "Make alist to use for the default frame on LAYOUT."
-  (list (cons 'width (my-cols layout))
-        (cons 'height (my-rows layout))
-        (cons 'top (my-frame-top))
-        (cons 'left (my-frame-default-left layout))))
+  (list (cons 'width (my/cols layout))
+        (cons 'height (my/rows layout))
+        (cons 'top (my/frame-top))
+        (cons 'left (my/frame-default-left layout))))
 
-(defun my-align-right-frame-alist (layout)
+(defun my/align-right-frame-alist (layout)
   "The alist to use extra frame on LAYOUT.
 The frame will appear on the far right of the display area."
-  (list (cons 'width (my-cols layout))
-        (cons 'height (my-rows layout))
-        (cons 'top (my-frame-top))
-        (cons 'left (my-frame-third-left layout))))
+  (list (cons 'width (my/cols layout))
+        (cons 'height (my/rows layout))
+        (cons 'top (my/frame-top))
+        (cons 'left (my/frame-third-left layout))))
 
-(defun my-setup-font (layout)
+(defun my/setup-font (layout)
   "Install the desired font in the default face for LAYOUT."
-  (set-face-attribute 'default nil :font (font-spec :family my-font-name :size (my-font-size layout))))
+  (set-face-attribute 'default nil :font (font-spec :family my/font-name :size (my/font-size layout))))
 
-(defun my-update-screen-frame-alists (layout)
+(defun my/update-screen-frame-alists (layout)
   "Update frame alists for current LAYOUT."
-  (setq initial-frame-alist (my-initial-frame-alist layout)
-        default-frame-alist (my-default-frame-alist layout)
-        my-right-frame-alist (my-align-right-frame-alist layout))
+  (setq initial-frame-alist (my/initial-frame-alist layout)
+        default-frame-alist (my/default-frame-alist layout)
+        my/right-frame-alist (my/align-right-frame-alist layout))
   (message "initial-frame: %s" initial-frame-alist)
   (message "default-frame: %s" default-frame-alist)
-  (message "  right-frame: %s" my-right-frame-alist))
+  (message "  right-frame: %s" my/right-frame-alist))
 
-(defun my-screen-layout-changed ()
+(defun my/screen-layout-changed ()
   "Recalculate values based on screen layout."
-  (let ((layout (my-screen-layout)))
+  (let ((layout (my/screen-layout)))
     (message "screen layout: %s" layout)
-    (my-setup-font layout)
-    (my-update-screen-frame-alists layout)))
+    (my/setup-font layout)
+    (my/update-screen-frame-alists layout)))
 
-(my-update-screen-frame-alists (my-screen-layout))
+(my/update-screen-frame-alists (my/screen-layout))
 
-(add-hook 'after-init-hook (lambda () (my-screen-layout-changed)))
+(add-hook 'after-init-hook (lambda () (my/screen-layout-changed)))
 
 (when scroll-bar-mode
   (scroll-bar-mode -1))
@@ -202,7 +202,7 @@ The frame will appear on the far right of the display area."
      '(mac-right-option-modifier 'hyper))))
 
 (let* ((common-paths (list (expand-file-name "~/bin")
-                           (concat my-venv "/bin")))
+                           (concat my/venv "/bin")))
        (macosx-paths (if is-macosx
                          (list "/opt/homebrew/sqlite/bin"
                                "/opt/homebrew/opt/grep/libexec/gnubin"
@@ -229,23 +229,23 @@ The frame will appear on the far right of the display area."
   "Font Lock mode face used to highlight parentheses, braces, and brackets.")
 
 (autoload 'emacs-pager "emacs-pager")
-(autoload 'my-lisp-mode-hook "my-lisp-mode")
-(add-hook 'lisp-mode-hook #'my-lisp-mode-hook)
-(add-hook 'emacs-lisp-mode-hook #'my-lisp-mode-hook)
-(add-hook 'lisp-interaction-mode-hook #'my-lisp-mode-hook)
-(add-hook 'scheme-mode-hook #'my-lisp-mode-hook)
-(autoload 'my-lisp-data-mode-hook "my-lisp-mode")
-(add-hook 'lisp-data-mode-hook #'my-lisp-data-mode-hook)
-(autoload 'my-cmake-mode-hook "my-cmake-mode")
-(add-hook 'cmake-mode-hook #'my-cmake-mode-hook)
-(autoload 'my-c++-mode-hook "my-c++-mode")
-(add-hook 'c++-mode-hook #'my-c++-mode-hook)
-(autoload 'my-sh-mode-hook "my-sh-mode")
-(add-hook 'sh-mode-hook #'my-sh-mode-hook)
-(autoload 'my-shell-mode-hook "my-shell-mode")
-(add-hook 'shell-mode-hook #'my-shell-mode-hook)
-(autoload 'my-makefile-mode-hook "my-makefile-mode")
-(add-hook 'makefile-mode-hook #'my-makefile-mode-hook)
+(autoload 'my/lisp-mode-hook "my-lisp-mode")
+(add-hook 'lisp-mode-hook #'my/lisp-mode-hook)
+(add-hook 'emacs-lisp-mode-hook #'my/lisp-mode-hook)
+(add-hook 'lisp-interaction-mode-hook #'my/lisp-mode-hook)
+(add-hook 'scheme-mode-hook #'my/lisp-mode-hook)
+(autoload 'my/lisp-data-mode-hook "my-lisp-mode")
+(add-hook 'lisp-data-mode-hook #'my/lisp-data-mode-hook)
+(autoload 'my/cmake-mode-hook "my-cmake-mode")
+(add-hook 'cmake-mode-hook #'my/cmake-mode-hook)
+(autoload 'my/c++-mode-hook "my-c++-mode")
+(add-hook 'c++-mode-hook #'my/c++-mode-hook)
+(autoload 'my/sh-mode-hook "my-sh-mode")
+(add-hook 'sh-mode-hook #'my/sh-mode-hook)
+(autoload 'my/shell-mode-hook "my-shell-mode")
+(add-hook 'shell-mode-hook #'my/shell-mode-hook)
+(autoload 'my/makefile-mode-hook "my-makefile-mode")
+(add-hook 'makefile-mode-hook #'my/makefile-mode-hook)
 
 ;; (unless (daemonp)
 ;;   (use-package session
@@ -287,16 +287,10 @@ The frame will appear on the far right of the display area."
   (global-eldoc-mode))
 
 (use-package dired
-  :init
-  (autoload 'my-dired-mode-hook "my-dired-mode")
-  :config
-  (setq dired-recursive-copies 'always
-        dired-recursive-deletes 'always
-        dired-listing-switches "-aGFhlv --group-directories-first --time-style=long-iso")
-  :bind (("C-<up>" . dired-tree-up)
-         ("M-u" . dired-tree-up))
-  :hook
-  (dired-mode . my-dired-mode-hook))
+  :init (autoload 'my/dired-mode-hook "my-dired-mode")
+  :bind (("C-<up>" . dired-up-directory)
+         ("M-u" . dired-up-directory))
+  :hook (dired-mode . my/dired-mode-hook))
 
 (use-package savehist
   :init
@@ -309,12 +303,23 @@ The frame will appear on the far right of the display area."
                 ediff-split-window-function 'split-window-horizontally
                 ediff-merge-split-window-function 'split-window-horizontally))
 
+;;; Annotate changed files that are under version control.
 (use-package diff-hl
   :ensure t
   :defer t
-  :commands (diff-hl-flydiff-mode)
-  :init (diff-hl-flydiff-mode t)
-  :hook (after-init . global-diff-hl-mode))
+  :commands (global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode diff-hl-flydiff-mode diff-hl-margin-mode)
+  :init
+  (diff-hl-flydiff-mode t)
+  (when is-terminal
+    (diff-hl-margin-mode t))
+  :hook ((dired-mode . diff-hl-dired-mode)
+         (after-init . (lambda ()
+                        (diff-hl-flydiff-mode t)
+                        (when is-terminal
+                          (diff-hl-margin-mode t))
+                        (global-diff-hl-mode t)
+                        (global-diff-hl-show-hunk-mouse-mode t)
+                        ))))
 
 (use-package magit
   :ensure t
@@ -371,44 +376,12 @@ The frame will appear on the far right of the display area."
 
 (use-package embark
   :ensure t
-  :commands (embark-prefix-help-command my-embark-ace-action my-embark-split-action)
+  :commands (embark-prefix-help-command)
   :bind (("C-." . embark-act)
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
   :init
-  (setq prefix-help-command #'embark-prefix-help-command)
-  :config
-  (defmacro my-embark-ace-action (fn)
-    `(defun ,(intern (concat "my-embark-ace-" (symbol-name fn))) ()
-       (interactive)
-       (with-demoted-errors "%s"
-         (require 'ace-window)
-         (let ((aw-dispatch-always t))
-           (aw-switch-to-window (aw-select nil))
-           (call-interactively (symbol-function ',fn))))))
-
-  (defmacro my-embark-split-action (fn split-type)
-    `(defun ,(intern (concat "my-embark-" (symbol-name fn) "-"
-                             (car (last (split-string (symbol-name split-type) "-"))))) ()
-       (interactive)
-       (funcall #',split-type)
-       (call-interactively #',fn)))
-
-  (define-key embark-file-map (kbd "o") (my-embark-ace-action #'find-file))
-  (define-key embark-buffer-map (kbd "o") (my-embark-ace-action #'switch-to-buffer))
-  (define-key embark-bookmark-map (kbd "o") (my-embark-ace-action #'bookmark-jump))
-
-  (define-key embark-file-map (kbd "2") (my-embark-split-action #'find-file #'split-window-below))
-  (define-key embark-buffer-map (kbd "2") (my-embark-split-action #'switch-to-buffer #'split-window-below))
-  (define-key embark-bookmark-map (kbd "2") (my-embark-split-action #'bookmark-jump #'split-window-below))
-
-  (define-key embark-file-map (kbd "3") (my-embark-split-action #'find-file #'split-window-right))
-  (define-key embark-buffer-map (kbd "3") (my-embark-split-action #'switch-to-buffer #'split-window-right))
-  (define-key embark-bookmark-map (kbd "3") (my-embark-split-action #'bookmark-jump #'split-window-right))
-
-  (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                                       nil
-                                       (window-parameters (mode-line-format . none)))))
+  (setq prefix-help-command #'embark-prefix-help-command))
 
 (use-package consult
   :ensure t
@@ -445,7 +418,7 @@ The frame will appear on the far right of the display area."
          ("M-s G" . consult-git-grep)
          ("M-s k" . consult-keep-lines)
          ("M-s l" . consult-line)
-         ("M-s M-l" . my-consult-line-symbol-at-point)
+         ("M-s M-l" . my/consult-line-symbol-at-point)
          ("M-s L" . consult-line-multi)
          ("M-s r" . consult-ripgrep)
          ("M-s u" . consult-focus-lines)
@@ -471,7 +444,7 @@ The frame will appear on the far right of the display area."
         xref-show-definitions-function #'consult-xref)
 
   :config
-  (defun my-consult-line-symbol-at-point ()
+  (defun my/consult-line-symbol-at-point ()
     "Start `consult-line' with symbol at point."
     (interactive)
     (consult-line (thing-at-point 'symbol)))
@@ -521,9 +494,9 @@ The frame will appear on the far right of the display area."
 (use-package orderless
   :ensure t
   :custom
-  (completion-styles '(orderless basic))
+  (completion-styles '(orderless partial-completion basic))
   (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+  (completion-category-overrides nil))
 
 ;; (orderless-define-completion-style orderless+initialism
 ;;   (orderless-matching-styles '(orderless-initialism
@@ -552,6 +525,10 @@ The frame will appear on the far right of the display area."
               ("M-n" . flymake-goto-next-error)
               ("M-p" . flymake-goto-prev-error)))
 
+(use-package cape
+  :ensure t
+  :commands (cape-file))
+
 (use-package corfu
   :ensure t
   :commands (global-corfu-mode corfu-history-mode)
@@ -560,6 +537,7 @@ The frame will appear on the far right of the display area."
               ("<return>" . corfu-complete))
   :custom ((corfu-cycle t)
            (corfu-auto t)
+           (corfu-auto-prefix 1)
            (corfu-popupinfo-mode t)
            (corfu-preselect 'directory))
   :config
@@ -604,14 +582,14 @@ The frame will appear on the far right of the display area."
                                         (swift "https://github.com/alex-pinkus/tree-sitter-swift"))))
 
 (use-package emacs
-  :commands (my-crm-indicator)
+  :commands (my/crm-indicator)
   :init
-  (defun my-crm-indicator(args)
+  (defun my/crm-indicator(args)
     (cons (format "[CRM%s] %s"
                   (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
                   (car args))
           (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'my-crm-indicator)
+  (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
 
   :config
   (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -641,29 +619,29 @@ The frame will appear on the far right of the display area."
 
 ;;; Custom functions
 
-(defun my-reset-frame-left ()
+(defun my/reset-frame-left ()
   "Reset frame size and position for left frame."
   (interactive)
-  (let ((layout (my-screen-layout)))
-    (modify-frame-parameters (window-frame (get-buffer-window)) (my-initial-frame-alist layout))))
+  (let ((layout (my/screen-layout)))
+    (modify-frame-parameters (window-frame (get-buffer-window)) (my/initial-frame-alist layout))))
 
-(defun my-reset-frame-right ()
+(defun my/reset-frame-right ()
   "Reset frame size and position for right frame."
   (interactive)
-  (let ((layout (my-screen-layout)))
-    (modify-frame-parameters (window-frame (get-buffer-window)) (my-default-frame-alist layout))))
+  (let ((layout (my/screen-layout)))
+    (modify-frame-parameters (window-frame (get-buffer-window)) (my/default-frame-alist layout))))
 
-(defun my-reset-frame-right-display ()
+(defun my/reset-frame-right-display ()
   "Reset frame size and position for right side of display frame."
   (interactive)
-  (let ((layout (my-screen-layout)))
-    (modify-frame-parameters (window-frame (get-buffer-window)) (my-align-right-frame-alist layout))))
+  (let ((layout (my/screen-layout)))
+    (modify-frame-parameters (window-frame (get-buffer-window)) (my/align-right-frame-alist layout))))
 
-(defun my-reset-framewidth ()
-  "Reset the current frame width to function `my-cols'."
+(defun my/reset-framewidth ()
+  "Reset the current frame width to function `my/cols'."
   (interactive)
-  (let ((layout (my-screen-layout)))
-    (set-frame-width (window-frame (get-buffer-window)) (my-cols layout))))
+  (let ((layout (my/screen-layout)))
+    (set-frame-width (window-frame (get-buffer-window)) (my/cols layout))))
 
 (defun ksh ()
   "Start a new shell."
@@ -672,25 +650,25 @@ The frame will appear on the far right of the display area."
     (switch-to-buffer tmp nil t)
     (shell tmp)))
 
-(defun my-shell-other-window ()
+(defun my/shell-other-window ()
   "Start a new shell in another window."
   (interactive)
   (let ((tmp (get-buffer-create "*Shell*")))
     (switch-to-buffer-other-window tmp)
     (ksh)))
 
-(defun my-shell-other-frame ()
+(defun my/shell-other-frame ()
   "Start a new shell in another frame."
   (interactive)
   (select-frame (make-frame))
   (ksh))
 
-(defun my-kill-buffer ()
+(defun my/kill-buffer ()
   "Kill the current buffer without asking."
   (interactive)
   (kill-buffer (current-buffer)))
 
-(defun my-info-other-frame ()
+(defun my/info-other-frame ()
   "Show Info in a new frame."
   (interactive)
   (let ((tmp (get-buffer-create "*info*")))
@@ -698,14 +676,14 @@ The frame will appear on the far right of the display area."
     (select-frame (make-frame))
     (info nil tmp)))
 
-(defun my-customize-other-window ()
+(defun my/customize-other-window ()
   "Show Customize in a new frame."
   (interactive)
   (let ((tmp (get-buffer-create "*Customize Group: Emacs*")))
     (switch-to-buffer-other-window tmp)
     (customize)))
 
-(defun my-customize-other-frame ()
+(defun my/customize-other-frame ()
   "Show Customize in a new frame."
   (interactive)
   (let ((tmp (get-buffer-create "*Customize Group: Emacs*")))
@@ -713,7 +691,7 @@ The frame will appear on the far right of the display area."
     (select-frame (make-frame))
     (customize)))
 
-(defun my-matching-paren (arg)
+(defun my/matching-paren (arg)
   "Locate the matching ARG paren."
   (interactive "P")
   (if arg
@@ -727,12 +705,12 @@ The frame will appear on the far right of the display area."
 	  (t
 	   (self-insert-command 1)))))
 
-(defun my-indent-buffer ()
+(defun my/indent-buffer ()
   "Reindent the whole buffer."
   (interactive)
   (indent-region (point-min) (point-max) nil))
 
-(defmacro my-emacs-keybind (keymap &rest definitions)
+(defmacro my/emacs-keybind (keymap &rest definitions)
   "Expand key binding DEFINITIONS for the given KEYMAP.
 DEFINITIONS is a sequence of string and command pairs."
   (declare (indent 1))
@@ -754,13 +732,7 @@ DEFINITIONS is a sequence of string and command pairs."
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 (add-hook 'before-save-hook #'copyright-update)
 
-(my-emacs-keybind global-map
-  "<insert>" nil
-  "C-z" nil
-  "C-x C-z" nil
-  "C-x h" nil
-  "C-h h" nil
-  "M-`" nil
+(my/emacs-keybind global-map
   "C-h K" #'describe-keymap
   "C-h u" #'apropos-user-option
   "C-h F" #'apropos-function
@@ -773,27 +745,36 @@ DEFINITIONS is a sequence of string and command pairs."
   "C-x O" #'other-frame
   "C-x C-o" #'other-frame
 
-  "M-<f1>" #'my-reset-frame-left
-  "M-<f2>" #'my-reset-frame-right
-  "M-<f3>" #'my-reset-frame-right-display
+  "M-<f1>" #'my/reset-frame-left
+  "M-<f2>" #'my/reset-frame-right
+  "M-<f3>" #'my/reset-frame-right-display
 
-  "C-x 4 c" #'my-customize-other-window
-  "C-x 4 k" #'my-shell-other-window
+  "C-x 4 c" #'my/customize-other-window
+  "C-x 4 k" #'my/shell-other-window
 
-  "C-x 5 c" #'my-customize-other-frame
-  "C-x 5 i" #'my-info-other-frame
-  "C-x 5 k" #'my-shell-other-frame
+  "C-x 5 c" #'my/customize-other-frame
+  "C-x 5 i" #'my/info-other-frame
+  "C-x 5 k" #'my/shell-other-frame
 
-  "C-c C-k" #'my-kill-buffer
+  "C-c C-k" #'my/kill-buffer
 
   "<f3>" #'eval-last-sexp
 
-  "C-M-\\" #'my-indent-buffer
+  "C-M-\\" #'my/indent-buffer
 
   "<home>" #'beginning-of-buffer
   "<end>" #'end-of-buffer
   "<delete>" #'delete-char
   "S-<f12>" #'package-list-packages
+
+  ;; Unmap the following
+  "<insert>" nil
+  "C-z" nil
+  "C-x C-z" nil
+  "C-x h" nil
+  "C-h h" nil
+
+  ;; "M-`" nil
 
   "C-<mouse-4>" nil
   "C-<mouse-5>" nil

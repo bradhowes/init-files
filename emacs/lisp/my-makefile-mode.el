@@ -9,18 +9,18 @@
 					  font-lock-brace-face)))
 
 
-(defun my-makefile-insert-block-comment ()
+(defun my/makefile-insert-block-comment ()
   "Insert block comment."
   (interactive)
-  (my-insert-block-comment 'newline-and-indent "#" "#" "#"))
+  (my/insert-block-comment #'newline-and-indent "#" "#" "#"))
 
-(defun my-makefile-mode-hook ()
+(defun my/makefile-mode-hook ()
   "Custom Makefile mode."
   (font-lock-mode t)
   (auto-fill-mode)
   (setq tab-width 4)
-  (local-set-key [(return)] 'newline-and-indent)
-  (local-set-key [(meta control \;)] 'my-makefile-insert-block-comment)
+  (local-set-key [(return)] #'newline-and-indent)
+  (local-set-key [(meta control \;)] #'my/makefile-insert-block-comment)
   (show-paren-mode t))
 
 (provide 'my-makefile-mode)

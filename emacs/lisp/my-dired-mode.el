@@ -2,10 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'dired-aux)
-(require 'dired-x)
+(require 'dired)
 
-(defun my-ediff-marked-pair ()
+(defun my/ediff-marked-pair ()
   "Run `ediff-files' on a pair of files marked in `dired' buffer."
   (interactive)
   (let ((marked-files (dired-get-marked-files nil)))
@@ -14,17 +13,16 @@
       (ediff-files (nth 0 marked-files)
                    (nth 1 marked-files)))))
 
-(defun my-dired-load-hook ()
-  "Custom hook for `dired' loading."
-  (load "dired-x"))
-
-(defun my-dired-mode-hook ()
+(defun my/dired-mode-hook ()
   "Custom hook for `dired' mode."
-  (load "dired-x")
-  (message "hi mom")
-  ;; (dired-omit-mode 1)
-  ;; (setq dired-omit-files "^\\.$\\||^\\.\\.$")
-  (local-set-key [(?=)] 'my-ediff-marked-pair))
+
+  ;; When the directory is on a remote machine always keep the buffer in case the connection is slow.
+  ;; Only necessary to do this when `dired-kill-when-opening-new-dired-buffer' is not `nil'.
+  (when (and dired-kill-when-opening-new-dired-buffer
+             (file-remote-p default-directory))
+    (set (make-local-variable 'dired-kill-when-opening-new-dired-buffer) nil))
+
+  (local-set-key [(?=)] #'my/ediff-marked-pair))
 
 (provide 'my-dired-mode)
 ;;; my-dired-mode.el ends here

@@ -9,7 +9,7 @@
 
 (font-lock-add-keywords 'python-mode '(("[][(){}]" . font-lock-brace-face)))
 
-(defun my-python-insert-block-comment ()
+(defun my/python-insert-block-comment ()
   "Insert block comment."
   (interactive)
   (insert "#")
@@ -23,17 +23,17 @@
   (end-of-line)
   (insert " "))
 
-(defun my-python-newline ()
+(defun my/python-newline ()
   "Really?"
   (interactive)
   (newline)
   (indent-for-tab-command))
 
-(defun my-string-trim (string)
+(defun my/string-trim (string)
   "Trim STRING."
   (replace-regexp-in-string "\\(^[ \t]*\\|[ \t]*$\\)" "" string))
 
-(defun my-python-doxygen-insert-prepped-comment (prefix found)
+(defun my/python-doxygen-insert-prepped-comment (prefix found)
   "Insert a Doxygen comment block and fill it with some tags.
 Thiss will represent the data contained in FOUND. The comment and its
 contents are indented with the value PREFIX. Places point at the
@@ -49,7 +49,7 @@ end of the first line of the comment block."
       (doxygen-push-marker))
     (save-excursion
       (insert "\n")
-      (let ((args (mapcar 'my-string-trim (nth 2 info))))
+      (let ((args (mapcar 'my/string-trim (nth 2 info))))
 	(message "%s %s" args (nth 0 args))
 	(when args
 	  (if (string-equal "self" (nth 0 args))
@@ -65,7 +65,7 @@ end of the first line of the comment block."
 	(insert "\n"))
       (insert prefix "#\n"))))
 
-(defun my-python-doxygen-insert-empty-comment ()
+(defun my/python-doxygen-insert-empty-comment ()
   "Insert an empty Doxygen comment block.
 The point is left at the end of the first line.
 The comment is indented with PREFIX."
@@ -76,24 +76,24 @@ The comment is indented with PREFIX."
     (doxygen-push-marker)
     (save-excursion (insert "\n" prefix "#\n"))))
 
-(defun my-python-doxygen-insert-block-comment ()
+(defun my/python-doxygen-insert-block-comment ()
   "Insert a Doxygen block comment for the next non-blank line."
   (interactive "*")
   (let ((found (doxygen-find-declaration)))
     (if found
-	(my-python-doxygen-insert-prepped-comment (progn
+	(my/python-doxygen-insert-prepped-comment (progn
 						    (goto-char (nth 0 found))
 						    (doxygen-line-prefix))
 						  found)
-      (my-python-doxygen-insert-empty-comment))
+      (my/python-doxygen-insert-empty-comment))
     (doxygen-update-markers)))
 
-(defun my-python-mode-hook ()
+(defun my/python-mode-hook ()
   "Custom hook for Python moode."
   (font-lock-mode t)
   (auto-fill-mode 1)
-  (local-set-key [(meta control \;)] 'my-python-insert-block-comment)
-  (local-set-key [(control c)(meta control \;)] 'my-python-doxygen-insert-block-comment))
+  (local-set-key [(meta control \;)] 'my/python-insert-block-comment)
+  (local-set-key [(control c)(meta control \;)] 'my/python-doxygen-insert-block-comment))
 
 (provide 'my-python-mode)
 

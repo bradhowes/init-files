@@ -6,16 +6,16 @@
 ;;; Save the following in a file named 'my-cc-block-comment', byte-compile,
 ;;; then add this to your .emacs file:
 ;;;
-;;;  (autoload 'my-cc-block-comment-install "my-cc-block-comment")
-;;;  (add-hook 'c++-mode-hook 'my-cc-block-comment-install)
+;;;  (autoload 'my/cc-block-comment-install "my-cc-block-comment")
+;;;  (add-hook 'c++-mode-hook 'my/cc-block-comment-install)
 ;;;
 ;;; Now, when you edit a C or C++ file, the following mappings will be
 ;;; installed:
 ;;;
-;;;   (local-set-key [?\r] 'my-cc-newline-and-indent)
-;;;   (local-set-key [?\M-\C-\;] 'my-cc-new-block-comment)
-;;;   (local-set-key [?\C-:] 'my-cc-new-header-comment)
-;;;   (local-set-key [?\M-q] 'my-cc-refill-block-comment)
+;;;   (local-set-key [?\r] 'my/cc-newline-and-indent)
+;;;   (local-set-key [?\M-\C-\;] 'my/cc-new-block-comment)
+;;;   (local-set-key [?\C-:] 'my/cc-new-header-comment)
+;;;   (local-set-key [?\M-q] 'my/cc-refill-block-comment)
 ;;;
 ;;; Typing "C-:" before a function will insert a header with the function name,
 ;;; return value and parameter names inserted in the header. NOTE: this does
@@ -54,7 +54,7 @@
 
 (require 'cc-mode)
 
-(defun my-cc-inside-comment ()
+(defun my/cc-inside-comment ()
   "Decides if the current point is inside of a C or C++ comment.
 If it is
 returns a prefix string that can be used to continue the comment properly.
@@ -109,13 +109,13 @@ Returns nil if not inside a comment"
             (aset prefix (- here 2) ? )))))
     prefix))
 
-(defun my-cc-newline-and-indent ()
+(defun my/cc-newline-and-indent ()
   "Front-end to usual `newline-and-indent' function.
 For use in C/C++ code with
 block-style comments. It properly adds whatever prefix it finds in previous
 lines of a comment block whenever a new line is created."
   (interactive)
-  (let ((prefix (my-cc-inside-comment)))
+  (let ((prefix (my/cc-inside-comment)))
 
     ;; Either insert a comment for the prefix block, or just a newline and
     ;; indent.
@@ -130,7 +130,7 @@ lines of a comment block whenever a new line is created."
       ;;
       (newline-and-indent))))
 
-(defun my-cc-refill-block-comment ()
+(defun my/cc-refill-block-comment ()
   "Routine to refill a C block comment.
 This leaves alone the '/*' and '*/'
 comment delimiters if they exist on a line by themselves."
@@ -140,7 +140,7 @@ comment delimiters if they exist on a line by themselves."
           (oldp fill-prefix)
           (rmin 0)
           (rmax 0)
-          (prefix (my-cc-inside-comment)))
+          (prefix (my/cc-inside-comment)))
 
       ;; Only fill region if we find ourselves in a C or C++ comment block. We
       ;; first check for C++ // block comment.
@@ -231,7 +231,7 @@ comment delimiters if they exist on a line by themselves."
                   (fill-region rmin rmax nil t nil)
                   (setq fill-prefix oldp)))))))
 
-(defun my-cc-do-auto-fill ()
+(defun my/cc-do-auto-fill ()
   "Function that handles auto filling comment blocks."
   (let ((here (point))
         (prefix nil)
@@ -242,7 +242,7 @@ comment delimiters if they exist on a line by themselves."
     (do-auto-fill)
     (and (not (eq major-mode 'c++-mode))
          (not (= (point) here))
-         (setq prefix (my-cc-inside-comment))
+         (setq prefix (my/cc-inside-comment))
 
          ;; Inside of comment, so remove whatever was previously added,
          ;; and insert the prefix for the comment block.
@@ -257,7 +257,7 @@ comment delimiters if they exist on a line by themselves."
                  (goto-char mark)
                  (set-marker mark nil)))))))
 
-(defun my-cc-get-proc-name (arg)
+(defun my/cc-get-proc-name (arg)
   "Extracts the name of the function.
 The point is currently in, or ARG previous
 functions. Name is returned as a string. Returns NIL if function not found."
@@ -270,7 +270,7 @@ functions. Name is returned as a string. Returns NIL if function not found."
          (looking-at "^\\<\\((\\sw+\\)\\>") ; are we looking at an identifier?
          (buffer-substring (match-beginning 1) (match-end 1)))))
 
-(defun my-cc-get-proc-args ()
+(defun my/cc-get-proc-args ()
   "Extracts arguments to function the point is current in.
 Returns the argument names as a list."
   (save-excursion
@@ -335,29 +335,29 @@ Returns the argument names as a list."
       ;;
       plist)))
 
-(defvar my-cc-header-comment-fields nil
+(defvar my/cc-header-comment-fields nil
   "Variable containing the field locations for the last comment."
   )
 
-(defvar my-cc-header-comment-field-index 0
+(defvar my/cc-header-comment-field-index 0
   "Variable indicating which field is current."
   )
 
-(make-variable-buffer-local 'my-cc-header-comment-fields)
-(make-variable-buffer-local 'my-cc-header-comment-field-index)
+(make-variable-buffer-local 'my/cc-header-comment-fields)
+(make-variable-buffer-local 'my/cc-header-comment-field-index)
 
-(defun my-cc-new-header-comment ()
+(defun my/cc-new-header-comment ()
   "Simple routine for inserting a new C function header comment.
 Inserts the function's name it precedes, and individual lines for
 each argument it takes."
   (interactive)
   (let (
-        (plist (my-cc-get-proc-args))
+        (plist (my/cc-get-proc-args))
         (rvalue nil)
         marker
         )
     (insert "/*")                       ; start of C block comment
-    (my-cc-newline-and-indent)          ; new line and continued comment
+    (my/cc-newline-and-indent)          ; new line and continued comment
     (insert " Function: ")              ; insert function name
     (setq marker (make-marker))
     (set-marker marker (point))
@@ -370,21 +370,21 @@ each argument it takes."
     ;;
     ;; Get rid of any old markers
     ;;
-    (if my-cc-header-comment-fields
+    (if my/cc-header-comment-fields
         (mapc (lambda (f)
                 (and (markerp f)
                      (set-marker f nil)))
-              my-cc-header-comment-fields))
+              my/cc-header-comment-fields))
 
-    (setq my-cc-header-comment-fields (list (+ (if plist (car plist) 1) 3)))
-    (setq my-cc-header-comment-field-index 1)
-    (nconc my-cc-header-comment-fields (list marker))
+    (setq my/cc-header-comment-fields (list (+ (if plist (car plist) 1) 3)))
+    (setq my/cc-header-comment-field-index 1)
+    (nconc my/cc-header-comment-fields (list marker))
 
     (setq plist (cdr plist))
-    (my-cc-newline-and-indent)          ; new line and continued comment
-    (my-cc-newline-and-indent)          ; ditto
+    (my/cc-newline-and-indent)          ; new line and continued comment
+    (my/cc-newline-and-indent)          ; ditto
     (insert "Inputs:")                  ; start of argument section
-    (my-cc-newline-and-indent)
+    (my/cc-newline-and-indent)
     (backward-delete-char 1)            ; remove space after '*'...
     (insert "\t")                       ; and replace with a TAB
     (cond (plist                        ; insert argument(s)
@@ -393,74 +393,74 @@ each argument it takes."
                (insert (car plist) " - "))
              (setq marker (make-marker))
              (set-marker marker (point))
-             (nconc my-cc-header-comment-fields (list marker))
+             (nconc my/cc-header-comment-fields (list marker))
              (setq plist (cdr plist))
-             (my-cc-newline-and-indent)))
+             (my/cc-newline-and-indent)))
           (t
            (setq marker (make-marker))
            (set-marker marker (point))
-           (nconc my-cc-header-comment-fields (list marker))
-           (my-cc-newline-and-indent)))
+           (nconc my/cc-header-comment-fields (list marker))
+           (my/cc-newline-and-indent)))
     (backward-delete-char 1)            ; end of argument section
-    (my-cc-newline-and-indent)
+    (my/cc-newline-and-indent)
     (insert " Outputs:")                ; start of output section
-    (my-cc-newline-and-indent)
+    (my/cc-newline-and-indent)
     (backward-delete-char 1)
     (insert "\t")
     (if rvalue
         (insert "none"))
     (setq marker (make-marker))
     (set-marker marker (point))
-    (nconc my-cc-header-comment-fields (list marker))
-    (my-cc-newline-and-indent)
+    (nconc my/cc-header-comment-fields (list marker))
+    (my/cc-newline-and-indent)
     (backward-delete-char 1)            ; start of explanatory text
-    (my-cc-newline-and-indent)
+    (my/cc-newline-and-indent)
     (insert " ")
     (setq marker (make-marker))
     (set-marker marker (point))
-    (nconc my-cc-header-comment-fields (list marker))
-    (my-cc-newline-and-indent)
+    (nconc my/cc-header-comment-fields (list marker))
+    (my/cc-newline-and-indent)
     (backward-delete-char 1)
     (insert "/")                        ; end of C block comment
     (newline-and-indent)
-    (goto-char (nth 1 my-cc-header-comment-fields))
+    (goto-char (nth 1 my/cc-header-comment-fields))
     )
   )
 
-(defun my-cc-header-comment-next-field ()
+(defun my/cc-header-comment-next-field ()
   "Go to next header field."
   (interactive)
   (let (
-        (next (nth (1+ my-cc-header-comment-field-index)
-                   my-cc-header-comment-fields))
+        (next (nth (1+ my/cc-header-comment-field-index)
+                   my/cc-header-comment-fields))
         )
     (if next
-        (setq my-cc-header-comment-field-index
-              (1+ my-cc-header-comment-field-index))
-      (setq my-cc-header-comment-field-index 1
-            next (nth 1 my-cc-header-comment-fields)))
+        (setq my/cc-header-comment-field-index
+              (1+ my/cc-header-comment-field-index))
+      (setq my/cc-header-comment-field-index 1
+            next (nth 1 my/cc-header-comment-fields)))
     (goto-char next)
     ))
 
-(defun my-cc-header-comment-prev-field ()
+(defun my/cc-header-comment-prev-field ()
   "Go to prev header field."
   (interactive)
   (let (
         prev
         )
-    (if (= 1 my-cc-header-comment-field-index)
-        (setq my-cc-header-comment-field-index
-              (car my-cc-header-comment-fields)
-              prev (nth my-cc-header-comment-field-index
-                        my-cc-header-comment-fields))
-      (setq my-cc-header-comment-field-index
-            (1- my-cc-header-comment-field-index)
-            prev (nth my-cc-header-comment-field-index
-                      my-cc-header-comment-fields)))
+    (if (= 1 my/cc-header-comment-field-index)
+        (setq my/cc-header-comment-field-index
+              (car my/cc-header-comment-fields)
+              prev (nth my/cc-header-comment-field-index
+                        my/cc-header-comment-fields))
+      (setq my/cc-header-comment-field-index
+            (1- my/cc-header-comment-field-index)
+            prev (nth my/cc-header-comment-field-index
+                      my/cc-header-comment-fields)))
     (goto-char prev)
     ))
 
-(defun my-cc-new-block-comment ()
+(defun my/cc-new-block-comment ()
   "Simple function for inserting a new C block comment.
 I originally had a macro, but that was sloooow."
   (interactive)
@@ -468,33 +468,33 @@ I originally had a macro, but that was sloooow."
     (cond
      ((eq major-mode 'c++-mode)
       (insert "//")
-      (my-cc-newline-and-indent)
+      (my/cc-newline-and-indent)
       (insert " ")
       (setq here (point))
-      (my-cc-newline-and-indent)
+      (my/cc-newline-and-indent)
       (backward-delete-char 1)
       )
      (t
       (insert "/*")                     ; start of C block comment
-      (my-cc-newline-and-indent)        ; new line and continued comment
+      (my/cc-newline-and-indent)        ; new line and continued comment
       (insert " ")
       (setq here (point))               ; remember point to go back to
-      (my-cc-newline-and-indent)        ; new line and continued comment
+      (my/cc-newline-and-indent)        ; new line and continued comment
       (backward-delete-char 1)
       (insert "/")                      ; end of C block comment
       ))
     (goto-char here)                    ; go back to place for comment text
     ))
 
-(defun my-cc-block-comment-install ()
+(defun my/cc-block-comment-install ()
   "Set up current C/C++ mode to use block comment functions."
 
   (auto-fill-mode 1)
-  (setq auto-fill-function 'my-cc-do-auto-fill)
-  (local-set-key [(return)] 'my-cc-newline-and-indent)
-  (local-set-key [(meta control \;)] 'my-cc-new-block-comment)
-  (local-set-key [(control :)] 'my-cc-new-header-comment)
-  (local-set-key [(meta q)] 'my-cc-refill-block-comment))
+  (setq auto-fill-function 'my/cc-do-auto-fill)
+  (local-set-key [(return)] 'my/cc-newline-and-indent)
+  (local-set-key [(meta control \;)] 'my/cc-new-block-comment)
+  (local-set-key [(control :)] 'my/cc-new-header-comment)
+  (local-set-key [(meta q)] 'my/cc-refill-block-comment))
 
 (provide 'my-cc-block-comment)
 ;;; my-cc-block-comment.el ends here

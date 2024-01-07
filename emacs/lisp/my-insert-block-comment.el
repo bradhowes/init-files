@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(defun my-insert-block-comment (newlineAndIndent commentBegin commentMiddle commentEnd)
+(defun my/insert-block-comment (newlineAndIndent commentBegin commentMiddle commentEnd)
   "Insert comment block in code.
 NEWLINEANDINDENT -- method to call to create a newline and indent it
 COMMENTBEGIN -- the string to insert to start the comment

@@ -10,18 +10,18 @@
 			   font-lock-variable-name-face t)
 			  ("[][(){}$]" 0 font-lock-brace-face t)))
 
-(defun my-sh-insert-block-comment ()
+(defun my/sh-insert-block-comment ()
   "Insert block comment."
   (interactive)
-  (my-insert-block-comment 'newline-and-indent "#" "#" "#"))
+  (my/insert-block-comment 'newline-and-indent "#" "#" "#"))
 
-(defun my-sh-mode-hook ()
+(defun my/sh-mode-hook ()
   "Custom SH mode."
   (font-lock-mode t)
   (auto-fill-mode 1)
   (show-paren-mode t)
-  (local-set-key [(return)] 'newline-and-indent)
-  (local-set-key [(meta control \;)] 'my-sh-insert-block-comment))
+  (local-set-key [(return)] #'newline-and-indent)
+  (local-set-key [(meta control \;)] #'my/sh-insert-block-comment))
 
 (provide 'my-sh-mode)
 

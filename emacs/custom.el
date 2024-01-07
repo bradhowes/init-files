@@ -24,6 +24,7 @@
  '(confirm-kill-emacs 'y-or-n-p)
  '(copyright-query nil)
  '(copyright-year-ranges t)
+ '(corfu-auto-prefix 1)
  '(current-language-environment "UTF-8")
  '(custom-enabled-themes '(modus-vivendi))
  '(custom-safe-themes
@@ -31,7 +32,11 @@
  '(delete-by-moving-to-trash t)
  '(delete-old-versions t)
  '(dired-auto-revert-buffer t)
+ '(dired-dwim-target t)
  '(dired-isearch-filenames t)
+ '(dired-kill-when-opening-new-dired-buffer t)
+ '(dired-recursive-copies 'always)
+ '(dired-recursive-deletes 'always)
  '(display-time-default-load-average nil)
  '(doom-modeline-buffer-file-name-style 'relative-from-project)
  '(doom-modeline-buffer-file-true-name t)
@@ -86,7 +91,7 @@
      ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
  '(package-quickstart t)
  '(package-selected-packages
-   '(corfu-info lsp-sourcekit swift-mode corfu use-package eglot treemacs treemacs-all-the-icons treemacs-magit treemacs-projectile ef-themes denote consult-dir orderless vertico consult embark-consult embark markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation flycheck-indentation flycheck doom-themes doom-modeline diminish diff-hl company-quickhelp company-jedi company cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
+   '(cape corfu-info lsp-sourcekit swift-mode corfu use-package eglot treemacs treemacs-all-the-icons treemacs-magit treemacs-projectile ef-themes denote consult-dir orderless vertico consult embark-consult embark markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation flycheck-indentation flycheck doom-themes doom-modeline diminish diff-hl company-quickhelp company-jedi company cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
  '(projectile-generic-command "rg --files --hidden -0")
  '(projectile-globally-ignored-directoriesx
    '(".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".tox" ".svn" ".cache" ".clangd" "./build" "./cmake"))

@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(defun my-split-string (string &optional sep omit)
+(defun my/split-string (string &optional sep omit)
   "Split STRING at SEP.
 If OMIT then remove any empty strings."
   (let ((result (split-string string sep)))
@@ -110,7 +110,7 @@ Also removes duplicates."
   ;; Take the last token in the string as the variable name (any function
   ;; pointer types have already been removed)
   ;;
-  (setq scrap (car (last (my-split-string scrap nil t))))
+  (setq scrap (car (last (my/split-string scrap nil t))))
 
   ;;
   ;; Strip off any trailing '[]'
@@ -166,7 +166,7 @@ Operates on KIND expressions with NAME."
   (let ((beg (match-beginning 0))
 	(end (match-end 0))
 	(tag (mapconcat 'identity
-			(my-split-string
+			(my/split-string
 			 (concat (capitalize
 				  (match-string-no-properties kind))
 				 " "
@@ -186,7 +186,7 @@ Operates on KIND expressions with NAME."
     (when (string-match "[ \t]*template\\b<.*>" clause)
       (setq info (cons (cons 'template (match-string-no-properties 0)) info)
 	    clause (substring clause (match-end 0))))
-    (setq items (my-split-string clause nil t)
+    (setq items (my/split-string clause nil t)
 	  first (car items))
 
     (when (string-equal "explicit" first)
@@ -226,7 +226,7 @@ returns a value, and ARGS is either nil if the function takes no arguments, or
 it is a list of argument names."
     (let ((beg (match-beginning 0))
 	  (end (match-end 0))
-	  (args (my-split-string (match-string-no-properties 2) "," t))
+	  (args (my/split-string (match-string-no-properties 2) "," t))
 	  (name (match-string-no-properties 1)))
       (list beg end (list t name args))))
 
@@ -269,7 +269,7 @@ it is a list of argument names."
 		      (if (eq major-mode 'c++-mode)
 			  (concat "Method " name)
 			(concat "Function " name)))))
-		  (mapcar 'doxygen-get-c-arg-name (my-split-string args ","
+		  (mapcar 'doxygen-get-c-arg-name (my/split-string args ","
 								   t))))))
 
 (defun doxygen-process-obj-function-match ()
