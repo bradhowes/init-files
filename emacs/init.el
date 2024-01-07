@@ -287,9 +287,13 @@ The frame will appear on the far right of the display area."
   (global-eldoc-mode))
 
 (use-package dired
-  :init (autoload 'my/dired-mode-hook "my-dired-mode")
+  :init
+  (require 'dired-aux)
+  (autoload 'my/dired-mode-hook "my-dired-mode")
   :bind (("C-<up>" . dired-up-directory)
-         ("M-u" . dired-up-directory))
+         ("M-u" . dired-up-directory)
+         ("C-s" . dired-isearch-filenames)
+         ("C-M-s" . dired-isearch-filenames-regexp))
   :hook (dired-mode . my/dired-mode-hook))
 
 (use-package savehist
