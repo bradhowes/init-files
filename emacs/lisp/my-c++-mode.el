@@ -6,6 +6,7 @@
 (require 'doxygen)
 (require 'my-c-mode-common)
 (require 'my-insert-block-comment)
+(require 'flyspell)
 
 (define-skeleton my/c++-class-skeleton
   "Insert a C++ class skeleton."
@@ -21,7 +22,7 @@
 (define-skeleton my/c++-copyright-skeleton
   "Insert a C++ copyright comment."
   nil
-  "// (C) Copyright 2022, 2023, 2024 Brad Howes. All rights reserved.\n"
+  "// (C) Copyright 2024 Brad Howes. All rights reserved.\n"
   "//\n\n"
 )
 
@@ -264,6 +265,18 @@ Setup a namespace with NAMESPACE name if non-nil."
     ;;         (replace-match "#include \"\\2\"")
     ;;       (replace-match "#include <\\2>"))))))
 
+(defun my/c++-on-include-line ()
+  "T if point is on a C/C++ include line."
+  (save-excursion
+    (beginning-of-line)
+    (looking-at-p "^#\\s-*include\\s-+[\"<]")))
+
+(defun my/flyspell-progmod-verify ()
+  "Custom `flyspell-generic-progmode-verify' function for C/C++ modes.
+Does not allow spell-checking in '#include' strings."
+  (and (flyspell-generic-progmode-verify)
+       (not (my/c++-on-include-line))))
+
 ;;;###autoload
 (defun my/c++-mode-hook ()
   "Custom C++ mode hook."
@@ -274,7 +287,8 @@ Setup a namespace with NAMESPACE name if non-nil."
   (setq c-at-vsemi-p-fn 'my/c++-at-vsemi-p
 	c-vsemi-status-unknown-p-fn 'my/c++-vsemi-status-unknown-p
         c-block-comment-prefix ""
-        c-doc-comment-style 'doxygenf)
+        c-doc-comment-style 'doxygenf
+        flyspell-generic-check-word-predicate #'my/flyspell-progmod-verify)
 
   (local-set-key [(f7)] #'compile)
   (local-set-key [(control c)(control i)] #'my/c++-copyright-skeleton)

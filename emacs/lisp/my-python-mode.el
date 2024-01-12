@@ -95,6 +95,10 @@ The comment is indented with PREFIX."
   (local-set-key [(meta control \;)] 'my/python-insert-block-comment)
   (local-set-key [(control c)(meta control \;)] 'my/python-doxygen-insert-block-comment))
 
+(defun my/inferior-python-mode-hook ()
+  "Custom hook for `inferior-python-mode`."
+  (local-set-key [(control c) (control r)] #'comint-kill-region))
+
 (provide 'my-python-mode)
 
 ;;; my-python-mode.el ends here

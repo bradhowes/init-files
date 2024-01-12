@@ -4,6 +4,7 @@
 ;;; Code:
 
 (require 'seq)
+(require 'cl-lib)
 
 (condition-case nil
     (require 'use-package)
@@ -28,7 +29,7 @@
   "The path to the Python eexecutable to use for elpy.")
 (defconst is-macosx (eq system-type 'darwin)
   "T if running on macOS.")
-(defconst is-terminal (eq window-system nil)
+(defconst is-terminal (not (display-graphic-p))
   "T if running in a terminal.")
 
 (setenv "WORKON_HOME" my/venv)
@@ -36,9 +37,7 @@
 (setq read-process-output-max (* 1024 1024)
       custom-file (expand-file-name "~/.emacs.d/custom.el")
       load-path (append (list (expand-file-name "~/.emacs.d/lisp")) load-path)
-      frame-title-format (list  '(:eval (abbreviate-file-name default-directory)))
-      scroll-conservatively 101
-      scroll-margin 2)
+      frame-title-format (list  '(:eval (abbreviate-file-name default-directory))))
 
 (defconst my/screen-laptop (intern "my/screen-laptop")
   "Symbol for laptop screen width.")
@@ -194,12 +193,14 @@ The frame will appear on the far right of the display area."
   (custom-set-variables
    '(ls-lisp-use-insert-directory-program nil))
   (when (not is-terminal)
-    (setq frame-resize-pixelwise t)
     (custom-set-variables
+     '(frame-resize-pixelwise t)
      '(mac-command-modifier 'meta)
      '(mac-option-modifier 'alt)
      '(mac-right-command-modifier 'super)
      '(mac-right-option-modifier 'hyper))))
+
+;;; Set various paths
 
 (let* ((common-paths (list (expand-file-name "~/bin")
                            (concat my/venv "/bin")))
@@ -214,7 +215,7 @@ The frame will appear on the far right of the display area."
   ;; Same for PATH environment variable
   (setenv "PATH" (concat (mapconcat 'identity (append additional-paths (list (getenv "PATH"))) ":"))))
 
-(when (eq window-system nil)
+(when is-terminal
   (set-face-background 'default "undefined"))
 
 (defvar font-lock-brace-face
@@ -228,29 +229,79 @@ The frame will appear on the far right of the display area."
     :group 'font-lock-faces)
   "Font Lock mode face used to highlight parentheses, braces, and brackets.")
 
-(autoload 'emacs-pager "emacs-pager")
-(autoload 'my/lisp-mode-hook "my-lisp-mode")
-(add-hook 'lisp-mode-hook #'my/lisp-mode-hook)
-(add-hook 'emacs-lisp-mode-hook #'my/lisp-mode-hook)
-(add-hook 'lisp-interaction-mode-hook #'my/lisp-mode-hook)
-(add-hook 'scheme-mode-hook #'my/lisp-mode-hook)
-(autoload 'my/lisp-data-mode-hook "my-lisp-mode")
-(add-hook 'lisp-data-mode-hook #'my/lisp-data-mode-hook)
-(autoload 'my/cmake-mode-hook "my-cmake-mode")
-(add-hook 'cmake-mode-hook #'my/cmake-mode-hook)
-(autoload 'my/c++-mode-hook "my-c++-mode")
-(add-hook 'c++-mode-hook #'my/c++-mode-hook)
-(autoload 'my/sh-mode-hook "my-sh-mode")
-(add-hook 'sh-mode-hook #'my/sh-mode-hook)
-(autoload 'my/shell-mode-hook "my-shell-mode")
-(add-hook 'shell-mode-hook #'my/shell-mode-hook)
-(autoload 'my/makefile-mode-hook "my-makefile-mode")
-(add-hook 'makefile-mode-hook #'my/makefile-mode-hook)
+(defun my/autoloads (&rest definitions)
+  "Setup autoloads.
+Each value in `DEFINITIONS' is a cons made up of
+a filename (without extension) and a symbol or a
+list of symbols."
+  (let* ((groups (seq-group-by #'stringp definitions))
+         (files (seq-drop (elt groups 0) 1))
+         (symbols (seq-drop (elt groups 1) 1)))
+    (seq-mapn
+     (lambda (file symbols)
+       (if (consp symbols)
+           (mapcar (lambda (symbol) (autoload symbol file)) symbols)
+         (autoload symbols file)))
+     files symbols)))
+
+;; Modes
+
+(my/autoloads
+ "emacs-pager" 'emacs-pager
+ "my-cmake-mode" 'my/cmake-mode-hook
+ "my-c++-mode" 'my/c++-mode-hook
+ "my-dired-mode" 'my/dired-mode-hook
+ "my-lisp-mode" '(my/lisp-mode-hook my/lisp-data-mode-hook)
+ "my-makefile-mode" 'my/makefile-mode-hook
+ "my-sh-mode" 'my/sh-mode-hook
+ "my-shell-mode" 'my/shell-mode-hook)
+
+(use-package lisp-mode
+  :defer t
+  :hook ((lisp-mode . my/lisp-mode-hook)
+         (lisp-interaction-mode . my/lisp-mode-hook)
+         (lisp-data-mode . my/lisp-data-mode-hook)
+         (scheme-mode . my/lisp-mode-hook)
+         (emacs-lisp-mode . my/lisp-mode-hook)))
+
+(use-package cc-mode
+  :defer t
+  :hook ((c++-mode . my/c++-mode-hook)))
+
+(use-package sh-mode
+  :defer t
+  :hook ((sh-mode . my/sh-mode-hook)))
+
+(use-package shell-mode
+  :defer t
+  :hook ((shell-mode . my/shell-mode-hook)))
+
+(use-package makefile-mode
+  :defer t
+  :hook ((makefile-mode . my/makefile-mode-hook)))
 
 ;; (unless (daemonp)
 ;;   (use-package session
 ;;     :ensure t
 ;;     :hook (after-init . session-initialize)))
+
+(defun my/emacs-keybind (keymap &rest definitions)
+  "Expand key binding DEFINITIONS for the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence."
+  (unless (zerop (% (length definitions) 2))
+    (error "Uneven number of key+command pairs"))
+  ;; Partition `definitions' into two groups, one with key definitions
+  ;; and another with functions and/or nil values
+  (let* ((groups (seq-group-by #'stringp definitions))
+         (keys (seq-drop (elt groups 0) 1))
+         (commands (seq-drop (elt groups 1) 1)))
+    ;; Only execute if given a valid keymap
+    (when-let ((keymapp keymap))
+      (seq-mapn
+       (lambda (key command) (define-key keymap (kbd key) command))
+       keys commands))))
+
+;;; PACKAGES
 
 (when (display-graphic-p)
   (use-package doom-themes
@@ -289,11 +340,9 @@ The frame will appear on the far right of the display area."
 (use-package dired
   :init
   (require 'dired-aux)
-  (autoload 'my/dired-mode-hook "my-dired-mode")
-  :bind (("C-<up>" . dired-up-directory)
-         ("M-u" . dired-up-directory)
-         ("C-s" . dired-isearch-filenames)
-         ("C-M-s" . dired-isearch-filenames-regexp))
+  :bind (:map dired-mode-map
+              ("C-s" . dired-isearch-filenames)
+              ("C-M-s" . dired-isearch-filenames-regexp))
   :hook (dired-mode . my/dired-mode-hook))
 
 (use-package savehist
@@ -330,8 +379,8 @@ The frame will appear on the far right of the display area."
   :defer t
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
-  :bind (("C-c g" . magit-file-dispatch)
-         ("C-x g" . magit-status)))
+  :bind (("C-x m f" . magit-file-dispatch)
+         ("C-x m m" . magit-status)))
 
 (use-package projectile
   :ensure t
@@ -399,10 +448,12 @@ The frame will appear on the far right of the display area."
          ;; C-x bindings in `ctl-x-map`
          ("C-x M-:" . consult-complex-command)
          ("C-x b" . consult-buffer)
+         ("C-x r" . consult-recent-file)
          ("C-x 4 b" . consult-buffer-other-window)
          ("C-x 5 b" . consult-buffer-other-frame)
          ("C-x t b" . consult-buffer-other-tab)
          ("C-x r b" . consult-bookmark)
+
          ;; ("C-x p b" . consult-project-bookmark)
          ("M-#" . consult-register-load)
          ("M-'" . consult-register-store)
@@ -486,7 +537,7 @@ The frame will appear on the far right of the display area."
   :ensure t
   :commands (eglot-ensure)
   :hook ((swift-mode . eglot-ensure)
-         (cc-mode . eglot-ensure)
+         (c++-mode . eglot-ensure)
          (python-mode . eglot-ensure))
   :config (add-to-list 'eglot-server-programs '(swift-mode . ("xcrun" "sourcekit-lsp")))
   :bind (:map eglot-mode-map
@@ -517,6 +568,11 @@ The frame will appear on the far right of the display area."
   :defer t
   :custom ((swift-mode:basic-offset 2))
   :hook (swift-mode . (lambda () (set (make-local-variable 'compile-command) "swift build"))))
+
+(use-package python
+  :ensure t
+  :hook ((python-mode . my/python-mode-hook)
+         (inferior-python-mode . my/inferior-python-mode-hook)))
 
 (use-package flymake
   :ensure t
@@ -560,7 +616,8 @@ The frame will appear on the far right of the display area."
 
 (use-package cmake-mode
   :ensure t
-  :defer t)
+  :defer t
+  :hook ((cmake-mode . my/cmake-mode-hook)))
 
 (use-package server
   :commands (server-running-p)
@@ -714,27 +771,15 @@ The frame will appear on the far right of the display area."
   (interactive)
   (indent-region (point-min) (point-max) nil))
 
-(defmacro my/emacs-keybind (keymap &rest definitions)
-  "Expand key binding DEFINITIONS for the given KEYMAP.
-DEFINITIONS is a sequence of string and command pairs."
-  (declare (indent 1))
-  (unless (zerop (% (length definitions) 2))
-    (error "Uneven number of key+command pairs"))
-  (let ((keys (seq-filter #'stringp definitions))
-        ;; We do accept nil as a definition: it unsets the given key.
-        (commands (seq-remove #'stringp definitions)))
-    `(when-let (((keymapp ,keymap))
-                (map ,keymap))
-       ,@(mapcar
-          (lambda (pair)
-            (let* ((key (car pair))
-                   (command (cdr pair)))
-              (unless (and (null key) (null command))
-                `(define-key map (kbd ,key) ,command))))
-          (cl-mapcar #'cons keys commands)))))
-
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 (add-hook 'before-save-hook #'copyright-update)
+
+(ffap-bindings)
+
+(use-package ibuffer
+  :config
+  (my/emacs-keybind ibuffer-mode-map
+		    "M-o" nil))
 
 (my/emacs-keybind global-map
   "C-h K" #'describe-keymap
@@ -748,6 +793,8 @@ DEFINITIONS is a sequence of string and command pairs."
 
   "C-x O" #'other-frame
   "C-x C-o" #'other-frame
+
+  "C-x C-b" #'ibuffer
 
   "M-<f1>" #'my/reset-frame-left
   "M-<f2>" #'my/reset-frame-right
