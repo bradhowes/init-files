@@ -42,7 +42,7 @@
  '(doom-modeline-buffer-file-name-style 'relative-from-project)
  '(doom-modeline-buffer-file-true-name t)
  '(doom-modeline-irc nil)
- '(doom-modeline-lsp nil)
+ '(doom-modeline-lsp t)
  '(doom-modeline-major-mode-color-icon nil)
  '(doom-modeline-major-mode-icon nil)
  '(doom-modeline-project-detection 'projectile)
@@ -59,9 +59,11 @@
  '(enable-recursive-minibuffers t)
  '(fill-column 120)
  '(find-file-visit-truename t)
+ '(frame-resize-pixelwise t)
  '(global-subword-mode t)
  '(grep-save-buffers t)
  '(history-delete-duplicates t)
+ '(indent-bars-prefer-character t)
  '(indent-tabs-mode nil)
  '(indicate-empty-lines t)
  '(inhibit-startup-echo-area-message "howes")
@@ -81,7 +83,7 @@
  '(next-line-add-newlines nil)
  '(ns-alternate-modifier 'alt)
  '(ns-command-modifier 'meta)
- '(ns-right-alternate-modifier 'super)
+ '(ns-right-alternate-modifier 'hyper)
  '(ns-right-command-modifier 'super)
  '(org-edna-use-inheritance t)
  '(org-roam-db-autosync-mode t)
@@ -92,7 +94,7 @@
      ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
  '(package-quickstart t)
  '(package-selected-packages
-   '(cape corfu-info lsp-sourcekit swift-mode corfu use-package eglot treemacs treemacs-all-the-icons treemacs-magit treemacs-projectile ef-themes denote consult-dir orderless vertico consult embark-consult embark markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation flycheck-indentation flycheck doom-themes doom-modeline diminish diff-hl company-quickhelp company-jedi company cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
+   '(rg eglot indent-guide ws-butler cape corfu-info lsp-sourcekit swift-mode corfu use-package treemacs treemacs-all-the-icons treemacs-magit treemacs-projectile ef-themes denote consult-dir orderless vertico consult embark-consult embark markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation flycheck-indentation flycheck doom-modeline diminish diff-hl company-quickhelp company-jedi company cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
  '(projectile-generic-command "rg --files --hidden -0")
  '(projectile-globally-ignored-directoriesx
    '(".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".tox" ".svn" ".cache" ".clangd" "./build" "./cmake"))
@@ -102,7 +104,13 @@
  '(read-extended-command-predicate 'command-completion-default-include-p)
  '(recentf-max-menu-items 50)
  '(recentf-max-saved-items 50)
+ '(resize-mini-windows t)
  '(ring-bell-function 'mode-line-bell-flash)
+ '(safe-local-variable-values
+   '((etags-regen-ignores "test/manual/etags/")
+     (etags-regen-regexp-alist
+      (("c" "objc")
+       "/[ \11]*DEFVAR_[A-Z_ \11(]+\"\\([^\"]+\\)\"/\\1/" "/[ \11]*DEFVAR_[A-Z_ \11(]+\"[^\"]+\",[ \11]\\([A-Za-z0-9_]+\\)/\\1/"))))
  '(save-place-mode t)
  '(savehist-additional-variables
    '(register-alist kill-ring projectile-project-command-history corfu-history))

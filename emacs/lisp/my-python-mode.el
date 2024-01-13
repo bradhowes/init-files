@@ -4,6 +4,7 @@
 (require 'python)
 (require 'font-lock)
 (require 'doxygen)
+(require 'indent-bars)
 
 ;;; Code:
 
@@ -92,6 +93,8 @@ The comment is indented with PREFIX."
   "Custom hook for Python moode."
   (font-lock-mode t)
   (auto-fill-mode 1)
+  (setq indent-bars-spacing-override 4)
+  (indent-bars-mode t)
   (local-set-key [(meta control \;)] 'my/python-insert-block-comment)
   (local-set-key [(control c)(meta control \;)] 'my/python-doxygen-insert-block-comment))
 

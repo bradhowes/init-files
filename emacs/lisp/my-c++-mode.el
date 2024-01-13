@@ -7,6 +7,7 @@
 (require 'my-c-mode-common)
 (require 'my-insert-block-comment)
 (require 'flyspell)
+(require 'indent-bars)
 
 (define-skeleton my/c++-class-skeleton
   "Insert a C++ class skeleton."
@@ -265,6 +266,46 @@ Setup a namespace with NAMESPACE name if non-nil."
     ;;         (replace-match "#include \"\\2\"")
     ;;       (replace-match "#include <\\2>"))))))
 
+(defun my/c++-use-pragma-once ()
+  "Transform #ifdef guard into #pragma once."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (if (derived-mode-p 'c-mode)
+        (insert "// (C) Copyright 2024 Brad Howes. All rights reserved. -*- C++ -*-\n\n#pragma once\n")
+      (when (re-search-forward "#ifndef \\(.*_H\\)[^\n]*\n#define \\1[^\n]*\n" nil t)
+        (replace-match "// (C) Copyright 2024 Brad Howes. All rights reserved. -*- C++ -*-\n\n#pragma once\n")
+        (goto-char (point-max))
+        (beginning-of-line)
+        (while (looking-at "^\\s-*$")
+          (beginning-of-line 0))
+        (when (looking-at "^#endif")
+          (beginning-of-line 0)
+          (while (looking-at "^\\s-*$")
+            (beginning-of-line 0))
+          (beginning-of-line 2)
+          (delete-region (point) (point-max)))))
+    (basic-save-buffer)))
+
+(defun my/c++-edit-all-files-named-in-buffer (p)
+  "Edit all files that are referenced in current buffer.
+They are assumed to be relative to the buffer that holds
+them. This routine moves to the first line and acts on each
+line, calling the given P on each one."
+  (interactive "aFunction: ")
+  (let ((cwd default-directory))
+    (point-min)
+    (while (looking-at "^.+$")
+      (let* ((partial (match-string-no-properties 0))
+             (path (file-name-concat cwd partial))
+             (buf (find-file-noselect path)))
+        (message "Editing %s" partial)
+        (with-current-buffer buf
+          (funcall p))
+        (kill-buffer buf))
+      (beginning-of-line 2)))
+  (message "Done."))
+
 (defun my/c++-on-include-line ()
   "T if point is on a C/C++ include line."
   (save-excursion
@@ -285,11 +326,13 @@ Does not allow spell-checking in '#include' strings."
   (c-add-style "My C++ Style" my/c-style t)
   (c-set-offset 'innamespace 0)
   (setq c-at-vsemi-p-fn 'my/c++-at-vsemi-p
+        indent-bars-spacing-override 4
 	c-vsemi-status-unknown-p-fn 'my/c++-vsemi-status-unknown-p
         c-block-comment-prefix ""
         c-doc-comment-style 'doxygenf
         flyspell-generic-check-word-predicate #'my/flyspell-progmod-verify)
 
+  (indent-bars-mode 1)
   (local-set-key [(f7)] #'compile)
   (local-set-key [(control c)(control i)] #'my/c++-copyright-skeleton)
   (local-set-key [(control meta \;)] #'my/c++-insert-block-comment)

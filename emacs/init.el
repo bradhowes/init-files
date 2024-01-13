@@ -253,6 +253,7 @@ list of symbols."
  "my-dired-mode" 'my/dired-mode-hook
  "my-lisp-mode" '(my/lisp-mode-hook my/lisp-data-mode-hook)
  "my-makefile-mode" 'my/makefile-mode-hook
+ "my-python-mode" '(my/python-mode-hook my/inferior-python-mode-hook)
  "my-sh-mode" 'my/sh-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
 
@@ -304,16 +305,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 ;;; PACKAGES
 
 (when (display-graphic-p)
-  (use-package doom-themes
-    :ensure t
-    :defer t
-    :functions (doom-themes-visual-bell-config
-                doom-themes-neotree-config)
-    :config
-    (load-theme 'doom-tomorrow-night t)
-    (doom-themes-visual-bell-config)
-    (doom-themes-neotree-config))
-
   (use-package all-the-icons
     :ensure t)
 
@@ -329,13 +320,19 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
   (use-package doom-modeline
     :ensure t
-    :hook (after-init . doom-modeline-mode)))
+    :hook (after-init . doom-modeline-mode))
+  )
 
 (auto-save-visited-mode t)
 
+;; Clean up whitespace at end of lines but only for edited lines.
+(use-package ws-butler
+   :ensure t
+   :hook (prog-mode . ws-butler-mode))
+
 (use-package eldoc
   :init
-  (global-eldoc-mode))
+  (global-eldoc-mode 1))
 
 (use-package dired
   :init
@@ -345,6 +342,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
               ("C-M-s" . dired-isearch-filenames-regexp))
   :hook (dired-mode . my/dired-mode-hook))
 
+;; Save minibuffer histories
 (use-package savehist
   :init
   (savehist-mode t))
@@ -379,14 +377,22 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :defer t
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
-  :bind (("C-x m f" . magit-file-dispatch)
-         ("C-x m m" . magit-status)))
+  :bind (("C-c f" . magit-file-dispatch)
+         ("C-x g" . magit-status)))
+
+;; Magit-like interface for ripgrep
+(use-package rg
+  :ensure t
+  :commands (rg-enable-default-bindings)
+  :config
+  (rg-enable-default-bindings))
 
 (use-package projectile
   :ensure t
   :defer t
   :commands (projectile-mode projectile-project-root projectile-register-project-type)
-  :bind-keymap ("C-x p" . projectile-command-map)
+  :bind-keymap (("C-x p" . projectile-command-map)
+                ("s-," . projectile-command-map))
   :hook (prog-mode . projectile-mode)
   :config
   (projectile-register-project-type 'swift '("Package.swift")
@@ -448,7 +454,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ;; C-x bindings in `ctl-x-map`
          ("C-x M-:" . consult-complex-command)
          ("C-x b" . consult-buffer)
-         ("C-x r" . consult-recent-file)
+         ("C-x f" . consult-recent-file)
+         ("C-x r r" . consult-recent-file)
          ("C-x 4 b" . consult-buffer-other-window)
          ("C-x 5 b" . consult-buffer-other-frame)
          ("C-x t b" . consult-buffer-other-tab)
@@ -612,6 +619,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :defer t)
 
 (use-package winner
+  :bind (("C-<left>" . winner-undo)
+         ("C-<right>" . winner-redo))
   :hook (after-init . winner-mode))
 
 (use-package cmake-mode
@@ -635,12 +644,24 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package recentf
   :init (recentf-mode t))
 
+(use-package flyspell
+  :defer t
+  :hook (prog-mode . flyspell-prog-mode))
+
 (use-package treesit
   :config
   (setq treesit-language-source-alist '((python "https://github.com/tree-sitter/tree-sitter-python")
                                         (c "https://github.com/tree-sitter/tree-sitter-c")
                                         (c++ "https://github.com/tree-sitter/tree-sitter-cpp")
                                         (swift "https://github.com/alex-pinkus/tree-sitter-swift"))))
+
+(use-package diminish
+  :ensure t
+  :commands (diminish)
+  :config
+  (diminish 'abbrev-mode "A")
+  (diminish 'auto-fill-function "F")
+  (diminish 'subword-mode "S"))
 
 (use-package emacs
   :commands (my/crm-indicator)
@@ -654,25 +675,20 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
   :config
   (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
-  :hook ((minibuffer-setup . cursor-intangible-mode)))
+  :hook ((minibuffer-setup . cursor-intangible-mode)
+         (before-save . copyright-update)))
+
+;; (add-hook 'before-save-hook #'delete-trailing-whitespace)
+
+
 
 
 (global-prettify-symbols-mode t)
 
-(autoload 'native-complete-setup-bash "native-complete")
-(with-eval-after-load 'shell
-  (message "Loading native-complete-setup-bash")
-  (native-complete-setup-bash))
-
-(add-hook 'prog-mode-hook #'flyspell-prog-mode)
-
-(use-package diminish
-  :ensure t
-  :commands (diminish)
-  :config
-  (diminish 'abbrev-mode "A")
-  (diminish 'auto-fill-function "F")
-  (diminish 'subword-mode "S"))
+;; (autoload 'native-complete-setup-bash "native-complete")
+;; (with-eval-after-load 'shell
+;;   (message "Loading native-complete-setup-bash")
+;;   (native-complete-setup-bash))
 
 (put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
 (put 'narrow-to-region 'disabled nil)
@@ -771,15 +787,16 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (interactive)
   (indent-region (point-min) (point-max) nil))
 
-(add-hook 'before-save-hook #'delete-trailing-whitespace)
-(add-hook 'before-save-hook #'copyright-update)
-
 (ffap-bindings)
 
 (use-package ibuffer
   :config
   (my/emacs-keybind ibuffer-mode-map
 		    "M-o" nil))
+
+(defun my/bury-help-buffer ()
+  "Bury the most-recent *Help* buffer."
+  (let ((wins (window-list))
 
 (my/emacs-keybind global-map
   "C-h K" #'describe-keymap
