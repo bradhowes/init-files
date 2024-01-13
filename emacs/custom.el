@@ -26,6 +26,7 @@
  '(copyright-query nil)
  '(copyright-year-ranges t)
  '(corfu-auto-prefix 1)
+ '(create-lockfiles nil)
  '(current-language-environment "UTF-8")
  '(custom-enabled-themes '(modus-vivendi))
  '(custom-safe-themes

@@ -663,9 +663,21 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (diminish 'auto-fill-function "F")
   (diminish 'subword-mode "S"))
 
+(use-package ibuffer
+  :config
+  ;; Unbind the ibuffer use of "M-o"
+  (my/emacs-keybind ibuffer-mode-map
+		    "M-o" nil))
+
 (use-package emacs
   :commands (my/crm-indicator)
   :init
+  (ffap-bindings)
+  (global-prettify-symbols-mode t)
+  ;; Forgot why this was done -- most likely for macOS
+  ;; (put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
+  (put 'narrow-to-region 'disabled nil)
+
   (defun my/crm-indicator(args)
     (cons (format "[CRM%s] %s"
                   (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
@@ -678,21 +690,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)))
 
-;; (add-hook 'before-save-hook #'delete-trailing-whitespace)
-
-
-
-
-(global-prettify-symbols-mode t)
-
 ;; (autoload 'native-complete-setup-bash "native-complete")
 ;; (with-eval-after-load 'shell
 ;;   (message "Loading native-complete-setup-bash")
 ;;   (native-complete-setup-bash))
-
-(put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
-(put 'narrow-to-region 'disabled nil)
-(fset 'yes-or-no-p 'y-or-n-p)
 
 ;;; Custom functions
 
@@ -786,17 +787,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   "Reindent the whole buffer."
   (interactive)
   (indent-region (point-min) (point-max) nil))
-
-(ffap-bindings)
-
-(use-package ibuffer
-  :config
-  (my/emacs-keybind ibuffer-mode-map
-		    "M-o" nil))
-
-(defun my/bury-help-buffer ()
-  "Bury the most-recent *Help* buffer."
-  (let ((wins (window-list))
 
 (my/emacs-keybind global-map
   "C-h K" #'describe-keymap
