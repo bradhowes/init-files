@@ -215,6 +215,26 @@ The frame will appear on the far right of the display area."
   ;; Same for PATH environment variable
   (setenv "PATH" (concat (mapconcat 'identity (append additional-paths (list (getenv "PATH"))) ":"))))
 
+;; Configure `display-buffer-alist' to manage window placement
+
+(use-package window
+  :init
+  (let ((window-parameters '(window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))))
+    (setq fit-window-to-buffer-horizontally t
+          switch-to-buffer-in-dedicated-window 'pop
+          switch-to-buffer-obey-display-actions t
+          window-resize-pixelwise t
+          window-sides-slots '(0 0 3 1) ; left top right bottom
+          display-buffer-base-action '((display-buffer-reuse-mode-window display-buffer-reuse-window display-buffer-in-previous-window display-buffer-same-window display-buffer-use-some-window))
+          display-buffer-alist `(("\\*\\(?:\\(?:Buffer List\\)\\|Ibuffer\\)\\*"
+                                  display-buffer-in-side-window (side . right) (slot . -2) (preserve-size . (nil . t)) ,window-parameters)
+                                 ("\\*Tags List\\*"
+                                  display-buffer-in-side-window (side . right) (slot . -1) (preserve-size . (t . nil)) ,window-parameters)
+                                 ("\\*\\(?:Help\\|grep\\|Completions\\|ripgrep-search\\|\\(?:Customize Option:.*\\)\\)\\*"
+                                  display-buffer-in-side-window (side . right) (slot . 0) (preserve-size . (nil . t)) ,window-parameters)
+                                 ("\\*\\(?:\\(?:Shell.*\\)\\|compilation\\|Compile-Log\\)\\*"
+                                  display-buffer-in-side-window (side . right) (slot . 1) (preserve-size . (nil . t)) ,window-parameters)))))
+
 (when is-terminal
   (set-face-background 'default "undefined"))
 
@@ -323,12 +343,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     :hook (after-init . doom-modeline-mode))
   )
 
-(auto-save-visited-mode t)
-
 ;; Clean up whitespace at end of lines but only for edited lines.
 (use-package ws-butler
-   :ensure t
-   :hook (prog-mode . ws-butler-mode))
+  :ensure t
+  :defer t
+  :hook (prog-mode . ws-butler-mode))
 
 (use-package eldoc
   :init
@@ -365,12 +384,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     (diff-hl-margin-mode t))
   :hook ((dired-mode . diff-hl-dired-mode)
          (after-init . (lambda ()
-                        (diff-hl-flydiff-mode t)
-                        (when is-terminal
-                          (diff-hl-margin-mode t))
-                        (global-diff-hl-mode t)
-                        (global-diff-hl-show-hunk-mouse-mode t)
-                        ))))
+                         (diff-hl-flydiff-mode t)
+                         (when is-terminal
+                           (diff-hl-margin-mode t))
+                         (global-diff-hl-mode t)
+                         (global-diff-hl-show-hunk-mouse-mode t)
+                         ))))
 
 (use-package magit
   :ensure t
@@ -406,6 +425,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package denote
   :ensure t
+  :defer t
   :commands (denote-dired-mode-in-directories)
   :hook ((dired-mode . denote-dired-mode-in-directories))
   :bind (("C-c n n" . denote))
@@ -456,6 +476,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("C-x b" . consult-buffer)
          ("C-x f" . consult-recent-file)
          ("C-x r r" . consult-recent-file)
+         ("C-x C-r" . consult-recent-file)
          ("C-x 4 b" . consult-buffer-other-window)
          ("C-x 5 b" . consult-buffer-other-frame)
          ("C-x t b" . consult-buffer-other-tab)
@@ -672,6 +693,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package emacs
   :commands (my/crm-indicator)
   :init
+  (auto-save-visited-mode t)
   (ffap-bindings)
   (global-prettify-symbols-mode t)
   ;; Forgot why this was done -- most likely for macOS
@@ -696,6 +718,47 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 ;;   (native-complete-setup-bash))
 
 ;;; Custom functions
+
+(defun my/window-grow-up ()
+  "Grow current window into the one above."
+  (interactive)
+  (delete-window (window-in-direction 'above)))
+
+(defun my/window-grow-down ()
+  "Grow current window into the one below."
+  (interactive)
+  (delete-window (window-in-direction 'below)))
+
+(defun my/window-grow-left ()
+  "Grow current window into the one at the left."
+  (interactive)
+  (delete-window (window-in-direction 'left)))
+
+(defun my/window-grow-right ()
+  "Grow current window into the one at the right."
+  (interactive)
+  (delete-window (window-in-direction 'right)))
+
+(defun my/window-reset-window-state ()
+  "Reset the window-state for the current frame."
+  (interactive)
+  (set-frame-parameter (selected-frame) 'window-state nil))
+
+(defvar my/windows-keymap (make-sparse-keymap)
+  "Keymap for the grow window functions.")
+
+(my/emacs-keybind my/windows-keymap
+                  "z" #'my/window-reset-window-state
+                  "1" #'window-toggle-side-windows
+                  "a" #'my/window-grow-up
+                  "u" #'my/window-grow-up
+                  "b" #'my/window-grow-down
+                  "d" #'my/window-grow-down
+                  "l" #'my/window-grow-left
+                  "r" #'my/window-grow-right)
+
+;; Rebind "C-x 1" to be a prefix key to `my/grow-window-keymap'
+(keymap-set ctl-x-map "1" my/windows-keymap)
 
 (defun my/reset-frame-left ()
   "Reset frame size and position for left frame."
@@ -789,63 +852,64 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (indent-region (point-min) (point-max) nil))
 
 (my/emacs-keybind global-map
-  "C-h K" #'describe-keymap
-  "C-h u" #'apropos-user-option
-  "C-h F" #'apropos-function
-  "C-h V" #'apropos-variable
-  "C-h L" #'apropos-library
-  "C-h c" #'describe-char
+                  "C-h K" #'describe-keymap
+                  "C-h u" #'apropos-user-option
+                  "C-h F" #'apropos-function
+                  "C-h V" #'apropos-variable
+                  "C-h L" #'apropos-library
+                  "C-h c" #'describe-char
 
-  "M-g d" #'dired-jump
+                  "M-g d" #'dired-jump
 
-  "C-x O" #'other-frame
-  "C-x C-o" #'other-frame
+                  "C-x O" #'other-frame
+                  "C-x C-o" #'other-frame
+                  "C-x k" #'bury-buffer
 
-  "C-x C-b" #'ibuffer
+                  "C-x C-b" #'ibuffer
 
-  "M-<f1>" #'my/reset-frame-left
-  "M-<f2>" #'my/reset-frame-right
-  "M-<f3>" #'my/reset-frame-right-display
+                  "M-<f1>" #'my/reset-frame-left
+                  "M-<f2>" #'my/reset-frame-right
+                  "M-<f3>" #'my/reset-frame-right-display
 
-  "C-x 4 c" #'my/customize-other-window
-  "C-x 4 k" #'my/shell-other-window
+                  "C-x 4 c" #'my/customize-other-window
+                  "C-x 4 k" #'my/shell-other-window
 
-  "C-x 5 c" #'my/customize-other-frame
-  "C-x 5 i" #'my/info-other-frame
-  "C-x 5 k" #'my/shell-other-frame
+                  "C-x 5 c" #'my/customize-other-frame
+                  "C-x 5 i" #'my/info-other-frame
+                  "C-x 5 k" #'my/shell-other-frame
 
-  "C-c C-k" #'my/kill-buffer
+                  "C-c C-k" #'bury-buffer ;; #'my/kill-buffer
 
-  "<f3>" #'eval-last-sexp
+                  "<f3>" #'eval-last-sexp
 
-  "C-M-\\" #'my/indent-buffer
+                  "C-M-\\" #'my/indent-buffer
 
-  "<home>" #'beginning-of-buffer
-  "<end>" #'end-of-buffer
-  "<delete>" #'delete-char
-  "S-<f12>" #'package-list-packages
+                  "<home>" #'beginning-of-buffer
+                  "<end>" #'end-of-buffer
+                  "<delete>" #'delete-char
+                  "S-<f12>" #'package-list-packages
 
-  ;; Unmap the following
-  "<insert>" nil
-  "C-z" nil
-  "C-x C-z" nil
-  "C-x h" nil
-  "C-h h" nil
+                  ;; Unmap the following
+                  "<insert>" nil
+                  "C-z" nil
+                  "C-x C-z" nil
+                  "C-x h" nil
+                  "C-h h" nil
 
-  ;; "M-`" nil
+                  ;; "M-`" nil
 
-  "C-<mouse-4>" nil
-  "C-<mouse-5>" nil
+                  "C-<mouse-4>" nil
+                  "C-<mouse-5>" nil
 
-  "C-<double-mouse-4>" nil
-  "C-<double-mouse-5>" nil
+                  "C-<double-mouse-4>" nil
+                  "C-<double-mouse-5>" nil
 
-  "C-<triple-mouse-4>" nil
-  "C-<triple-mouse-5>" nil
+                  "C-<triple-mouse-4>" nil
+                  "C-<triple-mouse-5>" nil
 
-  "M-[" #'previous-buffer
-  "M-]" #'next-buffer
-  )
+                  "M-[" #'previous-buffer
+                  "M-]" #'next-buffer
+                  )
 
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))

@@ -127,7 +127,6 @@ prompt lines in the first place."
   (setq ansi-color-names-vector ["black" "red3" "green3" "yellow3" "blue2" "magenta3" "cyan3" "gray90"]
         shell-dirtrackp nil
         comint-process-echoes t
-	comint-buffer-maximum-size (* 1024 5)
         comint-completion-addsuffix t
 	comint-eol-on-send t)
 
