@@ -220,16 +220,21 @@ The frame will appear on the far right of the display area."
 (use-package window
   :init
   (let ((window-parameters '(window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))))
-    (setq fit-window-to-buffer-horizontally t
-          switch-to-buffer-in-dedicated-window 'pop
+    (setq switch-to-buffer-in-dedicated-window 'pop
           switch-to-buffer-obey-display-actions t
           window-resize-pixelwise t
           window-sides-slots '(0 0 3 1) ; left top right bottom
-          display-buffer-base-action '((display-buffer-reuse-mode-window display-buffer-reuse-window display-buffer-in-previous-window display-buffer-same-window display-buffer-use-some-window))
-          display-buffer-alist `(("\\*\\(?:\\(?:Buffer List\\)\\|Ibuffer\\)\\*"
+          display-buffer-base-action '((display-buffer--maybe-same-window
+                                        display-buffer-reuse-window
+                                        display-buffer-in-previous-window
+                                        display-buffer-reuse-mode-window
+                                        display-buffer-pop-up-window
+                                        display-buffer-same-window
+                                        display-buffer-use-some-window))
+          display-buffer-alist `(("\\*\\(?:\\(?:Buffer List\\)\\|Ibuffer\\|\\(?:.* Buffers\\)\\)\\*"
                                   display-buffer-in-side-window (side . right) (slot . -2) (preserve-size . (nil . t)) ,window-parameters)
                                  ("\\*Tags List\\*"
-                                  display-buffer-in-side-window (side . right) (slot . -1) (preserve-size . (t . nil)) ,window-parameters)
+                                  display-buffer-in-side-window (side . right) (slot . -1) (preserve-size . (nil . t)) ,window-parameters)
                                  ("\\*\\(?:Help\\|grep\\|Completions\\|ripgrep-search\\|\\(?:Customize Option:.*\\)\\)\\*"
                                   display-buffer-in-side-window (side . right) (slot . 0) (preserve-size . (nil . t)) ,window-parameters)
                                  ("\\*\\(?:\\(?:Shell.*\\)\\|compilation\\|Compile-Log\\)\\*"
@@ -579,7 +584,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :custom
   (completion-styles '(orderless partial-completion basic))
   (completion-category-defaults nil)
-  (completion-category-overrides nil))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
 
 ;; (orderless-define-completion-style orderless+initialism
 ;;   (orderless-matching-styles '(orderless-initialism
@@ -689,6 +694,14 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   ;; Unbind the ibuffer use of "M-o"
   (my/emacs-keybind ibuffer-mode-map
 		    "M-o" nil))
+
+(use-package windmove
+  :bind (("s-<" . windmove-left)
+         ("s->" . windmove-right)
+         ("s-<left>" . windmove-left)
+         ("s-<right>" . windmove-right)
+         ("s-<up>" . windmove-up)
+         ("s-<down>" . windmove-down)))
 
 (use-package emacs
   :commands (my/crm-indicator)
@@ -860,6 +873,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                   "C-h c" #'describe-char
 
                   "M-g d" #'dired-jump
+
+                  "C-o" #'other-window
 
                   "C-x O" #'other-frame
                   "C-x C-o" #'other-frame
