@@ -879,6 +879,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
                   "C-o" #'other-window
 
+                  "C-x 0" #'delete-other-windows
                   "C-x O" #'other-frame
                   "C-x C-o" #'other-frame
                   "C-x k" #'bury-buffer
@@ -926,8 +927,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                   "C-<triple-mouse-5>" nil
 
                   "M-[" #'previous-buffer
-                  "M-]" #'next-buffer
-                  )
+                  "M-]" #'next-buffer)
 
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))
