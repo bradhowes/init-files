@@ -217,6 +217,9 @@ The frame will appear on the far right of the display area."
 
 ;; Configure `display-buffer-alist' to manage window placement
 
+(use-package ef-themes
+  :ensure t)
+
 (use-package window
   :init
   (let ((window-parameters '(window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))))
@@ -235,7 +238,7 @@ The frame will appear on the far right of the display area."
                                   display-buffer-in-side-window (side . right) (slot . -2) (preserve-size . (nil . t)) ,window-parameters)
                                  ("\\*Tags List\\*"
                                   display-buffer-in-side-window (side . right) (slot . -1) (preserve-size . (nil . t)) ,window-parameters)
-                                 ("\\*\\(?:Help\\|grep\\|Completions\\|ripgrep-search\\|\\(?:Customize Option:.*\\)\\)\\*"
+                                 ("\\*\\(?:Help\\|grep\\|Completions\\|Apropos\\|ripgrep-search\\|\\(?:Customize Option:.*\\)\\)\\*"
                                   display-buffer-in-side-window (side . right) (slot . 0) (preserve-size . (nil . t)) ,window-parameters)
                                  ("\\*\\(?:\\(?:Shell.*\\)\\|compilation\\|Compile-Log\\)\\*"
                                   display-buffer-in-side-window (side . right) (slot . 1) (preserve-size . (nil . t)) ,window-parameters)))))
