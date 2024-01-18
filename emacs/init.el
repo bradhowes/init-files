@@ -187,6 +187,9 @@ The frame will appear on the far right of the display area."
 (when scroll-bar-mode
   (scroll-bar-mode -1))
 
+(unless tab-bar-mode
+  (tab-bar-mode 1))
+
 (when is-macosx
   (eval-when-compile
     (require 'ls-lisp))
@@ -728,10 +731,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)))
 
-;; (autoload 'native-complete-setup-bash "native-complete")
-;; (with-eval-after-load 'shell
-;;   (message "Loading native-complete-setup-bash")
-;;   (native-complete-setup-bash))
+(autoload 'native-complete-setup-bash "native-complete")
+(with-eval-after-load 'shell
+  (message "Loading native-complete-setup-bash")
+  (native-complete-setup-bash))
 
 ;;; Custom functions
 
@@ -882,7 +885,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                   "C-x 0" #'delete-other-windows
                   "C-x O" #'other-frame
                   "C-x C-o" #'other-frame
-                  "C-x k" #'bury-buffer
+                  ;; "C-x k" #'bury-buffer
 
                   "C-x C-b" #'ibuffer
 

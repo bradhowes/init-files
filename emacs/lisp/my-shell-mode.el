@@ -4,7 +4,9 @@
 
 (require 'shell)
 (require 'company)
-(require 'native-complete)
+(require 'corfu)
+
+;; (require 'native-complete)
 
 (defvar my/shell-home-root nil
   "Value to prepend to a directory.")
@@ -128,7 +130,9 @@ prompt lines in the first place."
         shell-dirtrackp nil
         comint-process-echoes t
         comint-completion-addsuffix t
-	comint-eol-on-send t)
+	comint-eol-on-send t
+        corfu-auto nil
+        corfu-preselect 'valid)
 
   (ansi-color-for-comint-mode-on)
   (add-hook 'comint-output-filter-functions #'comint-osc-process-output)
