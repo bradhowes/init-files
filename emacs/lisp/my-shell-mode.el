@@ -5,8 +5,7 @@
 (require 'shell)
 (require 'company)
 (require 'corfu)
-
-;; (require 'native-complete)
+(require 'native-complete)
 
 (defvar my/shell-home-root nil
   "Value to prepend to a directory.")
@@ -122,6 +121,9 @@ prompt lines in the first place."
 (defun my/shell-mode-hook ()
   "Customize `shell-mode'."
 
+  (message "Loading native-complete-setup-bash")
+  (native-complete-setup-bash)
+
   (rename-uniquely)
 
   (set-process-coding-system (get-buffer-process (current-buffer)) 'utf-8 'utf-8)
@@ -133,6 +135,7 @@ prompt lines in the first place."
 	comint-eol-on-send t
         corfu-auto nil
         corfu-preselect 'valid)
+
 
   (ansi-color-for-comint-mode-on)
   (add-hook 'comint-output-filter-functions #'comint-osc-process-output)

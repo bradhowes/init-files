@@ -38,7 +38,7 @@ HISTORY_IGNORE="(cd|ls|ps|pwd|history|exit)"
 ZSH_THEME="robbyrussell"
 
 osc7_cwd() {
-    print -P "\e]7;file://%M${PWD}\e\\"
+    print -P "\e]7;file://$(hostname)${PWD}\e\\"
 }
 
 autoload -U add-zsh-hook
@@ -52,8 +52,7 @@ export EDITOR="emacs"
 if [[ -n "${INSIDE_EMACS}" ]]; then
     if [[ -x $(whence emacsclient) ]]; then
         EDITOR="$(whence emacsclient)"
-        function man
-        {
+        man() {
             ${EDITOR} --eval "(manual-entry \"${@}\")"
         }
     fi

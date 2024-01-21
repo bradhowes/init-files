@@ -4,7 +4,6 @@
 ;;; Code:
 
 (require 'seq)
-(require 'cl-lib)
 
 (condition-case nil
     (require 'use-package)
@@ -175,6 +174,7 @@ The frame will appear on the far right of the display area."
 
 (defun my/screen-layout-changed ()
   "Recalculate values based on screen layout."
+  (interactive)
   (let ((layout (my/screen-layout)))
     (message "screen layout: %s" layout)
     (my/setup-font layout)
@@ -218,10 +218,10 @@ The frame will appear on the far right of the display area."
   ;; Same for PATH environment variable
   (setenv "PATH" (concat (mapconcat 'identity (append additional-paths (list (getenv "PATH"))) ":"))))
 
-;; Configure `display-buffer-alist' to manage window placement
-
 (use-package ef-themes
   :ensure t)
+
+;; Configure `display-buffer-alist' to manage window placement
 
 (use-package window
   :init
@@ -230,20 +230,13 @@ The frame will appear on the far right of the display area."
           switch-to-buffer-obey-display-actions t
           window-resize-pixelwise t
           window-sides-slots '(0 0 3 1) ; left top right bottom
-          display-buffer-base-action '((display-buffer--maybe-same-window
-                                        display-buffer-reuse-window
-                                        display-buffer-in-previous-window
-                                        display-buffer-reuse-mode-window
-                                        display-buffer-pop-up-window
-                                        display-buffer-same-window
-                                        display-buffer-use-some-window))
           display-buffer-alist `(("\\*\\(?:\\(?:Buffer List\\)\\|Ibuffer\\|\\(?:.* Buffers\\)\\)\\*"
                                   display-buffer-in-side-window (side . right) (slot . -2) (preserve-size . (nil . t)) ,window-parameters)
                                  ("\\*Tags List\\*"
                                   display-buffer-in-side-window (side . right) (slot . -1) (preserve-size . (nil . t)) ,window-parameters)
                                  ("\\*\\(?:Help\\|grep\\|Completions\\|Apropos\\|ripgrep-search\\|\\(?:Customize Option:.*\\)\\)\\*"
                                   display-buffer-in-side-window (side . right) (slot . 0) (preserve-size . (nil . t)) ,window-parameters)
-                                 ("\\*\\(?:\\(?:Shell.*\\)\\|compilation\\|Compile-Log\\)\\*"
+                                 ("\\*\\(?:\\compilation\\|Compile-Log\\)\\*"
                                   display-buffer-in-side-window (side . right) (slot . 1) (preserve-size . (nil . t)) ,window-parameters)))))
 
 (when is-terminal
@@ -399,8 +392,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                          (when is-terminal
                            (diff-hl-margin-mode t))
                          (global-diff-hl-mode t)
-                         (global-diff-hl-show-hunk-mouse-mode t)
-                         ))))
+                         (global-diff-hl-show-hunk-mouse-mode t)))))
 
 (use-package magit
   :ensure t
@@ -718,6 +710,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   ;; Forgot why this was done -- most likely for macOS
   ;; (put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
   (put 'narrow-to-region 'disabled nil)
+  (fset 'yes-or-no-p 'y-or-n-p)
 
   (defun my/crm-indicator(args)
     (cons (format "[CRM%s] %s"
