@@ -36,8 +36,8 @@
 (setq read-process-output-max (* 1024 1024)
       custom-file (expand-file-name "~/.emacs.d/custom.el")
       load-path (append (list (expand-file-name "~/.emacs.d/lisp")
-                              (expand-file-name "~/.emacs.d/consult-notes")
-                              load-path)
+                              (expand-file-name "~/.emacs.d/lisp/consult-notes"))
+                        load-path)
       frame-title-format (list  '(:eval (abbreviate-file-name default-directory))))
 
 (defconst my/screen-laptop (intern "my/screen-laptop")
@@ -900,8 +900,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (indent-region (point-min) (point-max) nil))
 
 (my/emacs-keybind global-map
-                  "M-y" #'consult-yank-pop
-
                   "C-h K" #'describe-keymap
                   "C-h u" #'apropos-user-option
                   "C-h F" #'apropos-function
