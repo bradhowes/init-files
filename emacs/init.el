@@ -35,7 +35,9 @@
 
 (setq read-process-output-max (* 1024 1024)
       custom-file (expand-file-name "~/.emacs.d/custom.el")
-      load-path (append (list (expand-file-name "~/.emacs.d/lisp")) load-path)
+      load-path (append (list (expand-file-name "~/.emacs.d/lisp")
+                              (expand-file-name "~/.emacs.d/consult-notes")
+                              load-path)
       frame-title-format (list  '(:eval (abbreviate-file-name default-directory))))
 
 (defconst my/screen-laptop (intern "my/screen-laptop")
@@ -226,13 +228,13 @@ The frame will appear on the far right of the display area."
                                         display-buffer-use-some-window))
           display-buffer-alist nil
           ;; display-buffer-alist `(("\\*\\(?:\\(?:Buffer List\\)\\|Ibuffer\\|\\(?:.* Buffers\\)\\)\\*"
-          ;;                         display-buffer-in-side-window (side . right) (slot . -2) (preserve-size . (nil . t)) ,window-parameters)
+          ;;                         display-buffer-in-side-window (side . right) (slot . -2) (preserve-size . (t . nil)) ,window-parameters)
           ;;                        ("\\*Tags List\\*"
-          ;;                         display-buffer-in-side-window (side . right) (slot . -1) (preserve-size . (nil . t)) ,window-parameters)
+          ;;                         display-buffer-in-side-window (side . right) (slot . -1) (preserve-size . (t . nil)) ,window-parameters)
           ;;                        ("\\*\\(?:Help\\|grep\\|Completions\\|Apropos\\|ripgrep-search\\|\\(?:Customize Option:.*\\)\\)\\*"
-          ;;                         display-buffer-in-side-window (side . right) (slot . 0) (preserve-size . (nil . t)) ,window-parameters)
+          ;;                         display-buffer-in-side-window (side . right) (slot . 0) (preserve-size . (t . nil)) ,window-parameters)
           ;;                        ("\\*\\(?:\\compilation\\|Compile-Log\\)\\*"
-          ;;                         display-buffer-in-side-window (side . right) (slot . 1) (preserve-size . (nil . t)) ,window-parameters))
+          ;;                         display-buffer-in-side-window (side . right) (slot . 1) (preserve-size . (t . nil)) ,window-parameters))
           )))
 
 (when is-terminal
@@ -385,13 +387,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (diff-hl-flydiff-mode t)
   (when is-terminal
     (diff-hl-margin-mode t))
-  :hook ((dired-mode . diff-hl-dired-mode)
-         (after-init . (lambda ()
+  :hook ((after-init . (lambda ()
                          (diff-hl-flydiff-mode t)
                          (when is-terminal
                            (diff-hl-margin-mode t))
                          (global-diff-hl-mode t)
-                         (global-diff-hl-show-hunk-mouse-mode t)))))
+                         (global-diff-hl-show-hunk-mouse-mode t)
+                         ))))
 
 (use-package magit
   :ensure t
@@ -404,11 +406,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package projectile
   :ensure t
   :defer t
-  :commands (projectile-mode projectile-project-root projectile-register-project-type)
+  :commands (projectile-mode projectile-project-name projectile-register-project-type)
   :bind-keymap (("C-x p" . projectile-command-map)
                 ("M-s-p" . projectile-command-map))
   :hook (prog-mode . projectile-mode)
   :config
+  (setq projectile-mode-line-function (lambda () (format " [%s] " (projectile-project-name))))
   (projectile-register-project-type 'swift '("Package.swift")
                                     :project-file "Package.swift"
                                     :src-dir "Sources"
@@ -473,6 +476,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package consult
   :ensure t
+  :after (projectile)
   :bind (;; C-c bindings in `mode-specific-map`
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
@@ -495,7 +499,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("C-M-#" . consult-register)
 
          ("C-y" . consult-yank-from-kill-ring)
-         ("M-y" . consult-yank-pop)
+         ("M-y" . consult-yank-replace)
 
          ;; M-g bindings for goto
          ("M-g g" . consult-goto-line)
@@ -554,6 +558,17 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                      :preview-key '(:debounce 0.4 any))
   (setq consult-narrow-key "<")
   (setq consult-project-function (lambda (_) (projectile-project-root))))
+
+(use-package consult-notes
+  :defer f
+  :after (consult denote)
+  :defines (consult-notes-denote-files-function)
+  :commands (consult-notes-denote-mode denote-directory-files)
+  :config
+  (require 'consult-notes-denote)
+  (consult-notes-denote-mode)
+  (setq consult-notes-denote-files-function #'denote-directory-files)
+  :bind (("C-c n b" . consult-notes)))
 
 (use-package embark-consult
   :ensure t
@@ -929,6 +944,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
                   "M-[" #'previous-buffer
                   "M-]" #'next-buffer
+
+                  "%" #'my/matching-paren
 
                   ;; Unmap the following
                   "<insert>" nil
