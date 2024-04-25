@@ -8,7 +8,8 @@
 
 (defvar emacs-pager-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "q") #'quit-window))
+    (define-key map (kbd "q") #'quit-window)
+    map)
   "Keymap for Emacs pager mode.")
 
 (defcustom emacs-pager-max-line-coloring 2000

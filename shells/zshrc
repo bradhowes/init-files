@@ -44,8 +44,14 @@ osc7_cwd() {
     print -P "\e]7;file://$(hostname)${PWD}\e\\"
 }
 
+esc0_cwd() {
+    # NOTE: need to fix ansi-osc.el with `(string= (url-host url) (downcase (system-name)))))`
+    # to make Emacs see the changes in directory.
+    # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=68632
+    print -P "\e]0;${PWD}\007"
+}
+
 autoload -U add-zsh-hook
-add-zsh-hook -Uz chpwd (){ osc7_cwd }
 
 export LESS="-FRX"
 export PAGER="less ${LESS}"
@@ -53,6 +59,7 @@ export CLICOLOR=yes
 
 export EDITOR="emacs"
 if [[ -n "${INSIDE_EMACS}" ]]; then
+    add-zsh-hook -Uz chpwd (){ osc7_cwd }
     if [[ -x $(whence emacsclient) ]]; then
         EDITOR="$(whence emacsclient)"
         man() {
@@ -61,6 +68,8 @@ if [[ -n "${INSIDE_EMACS}" ]]; then
     fi
     export TERM=xterm-256color
     export PAGER="${HOME}/bin/emacs-pager"
+elif [[ -n "${TERM}" ]]; then
+    add-zsh-hook -Uz chpwd (){ esc0_cwd }
 fi
 
 case "${TERM}" in

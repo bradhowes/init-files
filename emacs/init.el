@@ -190,19 +190,6 @@ The frame will appear on the far right of the display area."
 (unless tab-bar-mode
   (tab-bar-mode 1))
 
-(when is-macosx
-  (eval-when-compile
-    (require 'ls-lisp))
-  (custom-set-variables
-   '(ls-lisp-use-insert-directory-program nil))
-  (when (not is-terminal)
-    (custom-set-variables
-     '(frame-resize-pixelwise t)
-     '(mac-command-modifier 'meta)
-     '(mac-option-modifier 'alt)
-     '(mac-right-command-modifier 'super)
-     '(mac-right-option-modifier 'hyper))))
-
 ;;; Set various paths
 
 (let* ((common-paths (list (expand-file-name "~/bin")
@@ -230,14 +217,23 @@ The frame will appear on the far right of the display area."
           switch-to-buffer-obey-display-actions t
           window-resize-pixelwise t
           window-sides-slots '(0 0 3 1) ; left top right bottom
-          display-buffer-alist `(("\\*\\(?:\\(?:Buffer List\\)\\|Ibuffer\\|\\(?:.* Buffers\\)\\)\\*"
-                                  display-buffer-in-side-window (side . right) (slot . -2) (preserve-size . (nil . t)) ,window-parameters)
-                                 ("\\*Tags List\\*"
-                                  display-buffer-in-side-window (side . right) (slot . -1) (preserve-size . (nil . t)) ,window-parameters)
-                                 ("\\*\\(?:Help\\|grep\\|Completions\\|Apropos\\|ripgrep-search\\|\\(?:Customize Option:.*\\)\\)\\*"
-                                  display-buffer-in-side-window (side . right) (slot . 0) (preserve-size . (nil . t)) ,window-parameters)
-                                 ("\\*\\(?:\\compilation\\|Compile-Log\\)\\*"
-                                  display-buffer-in-side-window (side . right) (slot . 1) (preserve-size . (nil . t)) ,window-parameters)))))
+          display-buffer-base-action '((display-buffer--maybe-same-window
+                                        display-buffer-reuse-window
+                                        display-buffer-in-previous-window
+                                        display-buffer-reuse-mode-window
+                                        display-buffer-pop-up-window
+                                        display-buffer-same-window
+                                        display-buffer-use-some-window))
+          display-buffer-alist nil
+          ;; display-buffer-alist `(("\\*\\(?:\\(?:Buffer List\\)\\|Ibuffer\\|\\(?:.* Buffers\\)\\)\\*"
+          ;;                         display-buffer-in-side-window (side . right) (slot . -2) (preserve-size . (nil . t)) ,window-parameters)
+          ;;                        ("\\*Tags List\\*"
+          ;;                         display-buffer-in-side-window (side . right) (slot . -1) (preserve-size . (nil . t)) ,window-parameters)
+          ;;                        ("\\*\\(?:Help\\|grep\\|Completions\\|Apropos\\|ripgrep-search\\|\\(?:Customize Option:.*\\)\\)\\*"
+          ;;                         display-buffer-in-side-window (side . right) (slot . 0) (preserve-size . (nil . t)) ,window-parameters)
+          ;;                        ("\\*\\(?:\\compilation\\|Compile-Log\\)\\*"
+          ;;                         display-buffer-in-side-window (side . right) (slot . 1) (preserve-size . (nil . t)) ,window-parameters))
+          )))
 
 (when is-terminal
   (set-face-background 'default "undefined"))
@@ -291,6 +287,8 @@ list of symbols."
 
 (use-package cc-mode
   :defer t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
   :hook ((c++-mode . my/c++-mode-hook)))
 
 (use-package sh-mode
@@ -354,6 +352,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook (prog-mode . ws-butler-mode))
 
 (use-package eldoc
+  :diminish "Ed"
   :init
   (global-eldoc-mode 1))
 
@@ -402,19 +401,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :bind (("C-c f" . magit-file-dispatch)
          ("C-x g" . magit-status)))
 
-;; Magit-like interface for ripgrep
-(use-package rg
-  :ensure t
-  :commands (rg-enable-default-bindings)
-  :config
-  (rg-enable-default-bindings))
-
 (use-package projectile
   :ensure t
   :defer t
   :commands (projectile-mode projectile-project-root projectile-register-project-type)
   :bind-keymap (("C-x p" . projectile-command-map)
-                ("s-," . projectile-command-map))
+                ("M-s-p" . projectile-command-map))
   :hook (prog-mode . projectile-mode)
   :config
   (projectile-register-project-type 'swift '("Package.swift")
@@ -425,6 +417,16 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                                     :test "swift test"
                                     :run "swift run"
                                     :test-suffix ""))
+
+;; Magit-like interface for ripgrep
+(use-package rg
+  :ensure t
+  :after (projectile)
+  :commands (rg-enable-default-bindings)
+  :bind (:map projectile-command-map
+              ("s r" . rg-project))
+  :config
+  (rg-enable-default-bindings))
 
 (use-package denote
   :ensure t
@@ -463,34 +465,39 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
   :init
-  (setq prefix-help-command #'embark-prefix-help-command))
+  (setq prefix-help-command #'embark-prefix-help-command)
+  :config
+  (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                                       nil
+                                       (window-parameters (mode-line-format . none)))))
 
 (use-package consult
   :ensure t
   :bind (;; C-c bindings in `mode-specific-map`
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
-         ("C-c i" . consult-info)
+         ;; ("C-c i" . consult-info)
          ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
-         ([remap Info-search] . consult-info)
+         ;; ([remap Info-search] . consult-info)
          ;; C-x bindings in `ctl-x-map`
          ("C-x M-:" . consult-complex-command)
          ("C-x b" . consult-buffer)
          ("C-x f" . consult-recent-file)
-         ("C-x r r" . consult-recent-file)
-         ("C-x C-r" . consult-recent-file)
+
          ("C-x 4 b" . consult-buffer-other-window)
-         ("C-x 5 b" . consult-buffer-other-frame)
-         ("C-x t b" . consult-buffer-other-tab)
          ("C-x r b" . consult-bookmark)
+         ("C-x r l" . consult-bookmark)
 
          ;; ("C-x p b" . consult-project-bookmark)
          ("M-#" . consult-register-load)
          ("M-'" . consult-register-store)
          ("C-M-#" . consult-register)
 
+         ("C-y" . consult-yank-from-kill-ring)
          ("M-y" . consult-yank-pop)
+
+         ;; M-g bindings for goto
          ("M-g g" . consult-goto-line)
          ("M-g M-g" . consult-goto-line)
          ("M-g o" . consult-outline)
@@ -498,6 +505,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("M-g k" . consult-global-mark)
          ("M-g i" . consult-imenu)
          ("M-g I" . consult-imenu-multi)
+
          ;; M-s bindings in `search-map`
          ("M-s d" . consult-find)
          ("M-s g" . consult-grep)
@@ -510,42 +518,46 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("M-s u" . consult-focus-lines)
          ;; Isearch integration
          ("M-s e" . consult-isearch-history)
+
          :map isearch-mode-map
          ("M-e" . consult-isearch-history)
          ("M-s e" . consult-isearch-history)
          ("M-s l" . consult-line)
          ("M-s L" . consult-line-multi)
+
          :map minibuffer-local-map
-         ("C-s" . consult-history))
+         ("C-s" . consult-history)
+
+         :map projectile-command-map
+         ("b" . consult-project-buffer))
 
   :hook (completion-list-mode . consult-preview-at-point-mode)
-  :commands (consult-register-format consult-register-window consult-xref)
+  :commands (consult-register-format consult-register-window consult-xref projectile-project-root)
   :init
   (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
+        register-preview-function #'consult-register-format
+        xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
 
   (advice-add #'register-preview :override #'consult-register-window)
-
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
 
   :config
   (defun my/consult-line-symbol-at-point ()
     "Start `consult-line' with symbol at point."
     (interactive)
     (consult-line (thing-at-point 'symbol)))
-  (consult-customize
-   consult-theme :review-key '(:debounce 0.2 any)
-   consult-ripgrep consult-git-grep consult-grep
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-file-register
-   consult--source-recent-file consult--source-project-recent-file
-   :preview-key '(:debounce 0.4 any))
+  (consult-customize consult-theme :preview-key '(:debounce 0.2 any)
+                     consult-ripgrep consult-git-grep consult-grep
+                     consult-bookmark consult-recent-file consult-xref
+                     consult--source-bookmark consult--source-file-register
+                     consult--source-recent-file consult--source-project-recent-file
+                     :preview-key '(:debounce 0.4 any))
   (setq consult-narrow-key "<")
   (setq consult-project-function (lambda (_) (projectile-project-root))))
 
 (use-package embark-consult
   :ensure t
+  :after (consult embark)
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package marginalia
@@ -624,8 +636,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :ensure t
   :commands (global-corfu-mode corfu-history-mode)
   :init
-  :bind (:map corfu-map
-              ("<return>" . corfu-complete))
+  ;; :bind (:map corfu-map
+  ;;             ("<return>" . corfu-complete))
   :custom ((corfu-cycle t)
            (corfu-auto t)
            (corfu-auto-prefix 1)
@@ -670,6 +682,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package flyspell
   :defer t
+  :config (setq flyspell-mode-line-string "s")
   :hook (prog-mode . flyspell-prog-mode))
 
 (use-package treesit
@@ -685,7 +698,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :config
   (diminish 'abbrev-mode "A")
   (diminish 'auto-fill-function "F")
-  (diminish 'subword-mode "S"))
+  (diminish 'subword-mode "S")
+  (diminish 'ws-butler-mode "~")
+  (diminish 'overwrite-mode "*"))
 
 (use-package ibuffer
   :config
@@ -704,8 +719,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package emacs
   :commands (my/crm-indicator)
   :init
-  (auto-save-visited-mode t)
-  (ffap-bindings)
+  ;; (auto-save-visited-mode t)
+  ;; (ffap-bindings)
   (global-prettify-symbols-mode t)
   ;; Forgot why this was done -- most likely for macOS
   ;; (put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
@@ -724,10 +739,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)))
 
-(autoload 'native-complete-setup-bash "native-complete")
-(with-eval-after-load 'shell
-  (message "Loading native-complete-setup-bash")
-  (native-complete-setup-bash))
+;; (autoload 'native-complete-setup-bash "native-complete")
+;; (with-eval-after-load 'shell
+;;   (message "Loading native-complete-setup-bash")
+;;   (native-complete-setup-bash))
 
 ;;; Custom functions
 
@@ -770,7 +785,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                   "r" #'my/window-grow-right)
 
 ;; Rebind "C-x 1" to be a prefix key to `my/grow-window-keymap'
-(keymap-set ctl-x-map "1" my/windows-keymap)
+;; (keymap-set ctl-x-map "1" my/windows-keymap)
 
 (defun my/reset-frame-left ()
   "Reset frame size and position for left frame."
@@ -844,6 +859,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     (select-frame (make-frame))
     (customize)))
 
+(defun my/remove-all-text-properties ()
+  "Remove all text properties from the current buffer."
+  (interactive)
+  (let ((inhibit-read-only t))
+    (set-text-properties (point-min) (point-max) nil)))
+
 (defun my/matching-paren (arg)
   "Locate the matching ARG paren."
   (interactive "P")
@@ -864,6 +885,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (indent-region (point-min) (point-max) nil))
 
 (my/emacs-keybind global-map
+                  "M-y" #'consult-yank-pop
+
                   "C-h K" #'describe-keymap
                   "C-h u" #'apropos-user-option
                   "C-h F" #'apropos-function
@@ -893,7 +916,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                   "C-x 5 i" #'my/info-other-frame
                   "C-x 5 k" #'my/shell-other-frame
 
-                  "C-c C-k" #'bury-buffer ;; #'my/kill-buffer
+                  "C-c C-k" #'my/kill-buffer
 
                   "<f3>" #'eval-last-sexp
 
@@ -904,29 +927,48 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                   "<delete>" #'delete-char
                   "S-<f12>" #'package-list-packages
 
+                  "M-[" #'previous-buffer
+                  "M-]" #'next-buffer
+
                   ;; Unmap the following
                   "<insert>" nil
                   "C-z" nil
                   "C-x C-z" nil
                   "C-x h" nil
                   "C-h h" nil
-
                   ;; "M-`" nil
 
-                  "C-<mouse-4>" nil
-                  "C-<mouse-5>" nil
+                  ;; "C-<mouse-4>" nil
+                  ;; "C-<mouse-5>" nil
 
-                  "C-<double-mouse-4>" nil
-                  "C-<double-mouse-5>" nil
+                  ;; "C-<double-mouse-4>" nil
+                  ;; "C-<double-mouse-5>" nil
 
-                  "C-<triple-mouse-4>" nil
-                  "C-<triple-mouse-5>" nil
-
-                  "M-[" #'previous-buffer
-                  "M-]" #'next-buffer)
+                  ;; "C-<triple-mouse-4>" nil
+                  ;; "C-<triple-mouse-5>" nil
+                  )
 
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))
+
+(if is-macosx
+    (progn
+      (eval-when-compile
+        (require 'ls-lisp))
+      (custom-set-variables
+       '(ls-lisp-use-insert-directory-program nil))
+      (when (not is-terminal)
+        (custom-set-variables
+         '(frame-resize-pixelwise t)
+         '(mac-command-modifier 'meta)
+         '(mac-option-modifier 'alt)
+         '(mac-right-command-modifier 'super)
+         '(mac-right-option-modifier 'hyper))))
+  (setq x-alt-keysym 'alt
+        x-meta-keysym 'meta
+        x-super-keysym 'super
+        x-hyper-keysym 'hyper))
+
 
 (provide 'init)
 

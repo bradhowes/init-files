@@ -18,7 +18,7 @@
  '(byte-compile-verbose nil)
  '(case-fold-search t)
  '(column-number-mode t)
- '(comint-buffer-maximum-size 8192)
+ '(comint-buffer-maximum-size 10000000)
  '(comint-input-ignoredups t)
  '(compilation-auto-jump-to-first-error nil)
  '(compilation-scroll-output t)
@@ -34,11 +34,8 @@
    '("69f7e8101867cfac410e88140f8c51b4433b93680901bb0b52014144366a08c8" "183dfa34e360f5bc2ee4a6b3f4236e6664f4cfce40de1d43c984e0e8fc5b51ae" default))
  '(delete-by-moving-to-trash t)
  '(delete-old-versions t)
- '(dired-auto-revert-buffer t)
- '(dired-dwim-target t)
  '(dired-isearch-filenames t)
- '(dired-kill-when-opening-new-dired-buffer t)
- '(dired-listing-switches "-AbBhF --group-diredtories-first")
+ '(dired-listing-switches "-AbBhF --group-diredtories-first") ;; "-hADFG"
  '(dired-recursive-copies 'always)
  '(dired-recursive-deletes 'always)
  '(display-time-default-load-average nil)
@@ -76,7 +73,10 @@
  '(isearch-lazy-count t)
  '(ispell-extra-args
    '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16" "--camel-case"))
+ '(jit-lock-stealth-load nil)
+ '(jit-lock-stealth-nice nil)
  '(kept-old-versions 10)
+ '(line-move-visual nil)
  '(ls-lisp-use-insert-directory-program nil)
  '(magit-diff-refine-hunk t)
  '(magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
@@ -116,7 +116,9 @@
  '(resize-mini-windows t)
  '(ring-bell-function 'mode-line-bell-flash)
  '(safe-local-variable-values
-   '((etags-regen-ignores "test/manual/etags/")
+   '((checkdoc-package-keywords-flag)
+     (projectile-project-compilation-cmd . "./build.sh --mode Debug")
+     (etags-regen-ignores "test/manual/etags/")
      (etags-regen-regexp-alist
       (("c" "objc")
        "/[ \11]*DEFVAR_[A-Z_ \11(]+\"\\([^\"]+\\)\"/\\1/" "/[ \11]*DEFVAR_[A-Z_ \11(]+\"[^\"]+\",[ \11]\\([A-Za-z0-9_]+\\)/\\1/"))))
