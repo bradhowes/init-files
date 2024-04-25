@@ -2,8 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(provide 'emacs-pager)
-
 (require 'ansi-color)
 
 (defvar emacs-pager-mode-map
@@ -46,5 +44,7 @@ If performance is bad when loading data, reduce this number."
   (find-file-other-window path)
   (emacs-pager-mode)
   (delete-file path))
+
+(provide 'emacs-pager)
 
 ;;; emacs-pager.el ends here

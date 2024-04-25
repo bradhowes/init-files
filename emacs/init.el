@@ -480,7 +480,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :bind (;; C-c bindings in `mode-specific-map`
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
-         ;; ("C-c i" . consult-info)
+         ;; ("C-h i" . consult-info)
          ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
          ;; ([remap Info-search] . consult-info)
@@ -493,7 +493,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("C-x r b" . consult-bookmark)
          ("C-x r l" . consult-bookmark)
 
-         ;; ("C-x p b" . consult-project-bookmark)
          ("M-#" . consult-register-load)
          ("M-'" . consult-register-store)
          ("C-M-#" . consult-register)
@@ -792,9 +791,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (my/emacs-keybind my/windows-keymap
                   "z" #'my/window-reset-window-state
                   "1" #'window-toggle-side-windows
-                  "a" #'my/window-grow-up
                   "u" #'my/window-grow-up
-                  "b" #'my/window-grow-down
                   "d" #'my/window-grow-down
                   "l" #'my/window-grow-left
                   "r" #'my/window-grow-right)
@@ -966,6 +963,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))
 
+(defun my/set-bound-var (symbol value)
+  "Set SYMBOL with VALUE if symbol exists."
+  (when (boundp symbol)
+    (set symbol value)))
+
 (if is-macosx
     (progn
       (eval-when-compile
@@ -979,11 +981,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          '(mac-option-modifier 'alt)
          '(mac-right-command-modifier 'super)
          '(mac-right-option-modifier 'hyper))))
-  (setq x-alt-keysym 'alt
-        x-meta-keysym 'meta
-        x-super-keysym 'super
-        x-hyper-keysym 'hyper))
-
+  (when (eq window-system 'x)
+    (my/set-bound-var 'x-alt-keysym 'alt)
+    (my/set-bound-var 'x-meta-keysym 'meta)
+    (my/set-bound-var 'x-super-keysym 'super)
+    (my/set-bound-var 'x-hyper-keysym 'hyper)))
 
 (provide 'init)
 

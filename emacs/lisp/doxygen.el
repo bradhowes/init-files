@@ -87,7 +87,7 @@ the value is set to t."
 Also removes duplicates."
   (when doxygen-markers
     (setq doxygen-markers (sort doxygen-markers '<)))
-  (if (and (length doxygen-markers)
+  (if (and (length> doxygen-markers 0)
 	   (equal (point-min) (marker-position (nth 0 doxygen-markers))))
       (setq doxygen-markers (cdr doxygen-markers))))
 
@@ -209,7 +209,7 @@ Operates on KIND expressions with NAME."
 	       (match-end 1))
       (setq name (substring name (match-end 1))))
 
-    (if (eq (length items) 1)
+    (if (length= items 1)
 	(cons (cons 'name name) info)
       (append (list (cons 'returns (not (string-equal "void" first)))
 		    (cons 'name name)
@@ -298,7 +298,7 @@ it is a list of argument names."
 	      name (concat name (match-string-no-properties 1 proc-clause))
 	      pos (match-end 0)))
 
-      (when (eq (length name) 0)	; handle methods w/ no args
+      (when (length= name 0)	; handle methods w/ no args
 	  (setq name proc-clause))
 
       (list beg end

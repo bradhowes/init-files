@@ -3,7 +3,6 @@
 ;;; Code:
 
 (require 'shell)
-(require 'company)
 (require 'corfu)
 (require 'native-complete)
 

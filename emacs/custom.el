@@ -34,6 +34,9 @@
    '("69f7e8101867cfac410e88140f8c51b4433b93680901bb0b52014144366a08c8" "183dfa34e360f5bc2ee4a6b3f4236e6664f4cfce40de1d43c984e0e8fc5b51ae" default))
  '(delete-by-moving-to-trash t)
  '(delete-old-versions t)
+ '(denote-rename-buffer-mode t)
+ '(denote-auto-revert-buffer t)
+ '(denote-dwim-target t)
  '(dired-isearch-filenames t)
  '(dired-listing-switches "-AbBhF --group-diredtories-first") ;; "-hADFG"
  '(dired-recursive-copies 'always)
@@ -45,7 +48,7 @@
  '(doom-modeline-lsp t)
  '(doom-modeline-major-mode-color-icon nil)
  '(doom-modeline-major-mode-icon nil)
- '(doom-modeline-minor-modes nil)
+ '(doom-modeline-minor-modes t)
  '(doom-modeline-mode t)
  '(doom-modeline-project-detection 'projectile)
  '(doom-modeline-vcs-max-length 40)
@@ -62,6 +65,7 @@
  '(fill-column 120)
  '(find-file-visit-truename t)
  '(frame-resize-pixelwise t)
+ '(global-prettify-symbols-mode t)
  '(global-subword-mode t)
  '(grep-save-buffers t)
  '(history-delete-duplicates t)
@@ -103,7 +107,7 @@
  '(package-selected-packages
    '(doom-modeline window-commander ef-themes dired-single persp-mode edwina rg eglot indent-guide ws-butler cape corfu-info lsp-sourcekit swift-mode corfu use-package treemacs treemacs-all-the-icons treemacs-magit treemacs-projectile denote consult-dir orderless vertico consult embark-consult embark markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation flycheck-indentation flycheck diminish diff-hl company-quickhelp company-jedi company cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
  '(projectile-generic-command "rg --files --hidden -0")
- '(projectile-globally-ignored-directoriesx
+ '(projectile-globally-ignored-directories
    '(".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".tox" ".svn" ".cache" ".clangd" "./build" "./cmake"))
  '(projectile-mode t nil (projectile))
  '(projectile-mode-line-prefix " P")
@@ -164,10 +168,6 @@
  '(font-lock-brace-face ((t (:foreground "deep pink"))))
  '(font-lock-comment-delimiter-face ((t (:foreground "OliveDrab3" :inherit font-lock-comment-face))))
  '(font-lock-comment-face ((t (:foreground "olive drab" :inherit modus-themes-slant))))
- '(helm-buffer-directory ((t (:extend t :foreground "DarkRed"))))
- '(helm-ff-directory ((t (:extend t :foreground "deep sky blue" :slant normal))))
- '(helm-mark-prefix ((t (:foreground "Gold1"))))
- '(helm-visible-mark ((t (:background "dark slate blue" :extend t :inherit bold))))
  '(highlight-indentation-current-column-face ((t nil)))
  '(hl-line ((t (:background "gray14" :extend t :inherit modus-themes-hl-line))))
  '(makefile-space ((t (:background "gray46"))))
