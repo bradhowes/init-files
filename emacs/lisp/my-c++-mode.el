@@ -8,6 +8,7 @@
 (require 'my-insert-block-comment)
 (require 'flyspell)
 (require 'indent-bars)
+(require 'eldoc-box)
 
 (define-skeleton my/c++-class-skeleton
   "Insert a C++ class skeleton."
@@ -323,10 +324,12 @@ Does not allow spell-checking in '#include' strings."
   "Custom C++ mode hook."
   (my/c-mode-common)
   (abbrev-mode 1)
+  (eldoc-box-hover-mode 1)
   (c-add-style "My C++ Style" my/c-style t)
   (c-set-offset 'innamespace 0)
   (setq c-at-vsemi-p-fn 'my/c++-at-vsemi-p
         indent-bars-spacing-override 4
+        c-basic-offset 2
 	c-vsemi-status-unknown-p-fn 'my/c++-vsemi-status-unknown-p
         c-block-comment-prefix ""
         c-doc-comment-style 'doxygenf

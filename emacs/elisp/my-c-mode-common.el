@@ -5,6 +5,7 @@
 (require 'font-lock)
 (require 'doxygen)
 (require 'eglot)
+(require 'cc-mode)
 
 ;; Hilight parentheses and braces
 ;;
@@ -128,10 +129,10 @@ EXTENSIONS. If the list is empty, use DEFAULT as the extension."
 	(my-c-find-file-with-extension base (cdr extensions) default)))))
 
 (defun my-c-make-twin-file ()
-  "Locate the 'twin' of the current source file.
+  "Locate the twin of the current source file.
 For instance, if the current
-file has 'cc' for its extension, attempt to locate and edit a file with the
-same name but with an extension of 'h'. Support C/C++/ObjC file extensions."
+file has .cc for its extension, attempt to locate and edit a file with the
+same name but with an extension of .h. Support C/C++/ObjC file extensions."
   (let ((extension (file-name-extension (buffer-file-name)))
 	(sans (file-name-sans-extension (buffer-file-name))))
     (if (string-match "[hH][xp]*" extension)
@@ -181,17 +182,17 @@ same name but with an extension of 'h'. Support C/C++/ObjC file extensions."
           (elt files (% found count))))))
 
 (defun my-c-find-twin ()
-  "Locate the 'twin' of the current buffer and show in the current window."
+  "Locate the twin of the current buffer and show in the current window."
   (interactive)
   (find-file (my-c-twin-file)))
 
 (defun my-c-find-twin-other-window ()
-  "Locate the 'twin' of the current buffer and show in another window."
+  "Locate the twin of the current buffer and show in another window."
   (interactive)
   (find-file-other-window (my-c-twin-file)))
 
 (defun my-c-find-twin-other-frame ()
-  "Locate the 'twin' of the current buffer and show in another frame."
+  "Locate the twin of the current buffer and show in another frame."
   (interactive)
   (find-file-other-frame (my-c-twin-file)))
 
@@ -359,11 +360,11 @@ ID ACTION CONTEXT."
 
 (defun my-c-mode-common ()
   "Common hook for C/C++ modes."
-  ;; (setq c-backspace-function 'backward-delete-char-untabify
-  ;; c-block-comment-prefix "   "
-  ;; c-basic-offset 4
-  ;; c-tab-always-indent nil
-  ;; )
+  (setq ;; c-backspace-function 'backward-delete-char-untabify
+        ;; c-block-comment-prefix "   "
+        c-basic-offset 4
+        ;; c-tab-always-indent nil
+        )
 
   (unless (boundp 'my-c-c-c-4-keymap)
     (define-prefix-command 'my-c-c-c-4-keymap))

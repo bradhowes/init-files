@@ -215,6 +215,7 @@ The frame will appear on the far right of the display area."
 (use-package window
   :init
   (let ((window-parameters '(window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))))
+    (message "%s" window-parameters)
     (setq switch-to-buffer-in-dedicated-window 'pop
           switch-to-buffer-obey-display-actions t
           window-resize-pixelwise t
@@ -350,13 +351,29 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 ;; Clean up whitespace at end of lines but only for edited lines.
 (use-package ws-butler
   :ensure t
-  :defer t
+  :defer nil
+  :diminish "~ "
   :hook (prog-mode . ws-butler-mode))
 
+(use-package diminish
+  :ensure t
+  :commands (diminish)
+  :config
+  (diminish 'abbrev-mode "A ")
+  (diminish 'isearch-mode "? ")
+  (diminish 'overwrite-mode "*"))
+
 (use-package eldoc
-  :diminish "Ed"
+  :diminish (eldoc-mode . "eD ")
   :init
   (global-eldoc-mode 1))
+
+(use-package eldoc-box
+  :ensure t
+  :diminish (eldoc-box-hover-mode . "eB ")
+  :commands (eldoc-box-hover-mode)
+  :hook (eldoc-mode-hook . (lambda () (eldoc-box-hover-mode t)))
+  :bind ("C-h ." . eldoc-box-help-at-point))
 
 (use-package dired
   :init
@@ -435,7 +452,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :ensure t
   :defer t
   :commands (denote-dired-mode-in-directories)
-  :hook ((dired-mode . denote-dired-mode-in-directories))
+  :hook (dired-mode . denote-dired-mode-in-directories)
   :bind (("C-c n n" . denote))
   :config
   (setq denote-directory (expand-file-name "~/Documents/notes/")
@@ -497,7 +514,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("M-'" . consult-register-store)
          ("C-M-#" . consult-register)
 
-         ("C-y" . consult-yank-from-kill-ring)
          ("M-y" . consult-yank-replace)
 
          ;; M-g bindings for goto
@@ -694,6 +710,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package recentf
   :init (recentf-mode t))
 
+(use-package ispell
+  :config (setq-default ispell-local-dictionary "english"))
+
 (use-package flyspell
   :defer t
   :config (setq flyspell-mode-line-string "s")
@@ -702,19 +721,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package treesit
   :config
   (setq treesit-language-source-alist '((python "https://github.com/tree-sitter/tree-sitter-python")
+                                        (bash "https://github.com/tree-sitter/tree-sitter-bash")
+                                        (cmake "https://github.com/uyha/tree-sitter-cmake")
+                                        (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+                                        (json "https://github.com/tree-sitter/tree-sitter-json")
                                         (c "https://github.com/tree-sitter/tree-sitter-c")
                                         (c++ "https://github.com/tree-sitter/tree-sitter-cpp")
                                         (swift "https://github.com/alex-pinkus/tree-sitter-swift"))))
-
-(use-package diminish
-  :ensure t
-  :commands (diminish)
-  :config
-  (diminish 'abbrev-mode "A")
-  (diminish 'auto-fill-function "F")
-  (diminish 'subword-mode "S")
-  (diminish 'ws-butler-mode "~")
-  (diminish 'overwrite-mode "*"))
 
 (use-package ibuffer
   :config
@@ -734,8 +747,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :commands (my/crm-indicator)
   :init
   ;; (auto-save-visited-mode t)
-  ;; (ffap-bindings)
-  (global-prettify-symbols-mode t)
+  (ffap-bindings)
+  (setq-default abbrev-mode t)
+
   ;; Forgot why this was done -- most likely for macOS
   ;; (put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
   (put 'narrow-to-region 'disabled nil)

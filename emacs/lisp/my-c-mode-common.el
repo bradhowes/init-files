@@ -359,13 +359,8 @@ ID ACTION CONTEXT."
 
 (defun my/c-mode-common ()
   "Common hook for C/C++ modes."
-  ;; (setq c-backspace-function 'backward-delete-char-untabify
-  ;; c-block-comment-prefix "   "
-  ;; c-basic-offset 4
-  ;; c-tab-always-indent nil
-  ;; )
-
-  (setq c-doc-comment-style 'doxygen)
+  (setq c-basic-offset 2
+        c-doc-comment-style 'doxygen)
 
   (unless (boundp 'my/c-c-c-4-keymap)
     (define-prefix-command 'my/c-c-c-4-keymap))
