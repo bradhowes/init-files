@@ -737,12 +737,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 		    "M-o" nil))
 
 (use-package windmove
-  :bind (("s-<" . windmove-left)
-         ("s->" . windmove-right)
-         ("s-<left>" . windmove-left)
-         ("s-<right>" . windmove-right)
-         ("s-<up>" . windmove-up)
-         ("s-<down>" . windmove-down)))
+  :bind (("A-M-<left>" . windmove-left)
+         ("A-M-<right>" . windmove-right)
+         ("A-M-." . windmove-up)
+         ("A-M-<up>" . windmove-up)
+         ("A-M-," . windmove-down)
+         ("A-M-<down>" . windmove-down)))
 
 (use-package multiple-cursors
   :bind (("C->" . mc/mark-next-like-this)
