@@ -352,27 +352,27 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package ws-butler
   :ensure t
   :defer nil
-  :diminish "~ "
+  :diminish " ~"
   :hook (prog-mode . ws-butler-mode))
 
 (use-package diminish
   :ensure t
   :commands (diminish)
   :config
-  (diminish 'abbrev-mode "A ")
-  (diminish 'isearch-mode "? ")
+  (diminish 'abbrev-mode " A")
+  (diminish 'isearch-mode " ?")
   (diminish 'overwrite-mode "*"))
 
-(use-package eldoc
-  :diminish (eldoc-mode . "eD ")
-  :init
-  (global-eldoc-mode 1))
+(use-package eldoc)
+;; :bind ("C-h ." . eldoc-print-current-symbol-info))
 
 (use-package eldoc-box
   :ensure t
-  :diminish (eldoc-box-hover-mode . "eB ")
+  :diminish (eldoc-box-hover-mode . " eB")
   :commands (eldoc-box-hover-mode)
-  :hook (eldoc-mode-hook . (lambda () (eldoc-box-hover-mode t)))
+  ;; :hook (eldoc-mode-hook . (lambda () (eldoc-box-hover-mode t)))
+  :config
+  ;; (setq eldoc-box-at-point-position-function eldoc-box-position-function)
   :bind ("C-h ." . eldoc-box-help-at-point))
 
 (use-package dired
@@ -529,9 +529,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("M-s d" . consult-find)
          ("M-s g" . consult-grep)
          ("M-s G" . consult-git-grep)
+         ("M-s i" . consult-info)
          ("M-s k" . consult-keep-lines)
          ("M-s l" . consult-line)
-         ("M-s M-l" . my/consult-line-symbol-at-point)
+         ("M-s M-s" . my/consult-line-symbol-at-point)
          ("M-s L" . consult-line-multi)
          ("M-s r" . consult-ripgrep)
          ("M-s u" . consult-focus-lines)
@@ -742,6 +743,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("s-<right>" . windmove-right)
          ("s-<up>" . windmove-up)
          ("s-<down>" . windmove-down)))
+
+(use-package multiple-cursors
+  :bind (("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)
+         ("C-c C->" . mc/mark-all-like-this)))
 
 (use-package emacs
   :commands (my/crm-indicator)
