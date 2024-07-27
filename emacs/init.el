@@ -58,8 +58,25 @@
 (defconst my/screen-terminal (intern "my/screen-terminal")
   "Symbol for terminal screen width.")
 
-(defvar my/right-frame-alist default-frame-alist
-  "Definition for a frame aligned on right side of display.")
+(defconst my/laptop-screen-width 2056
+  "MacBook Pro 16\" M1 screen width.")
+
+(defconst my/4k-screen-width 3840
+  "4K external display width in pixels.")
+
+(defconst my/screen-terminal (intern "my/screen-terminal")
+  "Symbol for terminal screen width.")
+
+(defgroup my/customizations nil
+  "The customization group for my settings."
+  :prefix "my/"
+  :group 'local)
+
+(defcustom my/screen-4k-pick 0
+  "The 4K screen to use for Emacs frames."
+  :type '(natnum)
+  :options '(0 1 2)
+  :group 'my/customizations)
 
 (defun my/screen-layout ()
   "Identify current screen layout.
@@ -75,14 +92,12 @@ Returns one of the follow symbols based on width:
 - `my/screen-4k-4k' -- two 4K monitors.
 - `my/screen-laptop-4k-4k' -- laptop screen + 2 4K monitors.
 - `my/screen-terminal' -- unknown screen."
-  (let* ((laptop-width 2056)
-         (4k-width 3840)
-         (width (display-pixel-width nil))
-         (value (cond ((= width laptop-width) my/screen-laptop)
-                      ((= width 4k-width) my/screen-4k)
-                      ((= width (+ laptop-width 4k-width)) my/screen-laptop-4k)
-                      ((= width (+ 4k-width 4k-width)) my/screen-4k-4k)
-                      ((= width (+ laptop-width 4k-width 4k-width)) my/screen-laptop-4k-4k)
+  (let* ((width (display-pixel-width nil))
+         (value (cond ((= width my/laptop-screen-width) my/screen-laptop)
+                      ((= width my/4k-screen-width) my/screen-4k)
+                      ((= width (+ my/laptop-screen-width my/4k-screen-width)) my/screen-laptop-4k)
+                      ((= width (* my/4k-screen-width 2)) my/screen-4k-4k)
+                      ((= width (+ my/laptop-screen-width (* 2 my/4k-screen-width))) my/screen-laptop-4k-4k)
                       (t my/screen-terminal))))
     (message "my/screen-layout: %s" value)
     value))
@@ -93,9 +108,7 @@ Returns one of the follow symbols based on width:
 
 (defun my/is-4k (layout)
   "T if LAYOUT is kind with at least 4K area."
-  (let ((value (memq layout '(my/screen-4k my/screen-laptop-4k my/screen-4k-4k my/screen-laptop-4k-4k))))
-    (message "my/is-4k: %s" value)
-    value))
+  (memq layout '(my/screen-4k my/screen-laptop-4k my/screen-4k-4k my/screen-laptop-4k-4k)))
 
 (defun my/font-size (layout)
   "The font size to use based on the LAYOUT."
@@ -110,20 +123,35 @@ Returns one of the follow symbols based on width:
   (if (or (my/is-4k layout) (my/is-laptop layout)) 132 80))
 
 (defun my/frame-pixel-width (layout)
-  "Width in pixels of a normal frame shown on LAYOUT."
+  "Width in pixels of a normal frame shown on LAYOUT.
+These values are hard-coded based on current settings.
+Probably a better way to figure this out."
   (if (my/is-4k layout) 1338 944))
 
 (defun my/frame-initial-left (layout)
-  "Pixels to use for the `left' of a frame on LAYOUT."
-  (if (or (eq layout my/screen-laptop-4k) (eq layout my/screen-laptop-4k-4k)) 2056 0))
+  "Pixels to use for the `left' of a frame on LAYOUT.
+This is to be used for the `initial-frame-alist' configuration."
+  ;; Use the first external monitor if there is one.
+  (if (memq layout '(my/screen-laptop-4k my/screen-laptop-4k-4k))
+      (+ 2056 (* my/screen-4k-pick my/4k-screen-width))
+    0))
 
 (defun my/frame-default-left (layout)
-  "Pixels to use for the `left' of a frame on LAYOUT."
+  "Pixels to use for the `left' of a frame on LAYOUT.
+This is to be use for the `default-frame-aliat' configuration."
   (+ (my/frame-initial-left layout) (my/frame-pixel-width layout)))
 
 (defun my/frame-third-left (layout)
-  "The offset to the `alt' window based on LAYOUT."
-  (- (display-pixel-width nil) (my/frame-pixel-width layout)))
+  "The offset to the `alt' window based on LAYOUT.
+This is not used in any particular `*-frame-alist' but it is used
+by custom commands that reposition a frame to be flush with the
+right-side of the active screen that is being used to host
+Emacs frames."
+  (- (+ (my/frame-initial-left layout)
+        (if (eq layout my/screen-laptop)
+            my/laptop-screen-width
+          my/4k-screen-width))
+     (my/frame-pixel-width layout)))
 
 (defconst my/font-name "Berkeley Mono"
   "The name of the font to use.")
@@ -165,11 +193,9 @@ The frame will appear on the far right of the display area."
 (defun my/update-screen-frame-alists (layout)
   "Update frame alists for current LAYOUT."
   (setq initial-frame-alist (my/initial-frame-alist layout)
-        default-frame-alist (my/default-frame-alist layout)
-        my/right-frame-alist (my/align-right-frame-alist layout))
+        default-frame-alist (my/default-frame-alist layout))
   (message "initial-frame: %s" initial-frame-alist)
-  (message "default-frame: %s" default-frame-alist)
-  (message "  right-frame: %s" my/right-frame-alist))
+  (message "default-frame: %s" default-frame-alist))
 
 (defun my/screen-layout-changed ()
   "Recalculate values based on screen layout."
@@ -178,6 +204,14 @@ The frame will appear on the far right of the display area."
     (message "screen layout: %s" layout)
     (my/setup-font layout)
     (my/update-screen-frame-alists layout)))
+
+(defun my/pick-screen-4k (screen)
+  "Set the 4K SCREEN to use to host future Emacs frames.
+It does not affect existing frames."
+  (interactive "NScreen:")
+  (custom-set-variables (list 'my/screen-4k-pick screen))
+  (custom-save-all)
+  (my/screen-layout-changed))
 
 (my/update-screen-frame-alists (my/screen-layout))
 
@@ -718,17 +752,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :defer t
   :config (setq flyspell-mode-line-string "s")
   :hook (prog-mode . flyspell-prog-mode))
-
-;; (use-package treesit
-;;   :config
-;;   (setq treesit-language-source-alist '((python "https://github.com/tree-sitter/tree-sitter-python")
-;;                                         (bash "https://github.com/tree-sitter/tree-sitter-bash")
-;;                                         (cmake "https://github.com/uyha/tree-sitter-cmake")
-;;                                         (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-;;                                         (json "https://github.com/tree-sitter/tree-sitter-json")
-;;                                         (c "https://github.com/tree-sitter/tree-sitter-c")
-;;                                         (c++ "https://github.com/tree-sitter/tree-sitter-cpp")
-;;                                         (swift "https://github.com/alex-pinkus/tree-sitter-swift"))))
 
 (use-package ibuffer
   :config

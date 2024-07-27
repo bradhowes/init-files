@@ -92,6 +92,7 @@
  '(mode-line-compact 'long)
  '(mode-line-in-non-selected-windows t)
  '(mode-line-percent-position nil)
+ '(my/screen-4k-pick 0)
  '(next-line-add-newlines nil)
  '(ns-alternate-modifier 'alt)
  '(ns-command-modifier 'meta)
