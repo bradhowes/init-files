@@ -41,7 +41,7 @@ osc7_cwd() {
     # NOTE: need to fix ansi-osc.el with `(string= (url-host url) (downcase (system-name)))))`
     # to make Emacs see the changes in directory.
     # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=68632
-    print -P "\e]7;file://$(hostname)${PWD}\e\\"
+    print -P "\e]7;file://${HOST}${PWD}\e\\"
 }
 
 esc0_cwd() {

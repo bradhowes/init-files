@@ -1,4 +1,4 @@
-;; init.el --- load the full configuration -*- lexical-binding: t; -*-
+; init.el --- load the full configuration -*- lexical-binding: t; -*-
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3--
 ;;; Commentary:
 ;;; Code:
@@ -82,7 +82,7 @@ Returns one of the follow symbols based on width:
                       ((= width 4k-width) my/screen-4k)
                       ((= width (+ laptop-width 4k-width)) my/screen-laptop-4k)
                       ((= width (+ 4k-width 4k-width)) my/screen-4k-4k)
-                      ((= width (+ laptop-width 4k-width 4k-width) my/screen-laptop-4k-4k))
+                      ((= width (+ laptop-width 4k-width 4k-width)) my/screen-laptop-4k-4k)
                       (t my/screen-terminal))))
     (message "my/screen-layout: %s" value)
     value))
@@ -93,10 +93,7 @@ Returns one of the follow symbols based on width:
 
 (defun my/is-4k (layout)
   "T if LAYOUT is kind with at least 4K area."
-  (let ((value (or (eq layout my/screen-4k)
-                   (eq layout my/screen-laptop-4k)
-                   (eq layout my/screen-4k-4k)
-                   (eq layout my/screen-laptop-4k-4k))))
+  (let ((value (memq layout '(my/screen-4k my/screen-laptop-4k my/screen-4k-4k my/screen-laptop-4k-4k))))
     (message "my/is-4k: %s" value)
     value))
 
@@ -279,6 +276,9 @@ list of symbols."
  "my-python-mode" '(my/python-mode-hook my/inferior-python-mode-hook)
  "my-sh-mode" 'my/sh-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
+
+(use-package tree-sitter)
+(use-package tree-sitter-langs)
 
 (use-package lisp-mode
   :defer t
@@ -719,16 +719,16 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :config (setq flyspell-mode-line-string "s")
   :hook (prog-mode . flyspell-prog-mode))
 
-(use-package treesit
-  :config
-  (setq treesit-language-source-alist '((python "https://github.com/tree-sitter/tree-sitter-python")
-                                        (bash "https://github.com/tree-sitter/tree-sitter-bash")
-                                        (cmake "https://github.com/uyha/tree-sitter-cmake")
-                                        (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-                                        (json "https://github.com/tree-sitter/tree-sitter-json")
-                                        (c "https://github.com/tree-sitter/tree-sitter-c")
-                                        (c++ "https://github.com/tree-sitter/tree-sitter-cpp")
-                                        (swift "https://github.com/alex-pinkus/tree-sitter-swift"))))
+;; (use-package treesit
+;;   :config
+;;   (setq treesit-language-source-alist '((python "https://github.com/tree-sitter/tree-sitter-python")
+;;                                         (bash "https://github.com/tree-sitter/tree-sitter-bash")
+;;                                         (cmake "https://github.com/uyha/tree-sitter-cmake")
+;;                                         (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+;;                                         (json "https://github.com/tree-sitter/tree-sitter-json")
+;;                                         (c "https://github.com/tree-sitter/tree-sitter-c")
+;;                                         (c++ "https://github.com/tree-sitter/tree-sitter-cpp")
+;;                                         (swift "https://github.com/alex-pinkus/tree-sitter-swift"))))
 
 (use-package ibuffer
   :config
@@ -911,6 +911,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 	  (t
 	   (self-insert-command 1)))))
 
+(defun repl ()
+  "Simple alias to start ielm."
+  (interactive)
+  (ielm))
+
 (defun my/indent-buffer ()
   "Reindent the whole buffer."
   (interactive)
@@ -923,6 +928,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                   "C-h V" #'apropos-variable
                   "C-h L" #'apropos-library
                   "C-h c" #'describe-char
+
+                  "C-c r" #'ielm
 
                   "M-g d" #'dired-jump
 
@@ -968,6 +975,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                   "C-x C-z" nil
                   "C-x h" nil
                   "C-h h" nil
+
+                  ;; Disable font size changes via trackpad
+                  "C-<wheel-up>" #'ignore
+                  "C-<wheel-down>" #'ignore
+
                   ;; "M-`" nil
 
                   ;; "C-<mouse-4>" nil
