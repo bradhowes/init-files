@@ -33,39 +33,37 @@
 
 (setenv "WORKON_HOME" my/venv)
 
-(setq read-process-output-max (* 1024 1024)
-      custom-file (expand-file-name "~/.emacs.d/custom.el")
+(setq read-process-output-max (* 4 1024 1024)
+      process-adaptive-read-buffering nil
+      custom-file (locate-user-emacs-file "custom.el")
       load-path (append (list (expand-file-name "~/.emacs.d/lisp")
                               (expand-file-name "~/.emacs.d/lisp/consult-notes"))
                         load-path)
       frame-title-format (list  '(:eval (abbreviate-file-name default-directory))))
 
 (defconst my/screen-laptop (intern "my/screen-laptop")
-  "Symbol for laptop screen width.")
+  "Symbol to indicate display is MacBook Pro 16\" laptop screen.")
 
 (defconst my/screen-4k (intern "my/screen-4k")
-  "Symbol for 4K screen width.")
+  "Symbol to indicate display is 4K screen.")
 
 (defconst my/screen-laptop-4k (intern "my/screen-laptop-4k")
-  "Symbol for laptop + 4K screen width.")
+  "Symbol to indicate display width is laptop and 1 4K screen.")
 
 (defconst my/screen-4k-4k (intern "my/screen-4k-4k")
-  "Symbol for 4K + 4K screen width.")
+  "Symbol to indicate display width is 2 4K screens.")
 
 (defconst my/screen-laptop-4k-4k (intern "my/screen-laptop-4k-4k")
-  "Symbol for laptop + 4K + 4K screen width.")
+  "Symbol to indicate display width is laptop and 2 4K screens.")
 
 (defconst my/screen-terminal (intern "my/screen-terminal")
-  "Symbol for terminal screen width.")
+  "Symbol to indicate display is a terminal.")
 
 (defconst my/laptop-screen-width 2056
-  "MacBook Pro 16\" M1 screen width.")
+  "MacBook Pro 16\" M1 screen width in pixels.")
 
 (defconst my/4k-screen-width 3840
   "4K external display width in pixels.")
-
-(defconst my/screen-terminal (intern "my/screen-terminal")
-  "Symbol for terminal screen width.")
 
 (defgroup my/customizations nil
   "The customization group for my settings."
@@ -75,7 +73,7 @@
 (defcustom my/screen-4k-pick 0
   "The 4K screen to use for Emacs frames."
   :type '(natnum)
-  :options '(0 1 2)
+  :options '(0 1)
   :group 'my/customizations)
 
 (defun my/screen-layout ()
@@ -213,7 +211,7 @@ It does not affect existing frames."
   (custom-save-all)
   (my/screen-layout-changed))
 
-(my/update-screen-frame-alists (my/screen-layout))
+;; (my/update-screen-frame-alists (my/screen-layout))
 
 (add-hook 'after-init-hook (lambda () (my/screen-layout-changed)))
 
@@ -238,8 +236,8 @@ It does not affect existing frames."
   ;; Same for PATH environment variable
   (setenv "PATH" (concat (mapconcat 'identity (append additional-paths (list (getenv "PATH"))) ":"))))
 
-(use-package ef-themes
-  :ensure t)
+;; (use-package ef-themes
+;;   :ensure t)
 
 ;; Configure `display-buffer-alist' to manage window placement
 
@@ -311,8 +309,8 @@ list of symbols."
  "my-sh-mode" 'my/sh-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
 
-(use-package tree-sitter)
-(use-package tree-sitter-langs)
+;; (use-package tree-sitter)
+;; (use-package tree-sitter-langs)
 
 (use-package lisp-mode
   :defer t
@@ -339,11 +337,6 @@ list of symbols."
 (use-package makefile-mode
   :defer t
   :hook ((makefile-mode . my/makefile-mode-hook)))
-
-;; (unless (daemonp)
-;;   (use-package session
-;;     :ensure t
-;;     :hook (after-init . session-initialize)))
 
 (defun my/emacs-keybind (keymap &rest definitions)
   "Expand key binding DEFINITIONS for the given KEYMAP.
@@ -410,6 +403,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :bind ("C-h ." . eldoc-box-help-at-point))
 
 (use-package dired
+  :defer t
   :init
   (require 'dired-aux)
   :bind (:map dired-mode-map
@@ -514,12 +508,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package embark
   :ensure t
-  :commands (embark-prefix-help-command)
+  ;; :commands (embark-prefix-help-command)
   :bind (("C-." . embark-act)
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
-  :init
-  (setq prefix-help-command #'embark-prefix-help-command)
+  ;; :init
+  ;; (setq prefix-help-command #'embark-prefix-help-command)
   :config
   (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                                        nil
@@ -544,9 +538,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("C-x r b" . consult-bookmark)
          ("C-x r l" . consult-bookmark)
 
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)
-         ("C-M-#" . consult-register)
+         ;; ("M-#" . consult-register-load)
+         ;; ("M-'" . consult-register-store)
+         ;; ("C-M-#" . consult-register)
 
          ("M-y" . consult-yank-replace)
 
@@ -636,7 +630,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :ensure t
   :commands (vertico-mode)
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
-  :init (vertico-mode))
+  :init (vertico-mode t))
 
 (use-package mode-line-bell
   :ensure t)
@@ -653,6 +647,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
               ("C-c c o" . eglot-code-action-organize-imports)
               ("C-c c r" . eglot-rename)
               ("C-c c f" . eglot-format)))
+
+(use-package consult-eglot
+  :ensure t
+  :after (consult eglot))
 
 (use-package orderless
   :ensure t
@@ -772,6 +770,35 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("C-<" . mc/mark-previous-like-this)
          ("C-c C->" . mc/mark-all-like-this)))
 
+(use-package popper
+  :ensure t
+  :defines (popper-reference-buffers)
+  :commands (popper-mode popper-echo-mode)
+  :bind (("C-'" . popper-toggle)
+         ("M-'" . popper-cycle)
+         ("C-M-'" . popper-toggle-type))
+  :init
+  (setq popper-reference-buffers
+        '("\\*Messages\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          help-mode
+          compilation-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1))
+
+(use-package char-menu
+  :ensure t
+  :defines (char-menu)
+  :bind (("C-z" . char-menu))
+  :init
+  (setq char-menu
+        '("—" "‘’" "“”" "…" "«»" "–"
+          ("Typography" "•" "©" "†" "‡" "°" "·" "§" "№" "★")
+          ("Math"       "≈" "≡" "≠" "∞" "×" "±" "∓" "÷" "√")
+          ("Arrows"     "←" "→" "↑" "↓" "⇐" "⇒" "⇑" "⇓")
+          ("Greek"      "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
+
 (use-package emacs
   :commands (my/crm-indicator)
   :init
@@ -796,51 +823,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)))
 
-;; (autoload 'native-complete-setup-bash "native-complete")
-;; (with-eval-after-load 'shell
-;;   (message "Loading native-complete-setup-bash")
-;;   (native-complete-setup-bash))
-
 ;;; Custom functions
-
-(defun my/window-grow-up ()
-  "Grow current window into the one above."
-  (interactive)
-  (delete-window (window-in-direction 'above)))
-
-(defun my/window-grow-down ()
-  "Grow current window into the one below."
-  (interactive)
-  (delete-window (window-in-direction 'below)))
-
-(defun my/window-grow-left ()
-  "Grow current window into the one at the left."
-  (interactive)
-  (delete-window (window-in-direction 'left)))
-
-(defun my/window-grow-right ()
-  "Grow current window into the one at the right."
-  (interactive)
-  (delete-window (window-in-direction 'right)))
-
-(defun my/window-reset-window-state ()
-  "Reset the window-state for the current frame."
-  (interactive)
-  (set-frame-parameter (selected-frame) 'window-state nil))
-
-(defvar my/windows-keymap (make-sparse-keymap)
-  "Keymap for the grow window functions.")
-
-(my/emacs-keybind my/windows-keymap
-                  "z" #'my/window-reset-window-state
-                  "1" #'window-toggle-side-windows
-                  "u" #'my/window-grow-up
-                  "d" #'my/window-grow-down
-                  "l" #'my/window-grow-left
-                  "r" #'my/window-grow-right)
-
-;; Rebind "C-x 1" to be a prefix key to `my/grow-window-keymap'
-;; (keymap-set ctl-x-map "1" my/windows-keymap)
 
 (defun my/reset-frame-left ()
   "Reset frame size and position for left frame."

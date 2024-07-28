@@ -107,7 +107,7 @@
      ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
  '(package-quickstart t)
  '(package-selected-packages
-   '(tree-sitter tree-sitter-langs lsp-pyright nerd-icons-corfu lsp-jedi exec-path-from-shell consult-denote consult-eglot verb multiple-cursors eglot-signature-eldoc-talkative eldoc-box doom-modeline window-commander ef-themes dired-single persp-mode rg eglot indent-guide ws-butler cape corfu-info lsp-sourcekit swift-mode corfu use-package denote consult-dir orderless vertico embark-consult embark markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation flycheck-indentation flycheck diminish diff-hl cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
+   '(char-menu popper tree-sitter tree-sitter-langs lsp-pyright nerd-icons-corfu lsp-jedi exec-path-from-shell consult-denote consult-eglot verb multiple-cursors eglot-signature-eldoc-talkative eldoc-box doom-modeline window-commander ef-themes dired-single persp-mode rg eglot indent-guide ws-butler cape corfu-info lsp-sourcekit swift-mode corfu use-package denote consult-dir orderless vertico embark-consult embark markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch ripgrep reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core highlight-indentation flycheck-indentation flycheck diminish diff-hl cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
  '(pixel-scroll-mode t)
  '(pixel-scroll-precision-mode t)
  '(pixel-scroll-precision-use-momentum t)
