@@ -808,9 +808,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
     (keymap-global-set "<remap> <dired>" #'dired-at-point)
     (keymap-global-set "<remap> <dired-other-window>" #'ffap-dired-other-window)
-    (keymap-global-set "<remap> <dired-other-frame>" #'ffap-dired-other-frame))
+    (keymap-global-set "<remap> <dired-other-frame>" #'ffap-dired-other-frame)
+    (keymap-global-set "<remap> <list-directory>" #'ffap-list-directory))
   "List of binding forms evaluated by function `ffap-bindings'.
-A reasonable ffap installation needs just this one line
+A reasonable ffap installation needs just this one line:
   (ffap-bindings)
 Of course if you do not like these bindings, just roll your own!")
 
