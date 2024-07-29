@@ -1025,11 +1025,10 @@ Of course if you do not like these bindings, just roll your own!")
                   "%" #'my/matching-paren
 
                   ;; Unmap the following
-                  "<insert>" nil
-                  "C-z" nil
-                  "C-x C-z" nil
-                  "C-x h" nil
-                  "C-h h" nil
+                  "<insert>" #'ignore   ; disable key for toggling overwrite mode
+                  "C-x C-z" #'ignore    ; suspend-frame
+                  "C-x h" #'ignore      ; mark-whole-buffer
+                  "C-h h" #'ignore      ; show 'Hello' in various fonts
 
                   ;; Disable font size changes via trackpad
                   "C-<wheel-up>" #'ignore
