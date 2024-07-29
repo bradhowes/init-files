@@ -807,6 +807,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (ffap-bindings)
   (setq-default abbrev-mode t)
 
+  (global-prettify-symbols-mode t)
   ;; Forgot why this was done -- most likely for macOS
   ;; (put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
   (put 'narrow-to-region 'disabled nil)
@@ -937,16 +938,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
-
-(defun my/scroll-other-window ()
-  "Scroll other window."
-  (interactive)
-  (scroll-other-window 1))
-
-(defun my/scroll-other-window-down ()
-  "Scroll other window down."
-  (interactive)
-  (scroll-other-window-down 1))
 
 (defun repl ()
   "Simple alias to start ielm."
