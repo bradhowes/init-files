@@ -446,6 +446,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-c f" . magit-file-dispatch)
+         ("C-c g" . magit-dispatch)
          ("C-x g" . magit-status)))
 
 (use-package projectile
@@ -653,22 +654,20 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :ensure t
   :after (consult eglot))
 
+(use-package crux
+  :ensure t
+  :bind ("C-a" . crux-move-beginning-of-line))
+
+(use-package expand-region
+  :ensure t
+  :bind ("M-\\" . er/expand-region))
+
 (use-package orderless
   :ensure t
   :custom
   (completion-styles '(orderless partial-completion basic))
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles basic partial-completion)))))
-
-;; (orderless-define-completion-style orderless+initialism
-;;   (orderless-matching-styles '(orderless-initialism
-;;                                orderless-literal
-;;                                orderless-regexp)))
-;; (setq completion-category-overrides
-;;       '((command (styles orderless+initialism))
-;;         (symbol (styles orderless+initialism))
-;;         (variable (styles orderless+initialism)))
-;;       orderless-component-separator "[ &]")
 
 (use-package swift-mode
   :ensure t
@@ -700,16 +699,16 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :ensure t
   :commands (global-corfu-mode corfu-history-mode)
   :init
-  ;; :bind (:map corfu-map
-  ;;             ("<return>" . corfu-complete))
+  :bind (:map corfu-map
+              ("<return>" . corfu-complete))
   :custom ((corfu-cycle t)
            (corfu-auto t)
-           (corfu-auto-prefix 1)
+           (corfu-auto-prefix 3)
            (corfu-popupinfo-mode t)
            (corfu-preselect 'directory))
   :config
-  (global-corfu-mode)
-  (corfu-history-mode))
+  (global-corfu-mode 1)
+  (corfu-history-mode 1))
 
 (require 'corfu-popupinfo)
 (corfu-popupinfo-mode)
@@ -795,6 +794,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
         '("\\*Messages\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
+          "\\*Compile-Log\\*"
           help-mode
           compilation-mode))
   (popper-mode +1)
@@ -830,7 +830,6 @@ Of course if you do not like these bindings, just roll your own!")
 (use-package emacs
   :commands (my/crm-indicator)
   :init
-  ;; (auto-save-visited-mode t)
   (ffap-bindings)
   (setq-default abbrev-mode t)
 
@@ -1032,19 +1031,7 @@ Of course if you do not like these bindings, just roll your own!")
 
                   ;; Disable font size changes via trackpad
                   "C-<wheel-up>" #'ignore
-                  "C-<wheel-down>" #'ignore
-
-                  ;; "M-`" nil
-
-                  ;; "C-<mouse-4>" nil
-                  ;; "C-<mouse-5>" nil
-
-                  ;; "C-<double-mouse-4>" nil
-                  ;; "C-<double-mouse-5>" nil
-
-                  ;; "C-<triple-mouse-4>" nil
-                  ;; "C-<triple-mouse-5>" nil
-                  )
+                  "C-<wheel-down>" #'ignore)
 
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))
