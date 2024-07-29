@@ -1,4 +1,4 @@
-; init.el --- load the full configuration -*- lexical-binding: t; -*-
+;;; init.el --- load the full configuration -*- lexical-binding: t; -*-
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3--
 ;;; Commentary:
 ;;; Code:
@@ -26,10 +26,12 @@
 
 (defconst my/venv-python (concat my/venv "/bin/python")
   "The path to the Python eexecutable to use for elpy.")
-(defconst is-macosx (eq system-type 'darwin)
+(defconst my/is-macosx (eq system-type 'darwin)
   "T if running on macOS.")
-(defconst is-terminal (not (display-graphic-p))
+(defconst my/is-terminal (not (display-graphic-p))
   "T if running in a terminal.")
+(defconst my/is-x-windows (eq window-system 'x)
+  "T if running in an X windows environment.")
 
 (setenv "WORKON_HOME" my/venv)
 
@@ -225,7 +227,7 @@ It does not affect existing frames."
 
 (let* ((common-paths (list (expand-file-name "~/bin")
                            (concat my/venv "/bin")))
-       (macosx-paths (if is-macosx
+       (macosx-paths (if my/is-macosx
                          (list "/opt/homebrew/sqlite/bin"
                                "/opt/homebrew/opt/grep/libexec/gnubin"
                                "/opt/homebrew/bin")
@@ -267,7 +269,7 @@ It does not affect existing frames."
           ;;                         display-buffer-in-side-window (side . right) (slot . 1) (preserve-size . (t . nil)) ,window-parameters))
           )))
 
-(when is-terminal
+(when my/is-terminal
   (set-face-background 'default "undefined"))
 
 (defvar font-lock-brace-face
@@ -390,16 +392,15 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (diminish 'isearch-mode " ?")
   (diminish 'overwrite-mode "*"))
 
-(use-package eldoc)
-;; :bind ("C-h ." . eldoc-print-current-symbol-info))
+(use-package eldoc
+  :ensure t
+  :diminish (eldoc-mode . "")
+  :init (global-eldoc-mode 1))
 
 (use-package eldoc-box
   :ensure t
-  :diminish (eldoc-box-hover-mode . " eB")
+  :diminish (eldoc-box-hover-mode . "")
   :commands (eldoc-box-hover-mode)
-  ;; :hook (eldoc-mode-hook . (lambda () (eldoc-box-hover-mode t)))
-  :config
-  ;; (setq eldoc-box-at-point-position-function eldoc-box-position-function)
   :bind ("C-h ." . eldoc-box-help-at-point))
 
 (use-package dired
@@ -429,12 +430,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :defer t
   :commands (global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode diff-hl-flydiff-mode diff-hl-margin-mode)
   :init
-  (diff-hl-flydiff-mode t)
-  (when is-terminal
+  (when my/is-terminal
     (diff-hl-margin-mode t))
   :hook ((after-init . (lambda ()
                          (diff-hl-flydiff-mode t)
-                         (when is-terminal
+                         (when my/is-terminal
                            (diff-hl-margin-mode t))
                          (global-diff-hl-mode t)
                          (global-diff-hl-show-hunk-mouse-mode t)
@@ -522,6 +522,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package consult
   :ensure t
   :after (projectile)
+  :commands (consult--customize-put)    ; silence flymake warning
   :bind (;; C-c bindings in `mode-specific-map`
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
@@ -843,7 +844,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (let ((layout (my/screen-layout)))
     (modify-frame-parameters (window-frame (get-buffer-window)) (my/align-right-frame-alist layout))))
 
-(defun my/reset-framewidth ()
+(defun my/reset-frame-width ()
   "Reset the current frame width to function `my/cols'."
   (interactive)
   (let ((layout (my/screen-layout)))
@@ -917,17 +918,43 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 	  (t
 	   (self-insert-command 1)))))
 
-(defun repl ()
-  "Simple alias to start ielm."
+(defun my/toggle-show-minor-modes ()
+  "Toggle the display of minor mode elements on the mode line."
   (interactive)
-  (ielm))
+  (setq doom-modeline-minor-modes (not doom-modeline-minor-modes)))
 
 (defun my/indent-buffer ()
   "Reindent the whole buffer."
   (interactive)
   (indent-region (point-min) (point-max) nil))
 
+(defun my/copy-file-name-to-clipboard ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
+
+(defun my/scroll-other-window ()
+  "Scroll other window."
+  (interactive)
+  (scroll-other-window 1))
+
+(defun my/scroll-other-window-down ()
+  "Scroll other window down."
+  (interactive)
+  (scroll-other-window-down 1))
+
+(defun repl ()
+  "Simple alias to start ielm."
+  (interactive)
+  (ielm))
+
 (my/emacs-keybind global-map
+                  "C-h RET" #'my/toggle-show-minor-modes
                   "C-h K" #'describe-keymap
                   "C-h u" #'apropos-user-option
                   "C-h F" #'apropos-function
@@ -947,6 +974,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                   ;; "C-x k" #'bury-buffer
 
                   "C-x C-b" #'ibuffer
+                  "C-x M-b" #'consult-project-buffer
 
                   "M-<f1>" #'my/reset-frame-left
                   "M-<f2>" #'my/reset-frame-right
@@ -959,11 +987,14 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                   "C-x 5 i" #'my/info-other-frame
                   "C-x 5 k" #'my/shell-other-frame
 
+                  "C-c C-c" #'my/copy-file-name-to-clipboard
                   "C-c C-k" #'my/kill-buffer
 
                   "<f3>" #'eval-last-sexp
 
                   "C-M-\\" #'my/indent-buffer
+
+                  "C-x m" #'rg-project
 
                   "<home>" #'beginning-of-buffer
                   "<end>" #'end-of-buffer
@@ -1006,24 +1037,28 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (when (boundp symbol)
     (set symbol value)))
 
-(if is-macosx
-    (progn
-      (eval-when-compile
-        (require 'ls-lisp))
-      (custom-set-variables
-       '(ls-lisp-use-insert-directory-program nil))
-      (when (not is-terminal)
-        (custom-set-variables
-         '(frame-resize-pixelwise t)
-         '(mac-command-modifier 'meta)
-         '(mac-option-modifier 'alt)
-         '(mac-right-command-modifier 'super)
-         '(mac-right-option-modifier 'hyper))))
-  (when (eq window-system 'x)
+(cond
+ (my/is-macosx
+  (eval-when-compile
+    (require 'ls-lisp))
+  (custom-set-variables
+   '(ls-lisp-use-insert-directory-program nil))
+  (when (not my/is-terminal)
+    (custom-set-variables
+     '(frame-resize-pixelwise t)
+     '(mac-command-modifier 'meta)
+     '(mac-option-modifier 'alt)
+     '(mac-right-command-modifier 'super)
+     '(mac-right-option-modifier 'hyper))))
+ (my/is-x-windows
+  (when (not my/is-terminal)
     (my/set-bound-var 'x-alt-keysym 'alt)
     (my/set-bound-var 'x-meta-keysym 'meta)
     (my/set-bound-var 'x-super-keysym 'super)
-    (my/set-bound-var 'x-hyper-keysym 'hyper)))
+    (my/set-bound-var 'x-hyper-keysym 'hyper))))
+
+(add-to-list 'compilation-error-regexp-alist
+             '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2))
 
 (provide 'init)
 
