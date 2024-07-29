@@ -126,7 +126,7 @@ Returns one of the follow symbols based on width:
   "Width in pixels of a normal frame shown on LAYOUT.
 These values are hard-coded based on current settings.
 Probably a better way to figure this out."
-  (if (my/is-4k layout) 1338 944))
+  (if (my/is-4k layout) (if my/is-macosx 1338 1358) 944))
 
 (defun my/frame-initial-left (layout)
   "Pixels to use for the `left' of a frame on LAYOUT.
@@ -799,6 +799,20 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
           ("Math"       "≈" "≡" "≠" "∞" "×" "±" "∓" "÷" "√")
           ("Arrows"     "←" "→" "↑" "↓" "⇐" "⇒" "⇑" "⇓")
           ("Greek"      "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
+
+(defvar ffap-bindings
+  '((keymap-global-set "<remap> <find-file>" #'find-file-at-point)
+    (keymap-global-set "<remap> <find-file-other-window>" #'ffap-other-window)
+    (keymap-global-set "<remap> <find-file-other-frame>" #'ffap-other-frame)
+    (keymap-global-set "<remap> <find-file-other-tab>" #'ffap-other-tab)
+
+    (keymap-global-set "<remap> <dired>" #'dired-at-point)
+    (keymap-global-set "<remap> <dired-other-window>" #'ffap-dired-other-window)
+    (keymap-global-set "<remap> <dired-other-frame>" #'ffap-dired-other-frame))
+  "List of binding forms evaluated by function `ffap-bindings'.
+A reasonable ffap installation needs just this one line
+  (ffap-bindings)
+Of course if you do not like these bindings, just roll your own!")
 
 (use-package emacs
   :commands (my/crm-indicator)
