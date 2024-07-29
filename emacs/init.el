@@ -126,7 +126,7 @@ Returns one of the follow symbols based on width:
   "Width in pixels of a normal frame shown on LAYOUT.
 These values are hard-coded based on current settings.
 Probably a better way to figure this out."
-  (if (my/is-4k layout) (if my/is-macosx 1338 1358) 944))
+  (if (my/is-4k layout) (if my/is-macosx 1338 1338) 944))
 
 (defun my/frame-initial-left (layout)
   "Pixels to use for the `left' of a frame on LAYOUT.
@@ -758,13 +758,25 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (my/emacs-keybind ibuffer-mode-map
 		    "M-o" nil))
 
-(use-package windmove
-  :bind (("A-M-<left>" . windmove-left)
-         ("A-M-<right>" . windmove-right)
-         ("A-M-." . windmove-up)
-         ("A-M-<up>" . windmove-up)
-         ("A-M-," . windmove-down)
-         ("A-M-<down>" . windmove-down)))
+(if my/is-macosx
+    (use-package windmove
+      :config
+      (setq windmove-wrap-around t)
+      :bind (("A-M-<left>" . windmove-left)
+             ("A-M-<right>" . windmove-right)
+             ("A-M-." . windmove-up)
+             ("A-M-<up>" . windmove-up)
+             ("A-M-," . windmove-down)
+             ("A-M-<down>" . windmove-down)))
+  (use-package windmove
+    :config
+    (setq windmove-wrap-around t)
+    :bind (("M-s-<left>" . windmove-left)
+           ("M-s-<right>" . windmove-right)
+           ("M-s-." . windmove-up)
+           ("M-s-<up>" . windmove-up)
+           ("M-s-," . windmove-down)
+           ("M-s-<down>" . windmove-down))))
 
 (use-package multiple-cursors
   :bind (("C->" . mc/mark-next-like-this)
