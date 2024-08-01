@@ -214,15 +214,7 @@ It does not affect existing frames."
   (custom-save-all)
   (my/screen-layout-changed))
 
-;; (my/update-screen-frame-alists (my/screen-layout))
-
 (add-hook 'after-init-hook (lambda () (my/screen-layout-changed)))
-
-(when scroll-bar-mode
-  (scroll-bar-mode -1))
-
-(unless tab-bar-mode
-  (tab-bar-mode 1))
 
 ;;; Set various paths
 
@@ -312,9 +304,6 @@ list of symbols."
  "my-sh-mode" 'my/sh-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
 
-;; (use-package tree-sitter)
-;; (use-package tree-sitter-langs)
-
 (use-package lisp-mode
   :defer t
   :hook ((lisp-mode . my/lisp-mode-hook)
@@ -346,8 +335,7 @@ list of symbols."
 DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (unless (zerop (% (length definitions) 2))
     (error "Uneven number of key+command pairs"))
-  ;; Partition `definitions' into two groups, one with key definitions
-  ;; and another with functions and/or nil values
+  ;; Partition `definitions' into two groups, one with key definitions and another with functions and/or nil values
   (let* ((groups (seq-group-by #'stringp definitions))
          (keys (seq-drop (elt groups 0) 1))
          (commands (seq-drop (elt groups 1) 1)))
@@ -370,13 +358,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
     :config (all-the-icons-completion-mode))
 
-  (use-package nerd-icons
-    :ensure t)
+  ;; (use-package nerd-icons
+  ;;   :ensure t)
 
   (use-package doom-modeline
     :ensure t
-    :hook (after-init . doom-modeline-mode))
-  )
+    :hook (after-init . doom-modeline-mode)))
 
 ;; Clean up whitespace at end of lines but only for edited lines.
 (use-package ws-butler
@@ -413,7 +400,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
               ("C-M-s" . dired-isearch-filenames-regexp))
   :hook (dired-mode . my/dired-mode-hook))
 
-;; Save minibuffer histories
 (use-package savehist
   :init
   (savehist-mode t))
@@ -425,7 +411,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                 ediff-split-window-function 'split-window-horizontally
                 ediff-merge-split-window-function 'split-window-horizontally))
 
-;;; Annotate changed files that are under version control.
 (use-package diff-hl
   :ensure t
   :defer t
@@ -506,12 +491,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package embark
   :ensure t
-  ;; :commands (embark-prefix-help-command)
   :bind (("C-." . embark-act)
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
-  ;; :init
-  ;; (setq prefix-help-command #'embark-prefix-help-command)
   :config
   (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                                        nil
@@ -611,7 +593,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :config
   (require 'consult-notes-denote)
   (consult-notes-denote-mode)
-  (setq consult-notes-denote-files-function #'denote-directory-files)
+  (setq consult-notes-denote-files-function #'denote-directory-files
+        consult-notes-use-rg t)
   :bind (("C-c n b" . consult-notes)))
 
 (use-package embark-consult
@@ -623,7 +606,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :ensure t
   :commands (marginalia-mode)
   :bind (:map minibuffer-local-map
-              ("M-a" . marginalia-cycle))
+              ("C-M-<tab>" . marginalia-cycle))
   :init (marginalia-mode))
 
 (use-package vertico
@@ -670,7 +653,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("C-k" . crux-smart-kill-line)
          ("C-c i" . crux-indent-defun)
          ("C-c I" . crux-find-user-init-file)
-         ("C-c C" . crux-find-user-custom-file)
+         ("C-c ," . crux-find-user-custom-file)
          ("C-^" . crux-top-join-line)))
 
 (use-package orderless
@@ -754,7 +737,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package expand-region
   :ensure t
-  :bind ("M-\\" . er/expand-region))
+  :bind ("C-\\" . er/expand-region))
 
 (use-package hl-line
   :commands (global-hl-line-mode)
@@ -810,14 +793,14 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("M-'" . popper-cycle)
          ("C-M-'" . popper-toggle-type))
   :init
-  (setq popper-reference-buffers
+  (setq popper-display-control 'user
+        popper-reference-buffers
         '("\\*Messages\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
           "\\*Compile-Log\\*"
           help-mode
-          compilation-mode)
-        popper-display-control 'user)
+          compilation-mode))
   (popper-mode +1)
   (popper-echo-mode +1))
 
@@ -832,6 +815,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
           ("Math"       "≈" "≡" "≠" "∞" "×" "±" "∓" "÷" "√")
           ("Arrows"     "←" "→" "↑" "↓" "⇐" "⇒" "⇑" "⇓")
           ("Greek"      "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
+
+(use-package osx-dictionary
+  :ensure t
+  :defer t
+  :bind (("C-l" . osx-dictionary-search-pointer)))
 
 (defvar ffap-bindings
   '((keymap-global-set "<remap> <find-file>" #'find-file-at-point)
@@ -1031,7 +1019,6 @@ Of course if you do not like these bindings, just roll your own!")
 (my/emacs-keybind global-map
                   "C-c r" #'ielm
                   "C-c D" #'crux-find-current-directory-dir-locals-file
-                  "C-c l" #'dictionary-lookup-definition
 
                   "C-h RET" #'my/toggle-show-minor-modes
                   "C-h a" #'describe-symbol
@@ -1066,7 +1053,7 @@ Of course if you do not like these bindings, just roll your own!")
                   "C-x 5 k" #'my/shell-other-frame
 
                   "C-c C-c" #'my/copy-file-name-to-clipboard
-                  "C-c C-k" #'my/kill-buffer
+                  "C-c C-k" #'my/kill-current-buffer
 
                   "<f3>" #'eval-last-sexp
 
