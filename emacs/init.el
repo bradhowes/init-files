@@ -692,7 +692,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package corfu
   :ensure t
   :commands (global-corfu-mode corfu-history-mode)
-  :init
   :bind (:map corfu-map
               ("<return>" . corfu-complete))
   :custom ((corfu-cycle t)
@@ -704,13 +703,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (global-corfu-mode 1)
   (corfu-history-mode 1))
 
-(when my/is-terminal
-  (use-package corfu-terminal
-    :ensure t
-    :defer t
-    :commands (corfu-terminal-mode)
-    :config
-    (corfu-terminal-mode +1)))
+(use-package corfu-terminal
+  :when my/is-terminal
+  :ensure t
+  :defer t
+  :commands (corfu-terminal-mode)
+  :config
+  (corfu-terminal-mode +1))
 
 (use-package markdown-mode
   :ensure t
@@ -793,12 +792,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("M-'" . popper-cycle)
          ("C-M-'" . popper-toggle-type))
   :init
-  (setq popper-display-control 'user
+  (setq popper-display-control 'user    ; Must use to prevent issues with Emacs byte-compile
         popper-reference-buffers
         '("\\*Messages\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
           "\\*Compile-Log\\*"
+          "\\*Man .*\\*"
           help-mode
           compilation-mode))
   (popper-mode +1)
@@ -817,9 +817,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
           ("Greek"      "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
 
 (use-package osx-dictionary
+  :when my/is-macosx
   :ensure t
   :defer t
-  :bind (("C-l" . osx-dictionary-search-pointer)))
+  :bind (("C-c l" . osx-dictionary-search-pointer)))
 
 (defvar ffap-bindings
   '((keymap-global-set "<remap> <find-file>" #'find-file-at-point)
@@ -1027,6 +1028,7 @@ Of course if you do not like these bindings, just roll your own!")
                   "C-h F" #'apropos-function
                   "C-h K" #'describe-keymap
                   "C-h L" #'apropos-library
+                  "C-h M" #'consult-man
                   "C-h V" #'apropos-variable
 
                   "M-g d" #'dired-jump
@@ -1070,7 +1072,7 @@ Of course if you do not like these bindings, just roll your own!")
                   "M-[" #'previous-buffer
                   "M-]" #'next-buffer
 
-                  "%" #'my/matching-paren
+                  ;; "%" #'my/matching-paren
 
                   "C-S-p" #'my/ace-window-previous
                   "C-S-n" #'my/ace-window-next
