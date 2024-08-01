@@ -27,7 +27,8 @@
 (defconst my/venv-python (concat my/venv "/bin/python")
   "The path to the Python eexecutable to use for elpy.")
 (defconst my/is-macosx (eq system-type 'darwin)
-  "T if running on macOS.")
+  "T if running on macOS.
+Note that this is also true when running in a terminal window.")
 (defconst my/is-terminal (not (display-graphic-p))
   "T if running in a terminal.")
 (defconst my/is-x-windows (eq window-system 'x)
@@ -505,6 +506,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package ace-window
   :ensure t
+  :commands (aw-window-list aw-switch-to-window)
   :bind (("M-o" . ace-window)))
 
 (use-package embark
@@ -643,7 +645,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook ((swift-mode . eglot-ensure)
          (c++-mode . eglot-ensure)
          (python-mode . eglot-ensure))
-  :config (add-to-list 'eglot-server-programs '(swift-mode . ("xcrun" "sourcekit-lsp")))
+  :config
+  (add-to-list 'eglot-server-programs '(swift-mode . ("xcrun" "sourcekit-lsp")))
+  (setq eglot-ignored-server-capabilities '(:documentHighlightProvider))
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-connect-timeout nil)
+  (eglot-send-changes-idle-time)
   :bind (:map eglot-mode-map
               ("C-c c a" . eglot-code-actions)
               ("C-c c o" . eglot-code-action-organize-imports)
@@ -656,7 +664,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package crux
   :ensure t
-  :bind ("C-a" . crux-move-beginning-of-line))
+  :bind (("C-a" . crux-move-beginning-of-line)
+         ("C-k" . crux-smart-kill-line)))
 
 (use-package expand-region
   :ensure t
@@ -710,8 +719,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (global-corfu-mode 1)
   (corfu-history-mode 1))
 
-(require 'corfu-popupinfo)
-(corfu-popupinfo-mode)
+(use-package corfu-terminal
+  :commands (corfu-terminal-mode)
+  :ensure t
+  :defer t
+  :config
+  (corfu-terminal-mode (and my/is-terminal +1)))
 
 (use-package markdown-mode
   :ensure t
@@ -796,7 +809,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
           "\\*Async Shell Command\\*"
           "\\*Compile-Log\\*"
           help-mode
-          compilation-mode))
+          compilation-mode)
+        popper-display-control 'user)
   (popper-mode +1)
   (popper-echo-mode +1))
 
@@ -826,6 +840,18 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 A reasonable ffap installation needs just this one line:
   (ffap-bindings)
 Of course if you do not like these bindings, just roll your own!")
+
+(use-package time
+  :config
+  (setq world-clock-time-format "%d %b %R %Z"
+        zoneinfo-style-world-list '(("America/Montreal" "Montreal")
+                                    ("America/New_York" "New York")
+                                    ("Europe/London" "London")
+                                    ("Europe/Paris" "Paris")
+                                    ("Asia/Tokyo" "Tokyo")
+                                    ("Asia/Hong_Kong" "Hong Kong")
+                                    ("Asia/Bangkok" "Bangkok")
+                                    ("Asia/Singapore" "Singapore"))))
 
 (use-package emacs
   :commands (my/crm-indicator)
@@ -970,7 +996,34 @@ Of course if you do not like these bindings, just roll your own!")
   (interactive)
   (ielm))
 
+(defun my/do-next-window (wins)
+  "Jump to next window in WINS after the current one."
+  (let* ((here (get-buffer-window))
+         (found (memq here wins))
+         (next (car-safe (cdr-safe found))))
+    (when next
+      (aw-switch-to-window next))))
+
+(defun my/ace-window-next ()
+  "Jump to next window according to `ace-window'."
+  (interactive)
+  (my/do-next-window (aw-window-list)))
+
+(defun my/ace-window-previous ()
+  "Jump to previous window according to `ace-window'."
+  (interactive)
+  (my/do-next-window (reverse (aw-window-list))))
+
+(defun crux-find-current-directory-dir-locals-file ()
+  "Edit the current directory's `.dir-locals.el' file in another window."
+  (interactive)
+  (find-file-other-window
+   (expand-file-name ".dir-locals.el")))
+
 (my/emacs-keybind global-map
+                  "C-c r" #'ielm
+                  "C-c D" #'crux-find-current-directory-dir-locals-file
+                  "C-c l" #'dictionary-lookup-definition
                   "C-h RET" #'my/toggle-show-minor-modes
                   "C-h K" #'describe-keymap
                   "C-h u" #'apropos-user-option
@@ -978,8 +1031,6 @@ Of course if you do not like these bindings, just roll your own!")
                   "C-h V" #'apropos-variable
                   "C-h L" #'apropos-library
                   "C-h c" #'describe-char
-
-                  "C-c r" #'ielm
 
                   "M-g d" #'dired-jump
 
@@ -1018,10 +1069,14 @@ Of course if you do not like these bindings, just roll your own!")
                   "<delete>" #'delete-char
                   "S-<f12>" #'package-list-packages
 
+                  "M-z" #'zap-up-to-char
                   "M-[" #'previous-buffer
                   "M-]" #'next-buffer
 
                   "%" #'my/matching-paren
+
+                  "C-S-p" #'my/ace-window-previous
+                  "C-S-n" #'my/ace-window-next
 
                   ;; Unmap the following
                   "<insert>" #'ignore   ; disable key for toggling overwrite mode
