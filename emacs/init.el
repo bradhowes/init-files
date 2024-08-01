@@ -443,19 +443,24 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package magit
   :ensure t
-  :defer t
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-c f" . magit-file-dispatch)
          ("C-c g" . magit-dispatch)
          ("C-x g" . magit-status)))
 
+(use-package rg
+  :ensure t)
+
 (use-package projectile
   :ensure t
   :defer t
+  :after (rg)
   :commands (projectile-mode projectile-project-name projectile-register-project-type)
   :bind-keymap (("C-x p" . projectile-command-map)
                 ("M-s-p" . projectile-command-map))
+  :bind (:map projectile-command-map
+              ("s r" . rg-project))
   :hook (prog-mode . projectile-mode)
   :config
   (setq projectile-mode-line-function (lambda () (format " [%s] " (projectile-project-name))))
@@ -467,16 +472,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                                     :test "swift test"
                                     :run "swift run"
                                     :test-suffix ""))
-
-;; Magit-like interface for ripgrep
-(use-package rg
-  :ensure t
-  :after (projectile)
-  :commands (rg-enable-default-bindings)
-  :bind (:map projectile-command-map
-              ("s r" . rg-project))
-  :config
-  (rg-enable-default-bindings))
 
 (use-package denote
   :ensure t
@@ -539,6 +534,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("C-x f" . consult-recent-file)
 
          ("C-x 4 b" . consult-buffer-other-window)
+         ("C-x 5 b" . consult-buffer-other-frame)
          ("C-x r b" . consult-bookmark)
          ("C-x r l" . consult-bookmark)
 
@@ -654,9 +650,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (eglot-send-changes-idle-time)
   :bind (:map eglot-mode-map
               ("C-c c a" . eglot-code-actions)
+              ("C-c c e" . eglot-code-action-extract)
+              ("C-c c j" . eglot-code-action-inline)
+              ("C-c c f" . eglot-format)
               ("C-c c o" . eglot-code-action-organize-imports)
+              ("C-c c q" . eglot-code-action-quickfix)
               ("C-c c r" . eglot-rename)
-              ("C-c c f" . eglot-format)))
+              ("C-c c w" . eglot-code-action-rewrite)))
 
 (use-package consult-eglot
   :ensure t
@@ -665,11 +665,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package crux
   :ensure t
   :bind (("C-a" . crux-move-beginning-of-line)
-         ("C-k" . crux-smart-kill-line)))
-
-(use-package expand-region
-  :ensure t
-  :bind ("M-\\" . er/expand-region))
+         ("C-c d" . crux-duplicate-line-or-region)
+         ("C-x 4 t" . crux-transpose-windows)
+         ("C-k" . crux-smart-kill-line)
+         ("C-c i" . crux-indent-defun)
+         ("C-c I" . crux-find-user-init-file)
+         ("C-c C" . crux-find-user-custom-file)
+         ("C-^" . crux-top-join-line)))
 
 (use-package orderless
   :ensure t
@@ -719,12 +721,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (global-corfu-mode 1)
   (corfu-history-mode 1))
 
-(use-package corfu-terminal
-  :commands (corfu-terminal-mode)
-  :ensure t
-  :defer t
-  :config
-  (corfu-terminal-mode (and my/is-terminal +1)))
+(when my/is-terminal
+  (use-package corfu-terminal
+    :ensure t
+    :defer t
+    :commands (corfu-terminal-mode)
+    :config
+    (corfu-terminal-mode +1)))
 
 (use-package markdown-mode
   :ensure t
@@ -748,6 +751,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :ensure t
   :commands (which-key-mode)
   :init (which-key-mode t))
+
+(use-package expand-region
+  :ensure t
+  :bind ("M-\\" . er/expand-region))
 
 (use-package hl-line
   :commands (global-hl-line-mode)
@@ -873,7 +880,8 @@ Of course if you do not like these bindings, just roll your own!")
   (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
 
   :config
-  (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+  (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt)
+        minibuffer-electric-default-mode t)
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)))
 
@@ -923,7 +931,7 @@ Of course if you do not like these bindings, just roll your own!")
   (select-frame (make-frame))
   (ksh))
 
-(defun my/kill-buffer ()
+(defun my/kill-current-buffer ()
   "Kill the current buffer without asking."
   (interactive)
   (kill-buffer (current-buffer)))
@@ -1024,13 +1032,15 @@ Of course if you do not like these bindings, just roll your own!")
                   "C-c r" #'ielm
                   "C-c D" #'crux-find-current-directory-dir-locals-file
                   "C-c l" #'dictionary-lookup-definition
+
                   "C-h RET" #'my/toggle-show-minor-modes
-                  "C-h K" #'describe-keymap
+                  "C-h a" #'describe-symbol
+                  "C-h c" #'describe-char
                   "C-h u" #'apropos-user-option
                   "C-h F" #'apropos-function
-                  "C-h V" #'apropos-variable
+                  "C-h K" #'describe-keymap
                   "C-h L" #'apropos-library
-                  "C-h c" #'describe-char
+                  "C-h V" #'apropos-variable
 
                   "M-g d" #'dired-jump
 
