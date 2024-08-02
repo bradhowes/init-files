@@ -79,6 +79,11 @@ Note that this is also true when running in a terminal window.")
   :options '(0 1)
   :group 'my/customizations)
 
+(defcustom my/next-window-wrap-around t
+  "Wrap around when moving to next window in `ace-window' list."
+  :type '(boolean)
+  :group 'my/customizations)
+
 (defun my/screen-layout ()
   "Identify current screen layout.
 Uses result from `display-pixel-width' to determine what monitors
@@ -432,7 +437,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          (magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-c f" . magit-file-dispatch)
          ("C-c g" . magit-dispatch)
-         ("C-x g" . magit-status)))
+         ("C-x g" . magit-status)
+         ("A-C-M-S-g" . magit-status)
+         ("C-M-g" . magit-status)))
 
 (use-package rg
   :ensure t)
@@ -995,11 +1002,14 @@ Of course if you do not like these bindings, just roll your own!")
 
 (defun my/do-next-window (wins)
   "Jump to next window in WINS after the current one."
-  (let* ((here (get-buffer-window))
-         (found (memq here wins))
-         (next (car-safe (cdr-safe found))))
-    (when next
-      (aw-switch-to-window next))))
+  (let* ((current-window (get-buffer-window))
+         (current-index (seq-position wins current-window #'eq))
+         (next-index (and current-index (1+ current-index)))
+         (final-index (if my/next-window-wrap-around
+                          (% next-index (length wins))
+                        (and (length> wins next-index) next-index))))
+    (when final-index
+      (aw-switch-to-window (nth final-index wins)))))
 
 (defun my/ace-window-next ()
   "Jump to next window according to `ace-window'."
@@ -1038,7 +1048,6 @@ Of course if you do not like these bindings, just roll your own!")
                   "C-x 0" #'delete-other-windows
                   "C-x O" #'other-frame
                   "C-x C-o" #'other-frame
-                  ;; "C-x k" #'bury-buffer
 
                   "C-x C-b" #'ibuffer
                   "C-x M-b" #'consult-project-buffer
@@ -1095,20 +1104,93 @@ Of course if you do not like these bindings, just roll your own!")
   (when (boundp symbol)
     (set symbol value)))
 
+(use-package term/xterm
+  :commands (xterm--init-modify-other-keys my/init-xterm)
+  :when my/is-terminal
+  :init
+  (defun my/init-xterm ()
+    ;; Courtesy https://emacs.stackexchange.com/a/13957, modified per
+    ;; https://gitlab.com/gnachman/iterm2/-/issues/8382#note_365264207
+    (defun my/character-apply-modifiers (c &rest modifiers)
+      "Apply modifiers to the character C.
+MODIFIERS must be a list of symbols amongst (meta control shift).
+Return an event vector."
+      (if (memq 'control modifiers) (setq c (if (and (<= ?a c) (<= c ?z))
+                                                (logand c ?\x1f)
+                                              (logior (ash 1 26) c))))
+      (if (memq 'meta modifiers) (setq c (logior (ash 1 27) c)))
+      (if (memq 'shift modifiers) (setq c (logior (ash 1 25) c)))
+      (vector c))
+    (when (and (boundp 'xterm-extra-capabilities) (boundp 'xterm-function-map))
+      (let ((c 32))
+        (while (<= c 126)
+          (mapc (lambda (x)
+	          (define-key xterm-function-map (format (car x) c)
+			      (apply 'my/character-apply-modifiers c (cdr x))))
+	        '(;; with ?.VT100.formatOtherKeys: 0
+	          ("\e\[27;3;%d~" meta)
+	          ("\e\[27;5;%d~" control)
+	          ("\e\[27;6;%d~" control shift)
+	          ("\e\[27;7;%d~" control meta)
+	          ("\e\[27;8;%d~" control meta shift)
+	          ;; with ?.VT100.formatOtherKeys: 1
+	          ("\e\[%d;3u" meta)
+	          ("\e\[%d;5u" control)
+	          ("\e\[%d;6u" control shift)
+	          ("\e\[%d;7u" control meta)
+	          ("\e\[%d;8u" control meta shift)))
+          (setq c (1+ c))))))
+  (add-hook 'after-init-hook #'my/init-xterm))
+
+    ;; ;; Modified from https://gist.github.com/gnachman/b4fb1e643e7e82a546bc9f86f30360e4
+    ;; (unless (display-graphic-p)
+    ;;   ;; Take advantage of iterm2's CSI u support (https://gitlab.com/gnachman/iterm2/-/issues/8382).
+    ;;   (xterm--init-modify-other-keys)
+    ;;   (when (and (boundp 'xterm-extra-capabilities) (boundp 'xterm-function-map))
+    ;;     ;; fix M-S-ret for org mode
+    ;;     (define-key xterm-function-map "\e\[13;4u" [(control meta shift ?\r)])
+    ;;     (define-key xterm-function-map "\e\[27;4;13~" [(control meta shift ?\r)])
+    ;;     (let ((c 32))
+    ;;       (while (<= c 126)
+    ;;         (mapc (lambda (x)
+    ;;                 ;; define-key can take a vector that wraps a list of
+    ;;                 ;; events, e.g. [(control shift ?a)] for C-S-a
+    ;;                 (define-key xterm-function-map (format (car x) c)
+    ;;                             (vector (append (cdr x) (cons c '())))))
+    ;;               '(;; with ?.VT100.formatOtherKeys: 0
+    ;;                 ("\e\[27;3;%d~" meta)
+    ;;                 ("\e\[27;4;%d~" meta shift)
+    ;;                 ("\e\[27;5;%d~" control)
+    ;;                 ("\e\[27;6;%d~" control shift)
+    ;;                 ("\e\[27;7;%d~" control meta)
+    ;;                 ("\e\[27;8;%d~" control meta shift)
+    ;;                 ;; with ?.VT100.formatOtherKeys: 1
+    ;;                 ("\e\[%d;3u" meta)
+    ;;                 ("\e\[%d;4u" meta shift)
+    ;;                 ("\e\[%d;5u" control)
+    ;;                 ("\e\[%d;6u" control shift)
+    ;;                 ("\e\[%d;7u" control meta)
+    ;;                 ("\e\[%d;8u" control meta shift)))
+    ;;         (setq c (1+ c)))))))
+
 (cond
- (my/is-macosx
+ (my/is-macosx                          ; macOS specific
   (eval-when-compile
     (require 'ls-lisp))
   (custom-set-variables
    '(ls-lisp-use-insert-directory-program nil))
-  (when (not my/is-terminal)
+  (cond
+   (my/is-terminal                      ; macOS terminal
+    ;;
+    )
+   (t                                   ; macOS windows
     (custom-set-variables
      '(frame-resize-pixelwise t)
      '(mac-command-modifier 'meta)
      '(mac-option-modifier 'alt)
      '(mac-right-command-modifier 'super)
-     '(mac-right-option-modifier 'hyper))))
- (my/is-x-windows
+     '(mac-right-option-modifier 'hyper)))))
+ (my/is-x-windows                       ; X Windows
   (when (not my/is-terminal)
     (my/set-bound-var 'x-alt-keysym 'alt)
     (my/set-bound-var 'x-meta-keysym 'meta)
