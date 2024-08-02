@@ -475,7 +475,7 @@ unless (package-installed-p 'vc-use-package)
   (denote-infer-keywords t)
   (denote-sort-keywords t)
   (denote-file-type 'markdown-brh)
-  :init
+  :config
   (setq denote-file-types (cons
                            '(markdown-brh
                              :extension ".md"
