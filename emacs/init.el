@@ -23,7 +23,6 @@
 
 (defconst my/venv (expand-file-name "~/venv")
   "The Python virtual environment to use for elpy.")
-
 (defconst my/venv-python (concat my/venv "/bin/python")
   "The path to the Python eexecutable to use for elpy.")
 (defconst my/is-macosx (eq system-type 'darwin)
@@ -36,13 +35,7 @@ Note that this is also true when running in a terminal window.")
 
 (setenv "WORKON_HOME" my/venv)
 
-(setq read-process-output-max (* 4 1024 1024)
-      process-adaptive-read-buffering nil
-      custom-file (locate-user-emacs-file "custom.el")
-      load-path (append (list (expand-file-name "~/.emacs.d/lisp")
-                              (expand-file-name "~/.emacs.d/lisp/consult-notes"))
-                        load-path)
-      frame-title-format (list  '(:eval (abbreviate-file-name default-directory))))
+(push (expand-file-name "~/.emacs.d/lisp") load-path)
 
 (defconst my/screen-laptop (intern "my/screen-laptop")
   "Symbol to indicate display is MacBook Pro 16\" laptop screen.")
@@ -84,10 +77,19 @@ Note that this is also true when running in a terminal window.")
   :type '(boolean)
   :group 'my/customizations)
 
+(defcustom my/hyper-key-prefix (if my/is-macosx "A-C-M-S" "C-M-S-s")
+  "Modifier collection to use a a `hyper' modifier."
+  :type '(string)
+  :group 'my/customizations)
+
+(defun my/hyper-key (key)
+  "Create a `hyper' key definition for KEY."
+  (concat my/hyper-key-prefix "-" key))
+
 (defun my/screen-layout ()
   "Identify current screen layout.
 Uses result from `display-pixel-width' to determine what monitors
-there are. Better would be to use `display-monitor-attributes-list'
+there are.  Better would be to use `display-monitor-attributes-list'
 like done in `my/frame-top'.
 
 Returns one of the follow symbols based on width:
@@ -236,9 +238,6 @@ It does not affect existing frames."
   ;; Same for PATH environment variable
   (setenv "PATH" (concat (mapconcat 'identity (append additional-paths (list (getenv "PATH"))) ":"))))
 
-;; (use-package ef-themes
-;;   :ensure t)
-
 ;; Configure `display-buffer-alist' to manage window placement
 
 (use-package window
@@ -309,32 +308,6 @@ list of symbols."
  "my-sh-mode" 'my/sh-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
 
-(use-package lisp-mode
-  :defer t
-  :hook ((lisp-mode . my/lisp-mode-hook)
-         (lisp-interaction-mode . my/lisp-mode-hook)
-         (lisp-data-mode . my/lisp-data-mode-hook)
-         (scheme-mode . my/lisp-mode-hook)
-         (emacs-lisp-mode . my/lisp-mode-hook)))
-
-(use-package cc-mode
-  :defer t
-  :init
-  (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
-  :hook ((c++-mode . my/c++-mode-hook)))
-
-(use-package sh-mode
-  :defer t
-  :hook ((sh-mode . my/sh-mode-hook)))
-
-(use-package shell-mode
-  :defer t
-  :hook ((shell-mode . my/shell-mode-hook)))
-
-(use-package makefile-mode
-  :defer t
-  :hook ((makefile-mode . my/makefile-mode-hook)))
-
 (defun my/emacs-keybind (keymap &rest definitions)
   "Expand key binding DEFINITIONS for the given KEYMAP.
 DEFINITIONS is a sequence of string and command pairs given as a sequence."
@@ -349,8 +322,39 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
       (seq-mapn
        (lambda (key command) (define-key keymap (kbd key) command))
        keys commands))))
+(
 
 ;;; PACKAGES
+
+unless (package-installed-p 'vc-use-package)
+  (package-vc-install "https://github.com/slotThe/vc-use-package"))
+(require 'vc-use-package)
+
+(use-package indent-bars
+  :vc (:fetcher github :repo "jdtsmith/indent-bars")
+  :hook (prog-mode . indent-bars-mode))
+
+(use-package lisp-mode
+  :hook ((lisp-mode . my/lisp-mode-hook)
+         (lisp-interaction-mode . my/lisp-mode-hook)
+         (lisp-data-mode . my/lisp-data-mode-hook)
+         (scheme-mode . my/lisp-mode-hook)
+         (emacs-lisp-mode . my/lisp-mode-hook)))
+
+(use-package cc-mode
+  :init (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
+  :hook ((c++-mode . my/c++-mode-hook)))
+
+(use-package sh-mode
+  :hook ((sh-mode . my/sh-mode-hook)
+         (sh-mode . indent-bars-mode)))
+
+(use-package shell-mode
+  :hook ((shell-mode . my/shell-mode-hook)))
+
+(use-package makefile-mode
+  :hook ((makefile-mode . my/makefile-mode-hook)
+         (makefile-mode . indent-bars-mode)))
 
 (when (display-graphic-p)
   (use-package all-the-icons
@@ -360,20 +364,15 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     :ensure t
     :commands (all-the-icons-completion-mode)
     :after (marginalia all-the-icons)
-    :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
-    :config (all-the-icons-completion-mode))
-
-  ;; (use-package nerd-icons
-  ;;   :ensure t)
+    :hook ((marginalia-mode . all-the-icons-completion-marginalia-setup)
+           (after-init . all-the-icons-completion-mode)))
 
   (use-package doom-modeline
     :ensure t
     :hook (after-init . doom-modeline-mode)))
 
-;; Clean up whitespace at end of lines but only for edited lines.
 (use-package ws-butler
   :ensure t
-  :defer nil
   :diminish " ~"
   :hook (prog-mode . ws-butler-mode))
 
@@ -388,7 +387,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package eldoc
   :ensure t
   :diminish (eldoc-mode . "")
-  :init (global-eldoc-mode 1))
+  :hook (after-init . global-eldoc-mode))
 
 (use-package eldoc-box
   :ensure t
@@ -397,8 +396,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :bind ("C-h ." . eldoc-box-help-at-point))
 
 (use-package dired
-  :defer t
-  :init
+  :config
   (require 'dired-aux)
   :bind (:map dired-mode-map
               ("C-s" . dired-isearch-filenames)
@@ -406,30 +404,25 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook (dired-mode . my/dired-mode-hook))
 
 (use-package savehist
-  :init
-  (savehist-mode t))
+  :hook (after-init . savehist-mode))
 
 (use-package ediff
-  :defer t
-  :config
-  (setq-default ediff-window-setup-function 'ediff-setup-windows-plain
-                ediff-split-window-function 'split-window-horizontally
-                ediff-merge-split-window-function 'split-window-horizontally))
+  :custom
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  (ediff-split-window-function 'split-window-horizontally)
+  (ediff-merge-split-window-function 'split-window-horizontally))
 
 (use-package diff-hl
   :ensure t
-  :defer t
   :commands (global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode diff-hl-flydiff-mode diff-hl-margin-mode)
   :init
-  (when my/is-terminal
-    (diff-hl-margin-mode t))
-  :hook ((after-init . (lambda ()
-                         (diff-hl-flydiff-mode t)
-                         (when my/is-terminal
-                           (diff-hl-margin-mode t))
-                         (global-diff-hl-mode t)
-                         (global-diff-hl-show-hunk-mouse-mode t)
-                         ))))
+  :hook (after-init . (lambda ()
+                        (diff-hl-flydiff-mode t)
+                        (when my/is-terminal
+                          (diff-hl-margin-mode t))
+                        (global-diff-hl-mode t)
+                        (global-diff-hl-show-hunk-mouse-mode t)
+                        )))
 
 (use-package magit
   :ensure t
@@ -438,15 +431,17 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :bind (("C-c f" . magit-file-dispatch)
          ("C-c g" . magit-dispatch)
          ("C-x g" . magit-status)
-         ("A-C-M-S-g" . magit-status)
-         ("C-M-g" . magit-status)))
+         ("C-M-g" . magit-status))
+  :init
+  (let ((prefix (my/hyper-key "g")))
+    (message "bind-key %s" prefix)
+    (bind-key prefix #'magit-status)))
 
 (use-package rg
   :ensure t)
 
 (use-package projectile
   :ensure t
-  :defer t
   :after (rg)
   :commands (projectile-mode projectile-project-name projectile-register-project-type)
   :bind-keymap (("C-x p" . projectile-command-map)
@@ -454,6 +449,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :bind (:map projectile-command-map
               ("s r" . rg-project))
   :hook (prog-mode . projectile-mode)
+  :init
+  (let ((prefix (my/hyper-key "p")))
+    (bind-key prefix #'(lambda nil
+                         (interactive)
+                         (use-package-autoload-keymap 'projectile-command-map 'projectile nil))))
   :config
   (setq projectile-mode-line-function (lambda () (format " [%s] " (projectile-project-name))))
   (projectile-register-project-type 'swift '("Package.swift")
@@ -467,15 +467,16 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package denote
   :ensure t
-  :defer t
   :commands (denote-dired-mode-in-directories)
   :hook (dired-mode . denote-dired-mode-in-directories)
   :bind (("C-c n n" . denote))
-  :config
-  (setq denote-directory (expand-file-name "~/Documents/notes/")
-        denote-infer-keywords t
-        denote-sort-keywords t
-        denote-file-types (cons
+  :custom
+  (denote-directory (expand-file-name "~/Documents/notes/"))
+  (denote-infer-keywords t)
+  (denote-sort-keywords t)
+  (denote-file-type 'markdown-brh)
+  :init
+  (setq denote-file-types (cons
                            '(markdown-brh
                              :extension ".md"
                              :date-function (lambda (date) (format-time-string "%F %T"))
@@ -488,8 +489,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                              :keywords-value-reverse-function denote-extract-keywords-from-front-matter
                              :link denote-md-link-format
                              :link-in-context-regexp denote-md-link-in-context-regexp)
-                           denote-file-types)
-        denote-file-type 'markdown-brh))
+                           denote-file-types)))
 
 (use-package ace-window
   :ensure t
@@ -501,7 +501,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :bind (("C-." . embark-act)
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
-  :config
+  :init
   (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                                        nil
                                        (window-parameters (mode-line-format . none)))))
@@ -510,8 +510,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :ensure t
   :after (projectile)
   :commands (consult--customize-put)    ; silence flymake warning
-  :bind (;; C-c bindings in `mode-specific-map`
-         ("C-c M-x" . consult-mode-command)
+  :bind (("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
          ;; ("C-h i" . consult-info)
          ("C-c k" . consult-kmacro)
@@ -567,7 +566,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
          :map projectile-command-map
          ("b" . consult-project-buffer))
-
   :hook (completion-list-mode . consult-preview-at-point-mode)
   :commands (consult-register-format consult-register-window consult-xref projectile-project-root)
   :init
@@ -575,9 +573,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
         register-preview-function #'consult-register-format
         xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
-
   (advice-add #'register-preview :override #'consult-register-window)
-
+  (let ((prefix (my/hyper-key "b")))
+    (bind-key prefix #'consult-buffer))
   :config
   (defun my/consult-line-symbol-at-point ()
     "Start `consult-line' with symbol at point."
@@ -589,11 +587,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                      consult--source-bookmark consult--source-file-register
                      consult--source-recent-file consult--source-project-recent-file
                      :preview-key '(:debounce 0.4 any))
-  (setq consult-narrow-key "<")
-  (setq consult-project-function (lambda (_) (projectile-project-root))))
+  :custom
+  (consult-narrow-key "<")
+  (consult-project-function (lambda (_) (projectile-project-root))))
 
 (use-package consult-notes
-  :defer f
+  :vc (:fetcher github :repo "mclear-tools/consult-notes")
   :after (consult denote)
   :defines (consult-notes-denote-files-function)
   :commands (consult-notes-denote-mode denote-directory-files)
@@ -614,13 +613,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :commands (marginalia-mode)
   :bind (:map minibuffer-local-map
               ("C-M-<tab>" . marginalia-cycle))
-  :init (marginalia-mode))
+  :hook (after-init . marginalia-mode))
 
 (use-package vertico
   :ensure t
   :commands (vertico-mode)
-  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
-  :init (vertico-mode t))
+  :hook ((rfn-eshadow-update-overlay . vertico-directory-tidy)
+         (after-init . vertico-mode)))
 
 (use-package mode-line-bell
   :ensure t)
@@ -672,7 +671,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package swift-mode
   :ensure t
-  :defer t
   :custom ((swift-mode:basic-offset 2))
   :hook (swift-mode . (lambda () (set (make-local-variable 'compile-command) "swift build"))))
 
@@ -683,7 +681,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package flymake
   :ensure t
-  :defer t
   :config (setq elisp-flymake-byte-compile-load-path load-path
                 flymake-mode-line-title "FM")
   :hook ((emacs-lisp-mode . flymake-mode)
@@ -706,21 +703,18 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
            (corfu-auto-prefix 3)
            (corfu-popupinfo-mode t)
            (corfu-preselect 'directory))
-  :config
+  :custom
   (global-corfu-mode 1)
   (corfu-history-mode 1))
 
 (use-package corfu-terminal
   :when my/is-terminal
   :ensure t
-  :defer t
   :commands (corfu-terminal-mode)
-  :config
-  (corfu-terminal-mode +1))
+  :hook (after-init . corfu-terminal-mode))
 
 (use-package markdown-mode
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package winner
   :bind (("C-<left>" . winner-undo)
@@ -729,17 +723,16 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package cmake-mode
   :ensure t
-  :defer t
   :hook ((cmake-mode . my/cmake-mode-hook)))
 
 (use-package server
   :commands (server-running-p)
-  :hook (emacs-startup . (lambda () (unless (server-running-p) (server-start)))))
+  :hook (after-init . (lambda () (unless (server-running-p) (server-start)))))
 
 (use-package which-key
   :ensure t
   :commands (which-key-mode)
-  :init (which-key-mode t))
+  :hook (after-init . which-key-mode))
 
 (use-package expand-region
   :ensure t
@@ -747,17 +740,16 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package hl-line
   :commands (global-hl-line-mode)
-  :hook (emacs-startup . global-hl-line-mode))
+  :hook (after-init . global-hl-line-mode))
 
 (use-package recentf
-  :init (recentf-mode t))
+  :hook (after-init . recentf-mode))
 
 (use-package ispell
-  :config (setq-default ispell-local-dictionary "english"))
+  :custom (ispell-local-dictionary "english"))
 
 (use-package flyspell
-  :defer t
-  :config (setq flyspell-mode-line-string "s")
+  :custom (flyspell-mode-line-string "s")
   :hook (prog-mode . flyspell-prog-mode))
 
 (use-package ibuffer
@@ -768,8 +760,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (if my/is-macosx
     (use-package windmove
-      :config
-      (setq windmove-wrap-around t)
+      :custom (windmove-wrap-around t)
       :bind (("A-M-<left>" . windmove-left)
              ("A-M-<right>" . windmove-right)
              ("A-M-." . windmove-up)
@@ -777,8 +768,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
              ("A-M-," . windmove-down)
              ("A-M-<down>" . windmove-down)))
   (use-package windmove
-    :config
-    (setq windmove-wrap-around t)
+    :custom (windmove-wrap-around t)
     :bind (("M-s-<left>" . windmove-left)
            ("M-s-<right>" . windmove-right)
            ("M-s-." . windmove-up)
@@ -798,24 +788,23 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :bind (("C-'" . popper-toggle)
          ("M-'" . popper-cycle)
          ("C-M-'" . popper-toggle-type))
-  :init
-  (setq popper-display-control 'user    ; Must use to prevent issues with Emacs byte-compile
-        popper-reference-buffers
-        '("\\*Messages\\*"
-          "Output\\*$"
-          "\\*Async Shell Command\\*"
-          "\\*Compile-Log\\*"
-          "\\*Man .*\\*"
-          help-mode
-          compilation-mode))
-  (popper-mode +1)
-  (popper-echo-mode +1))
+  :custom
+  (popper-display-control 'user)        ; Must use to prevent issues with Emacs byte-compile
+  (popper-reference-buffers '("\\*Messages\\*"
+                              "Output\\*$"
+                              "\\*Async Shell Command\\*"
+                              "\\*Compile-Log\\*"
+                              "\\*Man .*\\*"
+                              help-mode
+                              compilation-mode))
+  :hook ((after-init . popper-mode)
+         (after-init . popper-echo-mode)))
 
 (use-package char-menu
   :ensure t
   :defines (char-menu)
   :bind (("C-z" . char-menu))
-  :init
+  :config
   (setq char-menu
         '("—" "‘’" "“”" "…" "«»" "–"
           ("Typography" "•" "©" "†" "‡" "°" "·" "§" "№" "★")
@@ -825,8 +814,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package osx-dictionary
   :when my/is-macosx
-  :ensure t
-  :defer t
   :bind (("C-c l" . osx-dictionary-search-pointer)))
 
 (defvar ffap-bindings
@@ -845,41 +832,40 @@ A reasonable ffap installation needs just this one line:
 Of course if you do not like these bindings, just roll your own!")
 
 (use-package time
-  :config
-  (setq world-clock-time-format "%d %b %R %Z"
-        zoneinfo-style-world-list '(("America/Montreal" "Montreal")
-                                    ("America/New_York" "New York")
-                                    ("Europe/London" "London")
-                                    ("Europe/Paris" "Paris")
-                                    ("Asia/Tokyo" "Tokyo")
-                                    ("Asia/Hong_Kong" "Hong Kong")
-                                    ("Asia/Bangkok" "Bangkok")
-                                    ("Asia/Singapore" "Singapore"))))
+  :custom
+  (world-clock-time-format "%d %b %R %Z")
+  (zoneinfo-style-world-list '(("America/Montreal" "Montreal")
+                               ("America/New_York" "New York")
+                               ("Europe/London" "London")
+                               ("Europe/Paris" "Paris")
+                               ("Asia/Tokyo" "Tokyo")
+                               ("Asia/Hong_Kong" "Hong Kong")
+                               ("Asia/Bangkok" "Bangkok")
+                               ("Asia/Singapore" "Singapore"))))
 
 (use-package emacs
   :commands (my/crm-indicator)
-  :init
-  (ffap-bindings)
-  (setq-default abbrev-mode t)
-
+  :custom
   (global-prettify-symbols-mode t)
-  ;; Forgot why this was done -- most likely for macOS
-  ;; (put 'temporary-file-directory 'standard-value '((file-name-as-directory "/tmp")))
+  (minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+  (minibuffer-electric-default-mode t)
+  :config
+  (setq read-process-output-max (* 4 1024 1024)
+        process-adaptive-read-buffering nil
+        custom-file (locate-user-emacs-file "custom.el")
+        frame-title-format (list  '(:eval (abbreviate-file-name default-directory))))
+  (ffap-bindings)
   (put 'narrow-to-region 'disabled nil)
   (fset 'yes-or-no-p 'y-or-n-p)
-
   (defun my/crm-indicator(args)
     (cons (format "[CRM%s] %s"
                   (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
                   (car args))
           (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
-
-  :config
-  (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt)
-        minibuffer-electric-default-mode t)
   :hook ((minibuffer-setup . cursor-intangible-mode)
-         (before-save . copyright-update)))
+         (before-save . copyright-update)
+         (after-init . abbrev-mode)))
 
 ;;; Custom functions
 
@@ -1000,6 +986,13 @@ Of course if you do not like these bindings, just roll your own!")
   (interactive)
   (ielm))
 
+(defun my/repl-other-window ()
+  "Start a new repl in another window."
+  (interactive)
+  (let ((tmp (get-buffer-create "*ielm*")))
+    (switch-to-buffer-other-window tmp)
+    (ielm)))
+
 (defun my/do-next-window (wins)
   "Jump to next window in WINS after the current one."
   (let* ((current-window (get-buffer-window))
@@ -1058,6 +1051,7 @@ Of course if you do not like these bindings, just roll your own!")
 
                   "C-x 4 c" #'my/customize-other-window
                   "C-x 4 k" #'my/shell-other-window
+                  "C-x 4 r" #'my/repl-other-window
 
                   "C-x 5 c" #'my/customize-other-frame
                   "C-x 5 i" #'my/info-other-frame
