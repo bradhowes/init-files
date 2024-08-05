@@ -25,7 +25,7 @@
 (defconst my/venv (expand-file-name "~/venv")
   "The Python virtual environment to use for elpy.")
 (defconst my/venv-python (concat my/venv "/bin/python")
-  "The path to the Python eexecutable to use for elpy.")
+  "The path to the Python executable to use for elpy.")
 (defconst my/is-macosx (eq system-type 'darwin)
   "T if running on macOS.
 Note that this is also true when running in a terminal window.")
