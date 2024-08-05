@@ -364,12 +364,10 @@ unless (package-installed-p 'vc-use-package)
     :ensure t
     :commands (all-the-icons-completion-mode)
     :after (marginalia all-the-icons)
-    :hook ((marginalia-mode . all-the-icons-completion-marginalia-setup)
-           (after-init . all-the-icons-completion-mode)))
+    :hook ((marginalia-mode . all-the-icons-completion-marginalia-setup)))
 
   (use-package doom-modeline
-    :ensure t
-    :hook (after-init . doom-modeline-mode)))
+    :ensure t))
 
 (use-package ws-butler
   :ensure t
@@ -386,14 +384,13 @@ unless (package-installed-p 'vc-use-package)
 
 (use-package eldoc
   :ensure t
-  :diminish (eldoc-mode . "")
-  :hook (after-init . global-eldoc-mode))
+  :diminish (eldoc-mode . ""))
 
-(use-package eldoc-box
-  :ensure t
-  :diminish (eldoc-box-hover-mode . "")
-  :commands (eldoc-box-hover-mode)
-  :bind ("C-h ." . eldoc-box-help-at-point))
+;; (use-package eldoc-box
+;;   :ensure t
+;;   :diminish (eldoc-box-hover-mode . "")
+;;   :commands (eldoc-box-hover-mode)
+;;   :bind ("C-h ." . eldoc-box-help-at-point))
 
 (use-package dired
   :config
@@ -403,25 +400,13 @@ unless (package-installed-p 'vc-use-package)
               ("C-M-s" . dired-isearch-filenames-regexp))
   :hook (dired-mode . my/dired-mode-hook))
 
-(use-package savehist
-  :hook (after-init . savehist-mode))
-
-(use-package ediff
-  :custom
-  (ediff-window-setup-function 'ediff-setup-windows-plain)
-  (ediff-split-window-function 'split-window-horizontally)
-  (ediff-merge-split-window-function 'split-window-horizontally))
-
 (use-package diff-hl
   :ensure t
   :commands (global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode diff-hl-flydiff-mode diff-hl-margin-mode)
   :init
   :hook (after-init . (lambda ()
-                        (diff-hl-flydiff-mode t)
                         (when my/is-terminal
                           (diff-hl-margin-mode t))
-                        (global-diff-hl-mode t)
-                        (global-diff-hl-show-hunk-mouse-mode t)
                         )))
 
 (use-package magit
@@ -455,7 +440,6 @@ unless (package-installed-p 'vc-use-package)
                          (interactive)
                          (use-package-autoload-keymap 'projectile-command-map 'projectile nil))))
   :config
-  (setq projectile-mode-line-function (lambda () (format " [%s] " (projectile-project-name))))
   (projectile-register-project-type 'swift '("Package.swift")
                                     :project-file "Package.swift"
                                     :src-dir "Sources"
@@ -493,7 +477,7 @@ unless (package-installed-p 'vc-use-package)
 
 (use-package ace-window
   :ensure t
-  :commands (aw-window-list aw-switch-to-window)
+  :commands (aw-window-list aw-switch-to-window) ; Used in custom functions below
   :bind (("M-o" . ace-window)))
 
 (use-package embark
@@ -569,10 +553,7 @@ unless (package-installed-p 'vc-use-package)
   :hook (completion-list-mode . consult-preview-at-point-mode)
   :commands (consult-register-format consult-register-window consult-xref projectile-project-root)
   :init
-  (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format
-        xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
+  (setq register-preview-function #'consult-register-format)
   (advice-add #'register-preview :override #'consult-register-window)
   (let ((prefix (my/hyper-key "b")))
     (bind-key prefix #'consult-buffer))
@@ -586,10 +567,7 @@ unless (package-installed-p 'vc-use-package)
                      consult-bookmark consult-recent-file consult-xref
                      consult--source-bookmark consult--source-file-register
                      consult--source-recent-file consult--source-project-recent-file
-                     :preview-key '(:debounce 0.4 any))
-  :custom
-  (consult-narrow-key "<")
-  (consult-project-function (lambda (_) (projectile-project-root))))
+                     :preview-key '(:debounce 0.4 any)))
 
 (use-package consult-notes
   :vc (:fetcher github :repo "mclear-tools/consult-notes")
@@ -598,9 +576,6 @@ unless (package-installed-p 'vc-use-package)
   :commands (consult-notes-denote-mode denote-directory-files)
   :config
   (require 'consult-notes-denote)
-  (consult-notes-denote-mode)
-  (setq consult-notes-denote-files-function #'denote-directory-files
-        consult-notes-use-rg t)
   :bind (("C-c n b" . consult-notes)))
 
 (use-package embark-consult
@@ -612,14 +587,12 @@ unless (package-installed-p 'vc-use-package)
   :ensure t
   :commands (marginalia-mode)
   :bind (:map minibuffer-local-map
-              ("C-M-<tab>" . marginalia-cycle))
-  :hook (after-init . marginalia-mode))
+              ("C-M-<tab>" . marginalia-cycle)))
 
 (use-package vertico
   :ensure t
   :commands (vertico-mode)
-  :hook ((rfn-eshadow-update-overlay . vertico-directory-tidy)
-         (after-init . vertico-mode)))
+  :hook ((rfn-eshadow-update-overlay . vertico-directory-tidy)))
 
 (use-package mode-line-bell
   :ensure t)
@@ -632,11 +605,6 @@ unless (package-installed-p 'vc-use-package)
          (python-mode . eglot-ensure))
   :config
   (add-to-list 'eglot-server-programs '(swift-mode . ("xcrun" "sourcekit-lsp")))
-  (setq eglot-ignored-server-capabilities '(:documentHighlightProvider))
-  :custom
-  (eglot-autoshutdown t)
-  (eglot-connect-timeout nil)
-  (eglot-send-changes-idle-time)
   :bind (:map eglot-mode-map
               ("C-c c a" . eglot-code-actions)
               ("C-c c e" . eglot-code-action-extract)
@@ -663,11 +631,7 @@ unless (package-installed-p 'vc-use-package)
          ("C-^" . crux-top-join-line)))
 
 (use-package orderless
-  :ensure t
-  :custom
-  (completion-styles '(orderless partial-completion basic))
-  (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+  :ensure t)
 
 (use-package swift-mode
   :ensure t
@@ -695,17 +659,8 @@ unless (package-installed-p 'vc-use-package)
 
 (use-package corfu
   :ensure t
-  :commands (global-corfu-mode corfu-history-mode)
   :bind (:map corfu-map
-              ("<return>" . corfu-complete))
-  :custom ((corfu-cycle t)
-           (corfu-auto t)
-           (corfu-auto-prefix 3)
-           (corfu-popupinfo-mode t)
-           (corfu-preselect 'directory))
-  :custom
-  (global-corfu-mode 1)
-  (corfu-history-mode 1))
+              ("<return>" . corfu-complete)))
 
 (use-package corfu-terminal
   :when my/is-terminal
@@ -718,8 +673,7 @@ unless (package-installed-p 'vc-use-package)
 
 (use-package winner
   :bind (("C-<left>" . winner-undo)
-         ("C-<right>" . winner-redo))
-  :hook (after-init . winner-mode))
+         ("C-<right>" . winner-redo)))
 
 (use-package cmake-mode
   :ensure t
@@ -730,26 +684,16 @@ unless (package-installed-p 'vc-use-package)
   :hook (after-init . (lambda () (unless (server-running-p) (server-start)))))
 
 (use-package which-key
-  :ensure t
-  :commands (which-key-mode)
-  :hook (after-init . which-key-mode))
+  :ensure t)
 
 (use-package expand-region
   :ensure t
   :bind ("C-\\" . er/expand-region))
 
 (use-package hl-line
-  :commands (global-hl-line-mode)
-  :hook (after-init . global-hl-line-mode))
-
-(use-package recentf
-  :hook (after-init . recentf-mode))
-
-(use-package ispell
-  :custom (ispell-local-dictionary "english"))
+  :ensure t)
 
 (use-package flyspell
-  :custom (flyspell-mode-line-string "s")
   :hook (prog-mode . flyspell-prog-mode))
 
 (use-package ibuffer
@@ -758,24 +702,6 @@ unless (package-installed-p 'vc-use-package)
   (my/emacs-keybind ibuffer-mode-map
 		    "M-o" nil))
 
-(if my/is-macosx
-    (use-package windmove
-      :custom (windmove-wrap-around t)
-      :bind (("A-M-<left>" . windmove-left)
-             ("A-M-<right>" . windmove-right)
-             ("A-M-." . windmove-up)
-             ("A-M-<up>" . windmove-up)
-             ("A-M-," . windmove-down)
-             ("A-M-<down>" . windmove-down)))
-  (use-package windmove
-    :custom (windmove-wrap-around t)
-    :bind (("M-s-<left>" . windmove-left)
-           ("M-s-<right>" . windmove-right)
-           ("M-s-." . windmove-up)
-           ("M-s-<up>" . windmove-up)
-           ("M-s-," . windmove-down)
-           ("M-s-<down>" . windmove-down))))
-
 (use-package multiple-cursors
   :bind (("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
@@ -783,22 +709,9 @@ unless (package-installed-p 'vc-use-package)
 
 (use-package popper
   :ensure t
-  :defines (popper-reference-buffers)
-  :commands (popper-mode popper-echo-mode)
   :bind (("C-'" . popper-toggle)
          ("M-'" . popper-cycle)
-         ("C-M-'" . popper-toggle-type))
-  :custom
-  (popper-display-control 'user)        ; Must use to prevent issues with Emacs byte-compile
-  (popper-reference-buffers '("\\*Messages\\*"
-                              "Output\\*$"
-                              "\\*Async Shell Command\\*"
-                              "\\*Compile-Log\\*"
-                              "\\*Man .*\\*"
-                              help-mode
-                              compilation-mode))
-  :hook ((after-init . popper-mode)
-         (after-init . popper-echo-mode)))
+         ("C-M-'" . popper-toggle-type)))
 
 (use-package char-menu
   :ensure t
@@ -831,24 +744,8 @@ A reasonable ffap installation needs just this one line:
   (ffap-bindings)
 Of course if you do not like these bindings, just roll your own!")
 
-(use-package time
-  :custom
-  (world-clock-time-format "%d %b %R %Z")
-  (zoneinfo-style-world-list '(("America/Montreal" "Montreal")
-                               ("America/New_York" "New York")
-                               ("Europe/London" "London")
-                               ("Europe/Paris" "Paris")
-                               ("Asia/Tokyo" "Tokyo")
-                               ("Asia/Hong_Kong" "Hong Kong")
-                               ("Asia/Bangkok" "Bangkok")
-                               ("Asia/Singapore" "Singapore"))))
-
 (use-package emacs
   :commands (my/crm-indicator)
-  :custom
-  (global-prettify-symbols-mode t)
-  (minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
-  (minibuffer-electric-default-mode t)
   :config
   (setq read-process-output-max (* 4 1024 1024)
         process-adaptive-read-buffering nil
