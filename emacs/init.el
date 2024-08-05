@@ -4,6 +4,7 @@
 ;;; Code:
 
 (require 'seq)
+(require 'subr-x)
 
 (condition-case nil
     (require 'use-package)
@@ -236,7 +237,7 @@ It does not affect existing frames."
   ;; Set exec-path to contain the above paths
   (setq exec-path (append additional-paths exec-path))
   ;; Same for PATH environment variable
-  (setenv "PATH" (concat (mapconcat 'identity (append additional-paths (list (getenv "PATH"))) ":"))))
+  (setenv "PATH" (concat (string-join additional-paths ":") ":" (getenv "PATH"))))
 
 ;; Configure `display-buffer-alist' to manage window placement
 
@@ -456,9 +457,6 @@ unless (package-installed-p 'vc-use-package)
   :bind (("C-c n n" . denote))
   :custom
   (denote-directory (expand-file-name "~/Documents/notes/"))
-  (denote-infer-keywords t)
-  (denote-sort-keywords t)
-  (denote-file-type 'markdown-brh)
   :config
   (setq denote-file-types (cons
                            '(markdown-brh

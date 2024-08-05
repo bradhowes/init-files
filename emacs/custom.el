@@ -46,7 +46,6 @@
    '("69f7e8101867cfac410e88140f8c51b4433b93680901bb0b52014144366a08c8" "183dfa34e360f5bc2ee4a6b3f4236e6664f4cfce40de1d43c984e0e8fc5b51ae" default))
  '(delete-by-moving-to-trash t)
  '(delete-old-versions t)
- '(denote-directory "/Users/howes/Documents/notes/")
  '(denote-file-type 'markdown-brh)
  '(denote-infer-keywords t)
  '(denote-rename-buffer-mode t)
