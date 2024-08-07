@@ -135,7 +135,7 @@ Returns one of the follow symbols based on width:
   "Width in pixels of a normal frame shown on LAYOUT.
 These values are hard-coded based on current settings.
 Probably a better way to figure this out."
-  (if (my/is-4k layout) (if my/is-macosx 1338 1338) 944))
+  (if (my/is-4k layout) (if my/is-macosx 1354 1338) 944))
 
 (defun my/frame-initial-left (layout)
   "Pixels to use for the `left' of a frame on LAYOUT.
@@ -309,7 +309,7 @@ list of symbols."
  "my-sh-mode" 'my/sh-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
 
-(defun my/emacs-keybind (keymap &rest definitions)
+(defun my/emacs-key-bind (keymap &rest definitions)
   "Expand key binding DEFINITIONS for the given KEYMAP.
 DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (unless (zerop (% (length definitions) 2))
@@ -323,17 +323,87 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
       (seq-mapn
        (lambda (key command) (define-key keymap (kbd key) command))
        keys commands))))
-(
+
+(defun my/emacs-chord-bind (&rest definitions)
+  "Expand key binding DEFINITIONS in the global keymap.
+DEFINITIONS is a sequence of string and command pairs given as a sequence."
+  (unless (zerop (% (length definitions) 2))
+    (error "Uneven number of chord+command pairs"))
+  ;; Partition `definitions' into two groups, one with chord definitions and another with functions and/or nil values
+  (let* ((groups (seq-group-by #'stringp definitions))
+         (chords (seq-drop (elt groups 0) 1))
+         (commands (seq-drop (elt groups 1) 1)))
+    (seq-mapn
+     (lambda (chord command) (key-chord-define-global chord command))
+     chords commands)))
 
 ;;; PACKAGES
 
-unless (package-installed-p 'vc-use-package)
+(unless (package-installed-p 'vc-use-package)
   (package-vc-install "https://github.com/slotThe/vc-use-package"))
 (require 'vc-use-package)
+
+(use-package impatient-mode
+  :vc (:fetcher github :repo "skeeto/impatient-mode")
+  :commands (imp-set-user-filter impatient-mode)
+  :defines (imp-user-filter)
+  :config
+  (setq-default imp-user-filter #'my/markdown-to-html))
+
+(defun my/point-min-after-front-matter ()
+  "Skip any front matter in current buffer and return POINT.
+Front matter is defined as a set of lines in the buffer
+that start and end with lines containing only `---'."
+  (goto-char (point-min))
+  (when (looking-at "^---$")
+    (forward-line 1)
+    (while (not (looking-at "^---$"))
+      (forward-line 1))
+    (forward-line 1))
+  (point))
+
+(defun my/markdown-to-html (buffer)
+  "Generate HTML from Markdown content in BUFFER.
+Will strip away any `denote' front matter that
+starts with `---' alone on the first line of the buffer and
+ends with the same `---' on its own line."
+  (princ (with-current-buffer buffer
+           (format "<!DOCTYPE html>
+<html>
+ <title>Impatient Markdown</title>
+ <xmp theme=\"united\" style=\"display:none;\">
+ %s
+ </xmp>
+ <script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\">
+ </script>
+</html>" (buffer-substring-no-properties (save-excursion
+                                           (my/point-min-after-front-matter))
+                                         (point-max))))
+         (current-buffer)))
+
+(defun my/markdown-mode ()
+  "Customization hook for `markdown-mode'."
+  (impatient-mode)
+  (imp-set-user-filter #'my/markdown-to-html))
 
 (use-package indent-bars
   :vc (:fetcher github :repo "jdtsmith/indent-bars")
   :hook (prog-mode . indent-bars-mode))
+
+(use-package key-chord
+  :commands (key-chord-define-global)
+  :ensure t
+  :config
+  (my/emacs-chord-bind "qq" #'magit-status
+                       "jj" #'consult-buffer
+                       "jk" #'consult-project-buffer
+                       "vv" #'diff-hl-show-hunk
+                       "fg" #'my/ace-window-next
+                       "ft" #'my/ace-window-previous
+                       "kk" #'my/kill-current-buffer))
+
+(use-package use-package-chords
+  :ensure t)
 
 (use-package lisp-mode
   :hook ((lisp-mode . my/lisp-mode-hook)
@@ -403,7 +473,7 @@ unless (package-installed-p 'vc-use-package)
 
 (use-package diff-hl
   :ensure t
-  :commands (global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode diff-hl-flydiff-mode diff-hl-margin-mode)
+  :commands (diff-hl-show-hunk diff-hl-margin-mode)
   :init
   :hook (after-init . (lambda ()
                         (when my/is-terminal
@@ -475,7 +545,7 @@ unless (package-installed-p 'vc-use-package)
 
 (use-package ace-window
   :ensure t
-  :commands (aw-window-list aw-switch-to-window) ; Used in custom functions below
+  :commands (aw-window-list aw-switch-to-window aw-select) ; Used in custom functions below
   :bind (("M-o" . ace-window)))
 
 (use-package embark
@@ -620,7 +690,7 @@ unless (package-installed-p 'vc-use-package)
 (use-package crux
   :ensure t
   :bind (("C-a" . crux-move-beginning-of-line)
-         ("C-c d" . crux-duplicate-line-or-region)
+         ("C-c d" . crux-duplicate-current-line-or-region)
          ("C-x 4 t" . crux-transpose-windows)
          ("C-k" . crux-smart-kill-line)
          ("C-c i" . crux-indent-defun)
@@ -667,7 +737,9 @@ unless (package-installed-p 'vc-use-package)
   :hook (after-init . corfu-terminal-mode))
 
 (use-package markdown-mode
-  :ensure t)
+  :ensure t
+  :after (impatient-mode)
+  :hook (markdown-mode . my/markdown-mode))
 
 (use-package winner
   :bind (("C-<left>" . winner-undo)
@@ -697,8 +769,8 @@ unless (package-installed-p 'vc-use-package)
 (use-package ibuffer
   :config
   ;; Unbind the ibuffer use of "M-o"
-  (my/emacs-keybind ibuffer-mode-map
-		    "M-o" nil))
+  (my/emacs-key-bind ibuffer-mode-map
+		     "M-o" nil))
 
 (use-package multiple-cursors
   :bind (("C->" . mc/mark-next-like-this)
@@ -909,81 +981,101 @@ Of course if you do not like these bindings, just roll your own!")
   (interactive)
   (my/do-next-window (reverse (aw-window-list))))
 
+(defun my/ace-window-prefix ()
+  "Use `ace-window' to display the buffer of the next command.
+The next buffer is the buffer displayed by the next command invoked
+immediately after this command (ignoring reading from the minibuffer).
+Creates a new window before displaying the buffer.
+When `switch-to-buffer-obey-display-actions' is non-nil,
+`switch-to-buffer' commands are also supported."
+  (interactive)
+  (display-buffer-override-next-command
+   (lambda (_ _)
+     (let (window type)
+       (setq
+        window (aw-select (propertize " ACE" 'face 'mode-line-highlight))
+        type 'reuse)
+       (cons window type)))
+   nil "[ace-window]")
+  (message "Use `ace-window' to display next command buffer..."))
+
+(keymap-global-set "C-x 4 o" #'my/ace-window-prefix)
+
 (defun crux-find-current-directory-dir-locals-file ()
   "Edit the current directory's `.dir-locals.el' file in another window."
   (interactive)
   (find-file-other-window
    (expand-file-name ".dir-locals.el")))
 
-(my/emacs-keybind global-map
-                  "C-c r" #'ielm
-                  "C-c D" #'crux-find-current-directory-dir-locals-file
+(my/emacs-key-bind global-map
+                   "C-c r" #'ielm
+                   "C-c D" #'crux-find-current-directory-dir-locals-file
 
-                  "C-h RET" #'my/toggle-show-minor-modes
-                  "C-h a" #'describe-symbol
-                  "C-h c" #'describe-char
-                  "C-h u" #'apropos-user-option
-                  "C-h F" #'apropos-function
-                  "C-h K" #'describe-keymap
-                  "C-h L" #'apropos-library
-                  "C-h M" #'consult-man
-                  "C-h V" #'apropos-variable
+                   "C-h RET" #'my/toggle-show-minor-modes
+                   "C-h a" #'describe-symbol
+                   "C-h c" #'describe-char
+                   "C-h u" #'apropos-user-option
+                   "C-h F" #'apropos-function
+                   "C-h K" #'describe-keymap
+                   "C-h L" #'apropos-library
+                   "C-h M" #'consult-man
+                   "C-h V" #'apropos-variable
 
-                  "M-g d" #'dired-jump
+                   "M-g d" #'dired-jump
 
-                  "C-o" #'other-window
+                   "C-o" #'other-window
 
-                  "C-x 0" #'delete-other-windows
-                  "C-x O" #'other-frame
-                  "C-x C-o" #'other-frame
+                   "C-x 0" #'delete-other-windows
+                   "C-x O" #'other-frame
+                   "C-x C-o" #'other-frame
 
-                  "C-x C-b" #'ibuffer
-                  "C-x M-b" #'consult-project-buffer
+                   "C-x C-b" #'ibuffer
+                   "C-x M-b" #'consult-project-buffer
 
-                  "M-<f1>" #'my/reset-frame-left
-                  "M-<f2>" #'my/reset-frame-right
-                  "M-<f3>" #'my/reset-frame-right-display
+                   "M-<f1>" #'my/reset-frame-left
+                   "M-<f2>" #'my/reset-frame-right
+                   "M-<f3>" #'my/reset-frame-right-display
 
-                  "C-x 4 c" #'my/customize-other-window
-                  "C-x 4 k" #'my/shell-other-window
-                  "C-x 4 r" #'my/repl-other-window
+                   "C-x 4 c" #'my/customize-other-window
+                   "C-x 4 k" #'my/shell-other-window
+                   "C-x 4 r" #'my/repl-other-window
 
-                  "C-x 5 c" #'my/customize-other-frame
-                  "C-x 5 i" #'my/info-other-frame
-                  "C-x 5 k" #'my/shell-other-frame
+                   "C-x 5 c" #'my/customize-other-frame
+                   "C-x 5 i" #'my/info-other-frame
+                   "C-x 5 k" #'my/shell-other-frame
 
-                  "C-c C-c" #'my/copy-file-name-to-clipboard
-                  "C-c C-k" #'my/kill-current-buffer
+                   "C-c C-c" #'my/copy-file-name-to-clipboard
+                   "C-c C-k" #'my/kill-current-buffer
 
-                  "<f3>" #'eval-last-sexp
+                   "<f3>" #'eval-last-sexp
 
-                  "C-M-\\" #'my/indent-buffer
+                   "C-M-\\" #'my/indent-buffer
 
-                  "C-x m" #'rg-project
+                   "C-x m" #'rg-project
 
-                  "<home>" #'beginning-of-buffer
-                  "<end>" #'end-of-buffer
-                  "<delete>" #'delete-char
-                  "S-<f12>" #'package-list-packages
+                   "<home>" #'beginning-of-buffer
+                   "<end>" #'end-of-buffer
+                   "<delete>" #'delete-char
+                   "S-<f12>" #'package-list-packages
 
-                  "M-z" #'zap-up-to-char
-                  "M-[" #'previous-buffer
-                  "M-]" #'next-buffer
+                   "M-z" #'zap-up-to-char
+                   "M-[" #'previous-buffer
+                   "M-]" #'next-buffer
 
-                  ;; "%" #'my/matching-paren
+                   ;; "%" #'my/matching-paren
 
-                  "C-S-p" #'my/ace-window-previous
-                  "C-S-n" #'my/ace-window-next
+                   "C-S-p" #'my/ace-window-previous
+                   "C-S-n" #'my/ace-window-next
 
-                  ;; Unmap the following
-                  "<insert>" #'ignore   ; disable key for toggling overwrite mode
-                  "C-x C-z" #'ignore    ; suspend-frame
-                  "C-x h" #'ignore      ; mark-whole-buffer
-                  "C-h h" #'ignore      ; show 'Hello' in various fonts
+                   ;; Unmap the following
+                   "<insert>" #'ignore   ; disable key for toggling overwrite mode
+                   "C-x C-z" #'ignore    ; suspend-frame
+                   "C-x h" #'ignore      ; mark-whole-buffer
+                   "C-h h" #'ignore      ; show 'Hello' in various fonts
 
-                  ;; Disable font size changes via trackpad
-                  "C-<wheel-up>" #'ignore
-                  "C-<wheel-down>" #'ignore)
+                   ;; Disable font size changes via trackpad
+                   "C-<wheel-up>" #'ignore
+                   "C-<wheel-down>" #'ignore)
 
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))
