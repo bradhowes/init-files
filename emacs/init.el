@@ -310,31 +310,34 @@ list of symbols."
  "my-shell-mode" 'my/shell-mode-hook)
 
 (defun my/emacs-key-bind (keymap &rest definitions)
-  "Expand key binding DEFINITIONS for the given KEYMAP.
+  "Apply key binding DEFINITIONS in the given KEYMAP.
 DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (unless (zerop (% (length definitions) 2))
     (error "Uneven number of key+command pairs"))
+  (unless (keymapp keymap)
+    (error "Expected a `keymap' as first argument"))
   ;; Partition `definitions' into two groups, one with key definitions and another with functions and/or nil values
   (let* ((groups (seq-group-by #'stringp definitions))
          (keys (seq-drop (elt groups 0) 1))
          (commands (seq-drop (elt groups 1) 1)))
     ;; Only execute if given a valid keymap
-    (when-let ((keymapp keymap))
-      (seq-mapn
-       (lambda (key command) (define-key keymap (kbd key) command))
-       keys commands))))
+    (seq-mapn
+     (lambda (key command) (define-key keymap (kbd key) command))
+     keys commands)))
 
-(defun my/emacs-chord-bind (&rest definitions)
-  "Expand key binding DEFINITIONS in the global keymap.
+(defun my/emacs-chord-bind (keymap &rest definitions)
+  "Apply chord binding DEFINITIONS in the given KEYMAP.
 DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (unless (zerop (% (length definitions) 2))
     (error "Uneven number of chord+command pairs"))
+  (unless (keymapp keymap)
+    (error "Expected a `keymap' as first argument"))
   ;; Partition `definitions' into two groups, one with chord definitions and another with functions and/or nil values
   (let* ((groups (seq-group-by #'stringp definitions))
          (chords (seq-drop (elt groups 0) 1))
          (commands (seq-drop (elt groups 1) 1)))
     (seq-mapn
-     (lambda (chord command) (key-chord-define-global chord command))
+     (lambda (chord command) (key-chord-define keymap chord command))
      chords commands)))
 
 ;;; PACKAGES
@@ -389,21 +392,6 @@ ends with the same `---' on its own line."
 (use-package indent-bars
   :vc (:fetcher github :repo "jdtsmith/indent-bars")
   :hook (prog-mode . indent-bars-mode))
-
-(use-package key-chord
-  :commands (key-chord-define-global)
-  :ensure t
-  :config
-  (my/emacs-chord-bind "qq" #'magit-status
-                       "jj" #'consult-buffer
-                       "jk" #'consult-project-buffer
-                       "vv" #'diff-hl-show-hunk
-                       "fg" #'my/ace-window-next
-                       "ft" #'my/ace-window-previous
-                       "kk" #'my/kill-current-buffer))
-
-(use-package use-package-chords
-  :ensure t)
 
 (use-package lisp-mode
   :hook ((lisp-mode . my/lisp-mode-hook)
@@ -713,6 +701,7 @@ ends with the same `---' on its own line."
 
 (use-package flymake
   :ensure t
+  :commands (flymake-show-buffer-diagnostics)
   :config (setq elisp-flymake-byte-compile-load-path load-path
                 flymake-mode-line-title "FM")
   :hook ((emacs-lisp-mode . flymake-mode)
@@ -798,6 +787,13 @@ ends with the same `---' on its own line."
 (use-package osx-dictionary
   :when my/is-macosx
   :bind (("C-c l" . osx-dictionary-search-pointer)))
+
+(use-package key-chord
+  :commands (key-chord-define)
+  :ensure t)
+
+(use-package use-package-chords
+  :ensure t)
 
 (defvar ffap-bindings
   '((keymap-global-set "<remap> <find-file>" #'find-file-at-point)
@@ -981,6 +977,19 @@ Of course if you do not like these bindings, just roll your own!")
   (interactive)
   (my/do-next-window (reverse (aw-window-list))))
 
+(defun my/ace-window-one-command ()
+  "Run an action in a chosen window.
+Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch."
+  (interactive)
+  (when-let ((win (aw-select " ACE"))
+             (windowp win))
+    (with-selected-window win
+      (let* ((command (key-binding
+                       (read-key-sequence
+                        (format "Run in %s..." (buffer-name)))))
+             (this-command command))
+        (call-interactively command)))))
+
 (defun my/ace-window-prefix ()
   "Use `ace-window' to display the buffer of the next command.
 The next buffer is the buffer displayed by the next command invoked
@@ -1006,6 +1015,18 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   (interactive)
   (find-file-other-window
    (expand-file-name ".dir-locals.el")))
+
+(my/emacs-chord-bind global-map
+                     "qw" #'magit-status
+                     "ww" #'delete-other-windows
+                     "hh" #'consult-buffer
+                     "jk" #'consult-project-buffer
+                     "vv" #'diff-hl-show-hunk
+                     "fd" #'flymake-show-buffer-diagnostics
+                     "fg" #'my/ace-window-next
+                     "ft" #'my/ace-window-previous
+                     "kk" #'my/kill-current-buffer
+                     "zx" #'undo)
 
 (my/emacs-key-bind global-map
                    "C-c r" #'ielm
