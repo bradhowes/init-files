@@ -18,7 +18,6 @@
         dfs = diff --staged
         lg = log -p
         who = shortlog -s --
-
         # Perform hard reset of repo (!)
         rh = reset --hard origin/main
 	di = diff
@@ -37,16 +36,11 @@
 	revert = checkout --
 	unstage = reset HEAD --
 	uncommit = reset --soft HEAD^
-
 [filter "lfs"]
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
 	clean = git-lfs clean -- %f
-
-#[credential]
-#	helper = osxkeychain
-
 [pull]
 	rebase = true
 [init]

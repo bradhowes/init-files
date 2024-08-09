@@ -340,11 +340,74 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
      (lambda (chord command) (key-chord-define keymap chord command))
      chords commands)))
 
-;;; PACKAGES
+;;; -- BUILT-IN PACKAGES
+
+(use-package project
+  :bind ([remap project-vc-dir] . #'magit-status))
+
+(use-package lisp-mode
+  :hook ((lisp-mode . my/lisp-mode-hook)
+         (lisp-interaction-mode . my/lisp-mode-hook)
+         (lisp-data-mode . my/lisp-data-mode-hook)
+         (scheme-mode . my/lisp-mode-hook)
+         (emacs-lisp-mode . my/lisp-mode-hook)))
+
+(use-package cc-mode
+  :init (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
+  :hook ((c++-mode . my/c++-mode-hook)))
+
+(use-package sh-mode
+  :hook ((sh-mode . my/sh-mode-hook)
+         (sh-mode . indent-bars-mode)))
+
+(use-package shell-mode
+  :hook ((shell-mode . my/shell-mode-hook)))
+
+(use-package winner
+  :bind (("C-<left>" . winner-undo)
+         ("C-<right>" . winner-redo)))
+
+(use-package server
+  :commands (server-running-p)
+  :hook (after-init . (lambda () (unless (server-running-p) (server-start)))))
+
+(use-package flyspell
+  :hook (prog-mode . flyspell-prog-mode))
+
+(use-package ibuffer
+  :config
+  ;; Unbind the ibuffer use of "M-o"
+  (my/emacs-key-bind ibuffer-mode-map
+		     "M-o" nil))
+
+(use-package python
+  :ensure t
+  :hook ((python-mode . my/python-mode-hook)
+         (inferior-python-mode . my/inferior-python-mode-hook)))
+
+(use-package eldoc
+  :ensure t
+  :diminish (eldoc-mode . ""))
+
+(use-package makefile-mode
+  :hook ((makefile-mode . my/makefile-mode-hook)
+         (makefile-mode . indent-bars-mode)))
+
+;;; -- ADDED PACKAGES
 
 (unless (package-installed-p 'vc-use-package)
   (package-vc-install "https://github.com/slotThe/vc-use-package"))
 (require 'vc-use-package)
+
+(use-package indent-bars
+  :vc (:fetcher github :repo "jdtsmith/indent-bars")
+  :hook (prog-mode . indent-bars-mode))
+
+(use-package multiple-cursors
+  :vc (:fetcher github :repo "magnars/multiple-cursors.el")
+  :bind (("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)
+         ("C-c C->" . mc/mark-all-like-this)))
 
 (use-package impatient-mode
   :vc (:fetcher github :repo "skeeto/impatient-mode")
@@ -389,32 +452,6 @@ ends with the same `---' on its own line."
   (impatient-mode)
   (imp-set-user-filter #'my/markdown-to-html))
 
-(use-package indent-bars
-  :vc (:fetcher github :repo "jdtsmith/indent-bars")
-  :hook (prog-mode . indent-bars-mode))
-
-(use-package lisp-mode
-  :hook ((lisp-mode . my/lisp-mode-hook)
-         (lisp-interaction-mode . my/lisp-mode-hook)
-         (lisp-data-mode . my/lisp-data-mode-hook)
-         (scheme-mode . my/lisp-mode-hook)
-         (emacs-lisp-mode . my/lisp-mode-hook)))
-
-(use-package cc-mode
-  :init (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
-  :hook ((c++-mode . my/c++-mode-hook)))
-
-(use-package sh-mode
-  :hook ((sh-mode . my/sh-mode-hook)
-         (sh-mode . indent-bars-mode)))
-
-(use-package shell-mode
-  :hook ((shell-mode . my/shell-mode-hook)))
-
-(use-package makefile-mode
-  :hook ((makefile-mode . my/makefile-mode-hook)
-         (makefile-mode . indent-bars-mode)))
-
 (when (display-graphic-p)
   (use-package all-the-icons
     :ensure t)
@@ -428,6 +465,12 @@ ends with the same `---' on its own line."
   (use-package doom-modeline
     :ensure t))
 
+(use-package marginalia
+  :ensure t
+  :commands (marginalia-mode)
+  :bind (:map minibuffer-local-map
+              ("C-M-<tab>" . marginalia-cycle)))
+
 (use-package ws-butler
   :ensure t
   :diminish " ~"
@@ -440,10 +483,6 @@ ends with the same `---' on its own line."
   (diminish 'abbrev-mode " A")
   (diminish 'isearch-mode " ?")
   (diminish 'overwrite-mode "*"))
-
-(use-package eldoc
-  :ensure t
-  :diminish (eldoc-mode . ""))
 
 ;; (use-package eldoc-box
 ;;   :ensure t
@@ -481,31 +520,35 @@ ends with the same `---' on its own line."
     (bind-key prefix #'magit-status)))
 
 (use-package rg
-  :ensure t)
-
-(use-package projectile
   :ensure t
-  :after (rg)
-  :commands (projectile-mode projectile-project-name projectile-register-project-type)
-  :bind-keymap (("C-x p" . projectile-command-map)
-                ("M-s-p" . projectile-command-map))
-  :bind (:map projectile-command-map
-              ("s r" . rg-project))
-  :hook (prog-mode . projectile-mode)
-  :init
-  (let ((prefix (my/hyper-key "p")))
-    (bind-key prefix #'(lambda nil
-                         (interactive)
-                         (use-package-autoload-keymap 'projectile-command-map 'projectile nil))))
+  :commands (rg-enable-default-bindings)
+  :bind ("C-x m" . rg-project)
   :config
-  (projectile-register-project-type 'swift '("Package.swift")
-                                    :project-file "Package.swift"
-                                    :src-dir "Sources"
-                                    :test-dir "Tests"
-                                    :compile "swift build"
-                                    :test "swift test"
-                                    :run "swift run"
-                                    :test-suffix ""))
+  (rg-enable-default-bindings))
+
+;; (use-package projectile
+;;   :ensure t
+;;   :after (rg)
+;;   :commands (projectile-mode projectile-project-name projectile-register-project-type)
+;;   :bind-keymap (("C-x p" . projectile-command-map)
+;;                 ("M-s-p" . projectile-command-map))
+;;   :bind (:map projectile-command-map
+;;               ("s r" . rg-project))
+;;   :hook (prog-mode . projectile-mode)
+;;   :init
+;;   (let ((prefix (my/hyper-key "p")))
+;;     (bind-key prefix #'(lambda nil
+;;                          (interactive)
+;;                          (use-package-autoload-keymap 'projectile-command-map 'projectile nil))))
+;;   :config
+;;   (projectile-register-project-type 'swift '("Package.swift")
+;;                                     :project-file "Package.swift"
+;;                                     :src-dir "Sources"
+;;                                     :test-dir "Tests"
+;;                                     :compile "swift build"
+;;                                     :test "swift test"
+;;                                     :run "swift run"
+;;                                     :test-suffix ""))
 
 (use-package denote
   :ensure t
@@ -534,16 +577,6 @@ ends with the same `---' on its own line."
   :ensure t
   :commands (aw-window-list aw-switch-to-window aw-select) ; Used in custom functions below
   :bind (("M-o" . ace-window)))
-
-(use-package embark
-  :ensure t
-  :bind (("C-." . embark-act)
-         ("C-;" . embark-dwim)
-         ("C-h B" . embark-bindings))
-  :init
-  (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                                       nil
-                                       (window-parameters (mode-line-format . none)))))
 
 (use-package consult
   :ensure t
@@ -624,6 +657,21 @@ ends with the same `---' on its own line."
                      consult--source-recent-file consult--source-project-recent-file
                      :preview-key '(:debounce 0.4 any)))
 
+(use-package embark
+  :ensure t
+  :bind (("C-." . embark-act)
+         ("C-;" . embark-dwim)
+         ("C-h B" . embark-bindings))
+  :init
+  (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                                       nil
+                                       (window-parameters (mode-line-format . none)))))
+
+(use-package embark-consult
+  :ensure t
+  :after (consult embark)
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
+
 (use-package consult-notes
   :vc (:fetcher github :repo "mclear-tools/consult-notes")
   :after (consult denote)
@@ -632,17 +680,6 @@ ends with the same `---' on its own line."
   :config
   (require 'consult-notes-denote)
   :bind (("C-c n b" . consult-notes)))
-
-(use-package embark-consult
-  :ensure t
-  :after (consult embark)
-  :hook (embark-collect-mode . consult-preview-at-point-mode))
-
-(use-package marginalia
-  :ensure t
-  :commands (marginalia-mode)
-  :bind (:map minibuffer-local-map
-              ("C-M-<tab>" . marginalia-cycle)))
 
 (use-package vertico
   :ensure t
@@ -693,11 +730,6 @@ ends with the same `---' on its own line."
   :custom ((swift-mode:basic-offset 2))
   :hook (swift-mode . (lambda () (set (make-local-variable 'compile-command) "swift build"))))
 
-(use-package python
-  :ensure t
-  :hook ((python-mode . my/python-mode-hook)
-         (inferior-python-mode . my/inferior-python-mode-hook)))
-
 (use-package flymake
   :ensure t
   :commands (flymake-show-buffer-diagnostics)
@@ -729,17 +761,9 @@ ends with the same `---' on its own line."
   :after (impatient-mode)
   :hook (markdown-mode . my/markdown-mode))
 
-(use-package winner
-  :bind (("C-<left>" . winner-undo)
-         ("C-<right>" . winner-redo)))
-
 (use-package cmake-mode
   :ensure t
   :hook ((cmake-mode . my/cmake-mode-hook)))
-
-(use-package server
-  :commands (server-running-p)
-  :hook (after-init . (lambda () (unless (server-running-p) (server-start)))))
 
 (use-package which-key
   :ensure t)
@@ -750,20 +774,6 @@ ends with the same `---' on its own line."
 
 (use-package hl-line
   :ensure t)
-
-(use-package flyspell
-  :hook (prog-mode . flyspell-prog-mode))
-
-(use-package ibuffer
-  :config
-  ;; Unbind the ibuffer use of "M-o"
-  (my/emacs-key-bind ibuffer-mode-map
-		     "M-o" nil))
-
-(use-package multiple-cursors
-  :bind (("C->" . mc/mark-next-like-this)
-         ("C-<" . mc/mark-previous-like-this)
-         ("C-c C->" . mc/mark-all-like-this)))
 
 (use-package popper
   :ensure t
@@ -793,6 +803,11 @@ ends with the same `---' on its own line."
 
 (use-package use-package-chords
   :ensure t)
+
+(use-package compile
+  :config
+  (add-to-list 'compilation-error-regexp-alist
+               '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2))) ; I think this is from pyright
 
 (defvar ffap-bindings
   '((keymap-global-set "<remap> <find-file>" #'find-file-at-point)
@@ -1080,7 +1095,6 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    "<end>" #'end-of-buffer
                    "<delete>" #'delete-char
                    "S-<f12>" #'package-list-packages
-                   "M-S-<f12>" #'package-list-packages
 
                    "M-z" #'zap-up-to-char
                    "M-[" #'previous-buffer
@@ -1201,9 +1215,6 @@ Return an event vector."
     (my/set-bound-var 'x-meta-keysym 'meta)
     (my/set-bound-var 'x-super-keysym 'super)
     (my/set-bound-var 'x-hyper-keysym 'hyper))))
-
-(add-to-list 'compilation-error-regexp-alist
-             '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2))
 
 (provide 'init)
 
