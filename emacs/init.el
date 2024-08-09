@@ -135,7 +135,7 @@ Returns one of the follow symbols based on width:
   "Width in pixels of a normal frame shown on LAYOUT.
 These values are hard-coded based on current settings.
 Probably a better way to figure this out."
-  (if (my/is-4k layout) (if my/is-macosx 1354 1338) 944))
+  (if (my/is-4k layout) (if my/is-macosx 1338 1338) 944))
 
 (defun my/frame-initial-left (layout)
   "Pixels to use for the `left' of a frame on LAYOUT.
@@ -381,12 +381,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 		     "M-o" nil))
 
 (use-package python
-  :ensure t
   :hook ((python-mode . my/python-mode-hook)
          (inferior-python-mode . my/inferior-python-mode-hook)))
 
 (use-package eldoc
-  :ensure t
   :diminish (eldoc-mode . ""))
 
 (use-package makefile-mode
@@ -580,7 +578,7 @@ ends with the same `---' on its own line."
 
 (use-package consult
   :ensure t
-  :after (projectile)
+  ;; :after (projectile)
   :commands (consult--customize-put)    ; silence flymake warning
   :bind (("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
@@ -636,10 +634,10 @@ ends with the same `---' on its own line."
          :map minibuffer-local-map
          ("C-s" . consult-history)
 
-         :map projectile-command-map
+         :map project-prefix-map
          ("b" . consult-project-buffer))
   :hook (completion-list-mode . consult-preview-at-point-mode)
-  :commands (consult-register-format consult-register-window consult-xref projectile-project-root)
+  :commands (consult-register-format consult-register-window consult-xref) ;; projectile-project-root)
   :init
   (setq register-preview-function #'consult-register-format)
   (advice-add #'register-preview :override #'consult-register-window)
@@ -1028,6 +1026,12 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   (find-file-other-window
    (expand-file-name ".dir-locals.el")))
 
+(defun my/noisy-check-parens ()
+  "Execute `check-parens' and notify if OK."
+  (interactive)
+  (check-parens)
+  (message "Ok"))
+
 ;;; --- Key Chords
 
 (my/emacs-chord-bind global-map
@@ -1040,7 +1044,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                      "fg" #'my/ace-window-next
                      "ft" #'my/ace-window-previous
                      "kk" #'my/kill-current-buffer
-                     "()" #'check-parens
+                     "cc" #'my/noisy-check-parens
                      "zx" #'undo)
 
 ;;; --- Key Bindings
