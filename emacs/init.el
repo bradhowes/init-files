@@ -1026,12 +1026,6 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   (find-file-other-window
    (expand-file-name ".dir-locals.el")))
 
-(defun my/noisy-check-parens ()
-  "Execute `check-parens' and notify if OK."
-  (interactive)
-  (check-parens)
-  (message "Ok"))
-
 ;;; --- Key Chords
 
 (my/emacs-chord-bind global-map
@@ -1044,7 +1038,6 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                      "fg" #'my/ace-window-next
                      "ft" #'my/ace-window-previous
                      "kk" #'my/kill-current-buffer
-                     "cc" #'my/noisy-check-parens
                      "zx" #'undo)
 
 ;;; --- Key Bindings

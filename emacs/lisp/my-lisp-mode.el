@@ -1,8 +1,9 @@
-;;; package -- my-lisp-mode -*- Mode: Emacs-Lisp -*-
+;;; package -- my-lisp-mode -*- Mode: Emacs-Lisp -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
 (require 'font-lock)
+(require 'key-chord)
 (require 'my-insert-block-comment)
 
 (dolist (elt '(lisp-mode lisp-data-mode scheme-mode emacs-lisp-mode))
@@ -30,8 +31,15 @@
   (font-lock-mode t)
   (show-paren-mode t))
 
+(defun my/noisy-check-parens ()
+  "Execute `check-parens' and notify if OK."
+  (interactive)
+  (check-parens)
+  (message "Ok"))
+
 (defun my/lisp-mode-hook ()
   "Custom Lisp mode."
+  (key-chord-define-local "cc" #'my/noisy-check-parens)
   (font-lock-mode t)
   (show-paren-mode t)
   (local-set-key [(control x)(control e)] #'my/eval-this-defun)
