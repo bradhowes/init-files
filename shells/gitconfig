@@ -1,0 +1,55 @@
+[user]
+	name = Brad Howes
+	useConfigOnly = true
+	email = bradhowes@mac.com
+[push]
+	default = simple
+	autoSetupRemote = true
+[core]
+	excludesfile = /Users/howes/.gitignore_global
+	autocrlf = input
+	eol = native
+[alias]
+        cia = commit --amend --no-edit -a
+        s = status
+        ci = commit
+        co = checkout
+        df = diff
+        dfs = diff --staged
+        lg = log -p
+        who = shortlog -s --
+
+        # Perform hard reset of repo (!)
+        rh = reset --hard origin/main
+	di = diff
+	dif = diff
+	dis = diff --staged
+	pu = push
+	pi = cherry-pick
+	pick = cherry-pick
+	cob = checkout -b
+	smartlog = log --graph --pretty=format:'commit: %C(bold red)%h%Creset %C(red)<%H>%Creset %C(bold magenta)%d %Creset%ndate: %C(bold yellow)%cd %Creset%C(yellow)%cr%Creset%nauthor: %C(bold blue)%an%Creset %C(blue)<%ae>%Creset%n%C(cyan)%s%n%Creset'
+	l = !git smartlog
+	l10 = !git smartlog -10
+	log-commit = log -1 --pretty=format:'commit: %C(bold red)%h%Creset %C(red)<%H>%Creset %C(bold magenta)%d %Creset%ndate: %C(bold yellow)%cd %Creset%C(yellow)%cr%Creset%nauthor: %C(bold blue)%an%Creset %C(blue)<%ae>%Creset%n%n%C(bold cyan)%s%n%n%C(cyan)%b%n%Creset'
+	lc = !git log-commit
+	purge = clean -fd
+	revert = checkout --
+	unstage = reset HEAD --
+	uncommit = reset --soft HEAD^
+
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+
+#[credential]
+#	helper = osxkeychain
+
+[pull]
+	rebase = true
+[init]
+	defaultBranch = main
+[credential]
+	helper = store

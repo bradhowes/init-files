@@ -312,7 +312,7 @@ list of symbols."
 (defun my/emacs-key-bind (keymap &rest definitions)
   "Apply key binding DEFINITIONS in the given KEYMAP.
 DEFINITIONS is a sequence of string and command pairs given as a sequence."
-  (unless (zerop (% (length definitions) 2))
+  (unless (zerop (logand (length definitions) 1))
     (error "Uneven number of key+command pairs"))
   (unless (keymapp keymap)
     (error "Expected a `keymap' as first argument"))
@@ -462,7 +462,6 @@ ends with the same `---' on its own line."
 (use-package diff-hl
   :ensure t
   :commands (diff-hl-show-hunk diff-hl-margin-mode)
-  :init
   :hook (after-init . (lambda ()
                         (when my/is-terminal
                           (diff-hl-margin-mode t))
@@ -937,12 +936,11 @@ Of course if you do not like these bindings, just roll your own!")
 (defun my/copy-file-name-to-clipboard ()
   "Copy the current buffer file name to the clipboard."
   (interactive)
-  (let ((filename (if (equal major-mode 'dired-mode)
-                      default-directory
-                    (buffer-file-name))))
-    (when filename
-      (kill-new filename)
-      (message "Copied buffer file name '%s' to the clipboard." filename))))
+  (when-let ((filename (if (equal major-mode 'dired-mode)
+                           default-directory
+                         (buffer-file-name))))
+    (kill-new filename)
+    (message "Copied buffer file name '%s' to the clipboard." filename)))
 
 (defun repl ()
   "Simple alias to start ielm."
@@ -958,14 +956,13 @@ Of course if you do not like these bindings, just roll your own!")
 
 (defun my/do-next-window (wins)
   "Jump to next window in WINS after the current one."
-  (let* ((current-window (get-buffer-window))
-         (current-index (seq-position wins current-window #'eq))
-         (next-index (and current-index (1+ current-index)))
-         (final-index (if my/next-window-wrap-around
-                          (% next-index (length wins))
-                        (and (length> wins next-index) next-index))))
-    (when final-index
-      (aw-switch-to-window (nth final-index wins)))))
+  (when-let ((current-window (get-buffer-window))
+             (current-index (seq-position wins current-window #'eq))
+             (next-index (and current-index (1+ current-index)))
+             (final-index (if my/next-window-wrap-around
+                              (% next-index (length wins))
+                            (and (length> wins next-index) next-index))))
+    (aw-switch-to-window (nth final-index wins))))
 
 (defun my/ace-window-next ()
   "Jump to next window according to `ace-window'."
@@ -1016,6 +1013,8 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   (find-file-other-window
    (expand-file-name ".dir-locals.el")))
 
+;;; --- Key Chords
+
 (my/emacs-chord-bind global-map
                      "qw" #'magit-status
                      "ww" #'delete-other-windows
@@ -1026,7 +1025,10 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                      "fg" #'my/ace-window-next
                      "ft" #'my/ace-window-previous
                      "kk" #'my/kill-current-buffer
+                     "()" #'check-parens
                      "zx" #'undo)
+
+;;; --- Key Bindings
 
 (my/emacs-key-bind global-map
                    "C-c r" #'ielm
@@ -1078,6 +1080,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    "<end>" #'end-of-buffer
                    "<delete>" #'delete-char
                    "S-<f12>" #'package-list-packages
+                   "M-S-<f12>" #'package-list-packages
 
                    "M-z" #'zap-up-to-char
                    "M-[" #'previous-buffer
