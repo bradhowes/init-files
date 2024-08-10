@@ -573,8 +573,21 @@ ends with the same `---' on its own line."
 
 (use-package ace-window
   :ensure t
-  :commands (aw-window-list aw-switch-to-window aw-select) ; Used in custom functions below
+  :commands (aw-window-list aw-switch-to-window aw-select aw-flip-window) ; Used in custom functions below
+  :defines (aw-dispatch-always)
   :bind (("M-o" . ace-window)))
+
+(defun my/ace-window-always-dispatch ()
+  "Invoke `ace-window' after setting `aw-dispatch-always' to T.
+When `aw-dispatch-always' is nil, `ace-window' does not invoke
+its dispatching mechanism if there are 2 or fewer windows. This
+command guarantees that dispatching will always happen."
+  (interactive)
+  (let ((current-aw-dispatch-always aw-dispatch-always))
+    (unwind-protect
+        (let ((aw-dispatch-always t))
+          (call-interactively #'ace-window))
+      (setq aw-dispatch-always current-aw-dispatch-always))))
 
 (use-package consult
   :ensure t
@@ -744,9 +757,9 @@ ends with the same `---' on its own line."
   :commands (cape-file))
 
 (use-package corfu
-  :ensure t
-  :bind (:map corfu-map
-              ("<return>" . corfu-complete)))
+  :ensure t)
+  ;; :bind (:map corfu-map
+  ;;             ("<return>" . corfu-complete)))
 
 (use-package corfu-terminal
   :when my/is-terminal
@@ -774,6 +787,7 @@ ends with the same `---' on its own line."
   :ensure t)
 
 (use-package popper
+  :commands (popper-kill-latest-popup)
   :ensure t
   :bind (("C-'" . popper-toggle)
          ("M-'" . popper-cycle)
@@ -1020,6 +1034,13 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 
 (keymap-global-set "C-x 4 o" #'my/ace-window-prefix)
 
+(defun my/describe-symbol-at-point ()
+  "Immediately show help for symbol at point if it exists."
+  (interactive)
+  (when-let ((v-or-f (symbol-at-point))
+             (found (cl-some (lambda (x) (funcall (nth 1 x) v-or-f)) describe-symbol-backends)))
+    (describe-symbol v-or-f (help-buffer))))
+
 (defun crux-find-current-directory-dir-locals-file ()
   "Edit the current directory's `.dir-locals.el' file in another window."
   (interactive)
@@ -1031,14 +1052,17 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 (my/emacs-chord-bind global-map
                      "qw" #'magit-status
                      "ww" #'delete-other-windows
-                     "hh" #'consult-buffer
+                     "hb" #'consult-buffer
+                     "hh" #'my/describe-symbol-at-point
+                     "hj" #'popper-kill-latest-popup
                      "jk" #'consult-project-buffer
                      "vv" #'diff-hl-show-hunk
-                     "fd" #'flymake-show-buffer-diagnostics
-                     "fg" #'my/ace-window-next
-                     "ft" #'my/ace-window-previous
+                     "fm" #'flymake-show-buffer-diagnostics
+                     "fn" #'my/ace-window-next
+                     "fp" #'my/ace-window-previous
+                     "fb" #'aw-flip-window
                      "kk" #'my/kill-current-buffer
-                     "zx" #'undo)
+                     "l;" #'undo)
 
 ;;; --- Key Bindings
 
@@ -1046,7 +1070,11 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    "C-c r" #'ielm
                    "C-c D" #'crux-find-current-directory-dir-locals-file
 
-                   "C-h RET" #'my/toggle-show-minor-modes
+                   ;; NOTE: do not bind RET or <return> -- that breaks Embark maps
+                   "C-h C-SPC"  #'my/toggle-show-minor-modes
+                   "C-h C-h" #'my/describe-symbol-at-point
+                   "C-h C-j" #'popper-kill-latest-popup
+                   "C-h C-j" #'popper-toggle
                    "C-h a" #'describe-symbol
                    "C-h c" #'describe-char
                    "C-h u" #'apropos-user-option
@@ -1057,8 +1085,9 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    "C-h V" #'apropos-variable
 
                    "M-g d" #'dired-jump
+                   "M-O" #'my/ace-window-always-dispatch
 
-                   "C-o" #'other-window
+                   "C-o" #'aw-flip-window
 
                    "C-x 0" #'delete-other-windows
                    "C-x O" #'other-frame
@@ -1092,7 +1121,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    "<end>" #'end-of-buffer
                    "<delete>" #'delete-char
                    "S-<f12>" #'package-list-packages
-
+                   "<f12>" #'consult-bookmark
                    "M-z" #'zap-up-to-char
                    "M-[" #'previous-buffer
                    "M-]" #'next-buffer
