@@ -13,7 +13,6 @@
   (setq js2-basic-offset 2)
         ;; js2-enter-indents-newline t)
   ;; (local-set-key [(control j)] 'newline)
-  (local-set-key [(return)] 'my-cc-newline-and-indent)
   (local-set-key [(meta control \;)] 'my-cc-new-block-comment)
 
   (local-set-key (kbd "C-x C-e") 'js-send-last-sexp)

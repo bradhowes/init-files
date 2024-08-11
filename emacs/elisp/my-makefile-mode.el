@@ -19,8 +19,6 @@
   (font-lock-mode t)
   (auto-fill-mode)
   (setq tab-width 4)
-  (local-set-key [(return)] 'newline-and-indent)
-  (local-set-key [(meta control \;)] 'my-makefile-insert-block-comment)
   (show-paren-mode t))
 
 (provide 'my-makefile-mode)

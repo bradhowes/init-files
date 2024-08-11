@@ -66,7 +66,6 @@
   (font-lock-mode t)
   (auto-fill-mode)
   (setq tab-width 4)
-  (local-set-key [(return)] 'newline-and-indent)
   (local-set-key [(meta control \;)] 'my-cmake-insert-block-comment)
   (local-set-key [(f3)] 'my-cmake-reformat-lowercase)
   (show-paren-mode t))

@@ -78,7 +78,37 @@ Note that this is also true when running in a terminal window.")
   :type '(boolean)
   :group 'my/customizations)
 
-(defcustom my/hyper-key-prefix (if my/is-macosx "A-C-M-S" "C-M-S-s")
+;; Define a pseudo-hyper modifier that is made up of CONTROL + OPTION + COMMAND on macOS and CONTROL + WINDOWS + ALT on
+;; Windows (unproven). To turn a key into "hyper" on macOS, use Karabiner Elements to map "caps lock" to the
+;; sequence via the following snippet:
+;;
+;; {
+;;     "manipulators": [
+;;         {
+;;             "description": "Change caps_lock to command+control+option",
+;;             "from": {
+;;                 "key_code": "caps_lock",
+;;                 "modifiers": {
+;;                     "optional": [
+;;                         "any"
+;;                     ]
+;;                 }
+;;             },
+;;             "to": [
+;;                 {
+;;                     "key_code": "left_command",
+;;                     "modifiers": [
+;;                         "left_control",
+;;                         "left_option"
+;;                     ]
+;;                 }
+;;             ],
+;;             "type": "basic"
+;;         }
+;;     ]
+;; }
+;;
+(defcustom my/hyper-key-prefix (if my/is-macosx "A-C-M" "C-M-s")
   "Modifier collection to use a a `hyper' modifier."
   :type '(string)
   :group 'my/customizations)
@@ -249,14 +279,20 @@ It does not affect existing frames."
           switch-to-buffer-obey-display-actions t
           window-resize-pixelwise t
           window-sides-slots '(0 0 3 1) ; left top right bottom
-          display-buffer-base-action '((display-buffer--maybe-same-window
-                                        display-buffer-reuse-window
-                                        display-buffer-in-previous-window
-                                        display-buffer-reuse-mode-window
-                                        display-buffer-pop-up-window
-                                        display-buffer-same-window
-                                        display-buffer-use-some-window))
-          display-buffer-alist nil
+          display-buffer-base-action '((display-buffer-reuse-window
+                                        ace-display-buffer))
+                                        ;; display-buffer-in-previous-window
+                                        ;; display-buffer-reuse-mode-window
+                                        ;; display-buffer-pop-up-window
+                                        ;; display-buffer-same-window
+                                        ;; display-buffer-use-some-window))
+          display-buffer-alist `(("\\*help\\[R" (display-buffer-reuse-mode-window
+                                                 ace-display-buffer)
+                                  (reusable-frames . nil))
+                                 ("\\*R" nil (reusable-frames . nil))
+                                 ,(cons "\\*helm" display-buffer-fallback-action)
+                                 ("magit-diff:" nil
+                                  (inhibit-same-window . t))))))
           ;; display-buffer-alist `(("\\*\\(?:\\(?:Buffer List\\)\\|Ibuffer\\|\\(?:.* Buffers\\)\\)\\*"
           ;;                         display-buffer-in-side-window (side . right) (slot . -2) (preserve-size . (t . nil)) ,window-parameters)
           ;;                        ("\\*Tags List\\*"
@@ -265,7 +301,7 @@ It does not affect existing frames."
           ;;                         display-buffer-in-side-window (side . right) (slot . 0) (preserve-size . (t . nil)) ,window-parameters)
           ;;                        ("\\*\\(?:\\compilation\\|Compile-Log\\)\\*"
           ;;                         display-buffer-in-side-window (side . right) (slot . 1) (preserve-size . (t . nil)) ,window-parameters))
-          )))
+          ;; )))
 
 (when my/is-terminal
   (set-face-background 'default "undefined"))
@@ -340,6 +376,22 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
      (lambda (chord command) (key-chord-define keymap chord command))
      chords commands)))
 
+(defun my/emacs-hyper-key-bind (keymap &rest definitions)
+  "Apply hyper key binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence."
+  (unless (zerop (logand (length definitions) 1))
+    (error "Uneven number of key+command pairs"))
+  (unless (keymapp keymap)
+    (error "Expected a `keymap' as first argument"))
+  ;; Partition `definitions' into two groups, one with key definitions and another with functions and/or nil values
+  (let* ((groups (seq-group-by #'stringp definitions))
+         (keys (seq-drop (elt groups 0) 1))
+         (commands (seq-drop (elt groups 1) 1)))
+    ;; Only execute if given a valid keymap
+    (seq-mapn
+     (lambda (key command) (define-key keymap (kbd (my/hyper-key key)) command))
+     keys commands)))
+
 ;;; -- BUILT-IN PACKAGES
 
 (use-package project
@@ -383,9 +435,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package python
   :hook ((python-mode . my/python-mode-hook)
          (inferior-python-mode . my/inferior-python-mode-hook)))
-
-(use-package eldoc
-  :diminish (eldoc-mode . ""))
 
 (use-package makefile-mode
   :hook ((makefile-mode . my/makefile-mode-hook)
@@ -471,20 +520,10 @@ ends with the same `---' on its own line."
 
 (use-package ws-butler
   :ensure t
-  :diminish " ~"
   :hook (prog-mode . ws-butler-mode))
-
-(use-package diminish
-  :ensure t
-  :commands (diminish)
-  :config
-  (diminish 'abbrev-mode " A")
-  (diminish 'isearch-mode " ?")
-  (diminish 'overwrite-mode "*"))
 
 ;; (use-package eldoc-box
 ;;   :ensure t
-;;   :diminish (eldoc-box-hover-mode . "")
 ;;   :commands (eldoc-box-hover-mode)
 ;;   :bind ("C-h ." . eldoc-box-help-at-point))
 
@@ -744,8 +783,7 @@ command guarantees that dispatching will always happen."
 (use-package flymake
   :ensure t
   :commands (flymake-show-buffer-diagnostics)
-  :config (setq elisp-flymake-byte-compile-load-path load-path
-                flymake-mode-line-title "FM")
+  :config (setq elisp-flymake-byte-compile-load-path load-path)
   :hook ((emacs-lisp-mode . flymake-mode)
          (python-mode . flymake-mode))
   :bind (:map flymake-mode-map
@@ -1005,7 +1043,8 @@ Of course if you do not like these bindings, just roll your own!")
   "Run an action in a chosen window.
 Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch."
   (interactive)
-  (when-let ((win (aw-select " ACE"))
+  (when-let ((aw-dispatch-always t)
+             (win (aw-select " ACE"))
              (windowp win))
     (with-selected-window win
       (let* ((command (key-binding
@@ -1013,6 +1052,17 @@ Taken from https://karthinks.com/software/emacs-window-management-almanac/#windo
                         (format "Run in %s..." (buffer-name)))))
              (this-command command))
         (call-interactively command)))))
+
+(my/emacs-hyper-key-bind global-map "o" #'my/ace-window-one-command)
+
+(defun my/display-buffer-pre-func (buffer alist)
+  "Method to use for `display-buffer-overriding-action'.
+The BUFFER and ALIST are ignored."
+  (let* ((_ (cons buffer alist))
+         (type 'reuse)
+         (aw-dispatch-always t)
+         (window (aw-select (propertize " ACE" 'face 'mode-line-highlight))))
+    (cons window type)))
 
 (defun my/ace-window-prefix ()
   "Use `ace-window' to display the buffer of the next command.
@@ -1022,14 +1072,7 @@ Creates a new window before displaying the buffer.
 When `switch-to-buffer-obey-display-actions' is non-nil,
 `switch-to-buffer' commands are also supported."
   (interactive)
-  (display-buffer-override-next-command
-   (lambda (_ _)
-     (let (window type)
-       (setq
-        window (aw-select (propertize " ACE" 'face 'mode-line-highlight))
-        type 'reuse)
-       (cons window type)))
-   nil "[ace-window]")
+  (display-buffer-override-next-command #'my/display-buffer-pre-func nil "[ace-window]")
   (message "Use `ace-window' to display next command buffer..."))
 
 (keymap-global-set "C-x 4 o" #'my/ace-window-prefix)
@@ -1053,8 +1096,10 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                      "qw" #'magit-status
                      "ww" #'delete-other-windows
                      "hb" #'consult-buffer
+
                      "hh" #'my/describe-symbol-at-point
-                     "hj" #'popper-kill-latest-popup
+                     "hb" #'popper-kill-latest-popup
+
                      "jk" #'consult-project-buffer
                      "vv" #'diff-hl-show-hunk
                      "fm" #'flymake-show-buffer-diagnostics
@@ -1063,6 +1108,18 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                      "fb" #'aw-flip-window
                      "kk" #'my/kill-current-buffer
                      "l;" #'undo)
+
+;;; --- Hyper-key Bindings
+
+(my/emacs-hyper-key-bind global-map
+                         "u" #'undo
+                         "1" #'delete-other-windows
+                         "h" #'my/describe-symbol-at-point
+                         "b" #'consult-buffer
+                         "p" #'consult-project-buffer
+                         "g" #'magit-status
+                         "w" #'my/ace-window-always-dispatch
+                         )
 
 ;;; --- Key Bindings
 

@@ -14,8 +14,6 @@
 	c-basic-offset 4
 	c-auto-newline t
 	c-tab-always-indent nil)
-  (local-set-key [(return)] 'newline-and-indent)
-  (local-set-key [(control j)] 'newline)
   (c-toggle-auto-newline 1)
   (font-lock-mode t)
   (show-paren-mode t))

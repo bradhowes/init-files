@@ -19,9 +19,7 @@
   "Custom SH mode."
   (font-lock-mode t)
   (auto-fill-mode 1)
-  (show-paren-mode t)
-  (local-set-key [(return)] 'newline-and-indent)
-  (local-set-key [(meta control \;)] 'my-sh-insert-block-comment))
+  (show-paren-mode t))
 
 (provide 'my-sh-mode)
 ;;; my-sh-mode.el ends here
