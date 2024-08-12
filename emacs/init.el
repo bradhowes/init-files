@@ -560,9 +560,9 @@ use `default-frame-alist' by default. If there are already two frames active
 then subsequent ones will be at `my/align-right-frame-alist' which aligns with
 the right-edge of the screen, but may overlap with the middle frame."
   (let ((num-frames (length (visible-frame-list))))
-    (make-frame)
-    (when (> num-frames 1)
-      (my/reset-frame-right-display))))
+    (if (< num-frames 2)
+        (make-frame)
+      (make-frame (my/align-right-frame-alist (my/screen-layout))))))
 
 (advice-add 'aw-make-frame :override #'my/aw-make-frame)
 
@@ -1099,7 +1099,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    "C-S-p" #'my/ace-window-previous
                    "C-S-n" #'my/ace-window-next
 
-                   "M-P" #'my/ace-window-prefix
+                   "M-P" #'my/ace-window-previous
                    "M-N" #'my/ace-window-next
 
                    ;; --- Hyper-key Bindings
@@ -1132,9 +1132,10 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                      "ww" #'my/ace-window-always-dispatch
                      "yy" #'consult-yank-replace
 
+                     "hb" #'consult-buffer
+
                      "UU" #'my/ace-window-previous
                      "II" #'my/ace-window-next
-                     "hb" #'consult-buffer
 
                      "hh" #'my/describe-symbol-at-point
                      "hb" #'popper-kill-latest-popup

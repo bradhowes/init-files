@@ -3,7 +3,6 @@
 ;;; Code:
 
 (require 'shell)
-(require 'corfu)
 (require 'native-complete)
 
 (defvar my/shell-home-root nil
@@ -128,13 +127,7 @@ prompt lines in the first place."
   (set-process-coding-system (get-buffer-process (current-buffer)) 'utf-8 'utf-8)
 
   (setq ansi-color-names-vector ["black" "red3" "green3" "yellow3" "blue2" "magenta3" "cyan3" "gray90"]
-        shell-dirtrackp nil
-        comint-process-echoes t
-        comint-completion-addsuffix t
-	comint-eol-on-send t
-        corfu-auto nil
-        corfu-preselect 'valid)
-
+        shell-dirtrackp nil)            ; disable since using comint-osc-process-output
 
   (ansi-color-for-comint-mode-on)
   (add-hook 'comint-output-filter-functions #'comint-osc-process-output)

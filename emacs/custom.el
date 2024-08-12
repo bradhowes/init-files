@@ -14,15 +14,12 @@
  '(auto-revert-use-notify nil)
  '(auto-save-list-file-prefix nil)
  '(auto-save-visited-interval 60)
- '(aw-dispatch-always nil)
  '(backup-directory-alist '(("." . ".~")))
  '(bookmark-save-flag 1)
  '(byte-compile-verbose nil)
- '(c-basic-offset 'set-from-style)
  '(case-fold-search t)
  '(column-number-mode t)
  '(comint-buffer-maximum-size 10000000)
- '(comint-input-ignoredups t)
  '(compilation-auto-jump-to-first-error nil)
  '(compilation-scroll-output t)
  '(completion-category-overrides '((file (styles basic partial-completion))) nil nil "Customized with use-package orderless")
@@ -33,7 +30,6 @@
  '(consult-notes-denote-files-function #'denote-directory-files)
  '(consult-notes-denote-mode t)
  '(consult-notes-use-rg t)
- '(consult-project-function '(lambda (_) (projectile-project-root)))
  '(copyright-query nil)
  '(copyright-year-ranges t)
  '(corfu-auto-prefix 1)
@@ -69,7 +65,6 @@
  '(doom-modeline-major-mode-icon nil)
  '(doom-modeline-minor-modes nil)
  '(doom-modeline-mode t)
- '(doom-modeline-project-detection 'projectile)
  '(doom-modeline-vcs-max-length 40)
  '(doom-modeline-window-width-limit 120)
  '(doom-themes-enable-bold t)
@@ -96,6 +91,7 @@
  '(global-subword-mode t)
  '(grep-save-buffers t)
  '(history-delete-duplicates t)
+ '(httpd-port 4465)
  '(indent-bars-color '(highlight :face-bg t :blend 0.4))
  '(indent-bars-prefer-character t)
  '(indent-bars-unspecified-bg-color "black")
@@ -138,7 +134,7 @@
      ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
  '(package-quickstart t)
  '(package-selected-packages
-   '(key-chord js2-mode company embark-consult embark posframe htmlize impatient-mode vterm doom-modeline consult-notes vc-use-package indent-bars osx-dictionary corfu-terminal expand-region crux char-menu popper tree-sitter tree-sitter-langs lsp-pyright lsp-jedi exec-path-from-shell consult-denote consult-eglot verb multiple-cursors eglot-signature-eldoc-talkative eldoc-box window-commander rg eglot ws-butler cape corfu-info lsp-sourcekit swift-mode corfu use-package denote consult-dir orderless vertico markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core flycheck-indentation flycheck diff-hl cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
+   '(simple-httpd key-chord js2-mode company embark-consult embark posframe htmlize impatient-mode vterm doom-modeline consult-notes vc-use-package indent-bars osx-dictionary corfu-terminal expand-region crux char-menu popper tree-sitter tree-sitter-langs lsp-pyright lsp-jedi exec-path-from-shell consult-denote consult-eglot verb multiple-cursors eglot-signature-eldoc-talkative eldoc-box window-commander rg eglot ws-butler cape corfu-info lsp-sourcekit swift-mode corfu use-package denote consult-dir orderless vertico markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core flycheck-indentation flycheck diff-hl cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
  '(package-vc-selected-packages
    '((el-docstring-sap :vc-backend Git :url "https://github.com/rileyrg/el-docstring-sap")
      (impatient-mode :vc-backend Git :url "https://github.com/skeeto/impatient-mode")
@@ -153,14 +149,6 @@
  '(popper-mode t)
  '(popper-reference-buffers
    '("\\*Messages\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode compilation-mode))
- '(projectile-generic-command "rg --files --hidden -0")
- '(projectile-globally-ignored-directories
-   '(".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".tox" ".svn" ".cache" ".clangd" "./build" "./cmake"))
- '(projectile-mode t nil (projectile))
- '(projectile-mode-line-function (lambda nil (format " [%s] " (projectile-project-name))))
- '(projectile-mode-line-prefix " P")
- '(projectile-sort-order 'recently-active)
- '(projectile-switch-project-action 'projectile-dired)
  '(pyvenv-workon ".")
  '(read-extended-command-predicate 'command-completion-default-include-p)
  '(recentf-max-menu-items 50)
@@ -171,7 +159,6 @@
  '(ring-bell-function 'mode-line-bell-flash)
  '(safe-local-variable-values
    '((checkdoc-package-keywords-flag)
-     (projectile-project-compilation-cmd . "./build.sh --mode Debug")
      (etags-regen-ignores "test/manual/etags/")
      (etags-regen-regexp-alist
       (("c" "objc")
@@ -179,7 +166,7 @@
  '(save-interprogram-paste-before-kill t)
  '(save-place-mode t)
  '(savehist-additional-variables
-   '(register-alist kill-ring projectile-project-command-history corfu-history))
+   '(register-alist kill-ring project-regexp-history-variable corfu-history))
  '(savehist-mode t)
  '(scroll-conservatively 101)
  '(scroll-margin 2)
@@ -232,10 +219,8 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "Berkeley Mono" :foundry "nil" :slant normal :weight regular :height 130 :width normal))))
  '(aw-leading-char-face ((t (:inherit (bold modus-themes-reset-soft) :foreground "light green" :height 1.5))))
- '(child-frame-border ((t (:background "#646464" :foreground "dark red" :width normal))))
  '(doom-modeline-bar-inactive ((t nil)))
  '(eglot-highlight-symbol-face ((t (:background "orchid4" :inherit bold))))
- '(eldoc-box-border ((t (:background "#a8a8a8" :foreground "dark cyan"))))
  '(fixed-pitch ((t (:family "Berkeley Mono"))))
  '(font-lock-brace-face ((t (:foreground "tomato1" :weight bold))))
  '(font-lock-comment-delimiter-face ((t (:foreground "OliveDrab3" :inherit font-lock-comment-face))))
@@ -246,6 +231,7 @@
  '(makefile-space ((t (:background "gray46"))))
  '(mode-line ((t (:inherit modus-themes-ui-variable-pitch :background "dark slate gray" :foreground "#ffffff" :box nil))))
  '(mode-line-inactive ((t (:inherit modus-themes-ui-variable-pitch :background "tomato4" :foreground "gray" :box nil))))
+ '(region ((t (:extend t :background "dark violet" :foreground "#ffffff"))))
  '(show-paren-match ((t (:background "#0d0d0d" :foreground "spring green" :underline nil :weight ultra-bold)))))
 
 
