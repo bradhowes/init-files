@@ -349,8 +349,8 @@ list of symbols."
  "my-makefile-mode" 'my/makefile-mode-hook
  "my-python-mode" '(my/python-mode-hook my/inferior-python-mode-hook)
  "my-sh-mode" 'my/sh-mode-hook
- "my-js2-mode" 'my/js2-mode-hook
  "my-json-mode" 'my/json-mode-hook
+ "my-js2-mode" 'my/js2-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
 
 (use-package key-chord
