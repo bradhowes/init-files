@@ -78,46 +78,50 @@ Note that this is also true when running in a terminal window.")
   :type '(boolean)
   :group 'my/customizations)
 
-;; Define a pseudo-hyper modifier that is made up of CONTROL + OPTION + COMMAND on macOS and CONTROL + WINDOWS + ALT on
-;; Windows (unproven). To turn a key into "hyper" on macOS, use Karabiner Elements to map "caps lock" to the
-;; sequence via the following snippet:
+(defun my/add-event-modifier (mod-prefix event)
+  "Add a modifier MOD-PREFIX to EVENT."
+  (let* ((mods (if (symbolp event) event (car event)))
+         (new-mods (intern (concat mod-prefix (symbol-name mods)))))
+    (if (symbolp event)
+        new-mods
+      (cons new-mods (cdr event)))))
+
+(defun my/apply-mod-to-next-event (mod-symbol mod-bit mod-prefix)
+  "Read the next event and apply the MOD-BIT or MOD-PREFIX to it.
+Only adds MOD-BIT/MOD-SYMBOL if not already part of the event."
+  (let ((event (read-event)))
+    (vector (if (numberp event)
+                (logior (ash 1 mod-bit) event)
+              (if (memq mod-symbol (event-modifiers event))
+                  event
+                (my/add-event-modifier mod-prefix event))))))
+
+(defun my/hyperify (_)
+  "Read the next event and apply the `hyper' modifier to it.
+Returns a new vector holding the hyper-ed event."
+  (my/apply-mod-to-next-event 'hyper 24 "H-"))
+
+(defun my/superify (_)
+  "Read the next event and apply the `super' modifier to it.
+Returns a new vector holding the super-ed event."
+  (my/apply-mod-to-next-event 'super 23 "s-"))
+
+;; Translate a "special" key into a hyper prefix. Here, "C-M-<menu>" was setup in Windows PowerToys utility.
+;; I was unable to locate a key that does not repeat, so to use as a modifier just press CAPS LOCK once and then
+;; another key -- don't hold it down. Here's a snippet from the PowerToys configuration file:
 ;;
-;; {
-;;     "manipulators": [
+;; "remapKeys": {
+;;     "inProcess": [
 ;;         {
-;;             "description": "Change caps_lock to command+control+option",
-;;             "from": {
-;;                 "key_code": "caps_lock",
-;;                 "modifiers": {
-;;                     "optional": [
-;;                         "any"
-;;                     ]
-;;                 }
-;;             },
-;;             "to": [
-;;                 {
-;;                     "key_code": "left_command",
-;;                     "modifiers": [
-;;                         "left_control",
-;;                         "left_option"
-;;                     ]
-;;                 }
-;;             ],
-;;             "type": "basic"
+;;             "originalKeys": "20","newRemapKeys": "17;18;93"
 ;;         }
 ;;     ]
-;; }
+;; },
 ;;
-;; Also recommended: remap FN to left CTRL.
+;; The numbers above are the USB keycodes involved in the transformation, where 20 is the CAPS LOCK key,
+;; keycode 93 is the "menu" key, and 17 and 18 are the mods to set.
 ;;
-(defcustom my/hyper-key-prefix (if my/is-macosx "A-C-M" "C-M-s")
-  "Modifier collection to use a a `hyper' modifier."
-  :type '(string)
-  :group 'my/customizations)
-
-(defun my/hyper-key (key)
-  "Create a `hyper' key definition for KEY."
-  (concat my/hyper-key-prefix "-" key))
+(keymap-set local-function-key-map (if my/is-macosx "A-C-<help>" "C-M-<menu>") #'my/hyperify)
 
 (defun my/screen-layout ()
   "Identify current screen layout.
@@ -345,12 +349,13 @@ list of symbols."
  "my-makefile-mode" 'my/makefile-mode-hook
  "my-python-mode" '(my/python-mode-hook my/inferior-python-mode-hook)
  "my-sh-mode" 'my/sh-mode-hook
+ "my-js2-mode" 'my/js2-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
 
 (use-package key-chord
-  :vc (:fetcher github :repo "emacsorphanage/key-chord")
   :ensure t
-  :commands (key-chord-define))
+  :vc (:fetcher github :repo "emacsorphanage/key-chord"))
+(require 'key-chord)
 
 (defun my/emacs-key-bind (keymap &rest definitions)
   "Apply key binding DEFINITIONS in the given KEYMAP.
@@ -383,22 +388,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
      (lambda (chord command) (key-chord-define keymap chord command))
      chords commands)))
 
-(defun my/emacs-hyper-key-bind (keymap &rest definitions)
-  "Apply hyper key binding DEFINITIONS in the given KEYMAP.
-DEFINITIONS is a sequence of string and command pairs given as a sequence."
-  (unless (zerop (logand (length definitions) 1))
-    (error "Uneven number of key+command pairs"))
-  (unless (keymapp keymap)
-    (error "Expected a `keymap' as first argument"))
-  ;; Partition `definitions' into two groups, one with key definitions and another with functions and/or nil values
-  (let* ((groups (seq-group-by #'stringp definitions))
-         (keys (seq-drop (elt groups 0) 1))
-         (commands (seq-drop (elt groups 1) 1)))
-    ;; Only execute if given a valid keymap
-    (seq-mapn
-     (lambda (key command) (define-key keymap (kbd (my/hyper-key key)) command))
-     keys commands)))
-
 ;;; -- BUILT-IN PACKAGES
 
 (use-package project
@@ -421,6 +410,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package shell-mode
   :hook ((shell-mode . my/shell-mode-hook)))
+
+(use-package js2-mode
+  :ensure t
+  :hook ((js2-mode . my/js2-mode-hook)))
 
 (use-package winner
   :bind (("C-<left>" . winner-undo)
@@ -463,48 +456,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
          ("C-<" . mc/mark-previous-like-this)
          ("C-c C->" . mc/mark-all-like-this)))
 
-(use-package impatient-mode
-  :vc (:fetcher github :repo "skeeto/impatient-mode")
-  :commands (imp-set-user-filter impatient-mode)
-  :defines (imp-user-filter)
-  :config
-  (setq-default imp-user-filter #'my/markdown-to-html))
-
-(defun my/point-min-after-front-matter ()
-  "Skip any front matter in current buffer and return POINT.
-Front matter is defined as a set of lines in the buffer
-that start and end with lines containing only `---'."
-  (goto-char (point-min))
-  (when (looking-at "^---$")
-    (forward-line 1)
-    (while (not (looking-at "^---$"))
-      (forward-line 1))
-    (forward-line 1))
-  (point))
-
-(defun my/markdown-to-html (buffer)
-  "Generate HTML from Markdown content in BUFFER.
-Will strip away any `denote' front matter that
-starts with `---' alone on the first line of the buffer and
-ends with the same `---' on its own line."
-  (princ (with-current-buffer buffer
-           (format "<!DOCTYPE html>
-<html>
- <title>Impatient Markdown</title>
- <xmp theme=\"united\" style=\"display:none;\">
- %s
- </xmp>
- <script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\">
- </script>
-</html>" (buffer-substring-no-properties (save-excursion
-                                           (my/point-min-after-front-matter))
-                                         (point-max))))
-         (current-buffer)))
-
-(defun my/markdown-mode ()
-  "Customization hook for `markdown-mode'."
-  (impatient-mode)
-  (imp-set-user-filter #'my/markdown-to-html))
+(unless (display-graphic-p)
+  (use-package corfu-terminal
+    :ensure t
+    :commands (corfu-terminal-mode)
+    :hook (after-init . corfu-terminal-mode)))
 
 (when (display-graphic-p)
   (use-package all-the-icons
@@ -557,11 +513,7 @@ ends with the same `---' on its own line."
   :bind (("C-c f" . magit-file-dispatch)
          ("C-c g" . magit-dispatch)
          ("C-x g" . magit-status)
-         ("C-M-g" . magit-status))
-  :init
-  (let ((prefix (my/hyper-key "g")))
-    (message "bind-key %s" prefix)
-    (bind-key prefix #'magit-status)))
+         ("C-M-g" . magit-status)))
 
 (use-package rg
   :ensure t
@@ -569,30 +521,6 @@ ends with the same `---' on its own line."
   :bind ("C-x m" . rg-project)
   :config
   (rg-enable-default-bindings))
-
-;; (use-package projectile
-;;   :ensure t
-;;   :after (rg)
-;;   :commands (projectile-mode projectile-project-name projectile-register-project-type)
-;;   :bind-keymap (("C-x p" . projectile-command-map)
-;;                 ("M-s-p" . projectile-command-map))
-;;   :bind (:map projectile-command-map
-;;               ("s r" . rg-project))
-;;   :hook (prog-mode . projectile-mode)
-;;   :init
-;;   (let ((prefix (my/hyper-key "p")))
-;;     (bind-key prefix #'(lambda nil
-;;                          (interactive)
-;;                          (use-package-autoload-keymap 'projectile-command-map 'projectile nil))))
-;;   :config
-;;   (projectile-register-project-type 'swift '("Package.swift")
-;;                                     :project-file "Package.swift"
-;;                                     :src-dir "Sources"
-;;                                     :test-dir "Tests"
-;;                                     :compile "swift build"
-;;                                     :test "swift test"
-;;                                     :run "swift run"
-;;                                     :test-suffix ""))
 
 (use-package denote
   :ensure t
@@ -668,7 +596,6 @@ command guarantees that dispatching will always happen."
 
 (use-package consult
   :ensure t
-  ;; :after (projectile)
   :commands (consult--customize-put)    ; silence flymake warning
   :bind (("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
@@ -727,7 +654,7 @@ command guarantees that dispatching will always happen."
          :map project-prefix-map
          ("b" . consult-project-buffer))
   :hook (completion-list-mode . consult-preview-at-point-mode)
-  :commands (consult-register-format consult-register-window consult-xref) ;; projectile-project-root)
+  :commands (consult-register-format consult-register-window consult-xref)
   :init
   (setq register-preview-function #'consult-register-format)
   (advice-add #'register-preview :override #'consult-register-window)
@@ -804,8 +731,8 @@ command guarantees that dispatching will always happen."
          ("C-c d" . crux-duplicate-current-line-or-region)
          ("C-x 4 t" . crux-transpose-windows)
          ("C-k" . crux-smart-kill-line)
-         ("C-c i" . crux-indent-defun)
-         ("C-c I" . crux-find-user-init-file)
+         ("C-c C-i" . crux-indent-defun)
+         ("C-c i" . crux-find-user-init-file)
          ("C-c ," . crux-find-user-custom-file)
          ("C-^" . crux-top-join-line)))
 
@@ -833,18 +760,9 @@ command guarantees that dispatching will always happen."
 
 (use-package corfu
   :ensure t)
-  ;; :bind (:map corfu-map
-  ;;             ("<return>" . corfu-complete)))
-
-(use-package corfu-terminal
-  :when my/is-terminal
-  :ensure t
-  :commands (corfu-terminal-mode)
-  :hook (after-init . corfu-terminal-mode))
 
 (use-package markdown-mode
   :ensure t
-  :after (impatient-mode)
   :hook (markdown-mode . my/markdown-mode))
 
 (use-package cmake-mode
@@ -1004,19 +922,17 @@ Of course if you do not like these bindings, just roll your own!")
   (let ((inhibit-read-only t))
     (set-text-properties (point-min) (point-max) nil)))
 
-(defun my/matching-paren (arg)
-  "Locate the matching ARG paren."
-  (interactive "P")
-  (if arg
-      (self-insert-command 1); (insert "%")
-    (cond ((looking-at "[[({]")
-	   (forward-sexp 1)
-	   (forward-char -1))
-	  ((looking-at "[]})]")
-	   (forward-char 1)
-	   (forward-sexp -1))
-	  (t
-	   (self-insert-command 1)))))
+(defun my/matching-paren ()
+  "When point is on a paren-type character, jump to its twin."
+  (interactive)
+  (cond ((looking-at "[[({]")
+	 (forward-sexp 1)
+	 (forward-char -1))
+	((looking-at "[]})]")
+	 (forward-char 1)
+	 (forward-sexp -1))
+	(t
+	 nil)))
 
 (defun my/toggle-show-minor-modes ()
   "Toggle the display of minor mode elements on the mode line."
@@ -1118,219 +1034,6 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   (find-file-other-window
    (expand-file-name ".dir-locals.el")))
 
-;;; --- Key Chords
-
-;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to type with
-;; one or two hands.
-(my/emacs-chord-bind global-map
-                     ;; 'q' and same row
-                     "qq" #'undo
-                     "qw" nil
-                     ; "qe" nil -- "equal"
-                     "qr" nil
-                     "qt" nil
-                     "qy" nil
-                     "qi" nil
-                     "qo" nil
-                     "qp" nil
-                     "q[" nil
-                     "q]" nil
-                     "q\\" nil
-
-                     ;; 'q' and previous row
-                     "q2" nil
-                     "q3" nil
-                     "q7" nil
-                     "q8" nil
-                     "q9" nil
-                     "q0" nil
-                     "q-" nil
-                     "q=" nil
-                     ["q" "DEL"] nil
-
-                     ;; 'q' and next row
-                     "qd" nil
-                     "qf" nil
-                     "qg" nil
-                     "qf" nil
-                     "qg" nil
-                     "qh" nil
-                     "qj" nil
-                     "qk" nil
-                     "ql" nil
-                     "q;" nil
-                     "q'" nil
-                     ["q" "RET"] nil
-
-                     ;; 'q' and third row
-                     "qv" nil
-                     "qb" nil
-                     "qn" nil
-                     "qm" nil
-                     "q," nil
-                     "q." nil
-                     "q/" nil
-
-                     ;; 'w' and same row
-                     "ww" nil
-                     ; "qe" nil -- "equal"
-                     "wt" nil
-                     "wy" nil
-                     "wp" nil
-                     "w[" nil
-                     "w]" nil
-                     "w\\" nil
-                     ;; 'w' and previous row
-                     "w1" nil
-                     "w4" nil
-                     "w5" nil
-                     "w7" nil
-                     "w8" nil
-                     "w9" nil
-                     "w0" nil
-                     "w-" nil
-                     "w=" nil
-                     ["w" "DEL"] nil
-                     ;; 'w' and next row
-                     "wf" nil
-                     "wg" nil
-                     "wf" nil
-                     "wg" nil
-                     "wj" nil
-                     "wk" nil
-                     "wl" nil
-                     "w;" nil
-                     "w'" nil
-                     ["w" "RET"] nil
-                     ;; 'w' and third row
-                     "wv" nil
-                     "wb" nil
-                     "wn" nil
-                     "wm" nil
-                     "w," nil
-                     "w." nil
-                     "w/" nil
-
-                     ;; 'r' and next row
-                     "rj" nil
-                     "r;" nil
-                     "r'" nil
-                     ["r" "RET"] nil
-
-                     ;; 'r' and third row
-                     "rz" nil
-                     "rx" nil
-                     "rc" nil
-                     "rv" nil
-                     "r," nil
-                     "r." nil
-                     "r/" nil
-
-                     ;; 't' and previous row
-                     "t1" nil
-                     "t2" nil
-                     "t3" nil
-                     "t4" nil
-                     "t5" nil
-                     "t7" nil
-                     "t8" nil
-                     "t9" nil
-                     "t0" nil
-                     "t-" nil
-                     "t=" nil
-                     ["t" "DEL"] nil
-
-                     ;; 't' and next row
-                     "tj" nil
-                     "tk" nil
-                     "tl" nil
-                     "t;" nil
-                     "t'" nil
-                     ["t" "RET"] nil
-
-                     ;; 't' and third row
-                     "tz" nil
-                     "tx" nil
-                     "tc" nil
-                     "tv" nil
-                     "t," nil
-                     "t." nil
-                     "t/" nil
-
-                     ;; 'y' and previous row
-                     "y7" nil
-                     "y8" nil
-                     "y9" nil
-                     "y0" nil
-                     "y-" nil
-                     "y=" nil
-                     ["y" "DEL"] nil
-
-                     ;; 'y' and same row
-                     "yy" nil
-                     "yi" nil
-                     "y[" nil
-                     "y]" nil
-                     "y\\" nil
-                     ;; ''y' and third row
-                     "y/" nil
-
-                     ;; 'u' and same row
-                     "uu" #'my/ace-window-previous
-                     "u[" nil
-                     "u]" nil
-                     "u\\" nil
-
-                     ;; 'u' and next row
-                     "ua" nil
-                     "u'" nil
-                     ["u" "RET"] nil
-
-                     ;; 'p and next row
-                     "pj" nil
-                     "pk" nil
-                     "p;" nil
-                     "p'" nil
-                     ["p" "RET"] nil
-
-                     ;; 'p' and third row
-                     "pz" nil
-                     "px" nil
-                     "pc" nil
-                     "pv" nil
-                     "pb" nil
-                     "pn" nil
-                     "pm" nil
-                     "p," nil
-                     "p." nil
-                     "p/" nil
-
-                     "ii" #'my/ace-window-next
-                     "hb" #'consult-buffer
-
-                     "hh" #'my/describe-symbol-at-point
-                     "hb" #'popper-kill-latest-popup
-
-                     "jk" #'consult-project-buffer
-                     "vv" #'diff-hl-show-hunk
-                     "fm" #'flymake-show-buffer-diagnostics
-                     "kk" #'my/kill-current-buffer
-                     "ww" nil
-                     )
-
-;;; --- Hyper-key Bindings
-
-(my/emacs-hyper-key-bind global-map
-                         "u" #'undo
-                         "1" #'delete-other-windows
-                         "b" #'consult-buffer
-                         "g" #'magit-status
-                         "h" #'my/describe-symbol-at-point
-                         "m" #'consult-bookmark
-                         "p" #'consult-project-buffer
-                         "SPC" #'my/ace-window-always-dispatch
-                         )
-
 ;;; --- Key Bindings
 
 (my/emacs-key-bind global-map
@@ -1393,10 +1096,22 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    "M-[" #'previous-buffer
                    "M-]" #'next-buffer
 
-                   ;; "%" #'my/matching-paren
-
                    "C-S-p" #'my/ace-window-previous
                    "C-S-n" #'my/ace-window-next
+
+                   "M-P" #'my/ace-window-prefix
+                   "M-N" #'my/ace-window-next
+
+                   ;; --- Hyper-key Bindings
+                   "H-SPC" #'my/ace-window-always-dispatch
+                   "H-1" #'delete-other-windows
+                   "H-b" #'consult-buffer
+                   "H-g" #'magit-status
+                   "H-h" #'my/describe-symbol-at-point
+                   "H-m" #'consult-bookmark
+                   "H-p" #'consult-project-buffer
+                   "H-u" #'undo
+                   "H-;" #'my/matching-paren
 
                    ;; Unmap the following
                    "<insert>" #'ignore   ; disable key for toggling overwrite mode
@@ -1407,6 +1122,28 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    ;; Disable font size changes via trackpad
                    "C-<wheel-up>" #'ignore
                    "C-<wheel-down>" #'ignore)
+
+;;; --- Key Chords
+
+;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to type with
+;; one or two hands.
+(my/emacs-chord-bind global-map
+                     "qq" #'undo
+                     "ww" #'my/ace-window-always-dispatch
+                     "yy" #'consult-yank-replace
+
+                     "UU" #'my/ace-window-previous
+                     "II" #'my/ace-window-next
+                     "hb" #'consult-buffer
+
+                     "hh" #'my/describe-symbol-at-point
+                     "hb" #'popper-kill-latest-popup
+
+                     "jk" #'consult-project-buffer
+                     "vv" #'diff-hl-show-hunk
+                     "fm" #'flymake-show-buffer-diagnostics
+                     "kk" #'my/kill-current-buffer
+                     )
 
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))
