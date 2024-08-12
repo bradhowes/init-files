@@ -108,6 +108,8 @@ Note that this is also true when running in a terminal window.")
 ;;     ]
 ;; }
 ;;
+;; Also recommended: remap FN to left CTRL.
+;;
 (defcustom my/hyper-key-prefix (if my/is-macosx "A-C-M" "C-M-s")
   "Modifier collection to use a a `hyper' modifier."
   :type '(string)
@@ -344,6 +346,11 @@ list of symbols."
  "my-python-mode" '(my/python-mode-hook my/inferior-python-mode-hook)
  "my-sh-mode" 'my/sh-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
+
+(use-package key-chord
+  :vc (:fetcher github :repo "emacsorphanage/key-chord")
+  :ensure t
+  :commands (key-chord-define))
 
 (defun my/emacs-key-bind (keymap &rest definitions)
   "Apply key binding DEFINITIONS in the given KEYMAP.
@@ -614,7 +621,38 @@ ends with the same `---' on its own line."
   :ensure t
   :commands (aw-window-list aw-switch-to-window aw-select aw-flip-window) ; Used in custom functions below
   :defines (aw-dispatch-always)
+  :config
+  (setq aw-make-frame-char ?n)
   :bind (("M-o" . ace-window)))
+
+(defun my/aw-make-frame ()
+  "Make a new frame using layout settings for the current display.
+The first frame always takes on `initial-frame-alist', and subsequent frames
+use `default-frame-alist' by default. If there are already two frames active
+then subsequent ones will be at `my/align-right-frame-alist' which aligns with
+the right-edge of the screen, but may overlap with the middle frame."
+  (let ((num-frames (length (visible-frame-list))))
+    (make-frame)
+    (when (> num-frames 1)
+      (my/reset-frame-right-display))))
+
+(advice-add 'aw-make-frame :override #'my/aw-make-frame)
+
+(setq aw-dispatch-alist
+      '((?k aw-delete-window "Delete Window")
+        (?s aw-swap-window "Swap Windows")
+        (?M aw-move-window "Move Window")
+        (?c aw-copy-window "Copy Window")
+        (?j aw-switch-buffer-in-window "Select Buffer")
+        (?n aw-flip-window)
+        (?u aw-switch-buffer-other-window "Switch Buffer Other Window")
+        (?e aw-execute-command-other-window "Execute Command Other Window")
+        (?F aw-split-window-fair "Split Fair Window")
+        (?v aw-split-window-vert "Split Vert Window")
+        (?b aw-split-window-horz "Split Horz Window")
+        (?o delete-other-windows "Delete Other Windows")
+        (?T aw-transpose-frame "Transpose Frame")
+        (?? aw-show-dispatch-help)))
 
 (defun my/ace-window-always-dispatch ()
   "Invoke `ace-window' after setting `aw-dispatch-always' to T.
@@ -693,8 +731,6 @@ command guarantees that dispatching will always happen."
   :init
   (setq register-preview-function #'consult-register-format)
   (advice-add #'register-preview :override #'consult-register-window)
-  (let ((prefix (my/hyper-key "b")))
-    (bind-key prefix #'consult-buffer))
   :config
   (defun my/consult-line-symbol-at-point ()
     "Start `consult-line' with symbol at point."
@@ -707,6 +743,7 @@ command guarantees that dispatching will always happen."
                      consult--source-recent-file consult--source-project-recent-file
                      :preview-key '(:debounce 0.4 any)))
 
+;; FYI: Embark's default action binding of "RET" fails if a mode binds to <return>.
 (use-package embark
   :ensure t
   :bind (("C-." . embark-act)
@@ -846,13 +883,6 @@ command guarantees that dispatching will always happen."
 (use-package osx-dictionary
   :when my/is-macosx
   :bind (("C-c l" . osx-dictionary-search-pointer)))
-
-(use-package key-chord
-  :commands (key-chord-define)
-  :ensure t)
-
-(use-package use-package-chords
-  :ensure t)
 
 (use-package compile
   :config
@@ -1053,8 +1083,6 @@ Taken from https://karthinks.com/software/emacs-window-management-almanac/#windo
              (this-command command))
         (call-interactively command)))))
 
-(my/emacs-hyper-key-bind global-map "o" #'my/ace-window-one-command)
-
 (defun my/display-buffer-pre-func (buffer alist)
   "Method to use for `display-buffer-overriding-action'.
 The BUFFER and ALIST are ignored."
@@ -1092,9 +1120,192 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 
 ;;; --- Key Chords
 
+;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to type with
+;; one or two hands.
 (my/emacs-chord-bind global-map
-                     "qw" #'magit-status
-                     "ww" #'delete-other-windows
+                     ;; 'q' and same row
+                     "qq" #'undo
+                     "qw" nil
+                     ; "qe" nil -- "equal"
+                     "qr" nil
+                     "qt" nil
+                     "qy" nil
+                     "qi" nil
+                     "qo" nil
+                     "qp" nil
+                     "q[" nil
+                     "q]" nil
+                     "q\\" nil
+
+                     ;; 'q' and previous row
+                     "q2" nil
+                     "q3" nil
+                     "q7" nil
+                     "q8" nil
+                     "q9" nil
+                     "q0" nil
+                     "q-" nil
+                     "q=" nil
+                     ["q" "DEL"] nil
+
+                     ;; 'q' and next row
+                     "qd" nil
+                     "qf" nil
+                     "qg" nil
+                     "qf" nil
+                     "qg" nil
+                     "qh" nil
+                     "qj" nil
+                     "qk" nil
+                     "ql" nil
+                     "q;" nil
+                     "q'" nil
+                     ["q" "RET"] nil
+
+                     ;; 'q' and third row
+                     "qv" nil
+                     "qb" nil
+                     "qn" nil
+                     "qm" nil
+                     "q," nil
+                     "q." nil
+                     "q/" nil
+
+                     ;; 'w' and same row
+                     "ww" nil
+                     ; "qe" nil -- "equal"
+                     "wt" nil
+                     "wy" nil
+                     "wp" nil
+                     "w[" nil
+                     "w]" nil
+                     "w\\" nil
+                     ;; 'w' and previous row
+                     "w1" nil
+                     "w4" nil
+                     "w5" nil
+                     "w7" nil
+                     "w8" nil
+                     "w9" nil
+                     "w0" nil
+                     "w-" nil
+                     "w=" nil
+                     ["w" "DEL"] nil
+                     ;; 'w' and next row
+                     "wf" nil
+                     "wg" nil
+                     "wf" nil
+                     "wg" nil
+                     "wj" nil
+                     "wk" nil
+                     "wl" nil
+                     "w;" nil
+                     "w'" nil
+                     ["w" "RET"] nil
+                     ;; 'w' and third row
+                     "wv" nil
+                     "wb" nil
+                     "wn" nil
+                     "wm" nil
+                     "w," nil
+                     "w." nil
+                     "w/" nil
+
+                     ;; 'r' and next row
+                     "rj" nil
+                     "r;" nil
+                     "r'" nil
+                     ["r" "RET"] nil
+
+                     ;; 'r' and third row
+                     "rz" nil
+                     "rx" nil
+                     "rc" nil
+                     "rv" nil
+                     "r," nil
+                     "r." nil
+                     "r/" nil
+
+                     ;; 't' and previous row
+                     "t1" nil
+                     "t2" nil
+                     "t3" nil
+                     "t4" nil
+                     "t5" nil
+                     "t7" nil
+                     "t8" nil
+                     "t9" nil
+                     "t0" nil
+                     "t-" nil
+                     "t=" nil
+                     ["t" "DEL"] nil
+
+                     ;; 't' and next row
+                     "tj" nil
+                     "tk" nil
+                     "tl" nil
+                     "t;" nil
+                     "t'" nil
+                     ["t" "RET"] nil
+
+                     ;; 't' and third row
+                     "tz" nil
+                     "tx" nil
+                     "tc" nil
+                     "tv" nil
+                     "t," nil
+                     "t." nil
+                     "t/" nil
+
+                     ;; 'y' and previous row
+                     "y7" nil
+                     "y8" nil
+                     "y9" nil
+                     "y0" nil
+                     "y-" nil
+                     "y=" nil
+                     ["y" "DEL"] nil
+
+                     ;; 'y' and same row
+                     "yy" nil
+                     "yi" nil
+                     "y[" nil
+                     "y]" nil
+                     "y\\" nil
+                     ;; ''y' and third row
+                     "y/" nil
+
+                     ;; 'u' and same row
+                     "uu" #'my/ace-window-previous
+                     "u[" nil
+                     "u]" nil
+                     "u\\" nil
+
+                     ;; 'u' and next row
+                     "ua" nil
+                     "u'" nil
+                     ["u" "RET"] nil
+
+                     ;; 'p and next row
+                     "pj" nil
+                     "pk" nil
+                     "p;" nil
+                     "p'" nil
+                     ["p" "RET"] nil
+
+                     ;; 'p' and third row
+                     "pz" nil
+                     "px" nil
+                     "pc" nil
+                     "pv" nil
+                     "pb" nil
+                     "pn" nil
+                     "pm" nil
+                     "p," nil
+                     "p." nil
+                     "p/" nil
+
+                     "ii" #'my/ace-window-next
                      "hb" #'consult-buffer
 
                      "hh" #'my/describe-symbol-at-point
@@ -1103,22 +1314,21 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                      "jk" #'consult-project-buffer
                      "vv" #'diff-hl-show-hunk
                      "fm" #'flymake-show-buffer-diagnostics
-                     "fn" #'my/ace-window-next
-                     "fp" #'my/ace-window-previous
-                     "fb" #'aw-flip-window
                      "kk" #'my/kill-current-buffer
-                     "l;" #'undo)
+                     "ww" nil
+                     )
 
 ;;; --- Hyper-key Bindings
 
 (my/emacs-hyper-key-bind global-map
                          "u" #'undo
                          "1" #'delete-other-windows
-                         "h" #'my/describe-symbol-at-point
                          "b" #'consult-buffer
-                         "p" #'consult-project-buffer
                          "g" #'magit-status
-                         "w" #'my/ace-window-always-dispatch
+                         "h" #'my/describe-symbol-at-point
+                         "m" #'consult-bookmark
+                         "p" #'consult-project-buffer
+                         "SPC" #'my/ace-window-always-dispatch
                          )
 
 ;;; --- Key Bindings
@@ -1178,7 +1388,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    "<end>" #'end-of-buffer
                    "<delete>" #'delete-char
                    "S-<f12>" #'package-list-packages
-                   "<f12>" #'consult-bookmark
+
                    "M-z" #'zap-up-to-char
                    "M-[" #'previous-buffer
                    "M-]" #'next-buffer
