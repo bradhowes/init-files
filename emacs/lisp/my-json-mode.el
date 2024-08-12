@@ -5,7 +5,7 @@
 (require 'indent-bars)
 (require 'font-lock)
 
-(font-lock-add-keywords 'js-json-mode '(("[][(){}]" . font-lock-brace-face)))
+(font-lock-add-keywords 'json-mode '(("[][(){}]" . font-lock-brace-face)))
 
 (defun my/json-mode-hook ()
   "Custom JSON mode."

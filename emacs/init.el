@@ -350,6 +350,7 @@ list of symbols."
  "my-python-mode" '(my/python-mode-hook my/inferior-python-mode-hook)
  "my-sh-mode" 'my/sh-mode-hook
  "my-js2-mode" 'my/js2-mode-hook
+ "my-json-mode" 'my/json-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
 
 (use-package key-chord
@@ -410,6 +411,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package shell-mode
   :hook ((shell-mode . my/shell-mode-hook)))
+
+(use-package json-mode
+  :ensure t
+  :init (add-to-list 'auto-mode-alist '("\\.yagconf\\'" . json-mode))
+  :hook ((json-mode . my/json-mode-hook)))
 
 (use-package js2-mode
   :ensure t
