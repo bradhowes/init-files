@@ -491,7 +491,6 @@ I originally had a macro, but that was sloooow."
 
   (auto-fill-mode 1)
   (setq auto-fill-function 'my/cc-do-auto-fill)
-  (local-set-key [(return)] 'my/cc-newline-and-indent)
   (local-set-key [(meta control \;)] 'my/cc-new-block-comment)
   (local-set-key [(control :)] 'my/cc-new-header-comment)
   (local-set-key [(meta q)] 'my/cc-refill-block-comment))

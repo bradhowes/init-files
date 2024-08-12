@@ -77,5 +77,5 @@ ends with the same `---' on its own line."
   (imp-set-user-filter #'my/markdown-to-html)
   (local-set-key [(f8)] #'my/make-link))
 
-(provide 'my-markdown)
-;;; my-markdown.el ends here
+(provide 'my-markdown-mode)
+;;; my-markdown-mode.el ends here

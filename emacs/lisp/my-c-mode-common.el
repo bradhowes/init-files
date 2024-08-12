@@ -391,13 +391,6 @@ ID ACTION CONTEXT."
   (local-set-key [(control c)(?5)] 'my/c-c-c-5-keymap)
   (local-set-key [(control c)(?5)(?i)] 'projectile-find-other-file-other-frame) ;; 'my/c-find-include-file-other-frame)
 
-  (local-set-key [(return)] 'newline-and-indent)
-  (local-set-key [(control j)] 'newline)
-
-  ;;(local-set-key [(f8)] 'c++-mode)
-  ;; (local-set-key [(shift) (f8)] 'objc-mode)
-
-  ;;
   ;; Attempt to locate a 'build' directory to move to when compiling a source
   ;; file.
   ;;

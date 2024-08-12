@@ -31,8 +31,7 @@
   "Custom Lisp mode."
   (font-lock-mode t)
   (show-paren-mode t)
-  (local-set-key [(control x)(control e)] 'my-eval-last-sexp)
-  (local-set-key [(control return)] 'eval-print-last-sexp))
+  (local-set-key [(control x)(control e)] 'my-eval-last-sexp))
 
 (provide 'my-lisp-mode)
 ;;; my-lisp-mode.el ends here

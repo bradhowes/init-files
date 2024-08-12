@@ -45,8 +45,6 @@
   (local-set-key [(control x)(control e)] #'my/eval-this-defun)
   (local-set-key [(control x)(meta e)] #'eval-last-sexp)
   (local-set-key [(meta control \;)] #'my/lisp-insert-block-comment)
-  ;; (local-set-key [(return)] #'newline-and-indent)
-  (local-set-key [(control j)] #'newline)
   (local-set-key [(control return)] #'eval-print-last-sexp))
 
 (provide 'my-lisp-mode)
