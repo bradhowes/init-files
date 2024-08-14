@@ -161,7 +161,7 @@ Returns one of the follow symbols based on width:
 
 (defun my/rows (layout)
   "The number of rows to show in a frame shown on LAYOUT."
-  (if (my/is-4k layout) 102 (if (my/is-laptop layout) 88 40)))
+  (if (my/is-4k layout) 104 (if (my/is-laptop layout) 88 40)))
 
 (defun my/cols (layout)
   "The number of columns to show in a frame shown on LAYOUT."
@@ -391,8 +391,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 ;;; -- BUILT-IN PACKAGES
 
-(use-package project
-  :bind ([remap project-vc-dir] . #'magit-status))
+;; (use-package project
+;;   :bind ([remap project-vc-dir] . #'magit-status))
+
+;; (advice-add #'project-root :filter-return (lambda (path) (expand-file-name path)))
 
 (use-package lisp-mode
   :hook ((lisp-mode . my/lisp-mode-hook)
@@ -452,6 +454,22 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (package-vc-install "https://github.com/slotThe/vc-use-package"))
 (require 'vc-use-package)
 
+(use-package projectile
+  :ensure t
+  :defer nil
+  :commands (projectile-mode)
+  :bind-keymap (("C-x p" . projectile-command-map)
+                ("H-p" . projectile-command-map))
+  :config (projectile-mode))
+
+(use-package compile-multi
+  :ensure t)
+
+(use-package consult-compile-multi
+  :ensure t
+  :after compile-multi
+  :hook (after-init . consult-compile-multi-mode))
+
 (use-package indent-bars
   :vc (:fetcher github :repo "jdtsmith/indent-bars")
   :hook (prog-mode . indent-bars-mode))
@@ -479,7 +497,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     :hook ((marginalia-mode . all-the-icons-completion-marginalia-setup)))
 
   (use-package doom-modeline
-    :ensure t))
+    :ensure t)
+
+  (use-package compile-multi-all-the-icons
+    :ensure t
+    :after (all-the-icons-completion compile-multi)))
 
 (use-package marginalia
   :ensure t
@@ -514,6 +536,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package magit
   :ensure t
+  :commands (magit-status-setup-buffer)
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-c f" . magit-file-dispatch)
@@ -523,8 +546,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package rg
   :ensure t
+  :after (projectile)
   :commands (rg-enable-default-bindings)
-  :bind ("C-x m" . rg-project)
+  :bind (:map projectile-command-map
+              ("s r" . rg-project))
   :config
   (rg-enable-default-bindings))
 
@@ -602,6 +627,7 @@ command guarantees that dispatching will always happen."
 
 (use-package consult
   :ensure t
+  :after (projectile)
   :commands (consult--customize-put)    ; silence flymake warning
   :bind (("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
@@ -657,10 +683,10 @@ command guarantees that dispatching will always happen."
          :map minibuffer-local-map
          ("C-s" . consult-history)
 
-         :map project-prefix-map
+         :map projectile-command-map
          ("b" . consult-project-buffer))
   :hook (completion-list-mode . consult-preview-at-point-mode)
-  :commands (consult-register-format consult-register-window consult-xref)
+  :commands (consult-register-format consult-register-window consult-xref projectile-project-root)
   :init
   (setq register-preview-function #'consult-register-format)
   (advice-add #'register-preview :override #'consult-register-window)
@@ -674,7 +700,8 @@ command guarantees that dispatching will always happen."
                      consult-bookmark consult-recent-file consult-xref
                      consult--source-bookmark consult--source-file-register
                      consult--source-recent-file consult--source-project-recent-file
-                     :preview-key '(:debounce 0.4 any)))
+                     :preview-key '(:debounce 0.4 any))
+  (setq consult-project-function (lambda (_) (projectile-project-root))))
 
 ;; FYI: Embark's default action binding of "RET" fails if a mode binds to <return>.
 (use-package embark
@@ -1115,7 +1142,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    "H-g" #'magit-status
                    "H-h" #'my/describe-symbol-at-point
                    "H-m" #'consult-bookmark
-                   "H-p" #'consult-project-buffer
+                   "H-p" #'projectile-command-map
                    "H-u" #'undo
                    "H-;" #'my/matching-paren
 

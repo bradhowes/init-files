@@ -134,7 +134,7 @@
      ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
  '(package-quickstart t)
  '(package-selected-packages
-   '(json-mode simple-httpd key-chord js2-mode company embark-consult embark posframe htmlize impatient-mode vterm doom-modeline consult-notes vc-use-package indent-bars osx-dictionary corfu-terminal expand-region crux char-menu popper tree-sitter tree-sitter-langs lsp-pyright lsp-jedi exec-path-from-shell consult-denote consult-eglot verb multiple-cursors eglot-signature-eldoc-talkative eldoc-box window-commander rg eglot ws-butler cape corfu-info lsp-sourcekit swift-mode corfu use-package denote consult-dir orderless vertico markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core flycheck-indentation flycheck diff-hl cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
+   '(compile-multi-all-the-icons consult-compile-multi compile-multi json-mode simple-httpd key-chord js2-mode company embark-consult embark posframe htmlize impatient-mode vterm doom-modeline consult-notes vc-use-package indent-bars osx-dictionary corfu-terminal expand-region crux char-menu popper tree-sitter tree-sitter-langs lsp-pyright lsp-jedi exec-path-from-shell consult-denote consult-eglot verb multiple-cursors eglot-signature-eldoc-talkative eldoc-box window-commander rg eglot ws-butler cape corfu-info lsp-sourcekit swift-mode corfu use-package denote consult-dir orderless vertico markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core flycheck-indentation flycheck diff-hl cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
  '(package-vc-selected-packages
    '((el-docstring-sap :vc-backend Git :url "https://github.com/rileyrg/el-docstring-sap")
      (impatient-mode :vc-backend Git :url "https://github.com/skeeto/impatient-mode")
@@ -149,6 +149,13 @@
  '(popper-mode t)
  '(popper-reference-buffers
    '("\\*Messages\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode compilation-mode))
+ '(projectile-generic-command "rg --files --hidden -0")
+ '(projectile-globally-ignored-directories
+   '(".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".tox" ".svn" ".cache" ".clangd" "./build" "./cmake"))
+ '(projectile-mode t nil (projectile))
+ '(projectile-mode-line-prefix " P")
+ '(projectile-sort-order 'recently-used)
+ '(projectile-switch-project-action 'projectile-dired)
  '(pyvenv-workon ".")
  '(read-extended-command-predicate 'command-completion-default-include-p)
  '(recentf-max-menu-items 50)
@@ -158,7 +165,9 @@
  '(resize-mini-windows t)
  '(ring-bell-function 'mode-line-bell-flash)
  '(safe-local-variable-values
-   '((checkdoc-package-keywords-flag)
+   '((projectile-project-compilation-cmd . "make -C emacs/lisp -k ")
+     (projectile-compile-project . "make -C emacs/lisp -k ")
+     (checkdoc-package-keywords-flag)
      (etags-regen-ignores "test/manual/etags/")
      (etags-regen-regexp-alist
       (("c" "objc")
