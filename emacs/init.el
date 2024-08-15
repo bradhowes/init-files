@@ -121,7 +121,8 @@ Returns a new vector holding the super-ed event."
 ;; The numbers above are the USB keycodes involved in the transformation, where 20 is the CAPS LOCK key,
 ;; keycode 93 is the "menu" key, and 17 and 18 are the mods to set.
 ;;
-(keymap-set local-function-key-map (if my/is-macosx "A-C-<help>" "C-M-<menu>") #'my/hyperify)
+(when my/is-x-windows
+  (keymap-set local-function-key-map "C-M-<menu>" #'my/hyperify))
 
 (defun my/screen-layout ()
   "Identify current screen layout.
@@ -462,13 +463,15 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                 ("H-p" . projectile-command-map))
   :config (projectile-mode))
 
-(use-package compile-multi
-  :ensure t)
+;; (use-package compile-multi
+;;   :custom
+;;   (compile-multi-default-directory 'projectile-project-root)
+;;   :ensure t)
 
-(use-package consult-compile-multi
-  :ensure t
-  :after compile-multi
-  :hook (after-init . consult-compile-multi-mode))
+;; (use-package consult-compile-multi
+;;   :ensure t
+;;   :after compile-multi
+;;   :hook (after-init . consult-compile-multi-mode))
 
 (use-package indent-bars
   :vc (:fetcher github :repo "jdtsmith/indent-bars")
@@ -497,11 +500,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     :hook ((marginalia-mode . all-the-icons-completion-marginalia-setup)))
 
   (use-package doom-modeline
-    :ensure t)
-
-  (use-package compile-multi-all-the-icons
-    :ensure t
-    :after (all-the-icons-completion compile-multi)))
+    :ensure t))
 
 (use-package marginalia
   :ensure t
@@ -548,8 +547,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :ensure t
   :after (projectile)
   :commands (rg-enable-default-bindings)
-  :bind (:map projectile-command-map
-              ("s r" . rg-project))
+  ;; :bind (:map projectile-command-map
+  ;;             ("s r" . rg-project))
   :config
   (rg-enable-default-bindings))
 
@@ -1118,8 +1117,6 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 
                    "C-M-\\" #'my/indent-buffer
 
-                   "C-x m" #'rg-project
-
                    "<home>" #'beginning-of-buffer
                    "<end>" #'end-of-buffer
                    "<delete>" #'delete-char
@@ -1138,6 +1135,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    ;; --- Hyper-key Bindings
                    "H-SPC" #'my/ace-window-always-dispatch
                    "H-1" #'delete-other-windows
+                   "H-2" #'split-window-below
                    "H-b" #'consult-buffer
                    "H-g" #'magit-status
                    "H-h" #'my/describe-symbol-at-point
@@ -1183,7 +1181,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   (load custom-file 'noerror))
 
 (defun my/set-bound-var (symbol value)
-  "Set SYMBOL with VALUE if symbol exists."
+  "Set SYMBOL with VALUE if SYMBOL exists."
   (when (boundp symbol)
     (set symbol value)))
 
@@ -1256,25 +1254,17 @@ Return an event vector."
     ;;                 ("\e\[%d;8u" control meta shift)))
     ;;         (setq c (1+ c)))))))
 
-(cond
- (my/is-macosx                          ; macOS specific
-  (eval-when-compile
-    (require 'ls-lisp))
-  (custom-set-variables
-   '(ls-lisp-use-insert-directory-program nil))
+(unless my/is-terminal
   (cond
-   (my/is-terminal                      ; macOS terminal
-    ;;
-    )
-   (t                                   ; macOS windows
+   (my/is-macosx
     (custom-set-variables
+     '(insert-directory-program "gls")
      '(frame-resize-pixelwise t)
      '(mac-command-modifier 'meta)
      '(mac-option-modifier 'alt)
      '(mac-right-command-modifier 'super)
-     '(mac-right-option-modifier 'hyper)))))
- (my/is-x-windows                       ; X Windows
-  (when (not my/is-terminal)
+     '(mac-right-option-modifier 'hyper)))
+   (my/is-x-windows
     (my/set-bound-var 'x-alt-keysym 'alt)
     (my/set-bound-var 'x-meta-keysym 'meta)
     (my/set-bound-var 'x-super-keysym 'super)
@@ -1283,3 +1273,5 @@ Return an event vector."
 (provide 'init)
 
 ;;; init.el ends here.
+
+;; (define-key local-function-key-map (kbd "<rcontrol>") 'event-apply-hyper-modifier)

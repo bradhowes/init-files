@@ -154,6 +154,7 @@
    '(".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".tox" ".svn" ".cache" ".clangd" "./build" "./cmake"))
  '(projectile-mode t nil (projectile))
  '(projectile-mode-line-prefix " P")
+ '(projectile-per-project-compilation-buffer t)
  '(projectile-sort-order 'recently-used)
  '(projectile-switch-project-action 'projectile-dired)
  '(pyvenv-workon ".")
@@ -165,13 +166,9 @@
  '(resize-mini-windows t)
  '(ring-bell-function 'mode-line-bell-flash)
  '(safe-local-variable-values
-   '((projectile-project-compilation-cmd . "make -C emacs/lisp -k ")
-     (projectile-compile-project . "make -C emacs/lisp -k ")
-     (checkdoc-package-keywords-flag)
-     (etags-regen-ignores "test/manual/etags/")
-     (etags-regen-regexp-alist
-      (("c" "objc")
-       "/[ \11]*DEFVAR_[A-Z_ \11(]+\"\\([^\"]+\\)\"/\\1/" "/[ \11]*DEFVAR_[A-Z_ \11(]+\"[^\"]+\",[ \11]\\([A-Za-z0-9_]+\\)/\\1/"))))
+   '((projectile-project-compilation-cmd . "make ")
+     (projectile-project-compilation-cmd . "make -C emacs/lisp -k ")
+     (checkdoc-package-keywords-flag)))
  '(save-interprogram-paste-before-kill t)
  '(save-place-mode t)
  '(savehist-additional-variables
