@@ -164,6 +164,7 @@
  '(register-preview-delay 0.5)
  '(resize-mini-windows t)
  '(ring-bell-function 'mode-line-bell-flash)
+ '(safe-local-variable-directories '("/Users/howes/src/Mine/init-files/"))
  '(safe-local-variable-values
    '((etags-regen-ignores "test/manual/etags/")
      (etags-regen-regexp-alist

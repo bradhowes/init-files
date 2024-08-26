@@ -342,18 +342,18 @@ list of symbols."
 ;; Modes
 
 (my/autoloads
- "emacs-pager" #'emacs-pager
- "my-cmake-mode" #'my/cmake-mode-hook
- "my-c++-mode" #'my/c++-mode-hook
- "my-dired-mode" #'my/dired-mode-hook
- "my-lisp-mode" #'(my/lisp-mode-hook my/lisp-data-mode-hook)
- "my-makefile-mode" #'my/makefile-mode-hook
- "my-markdown-mode" #'my/markdown-mode-hook
- "my-python-mode" #'(my/python-mode-hook my/inferior-python-mode-hook)
- "my-sh-mode" #'my/sh-mode-hook
- "my-json-mode" #'my/json-mode-hook
- "my-js2-mode" #'my/js2-mode-hook
- "my-shell-mode" #'my/shell-mode-hook)
+ "emacs-pager" 'emacs-pager
+ "my-cmake-mode" 'my/cmake-mode-hook
+ "my-c++-mode" 'my/c++-mode-hook
+ "my-dired-mode" 'my/dired-mode-hook
+ "my-lisp-mode" '(my/lisp-mode-hook my/lisp-data-mode-hook)
+ "my-makefile-mode" 'my/makefile-mode-hook
+ "my-markdown-mode" 'my/markdown-mode-hook
+ "my-python-mode" '(my/python-mode-hook my/inferior-python-mode-hook)
+ "my-sh-mode" 'my/sh-mode-hook
+ "my-json-mode" 'my/json-mode-hook
+ "my-js2-mode" 'my/js2-mode-hook
+ "my-shell-mode" 'my/shell-mode-hook)
 
 (use-package key-chord
   :ensure t
@@ -522,7 +522,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package magit
   :ensure t
-  :commands (magit-status-setup-buffer)
+  :commands (magit-status-setup-buffer magit-status)
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-c f" . magit-file-dispatch)))
@@ -1267,3 +1267,16 @@ Return an event vector."
 ;;; init.el ends here.
 
 ;; (define-key local-function-key-map (kbd "<rcontrol>") 'event-apply-hyper-modifier)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-vc-selected-packages
+   '((indent-bars :url "https://github.com/jdtsmith/indent-bars"))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
