@@ -1,4 +1,4 @@
-;;; package -- my-swift-mode -*- Mode: Emacs-Lisp -*-
+;;; package -- my-swift-mode -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 

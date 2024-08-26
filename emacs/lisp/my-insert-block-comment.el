@@ -1,4 +1,4 @@
-;;; package -- my-insert-block-comment -*- Mode: Emacs-Lisp -*-
+;;; package -- my-insert-block-comment -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 

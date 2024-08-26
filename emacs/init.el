@@ -342,21 +342,22 @@ list of symbols."
 ;; Modes
 
 (my/autoloads
- "emacs-pager" 'emacs-pager
- "my-cmake-mode" 'my/cmake-mode-hook
- "my-c++-mode" 'my/c++-mode-hook
- "my-dired-mode" 'my/dired-mode-hook
- "my-lisp-mode" '(my/lisp-mode-hook my/lisp-data-mode-hook)
- "my-makefile-mode" 'my/makefile-mode-hook
- "my-python-mode" '(my/python-mode-hook my/inferior-python-mode-hook)
- "my-sh-mode" 'my/sh-mode-hook
- "my-json-mode" 'my/json-mode-hook
- "my-js2-mode" 'my/js2-mode-hook
- "my-shell-mode" 'my/shell-mode-hook)
+ "emacs-pager" #'emacs-pager
+ "my-cmake-mode" #'my/cmake-mode-hook
+ "my-c++-mode" #'my/c++-mode-hook
+ "my-dired-mode" #'my/dired-mode-hook
+ "my-lisp-mode" #'(my/lisp-mode-hook my/lisp-data-mode-hook)
+ "my-makefile-mode" #'my/makefile-mode-hook
+ "my-markdown-mode" #'my/markdown-mode-hook
+ "my-python-mode" #'(my/python-mode-hook my/inferior-python-mode-hook)
+ "my-sh-mode" #'my/sh-mode-hook
+ "my-json-mode" #'my/json-mode-hook
+ "my-js2-mode" #'my/js2-mode-hook
+ "my-shell-mode" #'my/shell-mode-hook)
 
 (use-package key-chord
   :ensure t
-  :vc (:fetcher github :repo "emacsorphanage/key-chord"))
+  :vc (:url "https://github.com/emacsorphanage/key-chord"))
 (require 'key-chord)
 
 (defun my/emacs-key-bind (keymap &rest definitions)
@@ -451,10 +452,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 ;;; -- ADDED PACKAGES
 
-(unless (package-installed-p 'vc-use-package)
-  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-(require 'vc-use-package)
-
 (use-package projectile
   :ensure t
   :defer nil
@@ -463,22 +460,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                 ("H-p" . projectile-command-map))
   :config (projectile-mode))
 
-;; (use-package compile-multi
-;;   :custom
-;;   (compile-multi-default-directory 'projectile-project-root)
-;;   :ensure t)
-
-;; (use-package consult-compile-multi
-;;   :ensure t
-;;   :after compile-multi
-;;   :hook (after-init . consult-compile-multi-mode))
-
 (use-package indent-bars
-  :vc (:fetcher github :repo "jdtsmith/indent-bars")
+  :vc (:url "https://github.com/jdtsmith/indent-bars")
   :hook (prog-mode . indent-bars-mode))
 
 (use-package multiple-cursors
-  :vc (:fetcher github :repo "magnars/multiple-cursors.el")
+  :vc (:url "https://github.com/magnars/multiple-cursors.el")
   :bind (("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          ("C-c C->" . mc/mark-all-like-this)))
@@ -538,10 +525,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :commands (magit-status-setup-buffer)
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
-  :bind (("C-c f" . magit-file-dispatch)
-         ("C-c g" . magit-dispatch)
-         ("C-x g" . magit-status)
-         ("C-M-g" . magit-status)))
+  :bind (("C-c f" . magit-file-dispatch)))
 
 (use-package rg
   :ensure t
@@ -719,7 +703,7 @@ command guarantees that dispatching will always happen."
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package consult-notes
-  :vc (:fetcher github :repo "mclear-tools/consult-notes")
+  :vc (:url "https://github.com/mclear-tools/consult-notes")
   :after (consult denote)
   :defines (consult-notes-denote-files-function)
   :commands (consult-notes-denote-mode denote-directory-files)
@@ -838,6 +822,9 @@ command guarantees that dispatching will always happen."
   :config
   (add-to-list 'compilation-error-regexp-alist
                '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2))) ; I think this is from pyright
+
+(use-package fancy-compilation
+  :hook (compile-mode . fancy-compilation-mode))
 
 (defvar ffap-bindings
   '((keymap-global-set "<remap> <find-file>" #'find-file-at-point)
@@ -1091,6 +1078,9 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 
                    "C-o" #'aw-flip-window
 
+                   "C-s" #'isearch-forward-regexp
+                   "C-M-s" #'isearch-forward-symbol
+
                    "C-x 0" #'delete-other-windows
                    "C-x O" #'other-frame
                    "C-x C-o" #'other-frame
@@ -1139,10 +1129,13 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                    "H-b" #'consult-buffer
                    "H-g" #'magit-status
                    "H-h" #'my/describe-symbol-at-point
+                   "H-k" #'bury-buffer
                    "H-m" #'consult-bookmark
                    "H-p" #'projectile-command-map
                    "H-u" #'undo
                    "H-;" #'my/matching-paren
+
+                   "H-M-k" #'my/kill-current-buffer
 
                    ;; Unmap the following
                    "<insert>" #'ignore   ; disable key for toggling overwrite mode
@@ -1262,8 +1255,7 @@ Return an event vector."
      '(frame-resize-pixelwise t)
      '(mac-command-modifier 'meta)
      '(mac-option-modifier 'alt)
-     '(mac-right-command-modifier 'super)
-     '(mac-right-option-modifier 'hyper)))
+     '(mac-right-control-modifier 'hyper)))
    (my/is-x-windows
     (my/set-bound-var 'x-alt-keysym 'alt)
     (my/set-bound-var 'x-meta-keysym 'meta)

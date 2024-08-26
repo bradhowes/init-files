@@ -1,4 +1,4 @@
-;;; package -- my-markdown-mode -*- Mode: Emacs-Lisp -*-
+;;; package -- my-markdown-mode -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -6,7 +6,7 @@
 
 (use-package impatient-mode
   :ensure t
-  :vc (:fetcher github :repo "skeeto/impatient-mode")
+  :vc (:url "https://github.com/skeeto/impatient-mode")
   :config
   (setq-default imp-user-filter #'my/markdown-to-html))
 

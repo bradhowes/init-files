@@ -1,4 +1,4 @@
-;;; package -- my-makefile-mode -*- Mode: Emacs-Lisp -*-
+;;; package -- my-makefile-mode -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 

@@ -1,4 +1,4 @@
-;;; package -- my-cmake-mode -*- Mode: Emacs-Lisp -*-
+;;; package -- my-cmake-mode -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -18,9 +18,7 @@
   (save-excursion
     (goto-char (point-min))
     (while (re-search-forward "\\([A-Z0-9_]+\\)( \\([^\)]*\\))" nil t)
-      (let ((beg (match-beginning 0))
-            (end (match-end 0))
-            (args (match-string 2)))
+      (let ((args (match-string 2)))
         (while (eq (elt args (- (length args) 1)) ?\ )
           (setq args (substring args 0 (- (length args) 1))))
         (replace-match (concat (downcase (match-string 1)) "(" args ")") t t)
@@ -30,12 +28,9 @@
     (while (re-search-forward "^[ 	]*
 #[ 	]*
 # " nil t)
-      (let ((beg (match-beginning 0))
-            (end (match-end 0)))
-        (replace-match "
+      (replace-match "
 # " t t)
-        (fill-paragraph)))
-
+      (fill-paragraph))
     (goto-char (point-min))
     (indent-region (point-min) (point-max))
     ))

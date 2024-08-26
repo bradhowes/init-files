@@ -1,4 +1,4 @@
-;;; package -- my-ksh-mode -*- Mode: Emacs-Lisp -*-
+;;; package -- my-ksh-mode -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 

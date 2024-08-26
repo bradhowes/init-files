@@ -1,4 +1,4 @@
-;;; emacs-pager.el --- incredibl simple mode for showing data paged by emacs-pager
+;;; emacs-pager.el --- incredibly simple mode for showing data paged by emacs-pager -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 

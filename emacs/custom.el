@@ -40,7 +40,8 @@
  '(current-language-environment "UTF-8")
  '(custom-enabled-themes '(modus-vivendi))
  '(custom-safe-themes
-   '("69f7e8101867cfac410e88140f8c51b4433b93680901bb0b52014144366a08c8" "183dfa34e360f5bc2ee4a6b3f4236e6664f4cfce40de1d43c984e0e8fc5b51ae" default))
+   '("69f7e8101867cfac410e88140f8c51b4433b93680901bb0b52014144366a08c8"
+     "183dfa34e360f5bc2ee4a6b3f4236e6664f4cfce40de1d43c984e0e8fc5b51ae" default))
  '(delete-by-moving-to-trash t)
  '(delete-old-versions t)
  '(denote-file-type 'markdown-brh)
@@ -100,6 +101,7 @@
  '(indicate-empty-lines t)
  '(inhibit-startup-echo-area-message "howes")
  '(inhibit-startup-screen t)
+ '(insert-directory-program "gls")
  '(isearch-lazy-count t)
  '(ispell-extra-args
    '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16" "--camel-case"))
@@ -109,7 +111,7 @@
  '(kept-old-versions 10)
  '(key-chord-mode t)
  '(line-move-visual nil)
- '(load-prefer-newer t)
+ '(load-prefer-newer t t)
  '(ls-lisp-use-insert-directory-program nil)
  '(magit-diff-refine-hunk t)
  '(magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
@@ -128,13 +130,9 @@
  '(ns-command-modifier 'meta)
  '(ns-right-alternate-modifier 'hyper)
  '(ns-right-command-modifier 'super)
- '(package-archives
-   '(("melpa" . "http://stable.melpa.org/packages/")
-     ("gnu" . "https://elpa.gnu.org/packages/")
-     ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+ '(ns-right-control-modifier 'hyper)
  '(package-quickstart t)
- '(package-selected-packages
-   '(compile-multi-all-the-icons consult-compile-multi compile-multi json-mode simple-httpd key-chord js2-mode company embark-consult embark posframe htmlize impatient-mode vterm doom-modeline consult-notes vc-use-package indent-bars osx-dictionary corfu-terminal expand-region crux char-menu popper tree-sitter tree-sitter-langs lsp-pyright lsp-jedi exec-path-from-shell consult-denote consult-eglot verb multiple-cursors eglot-signature-eldoc-talkative eldoc-box window-commander rg eglot ws-butler cape corfu-info lsp-sourcekit swift-mode corfu use-package denote consult-dir orderless vertico markdown-mode ace-window flymake yaml yaml-mode which-key wgrep scratch reformatter projectile-ripgrep projectile mode-line-bell mode-icons marginalia magit jedi-core flycheck-indentation flycheck diff-hl cmake-mode async all-the-icons-ibuffer all-the-icons-dired all-the-icons-completion all-the-icons))
+ '(package-selected-packages nil)
  '(package-vc-selected-packages
    '((el-docstring-sap :vc-backend Git :url "https://github.com/rileyrg/el-docstring-sap")
      (impatient-mode :vc-backend Git :url "https://github.com/skeeto/impatient-mode")
@@ -148,7 +146,8 @@
  '(popper-echo-mode t)
  '(popper-mode t)
  '(popper-reference-buffers
-   '("\\*Messages\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode compilation-mode))
+   '("\\*Messages\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
+     compilation-mode))
  '(projectile-generic-command "rg --files --hidden -0")
  '(projectile-globally-ignored-directories
    '(".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".tox" ".svn" ".cache" ".clangd" "./build" "./cmake"))
@@ -166,8 +165,11 @@
  '(resize-mini-windows t)
  '(ring-bell-function 'mode-line-bell-flash)
  '(safe-local-variable-values
-   '((projectile-project-compilation-cmd . "make ")
-     (projectile-project-compilation-cmd . "make -C emacs/lisp -k ")
+   '((etags-regen-ignores "test/manual/etags/")
+     (etags-regen-regexp-alist
+      (("c" "objc") "/[ \11]*DEFVAR_[A-Z_ \11(]+\"\\([^\"]+\\)\"/\\1/"
+       "/[ \11]*DEFVAR_[A-Z_ \11(]+\"[^\"]+\",[ \11]\\([A-Za-z0-9_]+\\)/\\1/"))
+     (projectile-project-compilation-cmd . "make ") (projectile-project-compilation-cmd . "make -C emacs/lisp -k ")
      (checkdoc-package-keywords-flag)))
  '(save-interprogram-paste-before-kill t)
  '(save-place-mode t)
@@ -210,14 +212,8 @@
  '(xref-show-definitions-function 'consult-xref)
  '(xref-show-xrefs-function 'consult-xref)
  '(zoneinfo-style-world-list
-   '(("America/Montreal" "Montreal")
-     ("America/New_York" "New York")
-     ("Europe/London" "London")
-     ("Europe/Paris" "Paris")
-     ("Asia/Tokyo" "Tokyo")
-     ("Asia/Hong_Kong" "Hong Kong")
-     ("Asia/Bangkok" "Bangkok")
-     ("Asia/Singapore" "Singapore"))))
+   '(("America/Montreal" "Montreal") ("America/New_York" "New York") ("Europe/London" "London") ("Europe/Paris" "Paris")
+     ("Asia/Tokyo" "Tokyo") ("Asia/Hong_Kong" "Hong Kong") ("Asia/Bangkok" "Bangkok") ("Asia/Singapore" "Singapore"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

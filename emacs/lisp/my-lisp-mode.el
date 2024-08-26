@@ -1,4 +1,4 @@
-;;; package -- my-lisp-mode -*- Mode: Emacs-Lisp -*- lexical-binding: t; -*-
+;;; package -- my-lisp-mode -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 

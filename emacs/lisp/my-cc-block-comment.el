@@ -1,4 +1,4 @@
-;;; package -- my-cc-block-comment -*- Mode: Emacs-Lisp -*-
+;;; package -- my-cc-block-comment -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 ;;;
 ;;; Functions/Settings that provide "good" C block comment editing
@@ -385,7 +385,7 @@ each argument it takes."
     (my/cc-newline-and-indent)          ; ditto
     (insert "Inputs:")                  ; start of argument section
     (my/cc-newline-and-indent)
-    (backward-delete-char 1)            ; remove space after '*'...
+    (delete-char -1)                    ; remove space after '*'...
     (insert "\t")                       ; and replace with a TAB
     (cond (plist                        ; insert argument(s)
            (while plist
@@ -401,11 +401,11 @@ each argument it takes."
            (set-marker marker (point))
            (nconc my/cc-header-comment-fields (list marker))
            (my/cc-newline-and-indent)))
-    (backward-delete-char 1)            ; end of argument section
+    (delete-char -1)                    ; end of argument section
     (my/cc-newline-and-indent)
     (insert " Outputs:")                ; start of output section
     (my/cc-newline-and-indent)
-    (backward-delete-char 1)
+    (delete-char -1)
     (insert "\t")
     (if rvalue
         (insert "none"))
@@ -413,14 +413,14 @@ each argument it takes."
     (set-marker marker (point))
     (nconc my/cc-header-comment-fields (list marker))
     (my/cc-newline-and-indent)
-    (backward-delete-char 1)            ; start of explanatory text
+    (delete-char -1)                    ; start of explanatory text
     (my/cc-newline-and-indent)
     (insert " ")
     (setq marker (make-marker))
     (set-marker marker (point))
     (nconc my/cc-header-comment-fields (list marker))
     (my/cc-newline-and-indent)
-    (backward-delete-char 1)
+    (delete-char -1)
     (insert "/")                        ; end of C block comment
     (newline-and-indent)
     (goto-char (nth 1 my/cc-header-comment-fields))
@@ -472,7 +472,7 @@ I originally had a macro, but that was sloooow."
       (insert " ")
       (setq here (point))
       (my/cc-newline-and-indent)
-      (backward-delete-char 1)
+      (delete-char -1)
       )
      (t
       (insert "/*")                     ; start of C block comment
@@ -480,7 +480,7 @@ I originally had a macro, but that was sloooow."
       (insert " ")
       (setq here (point))               ; remember point to go back to
       (my/cc-newline-and-indent)        ; new line and continued comment
-      (backward-delete-char 1)
+      (delete-char -1)
       (insert "/")                      ; end of C block comment
       ))
     (goto-char here)                    ; go back to place for comment text

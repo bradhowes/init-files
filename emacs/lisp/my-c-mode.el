@@ -1,4 +1,4 @@
-;;; package -- my-c-mode -*- Mode: Emacs-Lisp -*-
+;;; package -- my-c-mode -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 

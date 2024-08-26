@@ -1,4 +1,4 @@
-;;; package -- my-python-mode -*- Mode: Emacs-Lisp -*-
+;;; package -- my-python-mode -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 
 (require 'python)
@@ -39,7 +39,6 @@ Thiss will represent the data contained in FOUND. The comment and its
 contents are indented with the value PREFIX. Places point at the
 end of the first line of the comment block."
   (let ((begin (nth 0 found))
-	(end (nth 1 found))
 	(info (nth 2 found)))
     (goto-char begin)
     (insert prefix "## ")

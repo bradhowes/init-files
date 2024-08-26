@@ -1,4 +1,4 @@
-;;; package -- my/c-mode-common -*- Mode: Emacs-Lisp -*-
+;;; package -- my/c-mode-common -*- Mode: Emacs-Lisp; lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -340,15 +340,15 @@ If POS is nil, the current point is used."
 
     found))
 
-(defun my/open-block-c-mode (id action context)
-  "Add new line after inserting pair of braces.
-ID ACTION CONTEXT."
-  (when (eq action 'insert)
-    (newline)
-    (newline)
-    (indent-according-to-mode)
-    (forward-line -1)
-    (indent-according-to-mode)))
+;; (defun my/open-block-c-mode (id action context)
+;;   "Add new line after inserting pair of braces.
+;; ID ACTION CONTEXT."
+;;   (when (eq action 'insert)
+;;     (newline)
+;;     (newline)
+;;     (indent-according-to-mode)
+;;     (forward-line -1)
+;;     (indent-according-to-mode)))
 
 (defun my/create-newline-and-enter-sexp (&rest _ignored)
   "Open a new brace or bracket expression, with relevant newlines and indent."
@@ -411,6 +411,7 @@ ID ACTION CONTEXT."
   (unless (string-equal (file-name-extension (buffer-name)) "idl")
     (imenu-add-menubar-index))
 
+  ;; If using smartparens
   ;; (sp-local-pair 'c-mode "{" nil :post-handlers '(:add my/open-block-c-mode))
   ;; (sp-local-pair 'c++-mode "{" nil :post-handlers '(:add my/create-newline-and-enter-sexp))
   (auto-fill-mode 1)

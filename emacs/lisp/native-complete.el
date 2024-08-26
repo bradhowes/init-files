@@ -1,6 +1,6 @@
 ;;; native-complete.el --- Shell completion using native complete mechanisms -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019, 2023 by Troy Hinckley
+;; Copyright (C) 2019, 2023, 2024 by Troy Hinckley
 
 ;; Author: Troy Hinckley <troy.hinckley@gmail.com>
 ;; URL: https://github.com/CeleritasCelery/emacs-native-shell-complete
@@ -263,8 +263,8 @@ emulator."
 
 ;;;###autoload
 (defun native-complete-check-config ()
-  (interactive)
   "Check the setup of native complete and look for common problems."
+  (interactive)
   (unless (memq major-mode native-complete-major-modes)
     (user-error "`native-complete-check-setup' must be run from a shell buffer"))
   (let* ((prompt-point (process-mark (get-buffer-process (current-buffer))))
