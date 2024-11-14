@@ -30,13 +30,4 @@
 ;; Stop Emacs from flashing a `white' screen when starting up
 (set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")
 
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-(push '("melpa" . -10) package-archive-priorities)
-(push '("melpa-stable" . 10) package-archive-priorities)
-(push '("nongnu" . 20) package-archive-priorities)
-(push '("gnu" . 30) package-archive-priorities)
-(package-initialize)
-
 ;;; early-init.el ends here.

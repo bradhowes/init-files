@@ -111,7 +111,7 @@
  '(kept-old-versions 10)
  '(key-chord-mode t)
  '(line-move-visual nil)
- '(load-prefer-newer t t)
+ '(load-prefer-newer t)
  '(ls-lisp-use-insert-directory-program nil)
  '(magit-diff-refine-hunk t)
  '(magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
@@ -132,7 +132,13 @@
  '(ns-right-command-modifier 'super)
  '(ns-right-control-modifier 'hyper)
  '(package-quickstart t)
- '(package-selected-packages nil)
+ '(package-selected-packages
+   '(ace-window cape char-menu cmake-mode consult-denote consult-dir consult-eglot consult-notes consult-projectile corfu
+                corfu-terminal crux diff-hl embark embark-consult esup exec-path-from-shell expand-region
+                fancy-compilation flymake-aspell flymake-json impatient-mode indent-bars jedi-core js2-mode json-mode
+                key-chord lsp-jedi lsp-pyright magit marginalia mode-line-bell mood-line multiple-cursors
+                nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer orderless osx-dictionary
+                popper rg scratch tree-sitter-langs treemacs-nerd-icons verb vertico which-key ws-butler yaml yaml-mode))
  '(package-vc-selected-packages
    '((el-docstring-sap :vc-backend Git :url "https://github.com/rileyrg/el-docstring-sap")
      (impatient-mode :vc-backend Git :url "https://github.com/skeeto/impatient-mode")
