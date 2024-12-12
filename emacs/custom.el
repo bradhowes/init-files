@@ -138,13 +138,8 @@
                 fancy-compilation flymake-aspell flymake-json impatient-mode indent-bars jedi-core js2-mode json-mode
                 key-chord lsp-jedi lsp-pyright magit marginalia mode-line-bell mood-line multiple-cursors
                 nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer orderless osx-dictionary
-                popper rg scratch tree-sitter-langs treemacs-nerd-icons verb vertico which-key ws-butler yaml yaml-mode))
- '(package-vc-selected-packages
-   '((el-docstring-sap :vc-backend Git :url "https://github.com/rileyrg/el-docstring-sap")
-     (impatient-mode :vc-backend Git :url "https://github.com/skeeto/impatient-mode")
-     (consult-notes :vc-backend Git :url "https://github.com/mclear-tools/consult-notes")
-     (indent-bars :vc-backend Git :url "https://github.com/jdtsmith/indent-bars")
-     (vc-use-package :vc-backend Git :url "https://github.com/slotThe/vc-use-package")))
+                popper pyvenv realgud rg scratch tree-sitter-langs treemacs-nerd-icons verb vertico which-key ws-butler
+                yaml yaml-mode))
  '(pixel-scroll-mode t)
  '(pixel-scroll-precision-mode t)
  '(pixel-scroll-precision-use-momentum t)

@@ -64,7 +64,7 @@ Hacky but for now it works since we are always starting up an initial xterm.")
 (defconst my/4k-screen-width 3840
   "4K external display width in pixels.")
 
-(defconst my/workspace-name (or (getenv "WORKSPACE_NAME") "N/A")
+(defconst my/workspace-name (or (getenv "WORKSPACE_NAME") "")
   "The value of WORKSPACE_NAME environment variable.")
 
 (defconst my/font-name "Berkeley Mono"
@@ -357,17 +357,14 @@ artifacts such as indentation bars."
 (setq filter-buffer-substring-function #'my/filter-buffer-substring)
 
 (use-package multiple-cursors
-  :vc (:url "https://github.com/magnars/multiple-cursors.el")
   :bind (("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          ("C-c C->" . mc/mark-all-like-this)))
 
 (use-package indent-bars
-  :vc (:url "https://github.com/jdtsmith/indent-bars")
   :hook (prog-mode . indent-bars-mode))
 
 (use-package consult-notes
-  :vc (:url "https://github.com/mclear-tools/consult-notes")
   :after (consult denote)
   :defines (consult-notes-denote-files-function)
   :commands (consult-notes-denote-mode denote-directory-files)
@@ -422,12 +419,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook ((shell-mode . my/shell-mode-hook)))
 
 (use-package json-mode
-  :ensure t
   :init (add-to-list 'auto-mode-alist '("\\.yagconf\\'" . json-mode))
   :hook ((json-mode . my/json-mode-hook)))
 
 (use-package js2-mode
-  :ensure t
   :hook ((js2-mode . my/js2-mode-hook)))
 
 (use-package winner
@@ -516,7 +511,6 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook (after-init . rg-enable-default-bindings))
 
 (use-package denote
-  :ensure t
   :commands (denote-dired-mode-in-directories)
   :hook (dired-mode . denote-dired-mode-in-directories)
   :bind (("C-c n n" . denote))
@@ -677,7 +671,6 @@ command guarantees that dispatching will always happen."
 (use-package mode-line-bell)
 
 (use-package eglot
-  :ensure t
   :commands (eglot-ensure)
   :hook ((c++-mode . eglot-ensure)
          (json-mode . eglot-ensure)
@@ -759,7 +752,7 @@ command guarantees that dispatching will always happen."
     :hook (after-init . corfu-terminal-mode)))
 
 (use-package markdown-mode
-  :hook (markdown-mode . my/markdown-mode))
+  :hook (markdown-mode . my/markdown-mode-hook))
 
 (use-package cmake-mode
   :hook ((cmake-mode . my/cmake-mode-hook)))
@@ -769,8 +762,7 @@ command guarantees that dispatching will always happen."
 (use-package expand-region
   :bind ("C-\\" . er/expand-region))
 
-(use-package hl-line
-  :ensure t)
+(use-package hl-line)
 
 (use-package popper
   :commands (popper-kill-latest-popup)
