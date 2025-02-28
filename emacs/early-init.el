@@ -2,24 +2,19 @@
 ;;; Commentary:
 ;;; Code:
 
+;; (setq native-comp-speed -1)
 
-;; (when (and (fboundp 'menu-bar-mode) (not (eq system-type 'darwin))) (menu-bar-mode -1))
+(when (and (fboundp 'menu-bar-mode) (not (eq system-type 'darwin))) (menu-bar-mode 1))
+
+(when (fboundp 'tab-bar-mode) (tool-bar-mode -1))
 (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-
-;; Faster to disable these here (before they've been initialized)
-(push '(menu-bar-lines . 0) initial-frame-alist)
-(push '(tool-bar-lines . 0) initial-frame-alist)
-(push '(vertical-scroll-bar) initial-frame-alist)
-
-(push '(menu-bar-lines . 0) default-frame-alist)
-(push '(tool-bar-lines . 0) default-frame-alist)
-(push '(vertical-scroll-bar) default-frame-alist)
 
 ;; Resizing the Emacs frame can be an expensive part of changing the font. Inhibit this to reduce startup times with
 ;; fonts that are larger than the system default
 (setq frame-inhibit-implied-resize t
       frame-resize-pixelwise t
+      custom-file nil
       load-prefer-newer t)
 
 (let ((threshold gc-cons-threshold)

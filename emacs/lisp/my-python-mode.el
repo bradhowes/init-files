@@ -7,8 +7,6 @@
 
 ;;; Code:
 
-(font-lock-add-keywords 'python-mode '(("[][(){}]" . font-lock-brace-face)))
-
 (defun my/python-insert-block-comment ()
   "Insert block comment."
   (interactive)
@@ -39,6 +37,7 @@ Thiss will represent the data contained in FOUND. The comment and its
 contents are indented with the value PREFIX. Places point at the
 end of the first line of the comment block."
   (let ((begin (nth 0 found))
+        (end (nth 1 found))
 	(info (nth 2 found)))
     (goto-char begin)
     (insert prefix "## ")
@@ -91,12 +90,13 @@ The comment is indented with PREFIX."
   "Custom hook for Python moode."
   (font-lock-mode t)
   (auto-fill-mode 1)
-  (local-set-key [(meta control \;)] 'my/python-insert-block-comment)
-  (local-set-key [(control c)(meta control \;)] 'my/python-doxygen-insert-block-comment))
+  (font-lock-add-keywords 'python-mode '(("[][(){}]" . font-lock-brace-face)))
+  (keymap-local-set "C-M-;" #'my/python-insert-block-comment)
+  (keymap-local-set "C-c C-M-;" #'my/python-doxygen-insert-block-comment))
 
 (defun my/inferior-python-mode-hook ()
   "Custom hook for `inferior-python-mode`."
-  (local-set-key [(control c) (control r)] #'comint-kill-region))
+  (keymap-local-set "C-c C-r" #'comint-kill-region))
 
 (provide 'my-python-mode)
 

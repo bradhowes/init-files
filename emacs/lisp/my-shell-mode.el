@@ -2,27 +2,27 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'consult)
 (require 'shell)
-(require 'native-complete)
 (require 'python)
 
-(defvar my/shell-home-root nil
-  "Value to prepend to a directory.")
+;; (require 'native-complete)
 
-(defun my/shell-set-home-root ()
-  "Locate home root."
-  (make-local-variable 'my/shell-home-root)
-  (setq my/shell-home-root
-        (cond ((> (length (getenv "MSYSTEM")) 0) "C:/msys64")
-              (t ""))))
+(defun my/shell-bol ()
+  "Move point to the end of a prompt or to beginning of line.
+If after a prompt, move to end of it. Otherwise move to
+actual beginning of line (same as if there were no prompt)."
+  (interactive)
+  (comint-bol (= (point) (comint-line-beginning-position))))
 
 (defun my/shell-mode-hook ()
   "Customize `shell-mode'."
 
-  (message "Loading native-complete-setup-bash")
-  (native-complete-setup-bash)
-
-  (rename-uniquely)
+  ;; Look for the process that exists for the now-current buffer. Rename buffer to include its process ID.
+  (when-let ((buf (current-buffer))
+             (found (seq-filter (lambda (p) (eq buf (process-buffer p))) (process-list)))
+             (pid (seq-map #'process-id found)))
+    (rename-buffer (format "*Shell [%d]*" (car pid))))
 
   (set-process-coding-system (get-buffer-process (current-buffer)) 'utf-8 'utf-8)
 
@@ -30,11 +30,15 @@
         shell-dirtrackp nil)            ; disable since using comint-osc-process-output
 
   (ansi-color-for-comint-mode-on)
+  (python-pdbtrack-setup-tracking)
   (add-hook 'comint-output-filter-functions #'comint-osc-process-output)
   (add-hook 'comint-output-filter-functions #'ansi-color-process-output)
   (add-hook 'comint-output-filter-functions #'comint-truncate-buffer)
   (add-hook 'comint-output-filter-functions #'comint-postoutput-scroll-to-bottom)
-  (python-pdbtrack-setup-tracking))
+
+  (buffer-disable-undo)
+  (keymap-local-set "C-a" #'my/shell-bol)
+  (keymap-local-set "M-h" #'consult-history))
 
 (provide 'my-shell-mode)
 ;;; my-shell-mode.el ends here

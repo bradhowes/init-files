@@ -3,10 +3,10 @@
 ;;; Code:
 
 (require 'font-lock)
+(require 'markdown-mode)
 
 (use-package impatient-mode
   :ensure t
-  :vc (:url "https://github.com/skeeto/impatient-mode")
   :config
   (setq-default imp-user-filter #'my/markdown-to-html))
 
@@ -61,6 +61,25 @@ ends with the same `---' on its own line."
          (s (my/markdown-is-spellcheckable f)))
     s))
 
+(defun my/escape-last-word ()
+  "Escape '_' and '*' characters in the word before point."
+  (interactive)
+  (let ((pos (point)))
+    (save-excursion
+      (re-search-forward "\\s " nil nil -1)
+      (format-replace-strings '(("_" . "\\_") ("*" . "\\*")) nil (point) pos))))
+
+(defun my/codify-last-word ()
+  "Escape wrap the last word with backquotes."
+  (interactive)
+  (let ((pos (point)))
+    (save-excursion
+      (re-search-forward "\\s " nil nil -1)
+      (when (looking-at "\\s ")
+        (forward-char 1))
+      (insert-char ?`))
+    (insert-char ?`)))
+
 (defun my/make-link ()
   "Make a link."
   (interactive)
@@ -75,7 +94,40 @@ ends with the same `---' on its own line."
   "Customization hook for `markdown-mode'."
   (impatient-mode)
   (imp-set-user-filter #'my/markdown-to-html)
-  (local-set-key [(f8)] #'my/make-link))
+  (keymap-local-set "C-c *" #'my/escape-last-word)
+  (keymap-local-set "C-c `" #'my/codify-last-word)
+  (keymap-local-set "C-c <space>" #'my/make-link))
+
+(defun my/fixup-code-region ()
+  "Get the region to work on as a CONS cell of start, end.
+If region is active, return that. If point is currently
+in a code block, return the start and end of the block.
+Otherwise, return the current point and max point."
+  (interactive)
+  (save-excursion
+    (let* ((re "\\(\\\\\n \\)\\|\\( +$\\)\\|\\(^ +\\)")
+           (region (my/fixup-code-region))
+           (beg (car region))
+           (end (cdr region)))
+      (message "region: %s" region)
+      (goto-char beg)
+      (beginning-of-line 1)
+      (while (re-search-forward re end t)
+        (replace-match "" nil nil)))))
+
+(defun my/format-fixdropcopy ()
+  "Format quickfix dropcopy messages pasted from TCS logs.
+Simply replaces all runs of '^A' (two characters) with a
+newline and 2 spaces."
+  (interactive)
+  (save-excursion
+    (let* ((re "\\^A")
+           (region (my/fixup-code-region))
+           (beg (car region))
+           (end (cdr region)))
+      (goto-char beg)
+      (while (re-search-forward re end t)
+        (replace-match "\n  " nil nil)))))
 
 (provide 'my-markdown-mode)
 ;;; my-markdown-mode.el ends here

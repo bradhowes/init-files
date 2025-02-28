@@ -3,21 +3,15 @@
 ;;; Code:
 
 (require 'font-lock)
-(require 'key-chord)
 (require 'my-insert-block-comment)
 
 (dolist (elt '(lisp-mode lisp-data-mode scheme-mode emacs-lisp-mode))
   (font-lock-add-keywords elt '(("[][(){}]" . font-lock-brace-face))))
 
-;; (font-lock-add-keywords 'lisp-mode '(("[][(){}]" . font-lock-brace-face)))
-;; (font-lock-add-keywords 'lisp-data-mode '(("[][(){}]" . font-lock-brace-face)))
-;; (font-lock-add-keywords 'scheme-mode '(("[][(){}]" . font-lock-brace-face)))
-;; (font-lock-add-keywords 'emacs-lisp-mode '(("[][(){}]" . font-lock-brace-face)))
-
 (defun my/lisp-insert-block-comment ()
   "Insert block comment."
   (interactive)
-  (my/insert-block-comment #'newline-and-indent ";;" ";;" ";;"))
+  (my/insert-block-comment #'newline-and-indent ";;" nil nil))
 
 (defun my/eval-this-defun (arg)
   "Eval last sexp ARG."
@@ -39,13 +33,13 @@
 
 (defun my/lisp-mode-hook ()
   "Custom Lisp mode."
-  (key-chord-define-local "cc" #'my/noisy-check-parens)
+  (keymap-local-set "C-c p" #'my/noisy-check-parens)
   (font-lock-mode t)
   (show-paren-mode t)
-  (local-set-key [(control x)(control e)] #'my/eval-this-defun)
-  (local-set-key [(control x)(meta e)] #'eval-last-sexp)
-  (local-set-key [(meta control \;)] #'my/lisp-insert-block-comment)
-  (local-set-key [(control return)] #'eval-print-last-sexp))
+  (keymap-local-set "C-x C-e" #'my/eval-this-defun)
+  (keymap-local-set "C-x M-e" #'eval-last-sexp)
+  (keymap-local-set "C-M-;" #'my/lisp-insert-block-comment)
+  (keymap-local-set "C-<return>" #'eval-print-last-sexp))
 
 (provide 'my-lisp-mode)
 ;;; my-lisp-mode.el ends here

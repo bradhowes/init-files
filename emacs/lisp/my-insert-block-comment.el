@@ -10,11 +10,13 @@ COMMENTMIDDLE -- the string to insert for each line insdie the comment
 COMMENTEND -- the string to insert to close the comment block"
   (interactive)
   (insert commentBegin)
-  (funcall newlineAndIndent)
-  (insert commentMiddle)
-  (funcall newlineAndIndent)
-  (insert commentEnd)
-  (forward-line -1)
+  (when commentEnd
+    (funcall newlineAndIndent)
+    (when commentMiddle
+      (insert commentMiddle)
+      (funcall newlineAndIndent))
+    (insert commentEnd)
+    (forward-line -1))
   (end-of-line)
   (insert " "))
 

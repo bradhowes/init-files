@@ -15,6 +15,7 @@
  '(auto-save-list-file-prefix nil)
  '(auto-save-visited-interval 60)
  '(backup-directory-alist '(("." . ".~")))
+ '(blink-cursor-blinks 0)
  '(bookmark-save-flag 1)
  '(byte-compile-verbose nil)
  '(case-fold-search t)
@@ -55,21 +56,6 @@
  '(dired-recursive-copies 'always)
  '(dired-recursive-deletes 'always)
  '(display-time-default-load-average nil)
- '(doom-modeline-battery nil)
- '(doom-modeline-buffer-file-name-style 'relative-from-project)
- '(doom-modeline-buffer-file-true-name t)
- '(doom-modeline-default-coding-system 'utf-8)
- '(doom-modeline-default-eol-type 0)
- '(doom-modeline-irc nil)
- '(doom-modeline-lsp t)
- '(doom-modeline-major-mode-color-icon nil)
- '(doom-modeline-major-mode-icon nil)
- '(doom-modeline-minor-modes nil)
- '(doom-modeline-mode t)
- '(doom-modeline-vcs-max-length 40)
- '(doom-modeline-window-width-limit 120)
- '(doom-themes-enable-bold t)
- '(doom-themes-enable-italic t)
  '(dynamic-completion-mode t)
  '(ediff-merge-split-window-function 'split-window-horizontally)
  '(ediff-split-window-function 'split-window-horizontally)
@@ -133,13 +119,14 @@
  '(ns-right-control-modifier 'hyper)
  '(package-quickstart t)
  '(package-selected-packages
-   '(ace-window cape char-menu cmake-mode consult-denote consult-dir consult-eglot consult-notes consult-projectile corfu
-                corfu-terminal crux diff-hl embark embark-consult esup exec-path-from-shell expand-region
-                fancy-compilation flymake-aspell flymake-json impatient-mode indent-bars jedi-core js2-mode json-mode
-                key-chord lsp-jedi lsp-pyright magit marginalia mode-line-bell mood-line multiple-cursors
-                nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer orderless osx-dictionary
-                pdb-capf popper pyvenv realgud rg scratch tree-sitter-langs treemacs-nerd-icons verb vertico which-key
-                ws-butler yaml yaml-mode))
+   '(accent ace-window async cape char-menu cmake-mode compile-multi consult consult-compile-multi consult-denote
+            consult-dir consult-eglot consult-notes consult-projectile corfu corfu-terminal crux dape diff-hl ef-themes
+            eglot-luau eldoc-box embark embark-consult esup exec-path-from-shell expand-region fancy-compilation
+            flymake-aspell flymake-json flymake-lua geiser geiser-guile impatient-mode indent-bars jedi-core jiralib2
+            js-comint js2-mode json-mode key-chord logview lsp-jedi lsp-pyright lua-mode magit marginalia mode-line-bell
+            mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer
+            orderless org-jira osx-dictionary pdb-capf popper pyvenv realgud rg scratch tree-sitter-langs
+            treemacs-nerd-icons verb vertico which-key ws-butler yaml yaml-mode))
  '(pixel-scroll-mode t)
  '(pixel-scroll-precision-mode t)
  '(pixel-scroll-precision-use-momentum t)
@@ -223,6 +210,7 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "Berkeley Mono" :foundry "nil" :slant normal :weight regular :height 130 :width normal))))
  '(aw-leading-char-face ((t (:inherit (bold modus-themes-reset-soft) :foreground "light green" :height 1.5))))
+ '(cursor ((t (:background "orange"))))
  '(doom-modeline-bar-inactive ((t nil)))
  '(eglot-highlight-symbol-face ((t (:background "orchid4" :inherit bold))))
  '(fixed-pitch ((t (:family "Berkeley Mono"))))
@@ -231,7 +219,7 @@
  '(font-lock-comment-face ((t (:foreground "olive drab" :inherit modus-themes-slant))))
  '(font-lock-string-face ((t (:foreground "cyan"))))
  '(highlight-indentation-current-column-face ((t nil)))
- '(hl-line ((t (:background "gray14" :extend t :inherit modus-themes-hl-line))))
+ '(hl-line ((t (:background "gray10" :extend t :inherit modus-themes-hl-line))))
  '(makefile-space ((t (:background "gray46"))))
  '(mode-line ((t (:inherit modus-themes-ui-variable-pitch :background "dark slate gray" :foreground "#ffffff" :box nil))))
  '(mode-line-inactive ((t (:inherit modus-themes-ui-variable-pitch :background "tomato4" :foreground "gray" :box nil))))
