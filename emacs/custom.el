@@ -138,8 +138,8 @@
                 fancy-compilation flymake-aspell flymake-json impatient-mode indent-bars jedi-core js2-mode json-mode
                 key-chord lsp-jedi lsp-pyright magit marginalia mode-line-bell mood-line multiple-cursors
                 nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer orderless osx-dictionary
-                popper pyvenv realgud rg scratch tree-sitter-langs treemacs-nerd-icons verb vertico which-key ws-butler
-                yaml yaml-mode))
+                pdb-capf popper pyvenv realgud rg scratch tree-sitter-langs treemacs-nerd-icons verb vertico which-key
+                ws-butler yaml yaml-mode))
  '(pixel-scroll-mode t)
  '(pixel-scroll-precision-mode t)
  '(pixel-scroll-precision-use-momentum t)

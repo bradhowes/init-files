@@ -4,6 +4,7 @@
 
 (require 'shell)
 (require 'native-complete)
+(require 'python)
 
 (defvar my/shell-home-root nil
   "Value to prepend to a directory.")
@@ -32,7 +33,8 @@
   (add-hook 'comint-output-filter-functions #'comint-osc-process-output)
   (add-hook 'comint-output-filter-functions #'ansi-color-process-output)
   (add-hook 'comint-output-filter-functions #'comint-truncate-buffer)
-  (add-hook 'comint-output-filter-functions #'comint-postoutput-scroll-to-bottom))
+  (add-hook 'comint-output-filter-functions #'comint-postoutput-scroll-to-bottom)
+  (python-pdbtrack-setup-tracking))
 
 (provide 'my-shell-mode)
 ;;; my-shell-mode.el ends here

@@ -14,6 +14,9 @@
   :prefix "my/"
   :group 'local)
 
+(defconst my/repos (file-name-directory (file-truename "~/repos"))
+  "Location of root of source repositories.")
+
 (defconst my/venv (expand-file-name "~/venv")
   "The Python virtual environment to use for elpy.")
 
@@ -21,6 +24,10 @@
 
 (defconst my/venv-python (concat my/venv "/bin/python")
   "The path to the Python executable to use for elpy.")
+
+(defconst my/is-work (or (string= "howesbra" user-login-name)
+                         (string= "sp_qa" user-login-name))
+  "This is t if running at work.")
 
 (defconst my/is-macosx (eq system-type 'darwin)
   "T if running on macOS.
@@ -300,6 +307,22 @@ the items to setup for autoloading from the given file."
          (autoload symbols file)))
      files symbols)))
 
+;; (set-frame-parameter (selected-frame) 'alpha '(85 50))
+
+;; (defun my/increase-opacity ()
+;;   "Increase opacity for frame background."
+;;   (interactive)
+;;   (let ((increase (+ 10 (car (frame-parameter nil 'alpha)))))
+;;     (when (> increase 99) (setq increase 99))
+;;     (set-frame-parameter (selected-frame) 'alpha (list increase 75))))
+
+;; (defun my/decrease-opacity ()
+;;   "Increase opacity for frame background."
+;;   (interactive)
+;;   (let ((decrease (- (car (frame-parameter nil 'alpha)) 10)))
+;;     (when (< decrease 20) (setq decrease 20))
+;;     (set-frame-parameter (selected-frame) 'alpha (list decrease 75))))
+
 (my/autoloads
  "emacs-pager" 'emacs-pager
  "my-cmake-mode" 'my/cmake-mode-hook
@@ -435,8 +458,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   :hook (after-init . (lambda () (unless (server-running-p)
                               ;; Make a unique server connection since I run multiple Emacs instances and I want the
                               ;; emacsclient in a comint buffer to connect to the right connection.
-                              (setq server-name (format "server-%d" (emacs-pid)))
-                              (setenv "EMACS_SERVER_FILE" server-name)
+                              (when my/is-linux
+                                (setq server-name (format "server-%d" (emacs-pid)))
+                                (setenv "EMACS_SERVER_FILE" server-name))
                               (server-start)))))
 
 (use-package flyspell
@@ -450,6 +474,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (use-package python
   :hook ((python-mode . my/python-mode-hook)
          (inferior-python-mode . my/inferior-python-mode-hook)))
+
+(use-package pdb-capf
+  :hook (pdb-mode . (lambda () (add-hook 'completion-at-point-functions 'pdb-capf nil t))))
 
 (use-package makefile-mode
   :hook ((makefile-mode . my/makefile-mode-hook)
@@ -494,6 +521,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
 (use-package magit
   :after (projectile)
+  :defines (magit-repository-directories)
   :commands (magit-status-setup-buffer magit-status)
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
@@ -816,6 +844,15 @@ command guarantees that dispatching will always happen."
     (keymap-global-set "<remap> <list-directory>" #'ffap-list-directory))
   "List of binding forms evaluated by function `ffap-bindings'.")
 
+(use-package crm)
+
+(defun my/crm-indicator(args)
+  "Custom CRM indicator for ARGS."
+  (cons (format "[CRM%s] %s"
+                (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
+                (car args))
+        (cdr args)))
+
 (use-package emacs
   :commands (my/crm-indicator)
   :config
@@ -828,11 +865,6 @@ command guarantees that dispatching will always happen."
   (ffap-bindings)
   (put 'narrow-to-region 'disabled nil)
   (fset 'yes-or-no-p 'y-or-n-p)
-  (defun my/crm-indicator(args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
-                  (car args))
-          (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
