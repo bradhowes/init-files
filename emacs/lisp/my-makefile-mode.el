@@ -4,10 +4,7 @@
 
 (require 'font-lock)
 (require 'my-insert-block-comment)
-
-(font-lock-add-keywords 'makefile-mode '(("[][(){}]" .
-					  font-lock-brace-face)))
-
+(require 'my-fontify-braces)
 
 (defun my/makefile-insert-block-comment ()
   "Insert block comment."
@@ -16,6 +13,7 @@
 
 (defun my/makefile-mode-hook ()
   "Custom Makefile mode."
+  (my/fontify-braces)
   (font-lock-mode t)
   (auto-fill-mode)
   (setq tab-width 4)

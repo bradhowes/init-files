@@ -4,8 +4,7 @@
 
 (require 'cmake-mode)
 (require 'font-lock)
-
-(font-lock-add-keywords 'cmake-mode '(("[][(){}]" . font-lock-brace-face)))
+(require 'my-fontify-braces)
 
 ;; Macro to lowercase CMake commands and remove spaces betwee the () and arguments.
 ;;
@@ -52,6 +51,7 @@
 
 (defun my/cmake-mode-hook ()
   "CMake mode hook."
+  (my/fontify-braces)
   (font-lock-mode t)
   (auto-fill-mode)
   (setq tab-width 4)

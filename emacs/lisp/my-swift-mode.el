@@ -2,13 +2,12 @@
 ;;; Commentary:
 ;;; Code:
 
-(eval-when-compile
-  (require 'font-lock))
-
-(font-lock-add-keywords 'swift-mode '(("[][(){}]" . font-lock-brace-face)))
+(require 'my-fontify-braces)
+(require 'font-lock)
 
 (defun my/swift-mode-hook ()
   "Custom Swift mode."
+  (my/fontify-braces)
   (font-lock-mode t)
   (show-paren-mode t))
 

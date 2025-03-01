@@ -4,9 +4,7 @@
 
 (require 'font-lock)
 (require 'my-insert-block-comment)
-
-(dolist (elt '(lisp-mode lisp-data-mode scheme-mode emacs-lisp-mode))
-  (font-lock-add-keywords elt '(("[][(){}]" . font-lock-brace-face))))
+(require 'my-fontify-braces)
 
 (defun my/lisp-insert-block-comment ()
   "Insert block comment."
@@ -34,6 +32,7 @@
 (defun my/lisp-mode-hook ()
   "Custom Lisp mode."
   (keymap-local-set "C-c p" #'my/noisy-check-parens)
+  (my/fontify-braces)
   (font-lock-mode t)
   (show-paren-mode t)
   (keymap-local-set "C-x C-e" #'my/eval-this-defun)

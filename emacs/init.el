@@ -3,6 +3,8 @@
 ;;; Commentary:
 ;;; Code:
 
+;; (add-to-list 'major-mode-remap-alist '(emacs-lisp-mode))
+
 ;; Set this to `t` to debug issue involving the filenotify package
 (when nil
   (require 'filenotify)
@@ -314,14 +316,6 @@ It does not affect existing frames."
 
 (when my/is-terminal
   (set-face-background 'default "undefined"))
-
-(defface font-lock-brace-face
-  '((((class color) (background light))
-     (:foreground "tomato1" :weight bold))
-    (((class color) (background dark))
-     (:foreground "tomato1" :weight bold)))
-  "Custom face used to highlight parentheses, braces, and brackets."
-  :group 'my/customizations)
 
 (defun my/autoloads (&rest definitions)
   "Setup autoloads for my mode customizations.
@@ -804,6 +798,11 @@ command guarantees that dispatching will always happen."
   :commands (cape-file))
 
 (use-package corfu)
+
+;; (use-package completion-preview
+;;   :bind (:map completion-preview-active-mode-map
+;;               ("M-n" #'completion-preview-next-candidate)
+;;               ("M-p" #'completion-preview-prev-candidate)))
 
 (use-package corfu-terminal
   :if my/is-terminal

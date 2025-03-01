@@ -5,13 +5,7 @@
 (require 'font-lock)
 (require 'doxygen)
 (require 'cc-vars)
-
-;; Hilight parentheses and braces
-;;
-(font-lock-add-keywords 'c-mode '(("[][(){}]" . font-lock-brace-face)))
-(font-lock-add-keywords 'c++-mode '(("[][(){}]" . font-lock-brace-face)))
-(font-lock-add-keywords 'objc-mode '(("[][(){}]" . font-lock-brace-face)))
-(font-lock-add-keywords 'idl-mode '(("[][(){}]" . font-lock-brace-face)))
+(require 'my-fontify-braces)
 
 (font-lock-add-keywords 'c++-mode
                         '(("\\<\\(constexpr\\|final\\|noexcept\\|nullptr\\)\\>" . 'font-lock-keyword-face)))
@@ -410,6 +404,8 @@ If POS is nil, the current point is used."
   ;;
   (unless (string-equal (file-name-extension (buffer-name)) "idl")
     (imenu-add-menubar-index))
+
+  (my/fontify-braces)
 
   ;; If using smartparens
   ;; (sp-local-pair 'c-mode "{" nil :post-handlers '(:add my/open-block-c-mode))

@@ -5,7 +5,7 @@
 (eval-when-compile
   (require 'font-lock))
 
-(font-lock-add-keywords 'swift-mode '(("[][(){}]" . font-lock-brace-face)))
+(font-lock-add-keywords 'swift-mode '(("[][(){}]" . my/font-lock-brace)))
 
 (defun my-swift-mode-hook ()
   "Custom Swift mode."

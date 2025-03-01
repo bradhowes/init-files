@@ -5,8 +5,7 @@
 (require 'js2-mode)
 (require 'font-lock)
 (require 'my-insert-block-comment)
-
-(font-lock-add-keywords 'js2-mode '(("[][(){}]" . font-lock-brace-face)))
+(require 'my-fontify-braces)
 
 ;;local
 (defun my/js2-mode-hook ()
@@ -17,7 +16,7 @@
   ;; (local-set-key (kbd "C-x C-e") #'js-send-last-sexp)
   ;; (local-set-key (kbd "C-c b") #'js-send-buffer)
   ;; (local-set-key (kbd "C-c C-b") #'js-send-buffer-and-go)
-
+  (my/fontify-braces)
   (font-lock-mode t)
   (show-paren-mode t))
 

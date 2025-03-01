@@ -4,6 +4,7 @@
 
 (require 'font-lock)
 (require 'my-insert-block-comment)
+(require 'my-fontify-braces)
 
 (defun my/sh-insert-block-comment ()
   "Insert block comment."
@@ -15,10 +16,10 @@
   (font-lock-mode t)
   (auto-fill-mode 1)
   (show-paren-mode t)
+  (my/fontify-braces)
   (font-lock-add-keywords nil
 			  '(("${*\\([A-Za-z0-9_]+\\)}*" 1
-			     font-lock-variable-name-face t)
-			    ("[][(){}$]" 0 font-lock-brace-face t)))
+			     font-lock-variable-name-face t)))
   (keymap-local-set "C-M-;" #'my/sh-insert-block-comment))
 
 (provide 'my-sh-mode)
