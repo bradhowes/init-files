@@ -192,8 +192,6 @@
  '(vertico-mode t)
  '(vertico-resize t)
  '(visible-bell nil)
- '(warning-suppress-log-types '((comp) ((flymake flymake))))
- '(warning-suppress-types '((emacs) (comp) ((flymake flymake))))
  '(which-key-idle-delay 1.0)
  '(which-key-mode t)
  '(windmove-wrap-around t)

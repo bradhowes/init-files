@@ -11,7 +11,8 @@
   :group 'my/customizations)
 
 (defun my/fontify-braces (&optional mode)
-  "Add font-lock for braces ([] {} ()) to MODE."
+  "Add font-lock for braces ([] {} ()) to MODE.
+If MODE is nil then apply to the current mode."
   (font-lock-add-keywords mode '(("[][(){}]" . 'my/font-lock-brace))))
 
 (provide 'my-fontify-braces)
