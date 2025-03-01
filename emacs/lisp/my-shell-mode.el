@@ -3,6 +3,7 @@
 ;;; Code:
 
 (require 'consult)
+(require 'corfu)
 (require 'shell)
 (require 'python)
 
@@ -27,6 +28,7 @@ actual beginning of line (same as if there were no prompt)."
   (set-process-coding-system (get-buffer-process (current-buffer)) 'utf-8 'utf-8)
 
   (setq ansi-color-names-vector ["black" "red3" "green3" "yellow3" "blue2" "magenta3" "cyan3" "gray90"]
+        comint-process-echoes t
         shell-dirtrackp nil)            ; disable since using comint-osc-process-output
 
   (ansi-color-for-comint-mode-on)
@@ -37,6 +39,7 @@ actual beginning of line (same as if there were no prompt)."
   (add-hook 'comint-output-filter-functions #'comint-postoutput-scroll-to-bottom)
 
   (buffer-disable-undo)
+  
   (keymap-local-set "C-a" #'my/shell-bol)
   (keymap-local-set "M-h" #'consult-history))
 
