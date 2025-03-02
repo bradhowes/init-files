@@ -24,6 +24,7 @@ If performance is bad when loading data, reduce this number."
                                            (split-string (match-string 1) ".")) "")
                     'face 'custom-face-tag))))
 
+;;;###autoload
 (define-derived-mode emacs-pager-mode fundamental-mode "Pager"
   "Mode for viewing data pagd by `emacs-pager`."
   ;; Treat buffer as read-only

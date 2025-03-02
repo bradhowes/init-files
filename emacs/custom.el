@@ -33,7 +33,6 @@
  '(consult-notes-use-rg t)
  '(copyright-query nil)
  '(copyright-year-ranges t)
- '(corfu-auto-prefix 1)
  '(corfu-history-mode t nil nil "Customized with use-package corfu")
  '(corfu-popupinfo-delay '(0.5 . 0.5))
  '(corfu-popupinfo-mode t)

@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'my-constants)
 (require 'consult)
 (require 'corfu)
 (require 'shell)
@@ -28,7 +29,7 @@ actual beginning of line (same as if there were no prompt)."
   (set-process-coding-system (get-buffer-process (current-buffer)) 'utf-8 'utf-8)
 
   (setq ansi-color-names-vector ["black" "red3" "green3" "yellow3" "blue2" "magenta3" "cyan3" "gray90"]
-        comint-process-echoes t
+        comint-process-echoes my/is-macosx
         shell-dirtrackp nil)            ; disable since using comint-osc-process-output
 
   (ansi-color-for-comint-mode-on)
