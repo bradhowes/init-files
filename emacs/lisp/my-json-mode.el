@@ -6,6 +6,9 @@
 (require 'font-lock)
 (require 'my-fontify-braces)
 
+(use-package 'flymake-json
+  :hook (json-mode . flymake-json))
+
 (defun my/json-mode-hook ()
   "Custom JSON mode."
   (when (string= "yagconf" (file-name-extension (buffer-file-name (current-buffer))))

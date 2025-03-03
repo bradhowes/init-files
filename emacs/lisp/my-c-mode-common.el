@@ -359,7 +359,7 @@ If POS is nil, the current point is used."
   (unless (boundp 'my/c-c-c-4-keymap)
     (define-prefix-command 'my/c-c-c-4-keymap))
 
-  (local-set-key [(control c)(control f)] 'projectile-find-other-file) ;; 'my/c-find-twin)
+  ;; (keymap-local-set "C-c C-f" #'projectile-find-other-file) ;; 'my/c-find-twin)
 
   (local-set-key [(control c)(control meta f)] 'c-forward-into-nomenclature)
   (local-set-key [(control c)(control meta b)] 'c-backward-into-nomenclature)
@@ -375,7 +375,7 @@ If POS is nil, the current point is used."
   (local-set-key [(control c)(?q)] 'view-qt-doc)
 
   (local-set-key [(control c)(?4)] 'my/c-c-c-4-keymap)
-  (local-set-key [(control c)(?4)(?i)] 'projectile-find-other-file-other-window) ;; 'my/c-find-include-file-other-window)
+  ;; (local-set-key [(control c)(?4)(?i)] 'projectile-find-other-file-other-window) ;; 'my/c-find-include-file-other-window)
   (local-set-key [(control c)(?4)(?f)] 'my/c-find-twin-other-window)
 
   (unless (boundp 'my/c-c-c-5-keymap)
@@ -383,7 +383,7 @@ If POS is nil, the current point is used."
 
   (local-set-key [(f5)] 'next-error)
   (local-set-key [(control c)(?5)] 'my/c-c-c-5-keymap)
-  (local-set-key [(control c)(?5)(?i)] 'projectile-find-other-file-other-frame) ;; 'my/c-find-include-file-other-frame)
+  ;; (local-set-key [(control c)(?5)(?i)] 'projectile-find-other-file-other-frame) ;; 'my/c-find-include-file-other-frame)
 
   ;; Attempt to locate a 'build' directory to move to when compiling a source
   ;; file.

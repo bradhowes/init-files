@@ -119,13 +119,16 @@
  '(package-quickstart t)
  '(package-selected-packages
    '(accent ace-window async cape char-menu cmake-mode compile-multi consult consult-compile-multi consult-denote
-            consult-dir consult-eglot consult-notes consult-projectile corfu corfu-terminal crux dape diff-hl ef-themes
-            eglot-luau eldoc-box embark embark-consult esup exec-path-from-shell expand-region fancy-compilation
-            flymake-aspell flymake-json flymake-lua geiser geiser-guile impatient-mode indent-bars jedi-core jiralib2
-            js-comint js2-mode json-mode key-chord logview lsp-jedi lsp-pyright lua-mode magit marginalia mode-line-bell
-            mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer
-            orderless org-jira osx-dictionary pdb-capf popper pyvenv realgud rg scratch tree-sitter-langs
-            treemacs-nerd-icons verb vertico which-key ws-butler yaml yaml-mode))
+            consult-dir consult-eglot consult-notes corfu corfu-terminal crux dape diff-hl ef-themes eglot-luau
+            eldoc-box embark embark-consult esup exec-path-from-shell expand-region fancy-compilation flymake-aspell
+            flymake-json flymake-lua geiser geiser-guile impatient-mode indent-bars jedi-core jiralib2 js-comint
+            js2-mode json-mode key-chord logview lsp-jedi lsp-pyright lua-mode magit marginalia mode-line-bell mood-line
+            multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer orderless
+            org-jira osx-dictionary pdb-capf popper pyvenv realgud rg scratch tree-sitter-langs treemacs-nerd-icons verb
+            vertico which-key ws-butler yaml yaml-mode))
+ '(package-vc-selected-packages
+   '((magit :url "https://github.com/magit/magit.git" :branch "v4.1.3" :lisp-dir "lisp" :make '("lisp" "info") :doc
+            "docs/magit.texi")))
  '(pixel-scroll-mode t)
  '(pixel-scroll-precision-mode t)
  '(pixel-scroll-precision-use-momentum t)
@@ -135,14 +138,6 @@
  '(popper-reference-buffers
    '("\\*Messages\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
      compilation-mode))
- '(projectile-generic-command "rg --files --hidden -0")
- '(projectile-globally-ignored-directories
-   '(".idea" ".vscode" ".ensime_cache" ".eunit" ".git" ".hg" ".tox" ".svn" ".cache" ".clangd" "./build" "./cmake"))
- '(projectile-mode t nil (projectile))
- '(projectile-mode-line-prefix " P")
- '(projectile-per-project-compilation-buffer t)
- '(projectile-sort-order 'recently-used)
- '(projectile-switch-project-action 'projectile-dired)
  '(pyvenv-workon ".")
  '(read-extended-command-predicate 'command-completion-default-include-p)
  '(recentf-max-menu-items 50)

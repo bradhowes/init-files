@@ -236,6 +236,11 @@ command guarantees that dispatching will always happen."
                                  ("magit-log" nil (inhibit-same-window . t))
                                  ("magit-diff:" nil (inhibit-same-window . t))))))
 
+(use-package mood-line
+  :commands (mood-line-mode)
+  :hook
+  (after-init . mood-line-mode))
+
 (when (display-graphic-p)
   (use-package nerd-icons)
 
@@ -243,12 +248,7 @@ command guarantees that dispatching will always happen."
     :after (marginalia)
     :commands (nerd-icons-completion-mode nerd-icons-completion-marginalia-setup)
     :hook ((after-init . nerd-icons-completion-mode)
-           (marginalia-mode nerd-icons-completion-marginalia-setup)))
-
-  (use-package mood-line
-    :commands (mood-line-mode)
-    :hook
-    (after-init . mood-line-mode)))
+           (marginalia-mode nerd-icons-completion-marginalia-setup))))
 
 (if my/is-terminal
     (progn

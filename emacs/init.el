@@ -197,8 +197,21 @@ Bound to \\`C-x p s'.")
                           (diff-hl-margin-mode t))
                         )))
 
+;; Work QA hosts have a Git v2.18.0 and latest Magit now yells about it. In QA, fetch the last Magit version that does not care
+;; about this. Unfortunately, I do not see a way to do this conditionally inside `use-package`.
+(when my/is-qa
+  (unless (package-installed-p 'magit)
+    (package-vc-install '(magit :url "https://github.com/magit/magit.git"
+                                :branch "v4.1.3"
+                                :lisp-dir "lisp"
+                                :make '("lisp" "info")
+                                :doc "docs/magit.texi")))
+  ;; For some reason this is still needed even after using `package-vc-install'
+  (push (concat user-emacs-directory "elpa/magit/lisp") load-path))
+
+;; Normal install of Magit
 (use-package magit
-  :after (project)
+  :ensure t
   :commands (magit-status-setup-buffer magit-status magit-project-status)
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
@@ -210,11 +223,9 @@ Bound to \\`C-x p s'.")
          ("C-c f" . magit-file-dispatch)))
 
 (use-package rg
-  :after (projectile)
   :commands (rg-enable-default-bindings rg-project)
   :bind ("C-x p s r" . #'rg-project)
-  :hook
-  (after-init . rg-enable-default-bindings))
+  :hook (after-init . rg-enable-default-bindings))
 
 (use-package denote
   :commands (denote-dired-mode-in-directories)
@@ -239,7 +250,6 @@ Bound to \\`C-x p s'.")
                            denote-file-types)))
 
 (use-package consult
-  :after (projectile)
   :commands (consult--customize-put consult-flymake)
   :bind (("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
@@ -339,7 +349,8 @@ Bound to \\`C-x p s'.")
   :commands (vertico-mode)
   :hook ((rfn-eshadow-update-overlay . vertico-directory-tidy)))
 
-(use-package mode-line-bell)
+(use-package mode-line-bell
+  :defer t)
 
 (use-package eglot
   :commands (eglot-ensure)
@@ -371,7 +382,8 @@ Bound to \\`C-x p s'.")
          ("C-c C-i" . crux-indent-defun)
          ("C-^" . crux-top-join-line)))
 
-(use-package orderless)
+(use-package orderless
+  :defer t)
 
 (use-package flymake
   :commands (flymake-show-buffer-diagnostics)
@@ -382,8 +394,6 @@ Bound to \\`C-x p s'.")
   :bind (:map flymake-mode-map
               ("M-n" . flymake-goto-next-error)
               ("M-p" . flymake-goto-prev-error)))
-
-(use-package flymake-json)
 
 (use-package cape
   :commands (cape-file))
@@ -399,6 +409,10 @@ Bound to \\`C-x p s'.")
                                          #'corfu-send))))
   :init
   (global-corfu-mode))
+
+(use-package corfu-terminal
+  :if my/is-terminal
+  :hook after-init)
 
 ;; (use-package completion-preview
 ;;   :ensure nil
@@ -885,7 +899,6 @@ THis is just a shortcut for \\[universal-argument] \\[set-mark-command]."
                    "<home>" #'beginning-of-buffer
                    "<end>" #'end-of-buffer
                    "<delete>" #'delete-char
-                   "S-<f12>" #'package-list-packages
 
                    "M-z" #'zap-up-to-char
                    "M-[" #'previous-buffer ; NOTE: this conflicts with terminal escape sequences (see below)
@@ -927,8 +940,17 @@ THis is just a shortcut for \\[universal-argument] \\[set-mark-command]."
 
                    "<f1>" #'my/normal-screen-font-size
                    "<f2>" #'my/share-screen-font-size
+                   "<f3>" #'ignore      ; disable kmacro-start-macro-or-insert-counter
+                   "<f4>" #'ignore      ; disable kmacro-end-or-call-macro
+                   "<f10>" #'ignore     ; disable menu-bar-open
+                   "<f11>" #'ignore     ; dispable toggle-frame-fullscreen
+                   "<f12>" #'ignore     ;
 
-                   "<insert>" #'ignore  ; disable key for toggling overwrite mode
+                   "S-<f10>" #'menu-bar-open
+                   "S-<f12>" #'package-list-packages
+
+                   "<insert>" #'ignore  ; disable overwrite-mode
+                   "<insertchar>" #'ignore  ; disable overwrite-mode
                    "C-x C-z" #'ignore   ; suspend-frame
 
                    "C-x C-+" #'ignore   ; text-scale-adjust
