@@ -72,13 +72,12 @@ ends with the same `---' on its own line."
 (defun my/codify-last-word ()
   "Escape wrap the last word with backquotes."
   (interactive)
-  (let ((pos (point)))
-    (save-excursion
-      (re-search-forward "\\s " nil nil -1)
-      (when (looking-at "\\s ")
-        (forward-char 1))
-      (insert-char ?`))
-    (insert-char ?`)))
+  (save-excursion
+    (re-search-forward "\\s " nil nil -1)
+    (when (looking-at "\\s ")
+      (forward-char 1))
+    (insert-char ?`))
+  (insert-char ?`))
 
 (defun my/make-link ()
   "Make a link."
@@ -128,6 +127,50 @@ newline and 2 spaces."
       (goto-char beg)
       (while (re-search-forward re end t)
         (replace-match "\n  " nil nil)))))
+
+(defun my/format-xml ()
+  "Format XML pasted into code block.
+Simply replaces all spaces between attributes in a clause with a
+newline and 2 spaces.
+
+Example:
+
+  <foo a=\"1\" b=\"2\"/>
+
+transforms into
+
+  <foo
+    a=\"1\"
+    b=\"2\"
+  />"
+  (interactive)
+  (save-excursion
+    (let* ((re "\\( [a-zA-Z0-9_]+=\\)\\|\\(/>\\)")
+           (region (my/fixup-code-region))
+           (beg (car region))
+           (end (cdr region)))
+      (goto-char beg)
+      (while (re-search-forward re end t)
+        (goto-char (match-beginning 0))
+        (insert "\n")
+        (if (match-beginning 2)
+            (forward-char 3)
+          (insert " "))
+        (when end
+          (setq end (+ 2 end)))
+        (goto-char (match-end 0))))))
+
+(defun my/sort-fixdropcopy ()
+  "Sort FIX dropcopy lines in region."
+  (interactive)
+  (save-excursion
+    (save-restriction
+      (narrow-to-region (region-beginning) (region-end))
+      (goto-char (point-min))
+      (let ((inhibit-field-text-motion t))
+        (sort-subr nil 'forward-line 'end-of-line
+                   (lambda () (if (looking-at "^\\s +[0-9]+=")
+                                  (string-to-number (match-string 0)))))))))
 
 (provide 'my-markdown-mode)
 ;;; my-markdown-mode.el ends here
