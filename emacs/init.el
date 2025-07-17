@@ -328,18 +328,7 @@ It does not affect existing frames."
 (when my/is-terminal
   (set-face-background 'default "undefined"))
 
-(defface my/font-lock-brace
-  '((((class color) (background light))
-     (:foreground "tomato1" :weight bold))
-    (((class color) (background dark))
-     (:foreground "tomato1" :weight bold)))
-  "Custom face used to highlight parentheses, braces, and brackets."
-  :group 'my/customizations)
-
-(defun my/fontify-braces (&optional mode)
-  "Apply `my/font-lock-brace' face for braces in MODE buffers.
-If MODE is nil then apply to the current mode."
-  (font-lock-add-keywords mode '(("[][(){}]" . 'my/font-lock-brace))))
+(use-package my-fontify-braces)
 
 (defun my/autoloads (&rest definitions)
   "Setup autoloads for my code customizations.
@@ -1370,7 +1359,7 @@ such directory, in the user's home directory."
 (defcustom my/git-sync-buffer-name " *my/git-sync"
   "The name of the buffer to use to hold output from my/git-sync func."
   :type '(string)
-  :grtoup 'my/customizations
+  :group 'my/customizations
   :set (lambda (symbol value)
          (set-default-toplevel-value symbol value)
          (set-default-toplevel-value 'popper-reference-buffers (append (list value) popper-reference-buffers))))
