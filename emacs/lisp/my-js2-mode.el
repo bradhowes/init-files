@@ -12,10 +12,10 @@
   "Custom JS2 mode hook."
   (setq js2-basic-offset 2)
         ;; js2-enter-indents-newline t)
-  ;; (local-set-key [(control j)] 'newline)
-  ;; (local-set-key (kbd "C-x C-e") #'js-send-last-sexp)
-  ;; (local-set-key (kbd "C-c b") #'js-send-buffer)
-  ;; (local-set-key (kbd "C-c C-b") #'js-send-buffer-and-go)
+
+  (keymap-local-set "C-x C-e" #'js-send-last-sexp)
+  (keymap-local-set "C-c b" #'js-send-buffer)
+
   (my/fontify-braces)
   (font-lock-mode t)
   (show-paren-mode t))

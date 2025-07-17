@@ -39,8 +39,6 @@ actual beginning of line (same as if there were no prompt)."
   (add-hook 'comint-output-filter-functions #'comint-truncate-buffer)
   (add-hook 'comint-output-filter-functions #'comint-postoutput-scroll-to-bottom)
 
-  (buffer-disable-undo)
-  
   (keymap-local-set "C-a" #'my/shell-bol)
   (keymap-local-set "M-h" #'consult-history))
 

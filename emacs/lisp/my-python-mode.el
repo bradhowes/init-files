@@ -5,6 +5,7 @@
 (require 'font-lock)
 (require 'doxygen)
 (require 'my-fontify-braces)
+(require 'yasnippet)
 
 ;;; Code:
 
@@ -91,6 +92,7 @@ The comment is indented with PREFIX."
   "Custom hook for Python moode."
   (font-lock-mode t)
   (auto-fill-mode 1)
+  (yas-minor-mode 1)
   (my/fontify-braces)
   (keymap-local-set "C-M-;" #'my/python-insert-block-comment)
   (keymap-local-set "C-c C-M-;" #'my/python-doxygen-insert-block-comment))

@@ -5,6 +5,7 @@
 (require 'font-lock)
 (require 'my-insert-block-comment)
 (require 'my-fontify-braces)
+(require 'yasnippet)
 
 (defun my/lisp-insert-block-comment ()
   "Insert block comment."
@@ -35,10 +36,12 @@
   (my/fontify-braces)
   (font-lock-mode t)
   (show-paren-mode t)
+  (yas-minor-mode 1)
   (keymap-local-set "C-x C-e" #'my/eval-this-defun)
   (keymap-local-set "C-x M-e" #'eval-last-sexp)
   (keymap-local-set "C-M-;" #'my/lisp-insert-block-comment)
-  (keymap-local-set "C-<return>" #'eval-print-last-sexp))
+  (keymap-local-set "C-<return>" #'eval-print-last-sexp)
+  (which-function-mode 1))
 
 (provide 'my-lisp-mode)
 ;;; my-lisp-mode.el ends here

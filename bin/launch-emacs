@@ -1,0 +1,7 @@
+#!/bin/bash
+
+HOST="${1}"
+shift 1
+
+ARGS="${*}"
+ssh -fX "${HOST}" "${HOME}/bin/run-emacs ${ARGS}"

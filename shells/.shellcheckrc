@@ -1,0 +1,5 @@
+disable=SC2219,SC3006,SC3010,SC3028,SC3033,SC3039,SC3043,SC3044,SC3045,SC3053,SC3054,SC3055
+
+external-sources=true
+source-path=${HOME}
+source-path=${HOME}/src/Mine/init-files/shells

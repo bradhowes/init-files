@@ -6,6 +6,7 @@
 (require 'doxygen)
 (require 'cc-vars)
 (require 'my-fontify-braces)
+(require 'subword)
 
 (font-lock-add-keywords 'c++-mode
                         '(("\\<\\(constexpr\\|final\\|noexcept\\|nullptr\\)\\>" . 'font-lock-keyword-face)))
@@ -284,8 +285,8 @@ If POS is nil, the current point is used."
 
 (defun my/get-build-directory (file-name)
   "Locate the build directory for FILE-NAME."
-  (let* ((dir (file-name-directory (expand-file-name file-name)))
-	 (build (concat dir my/oob-directory-name))
+  (let* ((dir (file-name-directory (file-truename file-name)))
+	 (build (file-name-concat dir my/oob-directory-name))
 	 (found nil)
 	 (bit nil)
 	 (bits '()))
@@ -300,7 +301,7 @@ If POS is nil, the current point is used."
 	    bit (file-name-nondirectory dir)
 	    bits (cons bit bits)
 	    dir (file-name-directory dir)
-	    build (concat dir my/oob-directory-name)))
+	    build (file-name-concat dir my/oob-directory-name)))
 
     ;;
     ;; Try and go down the same directory path but starting in the 'build'
@@ -310,7 +311,7 @@ If POS is nil, the current point is used."
     (while (and (not (null bits))
 		(file-exists-p build))
       (setq found build
-	    build (concat (file-name-as-directory build) (car bits))
+	    build (file-name-concat (file-name-as-directory build) (car bits))
 	    bits (cdr bits)))
 
     ;;
@@ -323,7 +324,7 @@ If POS is nil, the current point is used."
       (while (and (not (null bits))
 		  (file-exists-p build))
 	(setq found build
-	      build (concat (file-name-as-directory build) (car bits))
+	      build (file-name-concat (file-name-as-directory build) (car bits))
 	      bits (cdr bits))))
 
     ;;
@@ -359,43 +360,40 @@ If POS is nil, the current point is used."
   (unless (boundp 'my/c-c-c-4-keymap)
     (define-prefix-command 'my/c-c-c-4-keymap))
 
-  ;; (keymap-local-set "C-c C-f" #'projectile-find-other-file) ;; 'my/c-find-twin)
+  (keymap-local-set "C-c C-f" #'my/c-find-twin)
 
-  (local-set-key [(control c)(control meta f)] 'c-forward-into-nomenclature)
-  (local-set-key [(control c)(control meta b)] 'c-backward-into-nomenclature)
-  (local-set-key [(control c)(control meta u)] 'my/capitalize-nomenclature)
-  (local-set-key [(control c)(control meta d)] 'my/forward-delete-nomenclature)
+  (keymap-local-set "C-c C-M-f" #'subword-forward)
+  (keymap-local-set "C-c C-M-b" #'subword-backward)
 
-  (local-set-key [(control c)(?d)] doxygen-keymap)
-  (local-set-key [(control c)(?\;)] 'doxygen-insert-block-comment)
-  (local-set-key [(control c)(meta \;)] 'doxygen-insert-inline-comment)
-  (local-set-key [(control c)(meta \:)] 'doxygen-transform-inline-comment)
+  ;; (keymap-local-set "C-c C-M-u" #'my/capitalize-nomenclature)
+  ;; (keymap-local-set "C-c C-M-d)] #'my/forward-delete-nomenclature)
 
-  (local-set-key [(control c)(?i)] 'my/c-find-include-file)
-  (local-set-key [(control c)(?q)] 'view-qt-doc)
+  (keymap-local-set "C-c d" doxygen-keymap)
+  (keymap-local-set "C-c ;" #'doxygen-insert-block-comment)
+  (keymap-local-set "C-c M-;" #'doxygen-insert-inline-comment)
 
-  (local-set-key [(control c)(?4)] 'my/c-c-c-4-keymap)
-  ;; (local-set-key [(control c)(?4)(?i)] 'projectile-find-other-file-other-window) ;; 'my/c-find-include-file-other-window)
-  (local-set-key [(control c)(?4)(?f)] 'my/c-find-twin-other-window)
+  (keymap-local-set "C-c i" #'my/c-find-include-file)
+  (keymap-local-set "C-c q" #'view-qt-doc)
+
+  (keymap-local-set "C-c 4" 'my/c-c-c-4-keymap)
+  (keymap-local-set "C-c 4 i" #'my/c-find-include-file-other-window)
+  (keymap-local-set "C-c 4 f" #'my/c-find-twin-other-window)
 
   (unless (boundp 'my/c-c-c-5-keymap)
     (define-prefix-command 'my/c-c-c-5-keymap))
 
-  (local-set-key [(f5)] 'next-error)
-  (local-set-key [(control c)(?5)] 'my/c-c-c-5-keymap)
-  ;; (local-set-key [(control c)(?5)(?i)] 'projectile-find-other-file-other-frame) ;; 'my/c-find-include-file-other-frame)
+  (keymap-local-set "<f5>" #'next-error)
+  (keymap-local-set "C-c 5" 'my/c-c-c-5-keymap)
+  (keymap-local-set "C-c 5 i" #'my/c-find-include-file-other-frame)
 
-  ;; Attempt to locate a 'build' directory to move to when compiling a source
-  ;; file.
-  ;;
-  (unless (or (null buffer-file-name)
-	      (file-exists-p "Makefile")
-	      (file-exists-p "makefile")
-	      (file-exists-p "GNUMakefile"))
-    (let ((build-directory (my/get-build-directory buffer-file-name)))
-      (if build-directory
-	(set (make-local-variable 'compile-command)
-	     (concat "make -C " build-directory)))))
+  ;; (unless (or (null buffer-file-name)
+  ;;             (file-exists-p "Makefile")
+  ;;             (file-exists-p "makefile")
+  ;;             (file-exists-p "GNUMakefile"))
+  ;;   (let ((build-directory (my/get-build-directory buffer-file-name)))
+  ;;     (if build-directory
+  ;;       (set (make-local-variable 'compile-command)
+  ;;            (concat "make -C " build-directory)))))
 
   ;; (semantic-mode 1)
 
@@ -407,7 +405,6 @@ If POS is nil, the current point is used."
 
   (my/fontify-braces)
 
-  ;; If using smartparens
   ;; (sp-local-pair 'c-mode "{" nil :post-handlers '(:add my/open-block-c-mode))
   ;; (sp-local-pair 'c++-mode "{" nil :post-handlers '(:add my/create-newline-and-enter-sexp))
   (auto-fill-mode 1)

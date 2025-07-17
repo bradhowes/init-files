@@ -8,14 +8,14 @@
   "Insert three indented comment lines.
 Place cursor at end of middle line."
   (interactive)
-  (my/insert-block-comment 'reindent-then-newline-and-indent "#" "#" "#"))
+  (my/insert-block-comment 'reindent-then-newline-and-indent "#" "" "#"))
 
 (defun my/ksh-mode-hook ()
   "Custom KSH mode hook."
   (auto-fill-mode t)
   (font-lock-mode t)
   (show-paren-mode t)
-  (local-set-key [(meta control \;)] #'my/ksh-insert-block-comment))
+  (keymap-local-set "C-M-;" #'my/ksh-insert-block-comment))
 
 (provide 'my-ksh-mode)
 

@@ -11,7 +11,7 @@
 (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
 ;; Resizing the Emacs frame can be an expensive part of changing the font. Inhibit this to reduce startup times with
-;; fonts that are larger than the system default
+;; fonts that are larger than the system default.
 (setq frame-inhibit-implied-resize t
       frame-resize-pixelwise t
       custom-file nil

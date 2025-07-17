@@ -100,6 +100,7 @@
  '(ls-lisp-use-insert-directory-program nil)
  '(magit-diff-refine-hunk t)
  '(magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
+ '(major-mode-remap-alist '((python-mode . python-ts-mode)))
  '(makefile-electric-keys t)
  '(marginalia-mode t)
  '(message-send-mail-function 'sendmail-send-it)
@@ -121,11 +122,12 @@
    '(accent ace-window async cape char-menu cmake-mode compile-multi consult consult-compile-multi consult-denote
             consult-dir consult-eglot consult-notes corfu corfu-terminal crux dape diff-hl ef-themes eglot-luau
             eldoc-box embark embark-consult esup exec-path-from-shell expand-region fancy-compilation flymake-aspell
-            flymake-json flymake-lua geiser geiser-guile impatient-mode indent-bars jedi-core jiralib2 js-comint
-            js2-mode json-mode key-chord logview lsp-jedi lsp-pyright lua-mode magit marginalia mode-line-bell mood-line
-            multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer orderless
-            org-jira osx-dictionary pdb-capf popper pyvenv realgud rg scratch tree-sitter-langs treemacs-nerd-icons verb
-            vertico which-key ws-butler yaml yaml-mode))
+            flymake-json flymake-lua flymake-shellcheck geiser geiser-guile impatient-mode indent-bars jedi-core
+            jiralib2 js-comint js2-mode json-mode key-chord logview lsp-jedi lsp-pyright lua-mode magit marginalia
+            mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired
+            nerd-icons-ibuffer orderless org-jira osx-dictionary pdb-capf popper pyvenv realgud rg scratch
+            tree-sitter-langs treemacs-nerd-icons verb vertico which-key ws-butler yaml yaml-mode yasnippet
+            yasnippet-capf yasnippet-snippets))
  '(package-vc-selected-packages
    '((magit :url "https://github.com/magit/magit.git" :branch "v4.1.3" :lisp-dir "lisp" :make '("lisp" "info") :doc
             "docs/magit.texi")))
@@ -166,6 +168,7 @@
  '(sendmail-program "/opt/homebrew/bin/msmtp")
  '(sentence-end "[.?!][]\"')]*\\($\\|\11\\| \\)[\12]*")
  '(sentence-end-double-space nil)
+ '(sh-mode-hook '(flymake-shellcheck-load indent-bars-mode my/sh-mode-hook))
  '(size-indication-mode nil)
  '(smtpmail-smtp-server "smtp.mail.me.com")
  '(smtpmail-smtp-service 587)

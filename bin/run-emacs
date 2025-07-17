@@ -1,0 +1,10 @@
+#!/bin/bash
+
+[[ -z "${my_emacs_root}" ]] && source "${HOME}/.profile"
+
+my_emacs_d="${my_cfg}/emacs.d"
+my_init=""
+[[ -d "${my_emacs_d}" ]] && my_init="--init-directory ${my_emacs_d}"
+
+export DBUS_SESSION_BUS_ADDRESS="unix:path=/dev/null"
+exec emacs ${my_init} "$@"

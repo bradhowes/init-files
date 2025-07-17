@@ -104,7 +104,20 @@ in a code block, return the start and end of the block.
 Otherwise, return the current point and max point."
   (interactive)
   (save-excursion
-    (let* ((re "\\(\\\\\n \\)\\|\\( +$\\)\\|\\(^ +\\)")
+    (if (use-region-p)
+        (cons (use-region-beginning) (use-region-end))
+      (if-let ((block (markdown-code-block-at-pos (point))))
+          (cons (car block) (cadr block))
+        (cons (point) (point-max))))))
+
+(defun my/fixup-log-paste ()
+  "Fix-up log lines that were copied from terminal.
+If no region is active, see if point is in a markdown code block, and if so
+use the block limits for BEG and END values. Otherwise, work on lines from
+current line to the end of buffer."
+  (interactive)
+  (save-excursion
+    (let* ((re "\\(\\\\\\n \\)\\|\\( +$\\)\\|\\(^ +\\)")
            (region (my/fixup-code-region))
            (beg (car region))
            (end (cdr region)))
@@ -154,14 +167,14 @@ transforms into
         (goto-char (match-beginning 0))
         (insert "\n")
         (if (match-beginning 2)
-            (forward-char 3)
-          (insert " "))
+            (forward-char 3)            ; match />
+          (insert " "))                 ; match before attribute
         (when end
           (setq end (+ 2 end)))
         (goto-char (match-end 0))))))
 
 (defun my/sort-fixdropcopy ()
-  "Sort FIX dropcopy lines in region."
+  "Sort FIX dropcopy lines in region BEG to END."
   (interactive)
   (save-excursion
     (save-restriction
