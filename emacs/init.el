@@ -22,12 +22,12 @@
   "Location of root of my source repositories.")
 
 (defconst my/venv (file-truename "~/venv")
-  "The Python virtual environment to use for elpy.")
+  "The Python virtual environment to use for eglot.")
 
 (setenv "WORKON_HOME" my/venv)
 
-(defconst my/venv-python (concat my/venv "/bin/python")
-  "The path to the Python executable to use for elpy.")
+(defconst my/venv-python (file-name-concat my/venv "/bin/python")
+  "The path to the Python executable to use for eglot.")
 
 (defconst my/is-work (or (string= "howesbra" user-login-name)
                          (string= "sp_qa" user-login-name))
@@ -75,7 +75,7 @@ Hacky but for now it works since we are always starting up an initial xterm.")
 (defconst my/4k-screen-width 3840
   "4K external display width in pixels.")
 
-(defconst my/workspace-name (or (getenv "WORKSPACE_NAME") "")
+(defconst my/workspace-name (or (getenv "WORKSPACE_NAME") "N/A")
   "The value of WORKSPACE_NAME environment variable.")
 
 (defconst my/font-name "Berkeley Mono"
@@ -85,10 +85,10 @@ Hacky but for now it works since we are always starting up an initial xterm.")
   "T if running on dev box at work.")
 
 (defconst my/is-qa (and my/is-work (string-suffix-p "q" (system-name)))
-  "T if running on QA box at work.")
+  "T if running on QA box at work")
 
 (defconst my/dev-tmp "/apps/home/howesbra/tmp"
-  "The directory to use as temporary storage.")
+  "The directory to use for temporary files.")
 
 (defun my/valid-directory (dir)
   "Check if DIR is valid, returning it if so or nil if not."
@@ -196,7 +196,7 @@ Emacs frames."
 
 (defun my/frame-top ()
   "The top of the display area.
-NOTE: this assumes that the laptop display if present is,
+NOTE: this assumes that the laptop display if present,
 is on the left of any monitors."
   (declare (side-effect-free t))
   (let ((settings (display-monitor-attributes-list)))
@@ -277,7 +277,7 @@ It does not affect existing frames."
 (add-hook 'after-init-hook #'my/screen-layout-changed)
 
 (let* ((common-paths (list (file-truename "~/bin")
-                           (concat my/venv "/bin")))
+                           (file-name-concat my/venv "bin")))
        (macosx-paths (if my/is-macosx
                          (list "/opt/homebrew/sqlite/bin"
                                "/opt/homebrew/opt/grep/libexec/gnubin"
@@ -304,7 +304,7 @@ It does not affect existing frames."
     :init
     (package-initialize)))
 
-;; Configure `display-buffer-alist` to manage window placement
+;; Configure `display-buffer-alist' to manage window placement
 
 (use-package ace-window
   :commands (aw-window-list aw-switch-to-window aw-select aw-flip-window ace-display-buffer ace-window)
@@ -334,7 +334,7 @@ It does not affect existing frames."
 (use-package my-fontify-braces)
 
 (defun my/autoloads (&rest definitions)
-  "Setup autoloads for my code customizations.
+  "Setup autoloads for my mode customizations.
 DEFINITIONS is a sequence of string and symbol pairs, where the
 string is a filename (without extension), and the following symbol
 is either a standalone symbol or a list of symbols that represent
@@ -355,7 +355,7 @@ the items to setup for autoloading from the given file."
  "my-cmake-mode" 'my/cmake-mode-hook
  "my-c++-mode" 'my/c++-mode-hook
  "my-dired-mode" 'my/dired-mode-hook
- "my-js2-mode" 'my/jsd-mode-hook
+ "my-js2-mode" 'my/js2-mode-hook
  "my-json-mode" 'my/json-mode-hook
  "my-lisp-mode" '(my/lisp-mode-hook my/lisp-data-mode-hook)
  "my-makefile-mode" 'my/makefile-mode-hook
@@ -404,8 +404,8 @@ the items to setup for autoloading from the given file."
 
 (defun my/org-filter-buffer-substring (start end delete)
   "Custom filter on buffer text from START to END.
-When DELETE is t, delte the contents in the range.
-Otherwise, remove all properties from a span in a buffer.
+When DELETE is t, delete the contents from the range.
+Otherwise, removes all properties from a span in a buffer.
 Useful when copying code into Org blocks so that the copy does not contain any
 artifacts such as indentation bars."
   (if delete
@@ -451,18 +451,18 @@ artifacts such as indentation bars."
     (use-package flymake-shellcheck
       :hook
       (sh-mode . flymake-shellcheck-load))
-  (message "Not using flymake-shellcheck -- shellcheck executable not found."))
+  (message "Not using flymake-shellcheck - shellcheck executable not found."))
 
 (use-package shell-mode
   :defines (explicit-bash-args)
   :init
   ;; Special-case QA env -- we are logged in as `sp_qa` user but we want our custom
-  ;; environment. Command `bash` to load our custom settings.
+  ;; environment. Command `bash' to load our custom settings.
   (let ((rc (file-truename (file-name-concat my/repos "configurations/qa.bashrc"))))
     (if (and my/is-qa
              (file-exists-p rc)
              (string-suffix-p "q" (system-name)))
-        (setq explicit-bash-args (list "--no-editing" "--rcfile" rc "-i"))
+        (setq explicit-bash-args (list "--noediting" "--rcfile" rc "-i"))
       (setq explicit-bash-args '("--noediting" "-i"))))
   :hook ((shell-mode . my/shell-mode-hook)))
 
@@ -564,7 +564,7 @@ Bound to \\`C-x p s'.")
   :bind (:map dired-mode-map
               ("M-{" . nil)
               ("M-}" . nil)
-              ("c" . dired-do-copy)
+              ("c" . dired-do-copy)     ; swap copy and compress
               ("C" . dired-do-compress)
               ("C-s" . dired-isearch-filenames)
               ("C-M-s" . dired-isearch-filenames-regexp))
@@ -585,15 +585,15 @@ Bound to \\`C-x p s'.")
   (password-cache-expiry nil))
 
 (defun my/read-gitlab-password (host)
-  "Inject password into `password-cache` for HOST."
+  "Inject password into `password-cache' for HOST."
   (if-let ((password (password-read-from-cache host)))
       password
     (let ((password (password-read "Gitlab password: " host)))
       (password-cache-add host password)
       password)))
 
-;; Work QA hosts have a Git v2.18.0 and latest Magit now yells about it. In QA, fetch the last Magit version that does not care
-;; about this. Unfortunately, I do not see a way to do this conditionally inside `use-package`.
+;; Work QA hosts have a Git v2.18.0 and latest Magit now yells about it. In QA, fetch the last Magit version that did
+;; about this. Unfortunately I do not see a way to do this conditionally inside `use-package'.
 (when (and my/is-work my/is-qa)
   (unless (package-installed-p 'magit)
     (package-vc-install '(magit
@@ -603,10 +603,9 @@ Bound to \\`C-x p s'.")
                           :make '("lisp" "info")
                           :doc "docs/magit.texi")))
   ;; For some reason this is still needed even after using `package-vc-install'
-  (push (concat user-emacs-directory "elpa/magit/lisp") load-path))
+  (push (file-name-concat user-emacs-directory "elpa/magit/lisp") load-path))
 
 (use-package magit
-  :ensure t
   :commands (magit-status-setup-buffer magit-status magit-project-status)
   :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh))
@@ -703,7 +702,7 @@ command guarantees that dispatching will always happen."
          ("M-g o" . consult-outline)
          ("M-g m" . consult-mark)
          ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)
+         ("M-g i" . consult-imenu)      ; Duplicate 'M-g i'
          ("M-g I" . consult-imenu-multi)
 
          ;; M-s bindings in `search-map`
@@ -745,7 +744,6 @@ command guarantees that dispatching will always happen."
   ;; `consult-register-store', and the built-in commands. This improves the
   ;; register formatting, adds thin separate lines, register sorting and hides
   ;; the window mode line.
-  ;; (setq register-preview-function #'consult-register-format)
   (advice-add #'register-preview :override #'consult-register-window)
   (setq register-preview-delay 0.5)
 
@@ -820,7 +818,7 @@ command guarantees that dispatching will always happen."
   :after (consult eglot))
 
 (use-package crux
-  :defer nil
+  :defer nil                            ; load now due to dependencies below
   :bind (("C-a" . crux-move-beginning-of-line)
          ("C-c d" . crux-duplicate-current-line-or-region)
          ("C-x 4 t" . crux-transpose-windows)
@@ -832,7 +830,7 @@ command guarantees that dispatching will always happen."
 (defun my/find-user-init-file ()
   "Edit the `user-init-file`."
   (interactive)
-  (find-file user-init-file))
+  (find-file (file-truename user-init-file)))
 
 (defun my/find-user-custom-file ()
   "Edit the `custom-file` if it exists."
@@ -841,7 +839,7 @@ command guarantees that dispatching will always happen."
       (find-file custom-file)
     (message "No custom file defined.")))
 
-(defun my/find-shell-init-file()
+(defun my/find-shell-init-file ()
   "Edit a shell init file."
   (interactive)
   (let* ((shell (file-name-nondirectory (getenv "SHELL")))
@@ -880,7 +878,7 @@ command guarantees that dispatching will always happen."
 
 (when my/is-terminal
   (use-package corfu-terminal
-    :commands (corfu-terminal-mode)
+    :functions (corfu-terminal-mode)
     :hook (after-init . (lambda () (corfu-terminal-mode +1)))))
 
 (use-package markdown-mode
@@ -930,7 +928,7 @@ command guarantees that dispatching will always happen."
 
 (use-package fancy-compilation
   :commands (fancy-compilation-mode)
-  :hook (compile-mode . fancy-compilation-mode))
+  :hook (compilation-mode . fancy-compilation-mode))
 
 (use-package iso-transl
   :bind-keymap ("H-8" . iso-transl-ctl-x-8-map)) ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
@@ -963,6 +961,7 @@ command guarantees that dispatching will always happen."
                                buffer-directory)))
   (ffap-bindings)
   (put 'narrow-to-region 'disabled nil)
+  (put 'scroll-left 'disabled nil)
   (fset 'yes-or-no-p 'y-or-n-p)
   (defun my/crm-indicator(args)
     "Custom CRM indicator for ARGS."
@@ -1026,7 +1025,7 @@ frame that is abutting the right edge of the display."
 
 (defun my/reload-buffer ()
   "Reload the current buffer from disk.
-Checks to see if buffer needs saving first, aborting if changes not saved."
+Checks to see if buffer needs saving, aborting the reload if changes not saved."
   (interactive)
   (let ((filename (buffer-file-name)))
     (when (and (not buffer-read-only)
@@ -1068,7 +1067,7 @@ buffer."
 This function receives the buffer to use for the shell. The expectation
 is that the function will setup the display environment to host the
 buffer."
-  (my/run-something-in-buffer " *Shell*"
+  (my/run-something-in-buffer "*Shell*"
                               buffer-setup-proc
                               (lambda (buf) (shell buf))))
 
@@ -1123,7 +1122,7 @@ Otherwise just bury them."
     (info nil tmp)))
 
 (defun my/customize-other-window ()
-  "Show Customize in a new frame."
+  "Show Customize in a new window."
   (interactive)
   (let ((tmp (get-buffer-create "*Customize Group: Emacs*")))
     (switch-to-buffer-other-window tmp)
@@ -1222,7 +1221,7 @@ that are already visible somewhere."
 
 (defun my/next-buffer-current-window ()
   "Switch to `next' buffer in current window with filtering.
-Only switch to a buffer that passes the filter define in
+Only switch to a buffer that passes the filter defined in
 `my/next-buffer-skip-filter'."
   (interactive)
   (let ((switch-to-prev-buffer-skip #'my/next-buffer-skip-filter))
@@ -1230,7 +1229,7 @@ Only switch to a buffer that passes the filter define in
 
 (defun my/prev-buffer-current-window ()
   "Switch to `previous' buffer in current window with filtering.
-Only switch to a buffer that passes the filter define in
+Only switch to a buffer that passes the filter defined in
 `my/next-buffer-skip-filter'."
   (interactive)
   (let ((switch-to-prev-buffer-skip #'my/next-buffer-skip-filter))
@@ -1290,18 +1289,19 @@ symbol, then hide it."
 (defun my/htop ()
   "Run htop in a term buffer."
   (interactive)
-  (let* ((name "*htop*"))
+  (let ((name "*htop*")
+        (cmd (if my/is-macosx "sudo htop" "/bin/htop")))
     (if (get-buffer name)
         (switch-to-buffer name)
-      (ansi-term "sudo htop" name))))
+      (ansi-term cmd name))))
 
 (defun my/top ()
   "Run top in a term buffer."
   (interactive)
-  (let* ((name "*top*"))
+  (let ((name "*top*"))
     (if (get-buffer name)
         (switch-to-buffer name)
-      (ansi-term "top" name))))
+      (ansi-term "/usr/bin/top" name))))
 
 (defun crux-find-current-directory-dir-locals-file (find-2)
   "Edit the `.dir-locals.el' file for the current buffer in another window.
@@ -1340,16 +1340,16 @@ such directory, in the user's home directory."
   (dired (files--splice-dirname-file my/repos "tcs_hft")))
 
 (defun my/dired-wolverine-config ()
-  "Open Dired on wolveriine-config repo."
+  "Open Dired on wolverine-config repo."
   (interactive)
   (dired (files--splice-dirname-file my/repos "wolverine-config")))
 
 (defun my/dired-wolverine-config-qa ()
-  "Open Dired on wolveriine-config-qa repo."
+  "Open Dired on wolverine-config-qa repo."
   (interactive)
   (dired (files--splice-dirname-file my/repos "wolverine-config-qa")))
 
-(defun my/dired-yabgrat ()
+(defun my/dired-yagbrat ()
   "Open Dired on yagbrat repo."
   (interactive)
   (dired (files--splice-dirname-file my/repos "yagbrat")))
@@ -1359,7 +1359,7 @@ such directory, in the user's home directory."
   (interactive)
   (dired (files--splice-dirname-file my/repos "configurations")))
 
-(defcustom my/git-sync-buffer-name " *my/git-sync"
+(defcustom my/git-sync-buffer-name " *my/git-sync*"
   "The name of the buffer to use to hold output from my/git-sync func."
   :type '(string)
   :group 'my/customizations
@@ -1471,7 +1471,7 @@ This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
 
 (defun my/goto-mark ()
   "Move back to mark without enabling transient mode.
-THis is just a shortcut for \\[universal-argument] \\[set-mark-command]."
+This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
   (interactive)
   (set-mark-command 4))
 
@@ -1518,7 +1518,7 @@ less typing."
   (let* ((groups (seq-group-by #'stringp definitions))
          (keys (seq-drop (elt groups 0) 1))
          (commands (seq-drop (elt groups 1) 1))
-         (fn (lambda (key command) (define-key keymap (kbd key) command))))
+         (fn (lambda (key command) (keymap-set keymap key command))))
     (seq-mapn fn keys commands)))
 
 (defun my/emacs-chord-bind (keymap &rest definitions)
@@ -1578,7 +1578,7 @@ ARG is an optional integer which defaults to 2."
 
                    "C-o" #'aw-flip-window
 
-                   ;; "C-s" #'isearch-forward
+                   ;; "C-s" #'isearch-forward-regexp
                    ;; "C-M-s" #'isearch-forward-symbol
 
                    "C-x 0" #'delete-other-windows
@@ -1613,7 +1613,6 @@ ARG is an optional integer which defaults to 2."
                    "<delete>" #'delete-char
                    "S-<f12>" #'package-list-packages
 
-
                    "M-z" #'zap-up-to-char
                    "M-[" #'previous-buffer ; NOTE: this conflicts with terminal escape sequences (see below)
                    "M-]" #'next-buffer
@@ -1632,8 +1631,8 @@ ARG is an optional integer which defaults to 2."
                    
                    "H-1" #'delete-other-windows
                    "H-2" #'split-window-below
-                   "H-4" #'other-window-prefix ; was ctl-x-4-map
-                   "H-5" #'other-frame-prefix  ; was ctl-x-5-map
+                   "H-4" #'other-window-prefix ; was ctl-x-4-prefix
+                   "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
                    "H-a" #'ace-window
                    "H-b" #'consult-project-buffer
                    "H-B" #'consult-buffer
@@ -1656,18 +1655,18 @@ ARG is an optional integer which defaults to 2."
                    "<f1>" #'my/normal-screen-font-size
                    "<f2>" #'my/share-screen-font-size
                    
-                   "<insert>" #'ignore  ; disable overwrite-mode
-                   "<insertchar>" #'ignore  ; disable overwrite-mode
+                   "<insert>" #'ignore  ; disable key for toggling overwrite-mode
+                   "<insertchar>" #'ignore  ; disable key for toggling overwrite-mode
                    "C-x C-z" #'ignore   ; suspend-frame
 
                    "C-x C-+" #'ignore   ; text-scale-adjust
                    "C-x C-=" #'ignore   ; text-scale-adjust
                    "C-x C--" #'ignore   ; text-scale-adjust
 
-                   "C-x h" #'ignore      ; mark-whole-buffer
-                   "C-h h" #'ignore      ; show 'Hello' in various fonts
+                   "C-x h" #'ignore     ; mark-whole-buffer
+                   "C-h h" #'ignore     ; show 'Hello' in various fonts
 
-                   ;; Disable font size changes via trackpad
+                   ;; Disable font size changes via trackpad/scroll-wheel
                    "C-<mouse-4>" #'ignore
                    "C-<mouse-5>" #'ignore
                    "C-<wheel-up>" #'ignore
@@ -1733,7 +1732,7 @@ ARG is an optional integer which defaults to 2."
           (define-key map "D" #'backward-char)
           map)
         "Keymap for arrow keys")
-      (define-key esc-map "O" my/arrow-keys-map))
+      (keymap-set esc-map "O" my/arrow-keys-map))
   (when my/is-macosx
     (custom-set-variables
      '(insert-directory-program "gls")
@@ -1741,10 +1740,10 @@ ARG is an optional integer which defaults to 2."
      '(mac-command-modifier 'meta)
      '(mac-option-modifier 'alt)
      '(mac-right-command-modifier 'super)
-     '(mac-right-control-modifier 'hyper))))
+     '(mac-right-option-modifier 'hyper))))
 
 ;; Custom dir-locals
-(dir-locals-set-class-variables 'raze-variables '((nil . ((compile-command . "./builds.sh -m Debug ")))))
+(dir-locals-set-class-variables 'raze-variables '((nil . ((compile-command . "./build.sh -m Debug ")))))
 (dir-locals-set-directory-class (file-truename "~/repos/raze") 'raze-variables)
 
 (dir-locals-set-class-variables 'x23-variables '((nil . ((compile-command . "cmake -S . -B build && cd build && make tests ")))))
@@ -1752,7 +1751,7 @@ ARG is an optional integer which defaults to 2."
 
 ;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097
 ;;
-(let ((backup-dir (file-name-concat my/tmp-dir "emacs-backups"))
+(let ((backup-dir (file-name-concat my/tmp-dir "emacs_backups"))
       (auto-saves-dir (file-name-concat my/tmp-dir "emacs_autosaves")))
   (dolist (dir (list backup-dir auto-saves-dir))
     (unless (file-directory-p dir)
