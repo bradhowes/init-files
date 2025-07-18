@@ -2,7 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'my-constants)
 (require 'consult)
 (require 'corfu)
 (require 'shell)

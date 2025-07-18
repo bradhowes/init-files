@@ -87,18 +87,19 @@ Hacky but for now it works since we are always starting up an initial xterm.")
 (defconst my/is-qa (and my/is-work (string-suffix-p "q" (system-name)))
   "T if running on QA box at work.")
 
-(defun my/dev-tmp ()
-  "The directory to use for temporary purposes when in dev environment."
-  (let ((dev-tmp "/apps/home/howesbra/tmp"))
-    (and my/is-dev (file-directory-p dev-tmp)
-         dev-tmp)))
+(defconst my/dev-tmp "/apps/home/howesbra/tmp"
+  "The directory to use as temporary storage.")
+
+(defun my/valid-directory (dir)
+  "Check if DIR is valid, returning it if so or nil if not."
+  (and (file-directory-p dir) dir))
 
 (defconst my/tmp-dir
-  (let* ((work-tmp (my/dev-tmp))
+  (let* ((work-tmp (my/valid-directory my/dev-tmp))
          (home-tmp (file-truename "~/tmp"))
          (tmp (or work-tmp home-tmp)))
     (unless (file-directory-p tmp)
-      (make-directory home-tmp t))
+      (make-directory tmp t))
     (file-name-as-directory tmp))
   "The directory to use for temporary purposes - usually $HOME/tmp.")
 
@@ -172,7 +173,7 @@ This is to be used for the `initial-frame-alist' configuration."
   ;; Use the first external monitor if there is one.
   (if (memq layout '(my/screen-laptop-4k my/screen-laptop-4k-4k))
       (+ 2056 (* my/screen-4k-pick my/4k-screen-width))
-    0))
+    (if my/is-x-windows-on-win 0 0)))
 
 (defun my/frame-default-left (layout)
   "Pixels to use for the `left' of a frame on LAYOUT.
@@ -206,7 +207,8 @@ is on the left of any monitors."
        (if my/is-x-windows-on-win 30 0))))
 
 (defun my/initial-frame-alist (layout)
-  "Make alist to use for the initial frame on LAYOUT."
+  "Make alist to use for the initial frame on LAYOUT.
+Frame's left side is flush with the left side of the main display."
   (declare (side-effect-free t))
   (list (cons 'width (my/cols layout))
         (cons 'height (my/rows layout))
@@ -214,7 +216,8 @@ is on the left of any monitors."
         (cons 'left (my/frame-initial-left layout))))
 
 (defun my/default-frame-alist (layout)
-  "Make alist to use for the default frame on LAYOUT."
+  "Make alist to use for the default frame on LAYOUT.
+Frame's left side is next to the right side of the initial frame."
   (declare (side-effect-free t))
   (list (cons 'width (my/cols layout))
         (cons 'height (my/rows layout))
@@ -223,7 +226,7 @@ is on the left of any monitors."
 
 (defun my/align-right-frame-alist (layout)
   "The alist to use extra frame on LAYOUT.
-The frame will appear on the far right of the display area."
+Frame's right side is flush with the right side of the main display."
   (declare (side-effect-free t))
   (list (cons 'width (my/cols layout))
         (cons 'height (my/rows layout))
