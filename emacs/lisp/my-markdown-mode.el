@@ -117,7 +117,7 @@ use the block limits for BEG and END values. Otherwise, work on lines from
 current line to the end of buffer."
   (interactive)
   (save-excursion
-    (let* ((re "\\(\\\\\\n \\)\\|\\( +$\\)\\|\\(^ +\\)")
+    (let* ((re "\\(\\\\\n \\)\\|\\( +$\\)\\|\\(^ +\\)")
            (region (my/fixup-code-region))
            (beg (car region))
            (end (cdr region)))
@@ -133,7 +133,7 @@ Simply replaces all runs of '^A' (two characters) with a
 newline and 2 spaces."
   (interactive)
   (save-excursion
-    (let* ((re "\\^A")
+    (let* ((re "\\^A\\|")
            (region (my/fixup-code-region))
            (beg (car region))
            (end (cdr region)))
@@ -176,14 +176,7 @@ transforms into
 (defun my/sort-fixdropcopy ()
   "Sort FIX dropcopy lines in region BEG to END."
   (interactive)
-  (save-excursion
-    (save-restriction
-      (narrow-to-region (region-beginning) (region-end))
-      (goto-char (point-min))
-      (let ((inhibit-field-text-motion t))
-        (sort-subr nil 'forward-line 'end-of-line
-                   (lambda () (if (looking-at "^\\s +[0-9]+=")
-                                  (string-to-number (match-string 0)))))))))
+  (my/sort-lines-by-integer-key "^\\s *[0-9]+="))
 
 (provide 'my-markdown-mode)
 ;;; my-markdown-mode.el ends here

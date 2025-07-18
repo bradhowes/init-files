@@ -19,7 +19,7 @@
 
 (let ((threshold gc-cons-threshold)
       (gc-cons-threshold most-positive-fixnum))
-  ;; NOTE: needs lexical-binding for this to work and capture the value of 'threshold'
+  ;; NOTE: needs lexical-binding for this to work and capture the value of `threshold'
   (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold threshold))))
 
 ;; Stop Emacs from flashing a `white' screen when starting up
