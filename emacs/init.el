@@ -26,7 +26,7 @@
 
 (setenv "WORKON_HOME" my/venv)
 
-(defconst my/venv-python (file-name-concat my/venv "/bin/python")
+(defconst my/venv-python (file-name-concat my/venv "bin/python")
   "The path to the Python executable to use for eglot.")
 
 (defconst my/is-work (or (string= "howesbra" user-login-name)
@@ -85,7 +85,7 @@ Hacky but for now it works since we are always starting up an initial xterm.")
   "T if running on dev box at work.")
 
 (defconst my/is-qa (and my/is-work (string-suffix-p "q" (system-name)))
-  "T if running on QA box at work")
+  "T if running on QA box at work.")
 
 (defconst my/dev-tmp "/apps/home/howesbra/tmp"
   "The directory to use for temporary files.")
@@ -196,7 +196,7 @@ Emacs frames."
 
 (defun my/frame-top ()
   "The top of the display area.
-NOTE: this assumes that the laptop display if present,
+NOTE: this assumes that the laptop display, if present,
 is on the left of any monitors."
   (declare (side-effect-free t))
   (let ((settings (display-monitor-attributes-list)))
@@ -456,7 +456,7 @@ artifacts such as indentation bars."
 (use-package shell-mode
   :defines (explicit-bash-args)
   :init
-  ;; Special-case QA env -- we are logged in as `sp_qa` user but we want our custom
+  ;; Special-case QA env -- we are logged in as `sp_qa' user but we want our custom
   ;; environment. Command `bash' to load our custom settings.
   (let ((rc (file-truename (file-name-concat my/repos "configurations/qa.bashrc"))))
     (if (and my/is-qa
@@ -593,7 +593,7 @@ Bound to \\`C-x p s'.")
       password)))
 
 ;; Work QA hosts have a Git v2.18.0 and latest Magit now yells about it. In QA, fetch the last Magit version that did
-;; about this. Unfortunately I do not see a way to do this conditionally inside `use-package'.
+;; not care about this. Unfortunately I do not see a way to do this conditionally inside `use-package'.
 (when (and my/is-work my/is-qa)
   (unless (package-installed-p 'magit)
     (package-vc-install '(magit
@@ -702,14 +702,14 @@ command guarantees that dispatching will always happen."
          ("M-g o" . consult-outline)
          ("M-g m" . consult-mark)
          ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)      ; Duplicate 'M-g i'
+         ("M-g i" . consult-imenu)
          ("M-g I" . consult-imenu-multi)
 
          ;; M-s bindings in `search-map`
          ("M-s d" . consult-find)
          ("M-s g" . consult-grep)
          ("M-s G" . consult-git-grep)
-         ("M-s i" . consult-info)
+         ("M-s i" . consult-imenu)      ; Duplicate 'M-g i'
          ("M-s k" . consult-keep-lines)
          ("M-s l" . consult-line)
          ("M-s M-s" . my/consult-line-symbol-at-point)
@@ -928,7 +928,7 @@ command guarantees that dispatching will always happen."
 
 (use-package fancy-compilation
   :commands (fancy-compilation-mode)
-  :hook (compilation-mode . fancy-compilation-mode))
+  :hook ((compilation-mode . fancy-compilation-mode)))
 
 (use-package iso-transl
   :bind-keymap ("H-8" . iso-transl-ctl-x-8-map)) ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
