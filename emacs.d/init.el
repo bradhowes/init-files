@@ -1617,8 +1617,8 @@ ARG is an optional integer which defaults to 2."
                    "C-x 5 i" #'my/info-other-frame
                    "C-x 5 k" #'my/shell-other-frame
 
-                   # "C-c C-c" #'my/copy-file-name-to-clipboard
-                   # "C-c C-k" #'my/kill-current-buffer
+                   ;; "C-c C-c" #'my/copy-file-name-to-clipboard
+                   ;; "C-c C-k" #'my/kill-current-buffer
 
                    "C-M-\\" #'my/indent-buffer
 
