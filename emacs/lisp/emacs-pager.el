@@ -15,13 +15,19 @@
 If performance is bad when loading data, reduce this number."
   :group 'emacs-pager :type '(integer))
 
-(defun filter-buffer ()
-  "Remove occurrances of ^H and the character that follows."
+(defconst emacs-pager--control-h-dot (concat (make-string 1 ?\b) ".")
+  "String containing ^H and '.'.")
+
+(defconst emacs-pager--control-h-dot-re (concat "\\(\\(." emacs-pager--control-h-dot "\\)+\\)")
+  "Imprecise regular expression to find sequences of CHAR ^H CHAR.")
+
+(defun emacs-pager--filter-buffer ()
+  "Remove occurrences of ^H and the character that follows."
   (goto-char (point-min))
-  (while (re-search-forward "\\(\\(..\\)+\\)" nil t 1)
+  (while (re-search-forward emacs-pager--control-h-dot-re nil t 1)
     (replace-match (propertize
                     (mapconcat 'identity (save-match-data
-                                           (split-string (match-string 1) ".")) "")
+                                           (split-string (match-string 1) emacs-pager--control-h-dot)) "")
                     'face 'custom-face-tag))))
 
 ;;;###autoload
@@ -31,7 +37,7 @@ If performance is bad when loading data, reduce this number."
   (setq-local backup-inhibited t
               view-read-only t)
   (buffer-disable-undo)
-  (filter-buffer)
+  (emacs-pager--filter-buffer)
   (ansi-color-apply-on-region (goto-char (point-min))
                               (save-excursion
                                 (forward-line emacs-pager-max-line-coloring)

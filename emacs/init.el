@@ -5,8 +5,6 @@
 
 (require 'seq)
 
-(push (file-truename "~/.emacs.d/lisp") load-path)
-
 ;; Set this to `t` to debug issue involving the filenotify package
 (when nil
   (require 'filenotify)
@@ -19,7 +17,23 @@
   :group 'local)
 
 (defconst my/repos (file-name-as-directory (file-truename "~/src/Mine"))
-  "Location of root of my source repositories.")
+  "Location of root of source repositories.")
+
+(defconst my/configurations
+  (let ((repo-cfg (file-name-as-directory (file-name-concat my/repos "configurations")))
+        (home-cfg (file-name-as-directory (file-truename "~/configurations"))))
+    (if (file-directory-p repo-cfg)
+        repo-cfg
+      home-cfg))
+  "Location of configurations repo.")
+
+(defconst my/emacs.d (file-name-as-directory (file-name-concat my/configurations "emacs.d"))
+  "Location of emacs.d directory.")
+
+(defconst my/lisp (file-name-as-directory (file-name-concat my/emacs.d "lisp"))
+  "Location of personal Emacs Lisp files.")
+
+(push my/lisp load-path)
 
 (defconst my/venv (file-truename "~/venv")
   "The Python virtual environment to use for eglot.")
@@ -1603,8 +1617,8 @@ ARG is an optional integer which defaults to 2."
                    "C-x 5 i" #'my/info-other-frame
                    "C-x 5 k" #'my/shell-other-frame
 
-                   "C-c C-c" #'my/copy-file-name-to-clipboard
-                   "C-c C-k" #'my/kill-current-buffer
+                   # "C-c C-c" #'my/copy-file-name-to-clipboard
+                   # "C-c C-k" #'my/kill-current-buffer
 
                    "C-M-\\" #'my/indent-buffer
 

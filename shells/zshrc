@@ -106,4 +106,3 @@ export PROMPT='${vcs_info_msg_0_}%B%F{green}%n%#%f%b '
 cd "${PWD}"
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
