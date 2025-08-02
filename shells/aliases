@@ -14,9 +14,13 @@ alias llh="ls -CFlh"
 #
 alias psme='ps -U ${USER} -o "pid,command" -ww'
 
-# Show matches taken from shell history. NOTE: should be able to use 'fc -l -m'?
+# Show matches taken from shell history.
 #
-alias hgrep='history 1 | grep'
+alias hgrep='history 0 | grep'
+
+# Show all history by default.
+#
+alias history='history 0'
 
 # SHow matches taken from environment settings
 #

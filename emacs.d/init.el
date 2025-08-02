@@ -213,12 +213,12 @@ Emacs frames."
 NOTE: this assumes that the laptop display, if present,
 is on the left of any monitors."
   (declare (side-effect-free t))
-  (let ((settings (display-monitor-attributes-list)))
-    (+ (nth 2 (if (eq (length settings) 1)
-                  (car (car settings))
-                (car (car (cdr settings)))))
-       ;; Apply an offset to show the title bar when running under VcXsrv on Windows
-       (if my/is-x-windows-on-win 30 0))))
+  (let* ((settings (display-monitor-attributes-list))
+         (top (nth 2 (if (eq (length settings) 1)
+                         (car (car settings))
+                       (car (car (cdr settings))))))
+         (offset (if my/is-x-windows-on-win 30 0)))
+    (list '+ (+ offset top))))
 
 (defun my/initial-frame-alist (layout)
   "Make alist to use for the initial frame on LAYOUT.
@@ -258,8 +258,8 @@ Frame's right side is next to the left side of the `alt' frame."
 
 (defun my/update-screen-frame-alists (layout)
   "Update frame alists for current LAYOUT."
-  (setq initial-frame-alist (my/initial-frame-alist layout)
-        default-frame-alist (my/default-frame-alist layout))
+  (modify-all-frames-parameters (my/default-frame-alist layout))
+  (setq initial-frame-alist (my/initial-frame-alist layout))
   (message "initial-frame: %s" initial-frame-alist)
   (message "default-frame: %s" default-frame-alist))
 

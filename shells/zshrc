@@ -10,30 +10,33 @@ export GEM_HOME="${HOME}/.gem"
 export PATH
 PathAdd PATH \
         /opt/homebrew/opt/grep/libexec/gnubin \
-        /Applications/Emacs.app/Contents/MacOS/bin \
         /opt/homebrew/bin \
         /opt/homebrew/sbin \
-        /opt/homebrew/Cellar/ruby/3.2.2_1/bin \
+        /opt/homebrew/Cellar/ruby/4.2.2_1/bin \
         "${GEM_HOME}/bin" \
         "${HOME}/bin"
 
-HISTSIZE=10000
-SAVEHIST=${HISTSIZE}
 HISTFILE="${HOME}/.history"
+SAVEHIST=1000000
+HISTSIZE=1000000
 
-setopt EXTENDED_HISTORY
-setopt INC_APPEND_HISTORY
-setopt SHARE_HISTORY
+setopt EXTENDED_HISTORY         # include timestamp
 setopt HIST_EXPIRE_DUPS_FIRST
 setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_FIND_NO_DUPS
-setopt HIST_IGNORE_SPACE
 setopt HIST_SAVE_NO_DUPS
 setopt HIST_REDUCE_BLANKS
 setopt HIST_VERIFY
+setopt SHARE_HISTORY            # keep history file up-to-date from all shells 
 
 HISTORY_IGNORE="(cd|ls|ps|pwd|history|exit)"
+
+# autoload -U history-search-end
+# zle -N history-beginning-search-backward-end history-search-end
+# zle -N history-beginning-search-forward-end history-search-end
+# bindkey "[A" history-beginning-search-backward-end
+# bindkey "[B" history-beginning-search-forward-end
 
 ZSH_THEME="robbyrussell"
 
@@ -44,19 +47,18 @@ osc7_cwd() {
     print -P "\e]7;file://${HOST}${PWD}\e\\"
 }
 
-esc0_cwd() {
-    # NOTE: need to fix ansi-osc.el with `(string= (url-host url) (downcase (system-name)))))`
-    # to make Emacs see the changes in directory.
-    # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=68632
-    print -P "\e]0;${PWD}\007"
-}
+# esc0_cwd() {
+#     # NOTE: need to fix ansi-osc.el with `(string= (url-host url) (downcase (system-name)))))`
+#     # to make Emacs see the changes in directory.
+#     # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=68632
+#     print -P "\e]0;${PWD}\007"
+# }
 
 autoload -U add-zsh-hook
 
 export LESS="-FRX"
 export PAGER="less ${LESS}"
 export CLICOLOR=yes
-
 export TERM=xterm-256color
 
 export EDITOR="emacs"
@@ -70,7 +72,7 @@ if [[ -n "${INSIDE_EMACS}" ]]; then
     fi
     export PAGER="${HOME}/bin/emacs-pager"
 elif [[ -n "${TERM}" ]]; then
-    add-zsh-hook -Uz chpwd (){ esc0_cwd }
+    # add-zsh-hook -Uz chpwd (){ esc0_cwd }
 fi
 
 case "${TERM}" in
@@ -105,4 +107,4 @@ export PROMPT='${vcs_info_msg_0_}%B%F{green}%n%#%f%b '
 
 cd "${PWD}"
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+# test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
