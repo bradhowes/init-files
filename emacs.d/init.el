@@ -1753,7 +1753,6 @@ ARG is an optional integer which defaults to 2."
      '(frame-resize-pixelwise t)
      '(mac-command-modifier 'meta)
      '(mac-option-modifier 'alt)
-     '(mac-right-command-modifier 'super)
      '(mac-right-option-modifier 'hyper))))
 
 ;; Custom dir-locals
