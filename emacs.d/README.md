@@ -14,5 +14,6 @@ time, and a brief detour to XEmacs on Solaris when it appeared Emacs was stuck i
 dead and buried.
 
 - [dot\_emacs.old](dot_emacs.old) -- was originally named `.emacs` and found in my home directory
-- [lisp/old](lisp/old) -- old-style equivalent of [lisp](lisp) directory above, but with a [startup.el](elisp/startup.el) file
-  that served as a byte-compiled `init.el` file.
+- [lisp/old](lisp/old) -- old versions of [lisp](lisp) directory contents, but with a [startup.el](elisp/old/startup.el)
+  file that served as a byte-compiled `init.el` file. Some functionality has been kept in some form in the [lisp](lisp)
+  directory.
