@@ -4,6 +4,18 @@
 ;;; Code:
 
 (require 'seq)
+(require 'my-constants)
+
+(defun my/trusted-content-p (original-response)
+  "Advice for `trusted-content-p' to trust the `*scratch*' buffer.
+Honors ORIGINAL-RESPONSE when not nil and then checks the buffer's name
+if it is `*scratch*'. This is a loosening of security but the risk is
+very small for me, and it remove the obnoxious message at startup about
+the buffer having untrusted content."
+  (or original-response
+      (buffer-name "*scratch*")))
+
+(advice-add 'trusted-content-p :filter-return #'my/trusted-content-p)
 
 ;; Set this to `t` to debug issue involving the filenotify package
 (when nil
@@ -15,107 +27,6 @@
   "The customization group for my settings."
   :prefix "my/"
   :group 'local)
-
-(defconst my/repos (file-name-as-directory (file-truename "~/src/Mine"))
-  "Location of root of source repositories.")
-
-(defconst my/configurations
-  (let ((repo-cfg (file-name-as-directory (file-name-concat my/repos "configurations")))
-        (home-cfg (file-name-as-directory (file-truename "~/configurations"))))
-    (if (file-directory-p repo-cfg)
-        repo-cfg
-      home-cfg))
-  "Location of configurations repo.")
-
-(defconst my/emacs.d (file-name-as-directory (file-name-concat my/configurations "emacs.d"))
-  "Location of emacs.d directory.")
-
-(defconst my/lisp (file-name-as-directory (file-name-concat my/emacs.d "lisp"))
-  "Location of personal Emacs Lisp files.")
-
-(push my/lisp load-path)
-
-(defconst my/venv (file-truename "~/venv")
-  "The Python virtual environment to use for eglot.")
-
-(setenv "WORKON_HOME" my/venv)
-
-(defconst my/venv-python (file-name-concat my/venv "bin/python")
-  "The path to the Python executable to use for eglot.")
-
-(defconst my/is-work (or (string= "howesbra" user-login-name)
-                         (string= "sp_qa" user-login-name))
-  "This is t if running at work.")
-
-(defconst my/is-macosx (eq system-type 'darwin)
-  "T if running on macOS.
-Note that this is also true when running in a terminal window.")
-
-(defconst my/is-linux (eq system-type 'gnu/linux)
-  "T if running on GNU/Linux system.
-Note that this is also true when running in a terminal window.")
-
-(defconst my/is-terminal (not (display-graphic-p))
-  "T if running in a terminal.")
-
-(defconst my/is-x-windows (eq window-system 'x)
-  "T if running in an X windows environment.")
-
-(defconst my/is-x-windows-on-win (and my/is-x-windows (getenv "XTERM_SHELL"))
-  "T if running in VcXsrv on Windows.
-Hacky but for now it works since we are always starting up an initial xterm.")
-
-(defconst my/screen-laptop (intern "my/screen-laptop")
-  "Symbol to indicate display is MacBook Pro 16\" laptop screen.")
-
-(defconst my/screen-4k (intern "my/screen-4k")
-  "Symbol to indicate display is 4K screen.")
-
-(defconst my/screen-laptop-4k (intern "my/screen-laptop-4k")
-  "Symbol to indicate display width is laptop and 1 4K screen.")
-
-(defconst my/screen-4k-4k (intern "my/screen-4k-4k")
-  "Symbol to indicate display width is 2 4K screens.")
-
-(defconst my/screen-laptop-4k-4k (intern "my/screen-laptop-4k-4k")
-  "Symbol to indicate display width is laptop and 2 4K screens.")
-
-(defconst my/screen-terminal (intern "my/screen-terminal")
-  "Symbol to indicate display is a terminal.")
-
-(defconst my/laptop-screen-width 2056
-  "MacBook Pro 16\" M1 screen width in pixels.")
-
-(defconst my/4k-screen-width 3840
-  "4K external display width in pixels.")
-
-(defconst my/workspace-name (or (getenv "WORKSPACE_NAME") "N/A")
-  "The value of WORKSPACE_NAME environment variable.")
-
-(defconst my/font-name "Berkeley Mono"
-  "The name of the font to use.")
-
-(defconst my/is-dev (and my/is-work (string-suffix-p "d" (system-name)))
-  "T if running on dev box at work.")
-
-(defconst my/is-qa (and my/is-work (string-suffix-p "q" (system-name)))
-  "T if running on QA box at work.")
-
-(defconst my/dev-tmp "/apps/home/howesbra/tmp"
-  "The directory to use for temporary files.")
-
-(defun my/valid-directory (dir)
-  "Check if DIR is valid, returning it if so or nil if not."
-  (and (file-directory-p dir) dir))
-
-(defconst my/tmp-dir
-  (let* ((work-tmp (my/valid-directory my/dev-tmp))
-         (home-tmp (file-truename "~/tmp"))
-         (tmp (or work-tmp home-tmp)))
-    (unless (file-directory-p tmp)
-      (make-directory tmp t))
-    (file-name-as-directory tmp))
-  "The directory to use for temporary purposes - usually $HOME/tmp.")
 
 (defcustom my/screen-4k-pick 0
   "The 4K screen to use for Emacs frames."
@@ -402,8 +313,9 @@ the items to setup for autoloading from the given file."
 (use-package tempo
   :commands (tempo-define-template))
 
-(defun tempo-template-my/org-emacs-lisp-source ()
-  "Define empty function to satisfy flymake/byte-compile.")
+
+(defun tempo-template-my/org-emacs-lisp-source (&optional _)
+  "Define empty function to satisfy flymake/byte-compile (ARG is ignored).")
 
 (tempo-define-template "my/org-emacs-lisp-source" '("#+begin_src emacs-lisp" & r % "#+end_src")
                        "<m"
@@ -841,10 +753,12 @@ command guarantees that dispatching will always happen."
          ("C-^" . crux-top-join-line)))
 
 ;; My own version of some `crux` routines that use `find-file` instead of `find-file-other-window`
-(defun my/find-user-init-file ()
-  "Edit the `user-init-file`."
-  (interactive)
-  (find-file (file-truename user-init-file)))
+(defun my/find-user-init-file (arg)
+  "Edit the `user-init-file` when ARG is nil.
+Otherwise, edit the `early-init.el' file instead, creating it if
+necessary."
+  (interactive "P")
+  (find-file (locate-user-emacs-file (if arg "early-init.el" user-init-file))))
 
 (defun my/find-user-custom-file ()
   "Edit the `custom-file` if it exists."
@@ -1753,7 +1667,23 @@ ARG is an optional integer which defaults to 2."
      '(frame-resize-pixelwise t)
      '(mac-command-modifier 'meta)
      '(mac-option-modifier 'alt)
-     '(mac-right-option-modifier 'hyper))))
+
+     ;; NOTE: hyper use requires Karabiner-Elements mapping from 'caps_lock' to 'right_control'
+     ;;
+     ;; {
+     ;;   "manipulators": [
+     ;;     {
+     ;;       "description": "Change caps_lock to right_control. In Emacs set 'mac_right_control_modifier' to 'hyper.",
+     ;;       "from": {
+     ;;         "key_code": "caps_lock",
+     ;;         "modifiers": { "optional": ["any"] }
+     ;;       },
+     ;;       "to": [{ "key_code": "right_control" }],
+     ;;       "type": "basic"
+     ;;     }
+     ;;   ]
+     ;; }
+     '(mac-right-control-modifier 'hyper))))
 
 ;; Custom dir-locals
 (dir-locals-set-class-variables 'raze-variables '((nil . ((compile-command . "./build.sh -m Debug ")))))
