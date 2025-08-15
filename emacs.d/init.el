@@ -5,6 +5,7 @@
 
 (require 'seq)
 (require 'my-constants)
+(require 'my-functions)
 
 (defun my/trusted-content-p (original-response)
   "Advice for `trusted-content-p' to trust the `*scratch*' buffer.
@@ -1329,24 +1330,6 @@ such directory, in the user's home directory."
                        (cons "ldzls2164i" home)))
       (my/git-sync (car cfg) (cdr cfg))))
   (display-buffer my/git-sync-buffer-name))
-
-(defun my/sort-lines-by-integer-key (pattern &optional direction)
-  "Sort lines by an integer value that is found via PATTERN in a line.
-The sort is in increasing numerical order if DIRECTION is nil; otherwise
-it is in descending order."
-  (save-excursion
-    (save-restriction
-      (narrow-to-region (region-beginning) (region-end))
-      (goto-char (point-min))
-      (let ((inhibit-field-text-motion t))
-        (sort-subr direction
-                   #'forward-line       ; NEXTRECFUN
-                   #'end-of-line        ; ENDRECFUN
-                   (lambda ()                ; STARTKEYFUN -- returns numeric key
-                     (when (looking-at pattern)
-                       (string-to-number (match-string 0))))
-                   nil                  ; ENDKEYFUN
-                   nil)))))             ; PREDICATE
 
 (defun my/sort-lines-by-leading-integer (arg)
   "Sort lines in current region by extracting integer values from start of line.

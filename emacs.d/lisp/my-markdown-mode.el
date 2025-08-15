@@ -4,6 +4,7 @@
 
 (require 'font-lock)
 (require 'markdown-mode)
+(require 'my-functions)
 
 (use-package impatient-mode
   :ensure t
