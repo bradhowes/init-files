@@ -1,5 +1,8 @@
 # -*- Mode: Sh; -*-
 
+export INFOPATH
+export MANPATH
+
 . "${BRH_INIT_FILES}/functions"
 . "${BRH_INIT_FILES}/aliases"
 
@@ -9,13 +12,14 @@ export GEM_HOME="${HOME}/.gem"
 
 export PATH
 PathAdd PATH \
+        /opt/homebrew/opt/python@3.13/Frameworks/Python.framework/Versions/3.13/bin \
         /opt/homebrew/opt/grep/libexec/gnubin \
         /opt/homebrew/bin \
         /opt/homebrew/sbin \
         /opt/homebrew/Cellar/ruby/4.2.2_1/bin \
         "${GEM_HOME}/bin" \
         "${HOME}/bin"
-
+export INFO_PATH
 HISTFILE="${HOME}/.history"
 SAVEHIST=1000000
 HISTSIZE=1000000

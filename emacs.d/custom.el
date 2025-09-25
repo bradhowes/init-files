@@ -25,6 +25,12 @@
  '(compilation-scroll-output t)
  '(completion-category-overrides '((file (styles basic partial-completion))) nil nil "Customized with use-package orderless")
  '(completion-cycle-threshold 3)
+ '(completion-ignored-extensions
+   '(".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".bzr/"
+     "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".dfsl" ".pfsl" ".d64fsl"
+     ".p64fsl" ".lx64fsl" ".lx32fsl" ".dx64fsl" ".dx32fsl" ".fx64fsl" ".fx32fsl" ".sx64fsl" ".sx32fsl" ".wx64fsl"
+     ".wx32fsl" ".fasl" ".ufsl" ".fsl" ".dxl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr"
+     ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo"))
  '(completion-styles '(orderless partial-completion basic) nil nil "Customized with use-package orderless")
  '(confirm-kill-emacs 'y-or-n-p)
  '(consult-narrow-key "<")
@@ -98,6 +104,9 @@
  '(line-move-visual nil)
  '(load-prefer-newer t)
  '(ls-lisp-use-insert-directory-program nil)
+ '(mac-command-modifier 'meta)
+ '(mac-option-modifier 'alt)
+ '(mac-right-control-modifier 'hyper)
  '(magit-diff-refine-hunk t)
  '(magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
  '(major-mode-remap-alist '((python-mode . python-ts-mode)))
@@ -131,9 +140,6 @@
  '(package-vc-selected-packages
    '((magit :url "https://github.com/magit/magit.git" :branch "v4.1.3" :lisp-dir "lisp" :make '("lisp" "info") :doc
             "docs/magit.texi")))
- '(pixel-scroll-mode t)
- '(pixel-scroll-precision-mode t)
- '(pixel-scroll-precision-use-momentum t)
  '(popper-display-control 'user)
  '(popper-echo-mode t)
  '(popper-mode t)
@@ -161,8 +167,6 @@
  '(savehist-additional-variables
    '(register-alist kill-ring project-regexp-history-variable corfu-history))
  '(savehist-mode t)
- '(scroll-conservatively 101)
- '(scroll-margin 2)
  '(search-default-mode t)
  '(send-mail-function 'sendmail-send-it)
  '(sendmail-program "/opt/homebrew/bin/msmtp")

@@ -18,45 +18,13 @@ function die # MSG
     exit 1
 }
 
-# Add a value to a ':' separated variable value (eg PATH) as long as it does not
-# already exist in the given variable's value.
+# Add one or more values to a ':' separated environment variable value (eg PATH) as long as it does not already exist in
+# the given variable's value.
 #
+# \param -a optional flag to append new value instead of prepending it
 # \param VAR the name of the variable to change, such as PATH or LD_LIBRARY_PATH
 # \param VALUE value to add
 #
-function PathAddOne # [-a] VAR VALUE
-{
-    local APPEND=""
-    while [[ "${1#-}" != "${1}" ]]; do # Process anything that begins with a '-' character
-	case "${1}" in
-	    -a) APPEND="1" ;;
-	    *) echo "*** invalid option - '${1}' ***" ;;
-	esac
-	shift 1
-    done
-
-    [[ $# != 2 ]] && return 1
-
-    local VAR="${1}" VALUE="${2}"
-    [[ "${BRH_ARCH}" = "Darwin" && "${VAR}" = "LD_LIBRARY_PATH" ]] && VAR="DY${VAR}"
-
-    eval local CURRENT="\$${VAR}"
-
-    # See if the new value already exists in the variable, making sure that we don't partially match
-    # within an existing, larger value.
-    #
-    local CHECK=":${CURRENT}:"
-    [[ "${CHECK%%:${VALUE}:*}" != "${CHECK}" ]] && return 0
-
-    if [[ -n "${APPEND}" ]]; then
-	eval "${VAR}=\"${CURRENT}${CURRENT:+:}${VALUE}\""
-    else
-	eval "${VAR}=\"${VALUE}${CURRENT:+:}${CURRENT}\""
-    fi
-
-    return 0
-}
-
 function PathAdd # VAR VALUE [VALUE...]
 {
     local APPEND=""
@@ -69,9 +37,30 @@ function PathAdd # VAR VALUE [VALUE...]
     done
 
     local VAR="${1}"
+    [[ "${BRH_ARCH}" = "Darwin" && "${VAR}" = "LD_LIBRARY_PATH" ]] && VAR="DY${VAR}"
     shift 1
+    
+    eval local CURRENT="\$${VAR}"
+
     for EACH in "${@}"; do
-        [[ -d "${EACH}" ]] && PathAddOne ${APPEND} "${VAR}" "${EACH}"
+        [[ -d "${EACH}" ]] || continue
+        local CHECK=":${CURRENT}:"
+        if [[ "${CHECK%%:${EACH}:*}" = "${CHECK}" ]]; then
+            if [[ -n "${APPEND}" ]]; then
+	        CURRENT="${CURRENT}${CURRENT:+:}${EACH}"
+            else
+	        CURRENT="${EACH}${CURRENT:+:}${CURRENT}"
+            fi
+
+            if [[ "${VAR}" == "PATH" ]]; then
+                # Update MANPATH and INFOPATH with some possible values
+                local ROOT="${EACH%/bin}"
+                PathAdd MANPATH "${ROOT}/man" "${ROOT}/share/man"
+                PathAdd INFOPATH "${ROOT}/info" "${ROOT}/share/info"
+            fi
+        fi
+
+        eval "${VAR}=\"${CURRENT}\""
     done
 }
 

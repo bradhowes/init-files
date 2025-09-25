@@ -5,7 +5,10 @@
 
 (require 'seq)
 (require 'my-constants)
+(require 'my-customizations)
 (require 'my-functions)
+(require 'my-layout)
+(require 'my-modes)
 
 (defun my/trusted-content-p (original-response)
   "Advice for `trusted-content-p' to trust the `*scratch*' buffer.
@@ -23,184 +26,6 @@ the buffer having untrusted content."
   (require 'filenotify)
   (setq file-notify-debug nil))
 ;; (debug-on-entry 'file-notify-add-watch)
-
-(defgroup my/customizations nil
-  "The customization group for my settings."
-  :prefix "my/"
-  :group 'local)
-
-(defcustom my/screen-4k-pick 0
-  "The 4K screen to use for Emacs frames."
-  :type '(natnum)
-  :options '(0 1)
-  :group 'my/customizations)
-
-(defcustom my/next-window-wrap-around t
-  "Wrap around when moving to next window in `ace-window' list."
-  :type '(boolean)
-  :group 'my/customizations)
-
-(defun my/screen-layout ()
-  "Identify current screen layout.
-Uses result from `display-pixel-width' to determine what monitors
-there are.  Better would be to use `display-monitor-attributes-list'
-like done in `my/frame-top'.
-
-Returns one of the follow symbols based on width:
-
-- `my/screen-laptop' -- only laptop screen
-- `my/screen-4k' -- only 4K monitor.
-- `my/screen-laptop-4k' -- laptop screen + 4K monitor.
-- `my/screen-4k-4k' -- two 4K monitors.
-- `my/screen-laptop-4k-4k' -- laptop screen + 2 4K monitors.
-- `my/screen-terminal' -- unknown screen."
-  (declare (side-effect-free t))
-  (let* ((width (display-pixel-width nil))
-         (value (cond ((= width my/laptop-screen-width) my/screen-laptop)
-                      ((= width my/4k-screen-width) my/screen-4k)
-                      ((= width (+ my/laptop-screen-width my/4k-screen-width)) my/screen-laptop-4k)
-                      ((= width (* my/4k-screen-width 2)) my/screen-4k-4k)
-                      ((= width (+ my/laptop-screen-width (* 2 my/4k-screen-width))) my/screen-laptop-4k-4k)
-                      (t my/screen-terminal))))
-    (message "my/screen-layout: %s" value)
-    value))
-
-(defun my/is-laptop (layout)
-  "T if LAYOUT is laptop."
-  (declare (side-effect-free t))
-  (eq layout my/screen-laptop))
-
-(defun my/is-4k (layout)
-  "T if LAYOUT is kind with at least 4K area."
-  (declare (side-effect-free t))
-  (memq layout '(my/screen-4k my/screen-laptop-4k my/screen-4k-4k my/screen-laptop-4k-4k)))
-
-(defun my/rows (layout)
-  "The number of rows to show in a frame shown on LAYOUT."
-  (declare (side-effect-free t))
-  (if (my/is-4k layout) 103 (if (my/is-laptop layout) 88 40)))
-
-(defun my/cols (layout)
-  "The number of columns to show in a frame shown on LAYOUT."
-  (declare (side-effect-free t))
-  (if (or (my/is-4k layout) (my/is-laptop layout)) 132 80))
-
-(defun my/frame-pixel-width (layout)
-  "Width in pixels of a normal frame shown on LAYOUT.
-These values are hard-coded based on current settings.
-Probably a better way to figure this out."
-  (declare (side-effect-free t))
-  (if (my/is-4k layout) (if my/is-macosx 1338 1338) 944))
-
-(defun my/frame-initial-left (layout)
-  "Pixels to use for the `left' of a frame on LAYOUT.
-This is to be used for the `initial-frame-alist' configuration."
-  (declare (side-effect-free t))
-  ;; Use the first external monitor if there is one.
-  (if (memq layout '(my/screen-laptop-4k my/screen-laptop-4k-4k))
-      (+ 2056 (* my/screen-4k-pick my/4k-screen-width))
-    (if my/is-x-windows-on-win 0 0)))
-
-(defun my/frame-default-left (layout)
-  "Pixels to use for the `left' of a frame on LAYOUT.
-This is to be use for the `default-frame-aliat' configuration."
-  (declare (side-effect-free t))
-  (+ (my/frame-initial-left layout) (my/frame-pixel-width layout)))
-
-(defun my/frame-third-left (layout)
-  "The offset to the `alt' window based on LAYOUT.
-This is not used in any particular `*-frame-alist' but it is used
-by custom commands that reposition a frame to be flush with the
-right-side of the active screen that is being used to host
-Emacs frames."
-  (declare (side-effect-free t))
-  (- (+ (my/frame-initial-left layout)
-        (if (eq layout my/screen-laptop)
-            my/laptop-screen-width
-          my/4k-screen-width))
-     (my/frame-pixel-width layout)))
-
-(defun my/frame-top ()
-  "The top of the display area.
-NOTE: this assumes that the laptop display, if present,
-is on the left of any monitors."
-  (declare (side-effect-free t))
-  (let* ((settings (display-monitor-attributes-list))
-         (top (nth 2 (if (eq (length settings) 1)
-                         (car (car settings))
-                       (car (car (cdr settings))))))
-         (offset (if my/is-x-windows-on-win 30 0)))
-    (list '+ (+ offset top))))
-
-(defun my/initial-frame-alist (layout)
-  "Make alist to use for the initial frame on LAYOUT.
-Frame's left side is flush with the left side of the main display."
-  (declare (side-effect-free t))
-  (list (cons 'width (my/cols layout))
-        (cons 'height (my/rows layout))
-        (cons 'top (my/frame-top))
-        (cons 'left (my/frame-initial-left layout))))
-
-(defun my/default-frame-alist (layout)
-  "Make alist to use for the default frame on LAYOUT.
-Frame's left side is next to the right side of the initial frame."
-  (declare (side-effect-free t))
-  (list (cons 'width (my/cols layout))
-        (cons 'height (my/rows layout))
-        (cons 'top (my/frame-top))
-        (cons 'left (my/frame-default-left layout))))
-
-(defun my/align-right-frame-alist (layout)
-  "The alist to use extra frame on LAYOUT.
-Frame's right side is flush with the right side of the main display."
-  (declare (side-effect-free t))
-  (list (cons 'width (my/cols layout))
-        (cons 'height (my/rows layout))
-        (cons 'top (my/frame-top))
-        (cons 'left (my/frame-third-left layout))))
-
-(defun my/alt-default-frame-alist (layout)
-  "Make alt alist to use for the default frame on LAYOUT.
-Frame's right side is next to the left side of the `alt' frame."
-  (declare (side-effect-free t))
-  (list (cons 'width (my/cols layout))
-        (cons 'height (my/rows layout))
-        (cons 'top (my/frame-top))
-        (cons 'left (- (my/frame-third-left layout) (my/frame-pixel-width layout) 16))))
-
-(defun my/update-screen-frame-alists (layout)
-  "Update frame alists for current LAYOUT."
-  (modify-all-frames-parameters (my/default-frame-alist layout))
-  (setq initial-frame-alist (my/initial-frame-alist layout))
-  (message "initial-frame: %s" initial-frame-alist)
-  (message "default-frame: %s" default-frame-alist))
-
-(defun my/font-size (layout)
-  "The font size to use based on the LAYOUT."
-  (declare (side-effect-free t))
-  (if (my/is-4k layout) 16 12))
-
-(defun my/setup-font (layout)
-  "Install the desired font in the default face for LAYOUT."
-  (set-face-attribute 'default nil :font (font-spec :family my/font-name :size (my/font-size layout))))
-
-(defun my/screen-layout-changed ()
-  "Recalculate values based on screen layout."
-  (interactive)
-  (let ((layout (my/screen-layout)))
-    (message "screen layout: %s" layout)
-    (my/setup-font layout)
-    (my/update-screen-frame-alists layout)))
-
-(defun my/pick-screen-4k (screen)
-  "Set the 4K SCREEN to use to host future Emacs frames.
-It does not affect existing frames."
-  (interactive "NScreen:")
-  (custom-set-variables (list 'my/screen-4k-pick screen))
-  (custom-save-all)
-  (my/screen-layout-changed))
-
-(add-hook 'after-init-hook #'my/screen-layout-changed)
 
 (let* ((common-paths (list (file-truename "~/bin")
                            (file-name-concat my/venv "bin")))
@@ -230,382 +55,49 @@ It does not affect existing frames."
     :init
     (package-initialize)))
 
-;; Configure `display-buffer-alist' to manage window placement
+(defvar my/hyper-c-map
+  (make-sparse-keymap)
+  "Keymap for Hyper-c actions.")
+(keymap-set global-map "H-c" my/hyper-c-map)
+
+(use-package accent
+  :bind ("H-c a" . accent-menu))
 
 (use-package ace-window
   :commands (aw-window-list aw-switch-to-window aw-select aw-flip-window ace-display-buffer ace-window)
   :defines (aw-dispatch-always)
+  :config (setq aw-make-frame-char ?n))
+
+(use-package cape
+  :commands (cape-file))
+
+(use-package char-menu
+  :defines (char-menu)
+  :bind (("C-z" . char-menu))
   :config
-  (setq aw-make-frame-char ?n))
+  (setq char-menu
+        '("—" "‘’" "“”" "…" "«»" "–"
+          ("Typography" "•" "©" "†" "‡" "°" "·" "§" "№" "★")
+          ("Math"       "≈" "≡" "≠" "∞" "×" "±" "∓" "÷" "√")
+          ("Arrows"     "←" "→" "↑" "↓" "⇐" "⇒" "⇑" "⇓")
+          ("Greek"      "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
 
-(use-package window
-  :init
-  (let ((window-parameters '(window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))))
-    (message "%s" window-parameters)
-    (setq switch-to-buffer-in-dedicated-window 'pop
-          switch-to-buffer-obey-display-actions t
-          window-resize-pixelwise t
-          window-sides-slots '(0 0 3 1)
-          display-buffer-base-action '((display-buffer-reuse-window ace-display-buffer))
-          display-buffer-alist `(("\\*help\\[R" (display-buffer-reuse-mode-window ace-display-buffer) (reusable-frames . nil))
-                                 ("\\*R" nil (reusable-frames . nil))
-                                 ,(cons "\\*helm" display-buffer-fallback-action)))))
-                                 ;; Show log buffer in something other than the current window
-                                 ;; ("magit-log" nil (inhibit-same-window . t))
-                                 ;; ("magit-diff:" nil (inhibit-same-window . t))))))
-
-(when my/is-terminal
-  (set-face-background 'default "undefined"))
-
-(use-package my-fontify-braces)
-
-(defun my/autoloads (&rest definitions)
-  "Setup autoloads for my mode customizations.
-DEFINITIONS is a sequence of string and symbol pairs, where the
-string is a filename (without extension), and the following symbol
-is either a standalone symbol or a list of symbols that represent
-the items to setup for autoloading from the given file."
-  (let* ((groups (seq-group-by #'stringp definitions))
-         (files (seq-drop (elt groups 0) 1))
-         (symbols (seq-drop (elt groups 1) 1)))
-    (seq-mapn
-     (lambda (file symbols)
-       (if (consp symbols)
-           (mapcar (lambda (symbol) (autoload symbol file)) symbols)
-         (autoload symbols file)))
-     files symbols)))
-
-(my/autoloads
- "emacs-pager" 'emacs-pager
- "my-find-known-bindings" 'my/find-known-bindings
- "my-cmake-mode" 'my/cmake-mode-hook
- "my-c++-mode" 'my/c++-mode-hook
- "my-dired-mode" 'my/dired-mode-hook
- "my-js2-mode" 'my/js2-mode-hook
- "my-json-mode" 'my/json-mode-hook
- "my-lisp-mode" '(my/lisp-mode-hook my/lisp-data-mode-hook)
- "my-makefile-mode" 'my/makefile-mode-hook
- "my-markdown-mode" 'my/markdown-mode-hook
- "my-python-mode" '(my/python-mode-hook my/inferior-python-mode-hook)
- "my-sh-mode" 'my/sh-mode-hook
- "my-shell-mode" 'my/shell-mode-hook)
-
-(use-package key-chord
-  :vc (:url "https://github.com/emacsorphanage/key-chord" :rev :newest)
-  :commands (key-chord-define))
-
-(use-package accent
-  :bind ("C-c a" . accent-menu))
-
-(use-package org
-  :commands (org-store-link)
+(use-package compile
   :config
+  (add-to-list 'compilation-error-regexp-alist
+               '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2))) ; I think this is from pyright
 
-  (defvar my/org-key-map
-    (let ((map (make-sparse-keymap)))
-      (define-key map "a" #'org-agenda)
-      (define-key map "c" #'org-capture)
-      (define-key map "l" #'org-store-link)
-      map)
-    "Keymap for my org mode access.")
-
-  :bind-keymap ("H-o" . my/org-key-map))
-
-(use-package tempo
-  :commands (tempo-define-template))
-
-
-(defun tempo-template-my/org-emacs-lisp-source (&optional _)
-  "Define empty function to satisfy flymake/byte-compile (ARG is ignored).")
-
-(tempo-define-template "my/org-emacs-lisp-source" '("#+begin_src emacs-lisp" & r % "#+end_src")
-                       "<m"
-                       "Insert an Emacs Lisp source block in an org document.")
-
-(defun my/org-emacs-lisp-source-with-indent ()
-  "Execute `my/org-emacs-lisp-source' and then indent block."
-  (interactive)
-  (tempo-template-my/org-emacs-lisp-source)
-  (forward-line -1)
-  (org-cycle))
-
-(defun my/org-filter-buffer-substring (start end delete)
-  "Custom filter on buffer text from START to END.
-When DELETE is t, delete the contents from the range.
-Otherwise, removes all properties from a span in a buffer.
-Useful when copying code into Org blocks so that the copy does not contain any
-artifacts such as indentation bars."
-  (if delete
-      (delete-and-extract-region start end)
-    (buffer-substring-no-properties start end)))
-
-;; NOTE: this is setting a global variable, but we should really just do this when operating in an org buffer.
-(setq filter-buffer-substring-function #'my/org-filter-buffer-substring)
-
-(use-package multiple-cursors
-  :bind (("C->" . mc/mark-next-like-this)
-         ("C-<" . mc/mark-previous-like-this)
-         ("C-c C->" . mc/mark-all-like-this)))
-
-(unless my/is-terminal
-  (use-package indent-bars
-    :hook (prog-mode . indent-bars-mode)))
-
-(use-package consult-notes
-  :after (consult denote)
-  :defines (consult-notes-denote-files-function)
-  :commands (consult-notes-denote-mode denote-directory-files)
-  :config
-  (require 'consult-notes-denote)
-  :bind (("H-n b" . consult-notes)))
-
-(use-package lisp-mode
-  :hook ((lisp-mode . my/lisp-mode-hook)
-         (lisp-interaction-mode . my/lisp-mode-hook)
-         (lisp-data-mode . my/lisp-data-mode-hook)
-         (scheme-mode . my/lisp-mode-hook)
-         (emacs-lisp-mode . my/lisp-mode-hook)))
-
-(use-package cc-mode
-  :init (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
-  :hook ((c++-mode . my/c++-mode-hook)))
-
-(use-package sh-mode
-  :hook ((sh-mode . my/sh-mode-hook)
-         (sh-mode . indent-bars-mode)))
-
-(if (executable-find "shellcheck")
-    (use-package flymake-shellcheck
-      :hook
-      (sh-mode . flymake-shellcheck-load))
-  (message "Not using flymake-shellcheck - shellcheck executable not found."))
-
-(use-package shell-mode
-  :defines (explicit-bash-args)
-  :init
-  ;; Special-case QA env -- we are logged in as `sp_qa' user but we want our custom
-  ;; environment. Command `bash' to load our custom settings.
-  (let ((rc (file-truename (file-name-concat my/repos "configurations/qa.bashrc"))))
-    (if (and my/is-qa
-             (file-exists-p rc)
-             (string-suffix-p "q" (system-name)))
-        (setq explicit-bash-args (list "--noediting" "--rcfile" rc "-i"))
-      (setq explicit-bash-args '("--noediting" "-i"))))
-  :hook ((shell-mode . my/shell-mode-hook)))
-
-(use-package json-mode
-  :init (add-to-list 'auto-mode-alist '("\\.yagconf\\'" . json-mode))
-  :hook ((json-mode . my/json-mode-hook)))
-
-(use-package js2-mode
-  :hook ((js2-mode . my/js2-mode-hook)))
-
-(use-package winner
-  :bind (("C-<left>" . winner-undo)
-         ("C-<right>" . winner-redo)
-         ("C-c u" . winner-undo)
-         ("C-c C-u" . winner-undo)
-         ("C-c C-r" . winner-redo)))
-
-(require 'server)
-
-(defun my/start-emacs-server ()
-  "Start up an Emacs server to support `emacsclient' connections.
-Customize `server-name' so that each Emacs
-process has its own server connection."
-  (interactive)
-  ;; NOTE: `server-running-p` can report `t` even if we are not running it.
-  (unless server-process
-    ;; Make a unique server connection since I run multiple Emacs instances and I want the emacsclient in a comint
-    ;; buffer to connect to the right connection.
-    (setq server-name (format "server-%d" (emacs-pid)))
-    (setenv "EMACS_SERVER_FILE" server-name)
-    (setenv "EMACS_SOCKET_NAME" server-name)
-    (server-start)))
-
-(add-hook 'after-init-hook #'my/start-emacs-server)
-
-(use-package flyspell
-  :hook ((prog-mode . flyspell-prog-mode)
-         (sh-mode . ws-butler-mode)
-         (text-mode . flyspell-mode)))
-
-(use-package ibuffer
-  :config
-  ;; Unbind the ibuffer use of "M-o" so as not to conflict with my global definition using `ace-window'
-  (keymap-unset ibuffer-mode-map "M-o" t))
-
-(use-package python
-  :hook ((python-mode . my/python-mode-hook)
-         (inferior-python-mode . my/inferior-python-mode-hook)))
-
-(use-package makefile-mode
-  :hook ((makefile-mode . my/makefile-mode-hook)
-         (makefile-mode . indent-bars-mode)))
-
-(use-package hl-line)
-
-(use-package project
-  :commands (project--switch-project-command)
-  :bind (("C-x p $" . project-shell)))
-
-(defun my/show-project-menu ()
-  "Show the menu that is shown when switching to a new project."
-  (interactive)
-  (call-interactively (project--switch-project-command)))
-
-(keymap-set project-prefix-map "m" #'my/show-project-menu)
-
-(defvar my/project-search-map (make-sparse-keymap)
-  "A prefix map like that found in projectile.
-Bound to \\`C-x p s'.")
-(keymap-set project-prefix-map "s" my/project-search-map)
-
-(use-package marginalia
-  :commands (marginalia-mode)
-  :bind (:map minibuffer-local-map
-              ("C-M-<tab>" . marginalia-cycle))
-  :hook
-  (after-init . marginalia-mode))
-
-(when (display-graphic-p)
-  (use-package nerd-icons)
-
-  (use-package nerd-icons-completion
-    :after (marginalia)
-    :commands (nerd-icons-completion-mode nerd-icons-completion-marginalia-setup)
-    :hook ((after-init . nerd-icons-completion-mode)
-           (marginalia-mode nerd-icons-completion-marginalia-setup)))
-
-  (use-package mood-line
-    :commands (mood-line-mode)
-    :hook
-    (after-init . mood-line-mode)))
-
-(use-package ws-butler
-  :hook ((prog-mode . ws-butler-mode)
-         (sh-mode . ws-butler-mode)))
-
-(use-package dired
-  :config
-  :bind (:map dired-mode-map
-              ("M-{" . nil)
-              ("M-}" . nil)
-              ("c" . dired-do-copy)     ; swap copy and compress
-              ("C" . dired-do-compress)
-              ("C-s" . dired-isearch-filenames)
-              ("C-M-s" . dired-isearch-filenames-regexp))
-  :hook (dired-mode . my/dired-mode-hook))
-
-(use-package diff-hl
-  :commands (diff-hl-show-hunk diff-hl-margin-mode)
-  :hook (after-init . (lambda ()
-                        (when my/is-terminal
-                          (diff-hl-margin-mode t))
-                        )))
-
-(use-package password-cache
-  :defines (password-cache password-cache-expiry)
-  :commands (password-cache-add password-read password-read-from-cache)
-  :custom
-  (password-cache t)
-  (password-cache-expiry nil))
-
-(defun my/read-gitlab-password (host)
-  "Inject password into `password-cache' for HOST."
-  (if-let ((password (password-read-from-cache host)))
-      password
-    (let ((password (password-read "Gitlab password: " host)))
-      (password-cache-add host password)
-      password)))
-
-;; Work QA hosts have a Git v2.18.0 and latest Magit now yells about it. In QA, fetch the last Magit version that did
-;; not care about this. Unfortunately I do not see a way to do this conditionally inside `use-package'.
-(when (and my/is-work my/is-qa)
-  (unless (package-installed-p 'magit)
-    (package-vc-install '(magit
-                          :url "https://github.com/magit/magit.git"
-                          :branch "v4.1.3"
-                          :lisp-dir "lisp"
-                          :make '("lisp" "info")
-                          :doc "docs/magit.texi")))
-  ;; For some reason this is still needed even after using `package-vc-install'
-  (push (file-name-concat user-emacs-directory "elpa/magit/lisp") load-path))
-
-(use-package magit
-  :commands (magit-status-setup-buffer magit-status magit-project-status)
-  :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
-         (magit-post-refresh . diff-hl-magit-post-refresh))
-  :bind (("C-x g" . magit-status)
-         ;; Take over vc-dir
-         ("C-x p v" . magit-project-status)
-         ;; Take over vc-print-log
-         ("C-x v l" . magit-log-buffer-file)
-         ("C-c f" . magit-file-dispatch))
-  :custom
-  (magit-process-find-password-functions '(my/read-gitlab-password)))
-
-(use-package rg
-  :after (project)
-  :commands (rg-enable-default-bindings rg-project)
-  :bind ("C-x p s r" . #'rg-project)
-  :hook (after-init . rg-enable-default-bindings))
-
-(use-package denote
-  :commands (denote-dired-mode-in-directories)
-  :hook (dired-mode . denote-dired-mode-in-directories)
-  :bind (("H-n n" . denote))
-  :custom
-  (denote-directory (file-truename "~/Documents/notes/"))
-  :config
-  (setq denote-file-types (cons
-                           '(markdown-brh
-                             :extension ".md"
-                             :date-function (lambda (date) (format-time-string "%F %T"))
-                             :front-matter denote-yaml-front-matter
-                             :title-key-regexp "^title\\s-*:"
-                             :title-value-function denote-trim-whitespace
-                             :title-value-reverse-function denote-trim-whitespace
-                             :keywords-key-regexp "^tags\\s-*:"
-                             :keywords-value-function denote-format-keywords-for-text-front-matter
-                             :keywords-value-reverse-function denote-extract-keywords-from-front-matter
-                             :link denote-md-link-format
-                             :link-in-context-regexp denote-md-link-in-context-regexp)
-                           denote-file-types)))
-
-(defun my/aw-make-frame ()
-  "Make a new frame using layout settings for the current display.
-The first frame always takes on `initial-frame-alist', and subsequent frames
-use `default-frame-alist' by default. If there are already two frames active
-then subsequent ones will be at `my/align-right-frame-alist' which aligns with
-the right-edge of the screen, but may overlap with the middle frame."
-  (let ((num-frames (length (visible-frame-list))))
-    (if (< num-frames 2)
-        (make-frame)
-      (make-frame (my/align-right-frame-alist (my/screen-layout))))))
-
-(advice-add 'aw-make-frame :override #'my/aw-make-frame)
-
-(defun my/ace-window-always-dispatch ()
-  "Invoke `ace-window' after setting `aw-dispatch-always' to T.
-When `aw-dispatch-always' is nil, `ace-window' does not invoke
-its dispatching mechanism if there are 2 or fewer windows. This
-command guarantees that dispatching will always happen."
-  (interactive)
-  (let ((current-aw-dispatch-always aw-dispatch-always))
-    (unwind-protect
-        (let ((aw-dispatch-always t))
-          (call-interactively #'ace-window))
-      (setq aw-dispatch-always current-aw-dispatch-always))))
+(use-package xref
+  :defines (xref-show-xrefs-function xref-show-definitions-function))
 
 (use-package consult
-  :after (project)
+  :after (project xref)
   :commands (consult--customize-put consult-flymake)
-  :bind (("C-c M-x" . consult-mode-command)
-         ("C-c h" . consult-history)
+  :bind (("H-c M-x" . consult-mode-command)
+         ("H-c h" . consult-history)
          ;; ("C-h i" . consult-info)
-         ("C-c k" . consult-kmacro)
-         ("C-c m" . consult-man)
+         ("H-c k" . consult-kmacro)
+         ("H-c m" . consult-man)
          ([remap Info-search] . consult-info)
 
          ;; C-x bindings in `ctl-x-map`
@@ -658,7 +150,7 @@ command guarantees that dispatching will always happen."
          :map project-prefix-map
          ("b" . consult-project-buffer))
 
-  :commands (consult-register-format consult-register-window consult-xref)
+  :commands (consult-register-format consult-register-window consult-xref consult-register-store consult-register-load)
 
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
@@ -695,8 +187,95 @@ command guarantees that dispatching will always happen."
 
   ;; Optionally configure the narrowing key.
   ;; Both < and C-+ work reasonably well.
-  (setq consult-narrow-key "<") ;; "C-+"
-  )
+  (setq consult-narrow-key "<"))
+
+(use-package consult-notes
+  :after (consult denote)
+  :defines (consult-notes-denote-files-function)
+  :commands (consult-notes-denote-mode denote-directory-files)
+  :config
+  (require 'consult-notes-denote)
+  :bind (("H-n b" . consult-notes)))
+
+(use-package corfu
+  :bind (:map corfu-map ("C-SPC" . corfu-insert-separator)))
+
+(use-package corfu-terminal
+  :if my/is-terminal
+  :functions (corfu-terminal-mode)
+  :hook (after-init . (lambda () (corfu-terminal-mode +1))))
+
+(use-package crm)
+
+(use-package crux
+  :defer nil                            ; load now due to dependencies below
+  :bind (("C-a" . crux-move-beginning-of-line)
+         ("H-c d" . crux-duplicate-current-line-or-region)
+         ("C-x 4 t" . crux-transpose-windows)
+         ("C-k" . crux-smart-kill-line)
+         ("H-c C-i" . crux-indent-defun)
+         ("C-^" . crux-top-join-line)))
+
+(defun crux-find-current-directory-dir-locals-file (find-2)
+  "Edit the `.dir-locals.el' file for the current buffer in another window.
+If prefix arg FIND-2 is set then edit the `.dir-locals-2.el' file instead
+of `.dir-locals.el'. Scans parent directories if the file does not exist in
+the default directory of the current buffer. If not found, create a new,
+empty buffer in the current buffer's default directory, or if there is no
+such directory, in the user's home directory."
+  (interactive "P")
+  (let* ((prefix (if (eq system-type 'ms-dos) "_" "."))
+         (file (concat prefix (if find-2 "dir-locals-2" "dir-locals") ".el"))
+         (starting-dir (or (when (and default-directory
+                                      (file-readable-p default-directory))
+                             default-directory)
+                           (file-truename "~/")))
+         (found-dir (or (locate-dominating-file starting-dir file) starting-dir))
+         (found-file (concat found-dir file)))
+    (find-file-other-window found-file)
+    (if (file-exists-p found-file)
+        (message "Editing existing file %s" found-file)
+      (message "Editing new file %s" found-file))))
+
+(use-package denote
+  :commands (denote-dired-mode-in-directories)
+  :hook (dired-mode . denote-dired-mode-in-directories)
+  :bind (("H-n n" . denote))
+  :custom
+  (denote-directory (file-truename "~/Documents/notes/"))
+  :config
+  (setq denote-file-types (cons
+                           '(markdown-brh
+                             :extension ".md"
+                             :date-function (lambda (date) (format-time-string "%F %T"))
+                             :front-matter denote-yaml-front-matter
+                             :title-key-regexp "^title\\s-*:"
+                             :title-value-function denote-trim-whitespace
+                             :title-value-reverse-function denote-trim-whitespace
+                             :keywords-key-regexp "^tags\\s-*:"
+                             :keywords-value-function denote-format-keywords-for-text-front-matter
+                             :keywords-value-reverse-function denote-extract-keywords-from-front-matter
+                             :link denote-md-link-format
+                             :link-in-context-regexp denote-md-link-in-context-regexp)
+                           denote-file-types)))
+
+(use-package dired
+  :config
+  :bind (:map dired-mode-map
+              ("M-{" . nil)
+              ("M-}" . nil)
+              ("c" . dired-do-copy)     ; swap copy and compress
+              ("C" . dired-do-compress)
+              ("C-s" . dired-isearch-filenames)
+              ("C-M-s" . dired-isearch-filenames-regexp))
+  :hook (dired-mode . my/dired-mode-hook))
+
+(use-package eldoc-box
+  :if my/is-terminal)
+;; :hook (prog-mode . eldoc-box-hover-mode)))
+
+(use-package emacs-pager
+  :commands (emacs-pager emacs-pager-mode))
 
 ;; FYI: Embark's default action binding of "RET" fails if a mode binds to <return>.
 (use-package embark
@@ -712,46 +291,250 @@ command guarantees that dispatching will always happen."
   :after (consult embark)
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
-(unless my/is-terminal
-  (use-package eldoc-box))
-;; :hook (prog-mode . eldoc-box-hover-mode)))
+(use-package esup
+  :custom (esup-user-init-file (file-truename "~/.emacs.d/init.el")))
+
+(use-package expand-region
+  :bind ("C-\\" . er/expand-region))
+
+(use-package fancy-compilation
+  :commands (fancy-compilation-mode)
+  :hook ((compilation-mode . fancy-compilation-mode)))
+
+(use-package hippie-expand
+  :bind (("M-/" . hippie-expand)))
+
+(use-package hl-line)
+
+;; Unbind the ibuffer use of "M-o" so as not to conflict with my global definition using `ace-window'
+(use-package ibuffer
+  :config (keymap-unset ibuffer-mode-map "M-o" t))
+
+(use-package iso-transl
+  :bind-keymap ("H-8" . iso-transl-ctl-x-8-map)) ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
+
+(use-package key-chord
+  :vc (:url "https://github.com/emacsorphanage/key-chord" :rev :newest)
+  :commands (key-chord-define))
+
+;; Work QA hosts have a Git v2.18.0 and latest Magit now yells about it. In QA, fetch the last Magit version that did
+;; not care about this. Unfortunately I do not see a way to do this conditionally inside `use-package'.
+(when (and my/is-work my/is-qa)
+  (unless (package-installed-p 'magit)
+    (package-vc-install '(magit
+                          :url "https://github.com/magit/magit.git"
+                          :branch "v4.1.3"
+                          :lisp-dir "lisp"
+                          :make '("lisp" "info")
+                          :doc "docs/magit.texi")))
+  ;; For some reason this is still needed even after using `package-vc-install'
+  (push (file-name-concat user-emacs-directory "elpa/magit/lisp") load-path))
+
+(use-package magit
+  :commands (magit-status-setup-buffer magit-status magit-project-status)
+  :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
+         (magit-post-refresh . diff-hl-magit-post-refresh))
+  :bind (("C-x g" . magit-status)
+         ;; Take over vc-dir
+         ("C-x p v" . magit-project-status)
+         ;; Take over vc-print-log
+         ("C-x v l" . magit-log-buffer-file)
+         ("H-c f" . magit-file-dispatch))
+  :custom (magit-process-find-password-functions '(my/read-gitlab-password)))
+
+(use-package marginalia
+  :commands (marginalia-mode)
+  :bind (:map minibuffer-local-map
+              ("C-M-<tab>" . marginalia-cycle))
+  :hook (after-init . marginalia-mode))
+
+(use-package mode-line-bell)
+
+(use-package mood-line
+  :if (display-graphic-p)
+  :commands (mood-line-mode)
+  :hook (after-init . mood-line-mode))
+
+(use-package multiple-cursors
+  :bind (("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)
+         ("H-c C->" . mc/mark-all-like-this)))
+
+(use-package my-fontify-braces)
+
+(use-package nerd-icons
+  :if (display-graphic-p))
+
+(use-package nerd-icons-completion
+  :if (display-graphic-p)
+  :after (marginalia)
+  :commands (nerd-icons-completion-mode nerd-icons-completion-marginalia-setup)
+  :hook ((after-init . nerd-icons-completion-mode)
+         (marginalia-mode nerd-icons-completion-marginalia-setup)))
+
+(use-package orderless)
+
+(use-package org
+  :commands (org-store-link)
+  :config
+  (defvar my/org-key-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map "a" #'org-agenda)
+      (define-key map "c" #'org-capture)
+      (define-key map "l" #'org-store-link)
+      map)
+    "Keymap for my org mode access.")
+
+  :bind-keymap ("H-o" . my/org-key-map))
+
+(use-package osx-dictionary
+  :if my/is-macosx
+  :bind (("H-c l" . osx-dictionary-search-pointer)))
+
+(use-package password-cache
+  :defines (password-cache password-cache-expiry)
+  :commands (password-cache-add password-read password-read-from-cache)
+  :custom
+  (password-cache t)
+  (password-cache-expiry nil))
+
+(defun my/read-gitlab-password (host)
+  "Inject password into `password-cache' for HOST."
+  (if-let ((password (password-read-from-cache host)))
+      password
+    (let ((password (password-read "Gitlab password: " host)))
+      (password-cache-add host password)
+      password)))
+
+(use-package popper
+  :defer nil                            ; load now due to dependencies below
+  :commands (popper-kill-latest-popup)
+  :functions (popper--delete-popup)
+  :bind (("C-'" . popper-toggle)
+         ("M-'" . popper-cycle)))
+
+(use-package project
+  :commands (project--switch-project-command)
+  :bind (("C-x p $" . project-shell)))
+
+(defun my/show-project-menu ()
+  "Show the menu that is shown when switching to a new project."
+  (interactive)
+  (call-interactively (project--switch-project-command)))
+
+(keymap-set project-prefix-map "m" #'my/show-project-menu)
+
+(defvar my/project-search-map (make-sparse-keymap)
+  "A prefix map like that found in projectile.
+Bound to \\`C-x p s'.")
+(keymap-set project-prefix-map "s" my/project-search-map)
+
+(use-package rg
+  :after (project)
+  :commands (rg-enable-default-bindings rg-project)
+  :bind ("C-x p s r" . #'rg-project)
+  :hook (after-init . rg-enable-default-bindings))
+
+(use-package scratch
+  :bind (("H-c s" . scratch)))
+
+(use-package tempo
+  :commands (tempo-define-template))
+
+(defun tempo-template-my/org-emacs-lisp-source (&optional _)
+  "Define empty function to satisfy flymake/byte-compile (ARG is ignored).")
+
+(tempo-define-template "my/org-emacs-lisp-source" '("#+begin_src emacs-lisp" & r % "#+end_src")
+                       "<m"
+                       "Insert an Emacs Lisp source block in an org document.")
 
 (use-package vertico
   :commands (vertico-mode)
   :hook ((rfn-eshadow-update-overlay . vertico-directory-tidy)))
 
-(use-package mode-line-bell)
+(use-package which-key)
 
-(use-package eglot
-  :commands (eglot-ensure)
-  :hook ((c++-mode . eglot-ensure)
-         (json-mode . eglot-ensure)
-         (python-mode . eglot-ensure))
-  :custom
-  ((eglot-autoshutdown t)
-   (eglot-extend-to-xref t)
-   (eglot-ignore-server-capabilities '(:documentFormattingProvider :documentRangeFormattingProvider)))
-  :bind (:map eglot-mode-map
-              ("C-c c a" . eglot-code-actions)
-              ("C-c c e" . eglot-code-action-extract)
-              ("C-c c j" . eglot-code-action-inline)
-              ("C-c c f" . eglot-format)
-              ("C-c c o" . eglot-code-action-organize-imports)
-              ("C-c c q" . eglot-code-action-quickfix)
-              ("C-c c r" . eglot-rename)
-              ("C-c c w" . eglot-code-action-rewrite)))
+(use-package winner
+  :bind (("C-<left>" . winner-undo)
+         ("C-<right>" . winner-redo)
+         ("H-c u" . winner-undo)
+         ("H-c C-u" . winner-undo)
+         ("H-c C-r" . winner-redo)))
 
-(use-package consult-eglot
-  :after (consult eglot))
+(defun my/org-emacs-lisp-source-with-indent ()
+  "Execute `my/org-emacs-lisp-source' and then indent block."
+  (interactive)
+  (tempo-template-my/org-emacs-lisp-source)
+  (forward-line -1)
+  (org-cycle))
 
-(use-package crux
-  :defer nil                            ; load now due to dependencies below
-  :bind (("C-a" . crux-move-beginning-of-line)
-         ("C-c d" . crux-duplicate-current-line-or-region)
-         ("C-x 4 t" . crux-transpose-windows)
-         ("C-k" . crux-smart-kill-line)
-         ("C-c C-i" . crux-indent-defun)
-         ("C-^" . crux-top-join-line)))
+(defun my/org-filter-buffer-substring (start end delete)
+  "Custom filter on buffer text from START to END.
+When DELETE is t, delete the contents from the range.
+Otherwise, removes all properties from a span in a buffer.
+Useful when copying code into Org blocks so that the copy does not contain any
+artifacts such as indentation bars."
+  (if delete
+      (delete-and-extract-region start end)
+    (buffer-substring-no-properties start end)))
+
+;; NOTE: this is setting a global variable, but we should really just do this when operating in an org buffer.
+(setq filter-buffer-substring-function #'my/org-filter-buffer-substring)
+
+(defvar ffap-bindings
+  '((keymap-global-set "<remap> <find-file>" #'find-file-at-point)
+    (keymap-global-set "<remap> <find-file-other-window>" #'ffap-other-window)
+    (keymap-global-set "<remap> <find-file-other-frame>" #'ffap-other-frame)
+    (keymap-global-set "<remap> <find-file-other-tab>" #'ffap-other-tab)
+
+    (keymap-global-set "<remap> <dired>" #'dired-at-point)
+    (keymap-global-set "<remap> <dired-other-window>" #'ffap-dired-other-window)
+    (keymap-global-set "<remap> <dired-other-frame>" #'ffap-dired-other-frame)
+    (keymap-global-set "<remap> <list-directory>" #'ffap-list-directory))
+  "List of binding forms evaluated by function `ffap-bindings'.")
+
+(use-package emacs
+  :commands (my/crm-indicator)
+  :config
+  (setq read-process-output-max (* 4 1024 1024)
+        process-adaptive-read-buffering nil
+        custom-file (file-truename (locate-user-emacs-file "custom.el"))
+        frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
+                             (if my/is-terminal (list (concat (system-name) " ") buffer-directory)
+                               buffer-directory)))
+  (ffap-bindings)
+  (put 'narrow-to-region 'disabled nil)
+  (put 'scroll-left 'disabled nil)
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (defun my/crm-indicator(args)
+    "Custom CRM indicator for ARGS."
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
+  :hook ((minibuffer-setup . cursor-intangible-mode)
+         (before-save . copyright-update)
+         (after-init . abbrev-mode)
+         (after-init . (lambda ()
+                         (when (file-exists-p custom-file)
+                           (load custom-file 'noerror))))))
+
+(use-package window
+  :init
+  (let ((window-parameters '(window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))))
+    (message "%s" window-parameters)
+    (setq switch-to-buffer-in-dedicated-window 'pop
+          switch-to-buffer-obey-display-actions t
+          window-resize-pixelwise t
+          window-sides-slots '(0 0 3 1)
+          display-buffer-base-action '((display-buffer-reuse-window ace-display-buffer))
+          display-buffer-alist `(("\\*help\\[R" (display-buffer-reuse-mode-window ace-display-buffer) (reusable-frames . nil))
+                                 ("\\*R" nil (reusable-frames . nil))
+                                 ,(cons "\\*helm" display-buffer-fallback-action)))))
+                                 ;; Show log buffer in something other than the current window
+                                 ;; ("magit-log" nil (inhibit-same-window . t))
+                                 ;; ("magit-diff:" nil (inhibit-same-window . t))))))
 
 ;; My own version of some `crux` routines that use `find-file` instead of `find-file-other-window`
 (defun my/find-user-init-file (arg)
@@ -784,130 +567,6 @@ necessary."
         (find-file (completing-read "Choose shell init file: " candidates))
       (find-file (car candidates)))))
 
-(use-package orderless)
-
-(use-package flymake
-  :commands (flymake-show-buffer-diagnostics)
-  :config
-  (setq elisp-flymake-byte-compile-load-path load-path)
-  :hook ((emacs-lisp-mode . flymake-mode)
-         (sh-mode . flymake-mode)
-         (python-mode . flymake-mode))
-  :bind (:map flymake-mode-map
-              ("M-n" . flymake-goto-next-error)
-              ("M-p" . flymake-goto-prev-error)))
-
-(use-package flymake-json)
-
-(use-package cape
-  :commands (cape-file))
-
-(use-package corfu
-  :bind (:map corfu-map ("C-SPC" . corfu-insert-separator)))
-
-(when my/is-terminal
-  (use-package corfu-terminal
-    :functions (corfu-terminal-mode)
-    :hook (after-init . (lambda () (corfu-terminal-mode +1)))))
-
-(use-package markdown-mode
-  :hook (markdown-mode . my/markdown-mode-hook))
-
-(use-package cmake-mode
-  :hook ((cmake-mode . my/cmake-mode-hook)))
-
-(use-package which-key)
-
-(use-package expand-region
-  :bind ("C-\\" . er/expand-region))
-
-(use-package popper
-  :defer nil                            ; load now due to dependencies below
-  :commands (popper-kill-latest-popup)
-  :functions (popper--delete-popup)
-  :bind (("C-'" . popper-toggle)
-         ("M-'" . popper-cycle)))
-
-(use-package char-menu
-  :defines (char-menu)
-  :bind (("C-z" . char-menu))
-  :config
-  (setq char-menu
-        '("—" "‘’" "“”" "…" "«»" "–"
-          ("Typography" "•" "©" "†" "‡" "°" "·" "§" "№" "★")
-          ("Math"       "≈" "≡" "≠" "∞" "×" "±" "∓" "÷" "√")
-          ("Arrows"     "←" "→" "↑" "↓" "⇐" "⇒" "⇑" "⇓")
-          ("Greek"      "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
-
-(when my/is-macosx
-  (use-package osx-dictionary
-    :bind (("C-c l" . osx-dictionary-search-pointer))))
-
-(use-package scratch
-  :bind (("C-c s" . scratch)))
-
-(use-package esup
-  :custom
-  (esup-user-init-file (file-truename "~/.emacs.d/init.el")))
-
-(use-package compile
-  :config
-  (add-to-list 'compilation-error-regexp-alist
-               '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2))) ; I think this is from pyright
-
-(use-package fancy-compilation
-  :commands (fancy-compilation-mode)
-  :hook ((compilation-mode . fancy-compilation-mode)))
-
-(use-package iso-transl
-  :bind-keymap ("H-8" . iso-transl-ctl-x-8-map)) ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
-
-(use-package hippie-expand
-  :bind (("M-/" . hippie-expand)))
-
-(defvar ffap-bindings
-  '((keymap-global-set "<remap> <find-file>" #'find-file-at-point)
-    (keymap-global-set "<remap> <find-file-other-window>" #'ffap-other-window)
-    (keymap-global-set "<remap> <find-file-other-frame>" #'ffap-other-frame)
-    (keymap-global-set "<remap> <find-file-other-tab>" #'ffap-other-tab)
-
-    (keymap-global-set "<remap> <dired>" #'dired-at-point)
-    (keymap-global-set "<remap> <dired-other-window>" #'ffap-dired-other-window)
-    (keymap-global-set "<remap> <dired-other-frame>" #'ffap-dired-other-frame)
-    (keymap-global-set "<remap> <list-directory>" #'ffap-list-directory))
-  "List of binding forms evaluated by function `ffap-bindings'.")
-
-(use-package crm)
-
-(use-package emacs
-  :commands (my/crm-indicator)
-  :config
-  (setq read-process-output-max (* 4 1024 1024)
-        process-adaptive-read-buffering nil
-        custom-file (file-truename (locate-user-emacs-file "custom.el"))
-        frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
-                             (if my/is-terminal (list (concat (system-name) " ") buffer-directory)
-                               buffer-directory)))
-  (ffap-bindings)
-  (put 'narrow-to-region 'disabled nil)
-  (put 'scroll-left 'disabled nil)
-  (fset 'yes-or-no-p 'y-or-n-p)
-  (defun my/crm-indicator(args)
-    "Custom CRM indicator for ARGS."
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
-  :hook ((minibuffer-setup . cursor-intangible-mode)
-         (before-save . copyright-update)
-         (after-init . abbrev-mode)
-         (after-init . (lambda ()
-                         (when (file-exists-p custom-file)
-                           (load custom-file 'noerror))))))
-
-(require 'emacs-pager)
-
 (defun my/dump-hashtable (hashtable)
   "Show the contents of HASHTABLE."
   (interactive "Xhash table: ")
@@ -918,39 +577,6 @@ necessary."
       (maphash (lambda (key value)
                  (insert key " -> " value "\n")) hashtable)
       (emacs-pager-mode))))
-
-(defun my/reset-frame-left ()
-  "Reset frame size and position for left frame."
-  (interactive)
-  (let ((layout (my/screen-layout)))
-    (modify-frame-parameters (window-frame (get-buffer-window)) (my/initial-frame-alist layout))))
-
-(defun my/reset-frame-right ()
-  "Reset frame size and position for right frame."
-  (interactive)
-  (let ((layout (my/screen-layout)))
-    (modify-frame-parameters (window-frame (get-buffer-window)) (my/default-frame-alist layout))))
-
-(defun my/reset-frame-alt-right ()
-  "Reset frame size and position for alternative right position.
-This will shift the frame to the left so that it does not overlap with any
-frame that is abutting the right edge of the display."
-  (interactive)
-  (let ((layout (my/screen-layout)))
-    (modify-frame-parameters (window-frame (get-buffer-window)) (my/alt-default-frame-alist layout))))
-(keymap-global-set "C-M-<f2>" #'my/reset-frame-alt-right)
-
-(defun my/reset-frame-right-display ()
-  "Reset frame size and position for right side of display frame."
-  (interactive)
-  (let ((layout (my/screen-layout)))
-    (modify-frame-parameters (window-frame (get-buffer-window)) (my/align-right-frame-alist layout))))
-
-(defun my/reset-frame-width ()
-  "Reset the current frame width to function `my/cols'."
-  (interactive)
-  (let ((layout (my/screen-layout)))
-    (set-frame-width (window-frame (get-buffer-window)) (my/cols layout))))
 
 (defun my/reload-buffer ()
   "Reload the current buffer from disk.
@@ -1117,6 +743,31 @@ Otherwise just bury them."
                             (and (length> wins next-index) next-index))))
     (aw-switch-to-window (nth final-index wins))))
 
+(defun my/aw-make-frame ()
+  "Make a new frame using layout settings for the current display.
+The first frame always takes on `initial-frame-alist', and subsequent frames
+use `default-frame-alist' by default. If there are already two frames active
+then subsequent ones will be at `my/align-right-frame-alist' which aligns with
+the right-edge of the screen, but may overlap with the middle frame."
+  (let ((num-frames (length (visible-frame-list))))
+    (if (< num-frames 2)
+        (make-frame)
+      (make-frame (my/align-right-frame-alist (my/screen-layout))))))
+
+(advice-add 'aw-make-frame :override #'my/aw-make-frame)
+
+(defun my/ace-window-always-dispatch ()
+  "Invoke `ace-window' after setting `aw-dispatch-always' to T.
+When `aw-dispatch-always' is nil, `ace-window' does not invoke
+its dispatching mechanism if there are 2 or fewer windows. This
+command guarantees that dispatching will always happen."
+  (interactive)
+  (let ((current-aw-dispatch-always aw-dispatch-always))
+    (unwind-protect
+        (let ((aw-dispatch-always t))
+          (call-interactively #'ace-window))
+      (setq aw-dispatch-always current-aw-dispatch-always))))
+
 (defun my/ace-window-next ()
   "Jump to next window according to `ace-window'."
   (interactive)
@@ -1232,75 +883,46 @@ symbol, then hide it."
         (switch-to-buffer name)
       (ansi-term "/usr/bin/top" name))))
 
-(defun crux-find-current-directory-dir-locals-file (find-2)
-  "Edit the `.dir-locals.el' file for the current buffer in another window.
-If prefix arg FIND-2 is set then edit the `.dir-locals-2.el' file instead
-of `.dir-locals.el'. Scans parent directories if the file does not exist in
-the default directory of the current buffer. If not found, create a new,
-empty buffer in the current buffer's default directory, or if there is no
-such directory, in the user's home directory."
-  (interactive "P")
-  (let* ((prefix (if (eq system-type 'ms-dos) "_" "."))
-         (file (concat prefix (if find-2 "dir-locals-2" "dir-locals") ".el"))
-         (starting-dir (or (when (and default-directory
-                                      (file-readable-p default-directory))
-                             default-directory)
-                           (file-truename "~/")))
-         (found-dir (or (locate-dominating-file starting-dir file) starting-dir))
-         (found-file (concat found-dir file)))
-    (find-file-other-window found-file)
-    (if (file-exists-p found-file)
-        (message "Editing existing file %s" found-file)
-      (message "Editing new file %s" found-file))))
-
-(defun my/dired-raze ()
-  "Open Dired on Raze repo."
-  (interactive)
-  (dired (files--splice-dirname-file my/repos "raze")))
-
-(defun my/dired-x23 ()
-  "Open Dired on x23 repo."
-  (interactive)
-  (dired (files--splice-dirname-file my/repos "x23")))
-
-(defun my/dired-tcs ()
-  "Open Dired on tcs repo."
-  (interactive)
-  (dired (files--splice-dirname-file my/repos "tcs_hft")))
-
-(defun my/dired-wolverine-config ()
-  "Open Dired on wolverine-config repo."
-  (interactive)
-  (dired (files--splice-dirname-file my/repos "wolverine-config")))
-
-(defun my/dired-wolverine-config-qa ()
-  "Open Dired on wolverine-config-qa repo."
-  (interactive)
-  (dired (files--splice-dirname-file my/repos "wolverine-config-qa")))
-
-(defun my/dired-yagbrat ()
-  "Open Dired on yagbrat repo."
-  (interactive)
-  (dired (files--splice-dirname-file my/repos "yagbrat")))
-
-(defun my/dired-configurations ()
-  "Open Dired on configurations repo."
-  (interactive)
-  (dired (files--splice-dirname-file my/repos "configurations")))
-
-(defcustom my/git-sync-buffer-name " *my/git-sync*"
-  "The name of the buffer to use to hold output from my/git-sync func."
-  :type '(string)
-  :group 'my/customizations
-  :set (lambda (symbol value)
-         (set-default-toplevel-value symbol value)
-         (set-default-toplevel-value 'popper-reference-buffers (append (list value) popper-reference-buffers))))
+;; "Jump" to a well-known directory (eg "H-c j r" => dired buffer in Raze repo)
+(defvar my/dired-jumps-map
+  (let ((map (make-sparse-keymap)))
+    (mapc (lambda (tuple)
+            (let* ((key (elt tuple 0))
+                   (path (elt tuple 1))
+                   (name (intern (or (elt tuple 3)
+                                     (concat "my/jmp-" path)))))
+              (fset name (lambda ()
+                           (interactive)
+                           (dired (if (string= "/" (substring path 0 1))
+                                      (file-truename path)
+                                    (files--splice-dirname-file my/repos path)))))
+              (keymap-set map key name)))
+          ;; Collection of 3-tuples that define a directory to jump to:
+          ;; 1 - key to use
+          ;; 2 - the directory to jump to (if not absolute then prepend with value from `my/repos')
+          ;; 3 - the name to assign to the utility function (if nil make from directory)
+          `(("c" "configurations" nil)
+            ("l" "legion" nil)
+            ("q" "/apps/sp/logs/sp_qa/og" "my/jmp-qa")
+            ("r" "raze" nil)
+            ("t" ,(if my/is-qa "/apps/sp/logs/sp_qa/tcs_hft" "tcs_hft") "my/jmp-tcs")
+            ("w" "wolverine-config" nil)
+            ("W" "wolverine-config-qa" nil)
+            ("x" "x23" nil)
+            ("y" "yagbrat" nil)))
+    map)
+  "Keymap for quick Dired jumps.
+The map is made up of tiny functions that invoke `dired' on a path.")
 
 (defun my/git-sync (host path)
   "Execute a git pull on HOST in PATH."
   (interactive)
   (message "Running git-pull on %s:%s..." host path)
-  (let* ((git (list "cd" path "&&" "git" "pull"))
+  (let* ((git (list "cd" path "&&"
+                    "git" "stash" "push" "&&"
+                    "git" "pull" "&&"
+                    "git" "checkout" "'stash@{0}'" "emacs.d/places" "emacs.d/recentf" "&&"
+                    "git" "stash" "drop"))
          (cmd (if host
                   (append (list "/usr/bin/ssh" "-tt" host) git)
                 (append '("bash") git)))
@@ -1319,15 +941,15 @@ such directory, in the user's home directory."
     (kill-buffer buf))
   (let ((local (file-name-concat my/repos "configurations"))
         (home (file-truename "~/configurations")))
-    (dolist (cfg (list (cons nil local)
-                       (cons nil home)
-                       (cons "nyzls1644q" local)
-                       (cons "nyzls1646q" local)
-                       (cons "nyzls2686q" local)
-                       (cons "ldzls2164i" local)
-                       (cons "nyzls1514n" local)
-                       (cons "nyzls105i" local)
-                       (cons "ldzls2164i" home)))
+    ;; NOTE: treat `(nil local)` as the master and only update via magit
+    (dolist (cfg (list (cons nil home)  ; /lxhome/howesbra/configurations
+                       (cons "ldzls2164i" home)  ; vnc
+                       (cons "ldzls2164i" local) ; vnc
+                       (cons "nyzls1514n" local) ; internal ogsd / pickaxe
+                       (cons "nyzls1644q" local) ; wolverine QA
+                       (cons "nyzls1646q" local) ; raze QA
+                       (cons "nyzls2686q" local) ; tcs QA
+                       (cons "nyzls105i" local)))  ; logs archive
       (my/git-sync (car cfg) (cdr cfg))))
   (display-buffer my/git-sync-buffer-name))
 
@@ -1352,6 +974,11 @@ will treat the whole line as a value to compare against."
    (concat "sp_qa@" host)
    ". /apps/home/howesbra/repos/configurations/qa.profile; exec /opt/third/emacs/30.1.1/emacs"))
 
+(defun my/qa-emacs-wolv ()
+  "Launch X11 Emacs on nyzls1644q."
+  (interactive)
+  (my/launch-qa-emacs "nyzls1644q"))
+
 (defun my/qa-emacs-raze ()
   "Launch X11 Emacs on nyzls1646q."
   (interactive)
@@ -1361,16 +988,6 @@ will treat the whole line as a value to compare against."
   "Launch X11 Emacs on nyzls2686q."
   (interactive)
   (my/launch-qa-emacs "nyzls2686q"))
-
-(defun my/dired-qa-og ()
-  "Open Dired on og log directory in qa."
-  (interactive)
-  (dired (file-truename "/apps/sp/logs/sp_qa/og")))
-
-(defun my/dired-qa-tcs ()
-  "Open Dired on tcs_hft log directory in qa."
-  (interactive)
-  (dired (file-truename "/apps/sp/logs/sp_qa/tcs_hft")))
 
 (defun my/set-mark-deactivate ()
   "Set mark without activating it.
@@ -1400,25 +1017,23 @@ This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
     (setq mark-active t))
   (forward-line arg))
 
-;; "Jump" to a directory -- "C-c j r" => dired buffer in Raze repo
-(defvar my/dired-jumps-map
+;; "Jump" to a saved position -- "H-j"
+(defvar my/point-jumps-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "q" #'my/dired-qa-og)
-    (define-key map "c" #'my/dired-configurations)
-    (define-key map "r" #'my/dired-raze)
-    (define-key map "t" (if my/is-qa #'my/dired-qa-tcs #'my/dired-tcs))
-    (define-key map "w" #'my/dired-wolverine-config)
-    (define-key map "x" #'my/dired-x23)
+    (define-key map " " #'consult-register-store)
+    (define-key map "j" #'consult-register-load)
     map)
   "Keymap for quick Dired jumps.")
 
-(keymap-set mode-specific-map "j" my/dired-jumps-map)
-
 ;;; --- Key Bindings
 
-(defun my/emacs-key-bind (keymap &rest definitions)
+(defun my/emacs-make-key-bind (keymap make-key &rest definitions)
   "Apply key binding DEFINITIONS in the given KEYMAP.
-DEFINITIONS is a sequence of string and command pairs given as a sequence.
+DEFINITIONS is a sequence of string and command pairs given as a sequence,
+where the first element of the pair is a key sequence and the second is the
+function or keymap to bind with. The key sequence is passed to MAKE-KEY and
+the result of the call is used in the key binding.
+
 There is now `bind-keys' method from `use-package' but my version requires
 less typing."
   (unless (zerop (logand (length definitions) 1))
@@ -1426,11 +1041,12 @@ less typing."
   (unless (keymapp keymap)
     (error "Expected a `keymap' as first argument"))
   ;; Partition `definitions' into two groups, one with key definitions and another with functions and/or nil values
-  (let* ((groups (seq-group-by #'stringp definitions))
-         (keys (seq-drop (elt groups 0) 1))
-         (commands (seq-drop (elt groups 1) 1))
-         (fn (lambda (key command) (keymap-set keymap key command))))
-    (seq-mapn fn keys commands)))
+  (mapc (lambda (pair) (keymap-set keymap (funcall make-key (elt pair 0)) (elt pair 1))) (seq-split definitions 2)))
+
+(defun my/emacs-key-bind (keymap &rest definitions)
+  "Apply key binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence."
+  (apply #'my/emacs-make-key-bind keymap (lambda (key) key) definitions))
 
 (defun my/emacs-chord-bind (keymap &rest definitions)
   "Apply chord binding DEFINITIONS in the given KEYMAP.
@@ -1439,23 +1055,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     (error "Uneven number of chord+command pairs"))
   (unless (keymapp keymap)
     (error "Expected a `keymap' as first argument"))
-  ;; Partition `definitions' into two groups, one with chord definitions and another with functions and/or nil values
-  (let* ((groups (seq-group-by #'stringp definitions))
-         (chords (seq-drop (elt groups 0) 1))
-         (commands (seq-drop (elt groups 1) 1))
-         (fn (lambda (chord command) (key-chord-define keymap chord command))))
-    (seq-mapn fn chords commands)))
-
-(defun my/share-screen-font-size (&optional arg)
-  "Set font scaling to ARG when sharing screen.
-ARG is an optional integer which defaults to 2."
-  (interactive "P")
-  (text-scale-set (or arg 2)))
-
-(defun my/normal-screen-font-size ()
-  "Remove any font scaling."
-  (interactive)
-  (text-scale-set 0))
+  (mapc (lambda (pair) (key-chord-define keymap (elt pair 0) (elt pair 1))) (seq-split definitions 2)))
 
 (my/emacs-key-bind global-map
                    "S-<left>" #'my/ace-window-previous
@@ -1463,12 +1063,12 @@ ARG is an optional integer which defaults to 2."
                    "S-<up>" #'my/ace-window-previous
                    "S-<down>" #'my/ace-window-next
 
-                   "C-c r" #'ielm
-                   "C-c D" #'crux-find-current-directory-dir-locals-file
+                   "H-c r" #'ielm
+                   "H-c D" #'crux-find-current-directory-dir-locals-file
 
-                   "C-c i" #'my/find-user-init-file
-                   "C-c ," #'my/find-user-custom-file
-                   "C-c S" #'my/find-shell-init-file
+                   "H-c i" #'my/find-user-init-file
+                   "H-c ," #'my/find-user-custom-file
+                   "H-c S" #'my/find-shell-init-file
 
                    ;; NOTE: do not bind RET or <return> -- that breaks Embark maps
                    "C-h C-h" #'my/describe-symbol-at-point
@@ -1514,8 +1114,8 @@ ARG is an optional integer which defaults to 2."
                    "C-x 5 i" #'my/info-other-frame
                    "C-x 5 k" #'my/shell-other-frame
 
-                   ;; "C-c C-c" #'my/copy-file-name-to-clipboard
-                   ;; "C-c C-k" #'my/kill-current-buffer
+                   "H-c H-c" #'my/copy-file-name-to-clipboard
+                   "H-c C-k" #'my/kill-current-buffer
 
                    "C-M-\\" #'my/indent-buffer
 
@@ -1534,34 +1134,6 @@ ARG is an optional integer which defaults to 2."
 
                    "C-S-p" #'my/ace-window-previous
                    "C-S-n" #'my/ace-window-next
-
-                   ;; --- Hyper-key Bindings
-
-                   "H-SPC" #'my/set-mark-deactivate
-                   "H-j" #'my/goto-mark
-                   
-                   "H-1" #'delete-other-windows
-                   "H-2" #'split-window-below
-                   "H-4" #'other-window-prefix ; was ctl-x-4-prefix
-                   "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
-                   "H-a" #'ace-window
-                   "H-b" #'consult-project-buffer
-                   "H-B" #'consult-buffer
-                   "H-c" #'project-compile
-                   "H-f" #'consult-flymake
-                   "H-g" #'magit-status
-                   "H-h" #'my/describe-symbol-at-point
-                   "H-k" #'bury-buffer
-                   "H-m" #'consult-bookmark
-
-                   "H-p" project-prefix-map
-                   "H-r" #'speedbar
-                   "H-s" #'my/shell
-                   "H-t" #'my/htop
-                   "H-u" #'undo
-                   "H-w" #'my/ace-window-prefix
-                   "H-v" #'my/reload-buffer
-                   "H-;" #'my/matching-paren
 
                    "<f1>" #'my/normal-screen-font-size
                    "<f2>" #'my/share-screen-font-size
@@ -1589,13 +1161,38 @@ ARG is an optional integer which defaults to 2."
                    "C-M-<wheel-down>" #'ignore)
 
 (defvar my/hyper-keys-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map "g" #'magit-status)
-    (define-key map "b" #'consult-buffer)
-    (define-key map "k" #'my/bury-or-kill-current-buffer)
-    (define-key map "p" project-prefix-map)
-    map)
+  (make-sparse-keymap)
   "Keymap for terminal hyper actions.")
+
+;; Populate two key maps with hyper-key definitions. The first -- global -- holds the mapping that uses the real `Hyper'
+;; modifier. The second keymap -- my/hyper-keys-map -- holds the mapping that uses a keychord to activitate which is
+;; useful on terminals that do not offer a `Hyper' modifier.
+(let ((hyper-mapping (list "H-SPC" #'my/set-mark-deactivate
+                           "H-." #'my/goto-mark
+                           "H-1" #'delete-other-windows
+                           "H-2" #'split-window-below
+                           "H-4" #'other-window-prefix ; was ctl-x-4-prefix
+                           "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
+                           "H-a" #'ace-window
+                           "H-b" #'consult-project-buffer
+                           "H-B" #'consult-buffer
+                           ;; "H-c" my/hyper-c-map
+                           "H-f" #'consult-flymake
+                           "H-g" #'magit-status
+                           "H-h" #'my/describe-symbol-at-point
+                           "H-j" my/point-jumps-map
+                           "H-k" #'bury-buffer
+                           "H-m" #'consult-bookmark
+                           "H-p" project-prefix-map
+                           "H-r" #'speedbar
+                           "H-s" #'my/shell
+                           "H-t" #'my/htop
+                           "H-u" #'undo
+                           "H-v" #'my/reload-buffer
+                           "H-w" #'my/ace-window-prefix
+                           "H-;" #'my/matching-paren)))
+  (apply #'my/emacs-key-bind global-map hyper-mapping)
+  (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mapping))
 
 ;;; --- Key Chords
 
@@ -1633,6 +1230,7 @@ ARG is an optional integer which defaults to 2."
 
 (if my/is-terminal
     (when my/is-linux
+      (set-face-background 'default "undefined")
       ;; Undo the mapping for ESC [ so it does not take over defined xterm sequences
       (keymap-set (current-global-map) "M-[" nil)
       (defvar my/arrow-keys-map
@@ -1698,6 +1296,24 @@ ARG is an optional integer which defaults to 2."
   "Blah."
   "Field name: "
   > str " = \"" _ "\"\n")
+
+(require 'server)
+
+(defun my/start-emacs-server ()
+  "Start up an Emacs server to support `emacsclient' connections.
+Customize `server-name' so that each Emacs
+process has its own server connection."
+  (interactive)
+  ;; NOTE: `server-running-p` can report `t` even if we are not running it.
+  (unless server-process
+    ;; Make a unique server connection since I run multiple Emacs instances and I want the emacsclient in a comint
+    ;; buffer to connect to the right connection.
+    (setq server-name (format "server-%d" (emacs-pid)))
+    (setenv "EMACS_SERVER_FILE" server-name)
+    (setenv "EMACS_SOCKET_NAME" server-name)
+    (server-start)))
+
+(add-hook 'after-init-hook #'my/start-emacs-server)
 
 (provide 'init)
 

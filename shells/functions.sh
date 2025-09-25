@@ -40,7 +40,7 @@ PathAdd() {
     [[ "${my_arch}" = "Darwin" && "${var}" = "LD_LIBRARY_PATH" ]] && var="DY${var}"
     shift 1
 
-    eval local CURRENT="\$${var}"n
+    eval local current="\$${var}"n
 
     for each in "${@}"; do
         [[ -d "${each}" ]] || continue
