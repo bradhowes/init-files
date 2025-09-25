@@ -27,19 +27,6 @@ the buffer having untrusted content."
   (setq file-notify-debug nil))
 ;; (debug-on-entry 'file-notify-add-watch)
 
-(let* ((common-paths (list (file-truename "~/bin")
-                           (file-name-concat my/venv "bin")))
-       (macosx-paths (if my/is-macosx
-                         (list "/opt/homebrew/sqlite/bin"
-                               "/opt/homebrew/opt/grep/libexec/gnubin"
-                               "/opt/homebrew/bin")
-                       '()))
-       (additional-paths (seq-filter #'file-directory-p (append common-paths macosx-paths))))
-  ;; Set exec-path to contain the above paths
-  (setq exec-path (append additional-paths exec-path))
-  ;; Same for PATH environment variable
-  (setenv "PATH" (concat (string-join additional-paths ":") ":" (getenv "PATH"))))
-
 (if (or my/is-macosx (string= (system-name) "ldzls1144d"))
     (use-package package
       :custom
