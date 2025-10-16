@@ -6,6 +6,7 @@
 (require 'seq)
 (require 'my-constants)
 (require 'my-customizations)
+(require 'my-env)
 (require 'my-functions)
 (require 'my-layout)
 (require 'my-modes)
@@ -739,7 +740,7 @@ the right-edge of the screen, but may overlap with the middle frame."
   (let ((num-frames (length (visible-frame-list))))
     (if (< num-frames 2)
         (make-frame)
-      (make-frame (my/align-right-frame-alist (my/screen-layout))))))
+      (make-frame (my/frame-right-alist (my/screen-layout) my/screen-4k-pick)))))
 
 (advice-add 'aw-make-frame :override #'my/aw-make-frame)
 
@@ -1090,9 +1091,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                    "M-{" #'my/prev-buffer-current-window
                    "M-}" #'my/next-buffer-current-window
 
-                   "M-<f1>" #'my/reset-frame-left
-                   "M-<f2>" #'my/reset-frame-right
-                   "M-<f3>" #'my/reset-frame-right-display
+                   "M-<f1>" #'my/frame-pos-left
+                   "M-<f2>" #'my/frame-pos-center
+                   "M-<f3>" #'my/frame-pos-right
+
+                   "M-<f4>" #'my/frame-pos-display2-left
+                   "M-<f5>" #'my/frame-pos-display2-center
+                   "M-<f6>" #'my/frame-pos-display2-right
 
                    "C-x 4 c" #'my/customize-other-window
                    "C-x 4 k" #'my/shell-other-window

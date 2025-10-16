@@ -16,11 +16,11 @@ alias psme='ps -U ${USER} -o "pid,command" -ww'
 
 # Show matches taken from shell history.
 #
-alias hgrep='history 0 | grep'
+alias hgrep='history | grep'
 
 # Show all history by default.
 #
-alias history='history 0'
+alias history='history'
 
 # SHow matches taken from environment settings
 #

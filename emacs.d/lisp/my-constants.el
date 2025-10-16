@@ -45,6 +45,18 @@ Hacky but for now it works since we are always starting up an initial xterm.")
   (intern "my/screen-terminal")
   "Symbol to indicate display is a terminal.")
 
+(defconst my/laptop-display
+  (intern "my/laptop-display")
+  "Symbol to indicate the laptop display.")
+
+(defconst my/4k-display-1
+  0
+  "Symbol to indicate first 4K display.")
+
+(defconst my/4k-display-2
+  1
+  "Symbol to indicate second 4k display.")
+
 (defconst my/laptop-screen-width
   2056
   "MacBook Pro 16\" M1 screen width in pixels.")
