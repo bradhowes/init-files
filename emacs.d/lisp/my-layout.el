@@ -32,31 +32,31 @@ Returns one of the follow symbols based on width:
     value))
 
 (defun my/is-laptop (layout)
-  "T if LAYOUT is laptop."
+  "T if LAYOUT is laptop-only."
   (declare (side-effect-free t))
   (eq layout my/screen-laptop))
 
 (defun my/is-4k (layout)
-  "T if LAYOUT is kind with at least 4K area."
+  "T if LAYOUT is kind with at least one 4K area."
   (declare (side-effect-free t))
   (memq layout '(my/screen-4k my/screen-laptop-4k my/screen-4k-4k my/screen-laptop-4k-4k)))
 
 (defun my/rows (layout)
   "The number of rows to show in a frame shown on LAYOUT."
   (declare (side-effect-free t))
-  (if (my/is-4k layout) 103 (if (my/is-laptop layout) 88 40)))
+  (if (my/is-4k layout) my/layout-rows-4k (if (my/is-laptop layout) my/layout-rows-laptop my/layout-rows-terminal)))
 
 (defun my/cols (layout)
   "The number of columns to show in a frame shown on LAYOUT."
   (declare (side-effect-free t))
-  (if (or (my/is-4k layout) (my/is-laptop layout)) 132 80))
+  (if (my/is-4k layout) my/layout-cols-4k (if (my/is-laptop layout) my/layout-cols-laptop my/layout-cols-terminal)))
 
 (defun my/frame-pixel-width (layout)
   "Width in pixels of a normal frame shown on LAYOUT.
 These values are hard-coded based on current settings.
 Probably a better way to figure this out."
   (declare (side-effect-free t))
-  (if (my/is-4k layout) (if my/is-macosx 1338 1338) 944))
+  (if (my/is-4k layout) my/layout-frame-pixel-width-4k my/layout-frame-pixel-width-laptop))
 
 (defun my/frame-left (layout display)
   "The `left' position on LAYOUT and DISPLAY for a `left' frame.
@@ -131,15 +131,15 @@ Frame's right side is flush with the right side of the main display."
 
 (defun my/update-screen-frame-alists (layout)
   "Update frame alists for current LAYOUT and DISPLAY."
-  (modify-all-frames-parameters (my/frame-center-alist layout my/screen-4k-pick))
-  (setq initial-frame-alist (my/frame-left-alist layout my/screen-4k-pick))
+  (modify-all-frames-parameters (my/frame-center-alist layout my/layout-default-display-4k))
+  (setq initial-frame-alist (my/frame-left-alist layout my/layout-default-display-4k))
   (message "initial-frame: %s" initial-frame-alist)
   (message "default-frame: %s" default-frame-alist))
 
 (defun my/font-size (layout)
   "The font size to use based on the LAYOUT."
   (declare (side-effect-free t))
-  (if (my/is-4k layout) 16 12))
+  (if (my/is-4k layout) my/layout-font-size-4k my/layout-font-size-laptop))
 
 (defun my/setup-font (layout)
   "Install the desired font in the default face for LAYOUT."
@@ -157,7 +157,7 @@ Frame's right side is flush with the right side of the main display."
   "Set the 4K SCREEN to use to host future Emacs frames.
 It does not affect existing frames."
   (interactive "NScreen:")
-  (custom-set-variables (list 'my/screen-4k-pick screen))
+  (custom-set-variables (list 'my/layout-default-display-4k screen))
   (custom-save-all)
   (my/screen-layout-changed))
 
@@ -214,34 +214,38 @@ frame that is abutting the right edge of the display."
   (interactive)
   (my/frame-set-alist (my/frame-right-alist (my/screen-layout) my/4k-display-2)))
 
-(defun my/frame-pos-left (&optional screen)
-  "Reset frame size and position for left frame on SCREEN."
+(defun my/frame-pos-left (&optional display)
+  "Reset frame size and position for left frame on DISPLAY.
+If there are multiple 4K displays, by default the display to use for the new
+frame will be that found in `my/layout-default-display-4k'. A specific screen
+can be chosen by providing a prefix value where 0 is the first display, and 1
+is the second, etc."
   (interactive "P")
-  (if (eq 0 (or screen my/screen-4k-pick))
+  (if (eq 0 (or display my/layout-default-display-4k))
       (my/frame-pos-display1-left)
     (my/frame-pos-display2-left)))
 
-(defun my/frame-pos-center (&optional screen)
-  "Reset frame size and position for center frame on SCREEN."
+(defun my/frame-pos-center (&optional display)
+  "Reset frame size and position for center frame on DISPLAY.
+If there are multiple 4K displays, by default the display to use for the new
+frame will be that found in `my/layout-default-display-4k'. A specific screen
+can be chosen by providing a prefix value where 0 is the first display, and 1
+is the second, etc."
   (interactive "P")
-  (if (eq 0 (or screen my/screen-4k-pick))
+  (if (eq 0 (or display my/layout-default-display-4k))
       (my/frame-pos-display1-center)
     (my/frame-pos-display2-center)))
 
-(defun my/frame-pos-right (&optional screen)
-  "Reset frame size and position for right frame on SCREEN."
+(defun my/frame-pos-right (&optional display)
+  "Reset frame size and position for right frame on DISPLAY.
+If there are multiple 4K displays, by default the display to use for the new
+frame will be that found in `my/layout-default-display-4k'. A specific screen
+can be chosen by providing a prefix value where 0 is the first display, and 1
+is the second, etc."
   (interactive "P")
-  (if (eq 0 (or screen my/screen-4k-pick))
+  (if (eq 0 (or display my/layout-default-display-4k))
       (my/frame-pos-display1-right)
     (my/frame-pos-display2-right)))
-
-;; (keymap-global-set "C-M-<f2>" #'my/reset-frame-alt-right)
-
-(defun my/reset-frame-right-display ()
-  "Reset frame size and position for right side of display frame."
-  (interactive)
-  (let ((layout (my/screen-layout)))
-    (modify-frame-parameters (window-frame (get-buffer-window)) (my/align-right-frame-alist layout))))
 
 (defun my/reset-frame-width ()
   "Reset the current frame width to function `my/cols'."
