@@ -740,7 +740,7 @@ the right-edge of the screen, but may overlap with the middle frame."
   (let ((num-frames (length (visible-frame-list))))
     (if (< num-frames 2)
         (make-frame)
-      (make-frame (my/frame-right-alist (my/screen-layout) (my/layout-use-display-4k))))))
+      (make-frame (my/layout--frame-right-alist (my/layout--active-screens) (my/layout--which-4k-display))))))
 
 (advice-add 'aw-make-frame :override #'my/aw-make-frame)
 
@@ -1091,9 +1091,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                    "M-{" #'my/prev-buffer-current-window
                    "M-}" #'my/next-buffer-current-window
 
-                   "M-<f1>" #'my/frame-pos-left
-                   "M-<f2>" #'my/frame-pos-center
-                   "M-<f3>" #'my/frame-pos-right
+                   "M-<f1>" #'my/layout-frame-pos-left
+                   "M-<f2>" #'my/layout-frame-pos-center
+                   "M-<f3>" #'my/layout-frame-pos-right
 
                    "C-x 4 c" #'my/customize-other-window
                    "C-x 4 k" #'my/shell-other-window
@@ -1123,8 +1123,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                    "C-S-p" #'my/ace-window-previous
                    "C-S-n" #'my/ace-window-next
 
-                   "<f1>" #'my/normal-screen-font-size
-                   "<f2>" #'my/share-screen-font-size
+                   "<f1>" #'my/layout-normal-screen-font-size
+                   "<f2>" #'my/layout-share-screen-font-size
                    
                    "<insert>" #'ignore  ; disable key for toggling overwrite-mode
                    "<insertchar>" #'ignore  ; disable key for toggling overwrite-mode
