@@ -60,12 +60,14 @@
   :group 'my/customizations)
 
 (defcustom my/layout-frame-pixel-width-4k 1338
-  "Width of a frame in pixels on a 4K desktop."
+  "Width of a frame in pixels on a 4K desktop.
+NOTE: this should be calculated instead of being a constant."
   :type '(natnum)
   :group 'my/customizations)
 
 (defcustom my/layout-frame-pixel-width-laptop 944
-  "Width of a frame in pixels on a 4K desktop."
+  "Width of a frame in pixels on a 4K desktop.
+NOTE: this should be calculated instead of being a constant."
   :type '(natnum)
   :group 'my/customizations)
 

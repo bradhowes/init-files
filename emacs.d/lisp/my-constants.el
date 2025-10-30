@@ -21,50 +21,6 @@
   "T if running in VcXsrv on Windows.
 Hacky but for now it works since we are always starting up an initial xterm.")
 
-(defconst my/screen-laptop
-  (intern "my/screen-laptop")
-  "Symbol to indicate display is MacBook Pro 16\" laptop screen.")
-
-(defconst my/screen-4k
-  (intern "my/screen-4k")
-  "Symbol to indicate display is 4K screen.")
-
-(defconst my/screen-laptop-4k
-  (intern "my/screen-laptop-4k")
-  "Symbol to indicate display width is laptop and 1 4K screen.")
-
-(defconst my/screen-4k-4k
-  (intern "my/screen-4k-4k")
-  "Symbol to indicate display width is 2 4K screens.")
-
-(defconst my/screen-laptop-4k-4k
-  (intern "my/screen-laptop-4k-4k")
-  "Symbol to indicate display width is laptop and 2 4K screens.")
-
-(defconst my/screen-terminal
-  (intern "my/screen-terminal")
-  "Symbol to indicate display is a terminal.")
-
-(defconst my/laptop-display
-  (intern "my/laptop-display")
-  "Symbol to indicate the laptop display.")
-
-(defconst my/4k-display-1
-  0
-  "Symbol to indicate first 4K display.")
-
-(defconst my/4k-display-2
-  1
-  "Symbol to indicate second 4k display.")
-
-(defconst my/laptop-screen-width
-  2056
-  "MacBook Pro 16\" M1 screen width in pixels.")
-
-(defconst my/4k-screen-width
-  3840
-  "4K external display width in pixels.")
-
 (defconst my/workspace-name
   (or (getenv "WORKSPACE_NAME") "N/A")
   "The value of WORKSPACE_NAME environment variable.")
