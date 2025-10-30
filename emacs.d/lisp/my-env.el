@@ -87,8 +87,8 @@ control.")
     ;; Set exec-path to contain the above paths
     (setq exec-path (append bin-paths exec-path))
     (setq Info-default-directory-list (append info-paths Info-default-directory-list))
-    (unless (null Info-directory-list)
-      (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))
+    ;; (unless (null Info-directory-list)
+    ;;   (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))
     ;; Same for PATH environment variable
     (setenv "PATH" (concat (string-join bin-paths ":") ":" (getenv "PATH")))
     (setenv "INFOPATH" (concat (string-join info-paths ":") ":" (getenv "INFOPATH")))

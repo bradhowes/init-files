@@ -6,6 +6,18 @@
 (require 'my-constants)
 (require 'my-customizations)
 
+(defun my/layout-use-display-4k ()
+  "Obtain the index of the 4K screen to use (zero-based).
+Usually this is the value from `my/layout-default-display-4k' but it is
+limited by the number of actual 4K displays that are present at the time
+of the call."
+  (let ((layout (my/screen-layout)))
+    (min my/layout-default-display-4k
+         (cond
+          ((eq layout my/screen-laptop-4k-4k) 1)
+          ((eq layout my/screen-4k-4k) 1)
+          (t 0)))))
+
 (defun my/screen-layout ()
   "Identify current screen layout.
 Uses result from `display-pixel-width' to determine what monitors
@@ -131,8 +143,8 @@ Frame's right side is flush with the right side of the main display."
 
 (defun my/update-screen-frame-alists (layout)
   "Update frame alists for current LAYOUT and DISPLAY."
-  (modify-all-frames-parameters (my/frame-center-alist layout my/layout-default-display-4k))
-  (setq initial-frame-alist (my/frame-left-alist layout my/layout-default-display-4k))
+  (modify-all-frames-parameters (my/frame-center-alist layout (my/layout-use-display-4k)))
+  (setq initial-frame-alist (my/frame-left-alist layout (my/layout-use-display-4k)))
   (message "initial-frame: %s" initial-frame-alist)
   (message "default-frame: %s" default-frame-alist))
 
@@ -221,7 +233,7 @@ frame will be that found in `my/layout-default-display-4k'. A specific screen
 can be chosen by providing a prefix value where 0 is the first display, and 1
 is the second, etc."
   (interactive "P")
-  (if (eq 0 (or display my/layout-default-display-4k))
+  (if (eq 0 (or display (my/layout-use-display-4k)))
       (my/frame-pos-display1-left)
     (my/frame-pos-display2-left)))
 
@@ -232,7 +244,7 @@ frame will be that found in `my/layout-default-display-4k'. A specific screen
 can be chosen by providing a prefix value where 0 is the first display, and 1
 is the second, etc."
   (interactive "P")
-  (if (eq 0 (or display my/layout-default-display-4k))
+  (if (eq 0 (or display (my/layout-use-display-4k)))
       (my/frame-pos-display1-center)
     (my/frame-pos-display2-center)))
 
@@ -243,7 +255,7 @@ frame will be that found in `my/layout-default-display-4k'. A specific screen
 can be chosen by providing a prefix value where 0 is the first display, and 1
 is the second, etc."
   (interactive "P")
-  (if (eq 0 (or display my/layout-default-display-4k))
+  (if (eq 0 (or display (my/layout-use-display-4k)))
       (my/frame-pos-display1-right)
     (my/frame-pos-display2-right)))
 

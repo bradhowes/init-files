@@ -740,7 +740,7 @@ the right-edge of the screen, but may overlap with the middle frame."
   (let ((num-frames (length (visible-frame-list))))
     (if (< num-frames 2)
         (make-frame)
-      (make-frame (my/frame-right-alist (my/screen-layout) my/layout-default-display-4k)))))
+      (make-frame (my/frame-right-alist (my/screen-layout) (my/layout-use-display-4k))))))
 
 (advice-add 'aw-make-frame :override #'my/aw-make-frame)
 
