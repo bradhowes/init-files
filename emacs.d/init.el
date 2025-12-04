@@ -346,7 +346,7 @@ such directory, in the user's home directory."
 (use-package multiple-cursors
   :bind (("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
-         ("H-c C->" . mc/mark-all-like-this)))
+         ("H-c ." . mc/mark-all-like-this)))
 
 (use-package my-fontify-braces)
 
@@ -889,15 +889,13 @@ symbol, then hide it."
           ;; 1 - key to use
           ;; 2 - the directory to jump to (if not absolute then prepend with value from `my/repos')
           ;; 3 - the name to assign to the utility function (if nil make from directory)
-          `(("c" "configurations" nil)
-            ("l" "legion" nil)
-            ("q" "/apps/sp/logs/sp_qa/og" "my/jmp-qa")
-            ("r" "raze" nil)
-            ("t" ,(if my/is-qa "/apps/sp/logs/sp_qa/tcs_hft" "tcs_hft") "my/jmp-tcs")
-            ("w" "wolverine-config" nil)
-            ("W" "wolverine-config-qa" nil)
-            ("x" "x23" nil)
-            ("y" "yagbrat" nil)))
+          `(("a" "auv3-support" nil)
+            ("i" "init-files" nil)
+            ("c" "AUv3Controls" nil)
+            ("l" "init-files/emacs.d/lisp" "emacs-lisp")
+            ("p" "SoundFontsPlus" nil)
+            ("s" "AUv3Support" nil)
+            ("2" "SF2Lib" "my/jmp-qa")))
     map)
   "Keymap for quick Dired jumps.
 The map is made up of tiny functions that invoke `dired' on a path.")
@@ -1055,9 +1053,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                    "H-c D" #'crux-find-current-directory-dir-locals-file
 
                    "H-c i" #'my/find-user-init-file
+                   "H-c H-l" #'my/find-user-init-file
                    "H-c ," #'my/find-user-custom-file
                    "H-c S" #'my/find-shell-init-file
-
+                   "H-c j" my/dired-jumps-map
                    ;; NOTE: do not bind RET or <return> -- that breaks Embark maps
                    "C-h C-h" #'my/describe-symbol-at-point
                    "C-h C-j" #'popper-kill-latest-popup
@@ -1103,7 +1102,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                    "C-x 5 k" #'my/shell-other-frame
 
                    "H-c H-c" #'my/copy-file-name-to-clipboard
-                   "H-c C-k" #'my/kill-current-buffer
+                   "H-c H-k" #'my/kill-current-buffer
 
                    "C-M-\\" #'my/indent-buffer
 
