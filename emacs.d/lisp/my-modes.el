@@ -102,8 +102,11 @@ the items to setup for autoloading from the given file."
   :init (add-to-list 'auto-mode-alist '("\\.yagconf\\'" . json-mode))
   :hook ((json-mode . my/json-mode-hook)))
 
-(use-package js2-mode
-  :hook ((js2-mode . my/js2-mode-hook)))
+(use-package js
+  :config (setq js-indent-level 2))
+
+;; (use-package js2-mode
+;;   :hook ((js2-mode . my/js2-mode-hook)))
 
 (use-package lisp-mode
   :hook ((lisp-mode . my/lisp-mode-hook)

@@ -1,6 +1,6 @@
 # shellcheck shell=bash # -*- Mode: Sh; -*-
 
-tracer BEGIN functions.sh
+# tracer BEGIN functions.sh
 
 let my_is_zsh=0
 [[ "${SHELL%zsh}" != "${SHELL}" ]] && let my_is_zsh=1
@@ -40,7 +40,7 @@ PathAdd() {
     [[ "${my_arch}" = "Darwin" && "${var}" = "LD_LIBRARY_PATH" ]] && var="DY${var}"
     shift 1
 
-    eval local current="\$${var}"n
+    eval local current="\$${var}"
 
     for each in "${@}"; do
         [[ -d "${each}" ]] || continue
@@ -199,4 +199,4 @@ parse_git_branch() {
     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
 
-tracer END functions.sh
+# tracer END functions.sh

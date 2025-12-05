@@ -78,9 +78,9 @@ if [[ -n "${INSIDE_EMACS}" ]]; then
     fi
     export PAGER="${HOME}/bin/emacs-pager"
 
-    add-zsh-hook -Uz chpwd1
+    add-zsh-hook -Uz chpwd chpwd1
 elif [[ -n "${TERM}" ]]; then
-    add-zsh-hook -Uz chpwd2
+    add-zsh-hook -Uz chpwd chpwd2
 fi
 
 case "${TERM}" in
@@ -117,3 +117,9 @@ cd "${PWD}" || :
 
 # shellcheck disable=SC1091
 [[ -f "${HOME}/.iterm2_shell_integration.zsh" ]] && . "${HOME}/.iterm2_shell_integration.zsh"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/howes/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/howes/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/howes/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/howes/google-cloud-sdk/completion.zsh.inc'; fi

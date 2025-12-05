@@ -1,6 +1,6 @@
 # shellcheck shell=bash # -*- Mode: Sh; -*-
 
-tracer BEGIN aliases.sh
+# tracer BEGIN aliases.sh
 
 # Reload alias and function definitions
 #
@@ -35,4 +35,4 @@ alias scrolling="tput rmcup"
 
 alias cfg="cd \${my_cfg}"
 
-tracer END aliases.sh
+# tracer END aliases.sh
