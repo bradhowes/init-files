@@ -121,7 +121,7 @@ activate() {
 
     if [[ -z "${dir}" ]]; then
         echo "*** missing or empty DIR argument"
-    elif [[ -f "${DIR}/bin/activate" ]]; then
+    elif [[ -f "${dir}/bin/activate" ]]; then
         local tmp_ps1="${PS1}"
         # shellcheck disable=SC1091
         . "${dir}/bin/activate"

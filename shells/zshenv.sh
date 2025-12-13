@@ -10,3 +10,5 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
 export WORKON_HOME="${HOME}/venvs/notebooks"
+
+[[ -f "${HOME}/.local_envs" ]] && source "${HOME}/.local_envs"

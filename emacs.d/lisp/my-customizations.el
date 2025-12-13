@@ -3,8 +3,6 @@
 ;;; Runtime constants that describe various properties of the environment.
 ;;; Code:
 
-(require 'popper)
-
 (defgroup my/customizations nil
   "The customization group for my settings."
   :prefix "my/"
@@ -18,10 +16,12 @@
 (defcustom my/git-sync-buffer-name " *my/git-sync*"
   "The name of the buffer to use to hold output from my/git-sync func."
   :type '(string)
-  :group 'my/customizations
-  :set (lambda (symbol value)
-         (set-default-toplevel-value symbol value)
-         (set-default-toplevel-value 'popper-reference-buffers (append (list value) popper-reference-buffers))))
+  :group 'my/customizations)
+
+;;   :set (lambda (symbol value)
+;;          (set-default-toplevel-value symbol value)
+;;          ;; (set-default-toplevel-value 'popper-reference-buffers (append (list value) popper-reference-buffers))))
+;;          (set-default-toplevel-value 'popper-reference-buffers (append (list value) popper-reference-buffers))))
 
 (defcustom my/layout-default-display-4k 0
   "The 4K display to use for new Emacs frames."

@@ -1,4 +1,4 @@
-;;; init.el --- load the full configuration -*- lexical-binding: t; -*-
+,;;; init.el --- load the full configuration -*- lexical-binding: t; -*-
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3--
 ;;; Commentary:
 ;;; Code:
@@ -31,7 +31,7 @@ the buffer having untrusted content."
 (if (or my/is-macosx (string= (system-name) "ldzls1144d"))
     (use-package package
       :custom
-      (package-archive-priorities '(("melpa" . -5)
+      (package-archive-priorities '(("melpa" . 10)
                                     ("melpa-stable" . 10)
                                     ("gnu" . 15)
                                     ("nongnu" . 20)))
@@ -305,23 +305,9 @@ such directory, in the user's home directory."
   :vc (:url "https://github.com/emacsorphanage/key-chord" :rev :newest)
   :commands (key-chord-define))
 
-;; Work QA hosts have a Git v2.18.0 and latest Magit now yells about it. In QA, fetch the last Magit version that did
-;; not care about this. Unfortunately I do not see a way to do this conditionally inside `use-package'.
-(when (and my/is-work my/is-qa)
-  (unless (package-installed-p 'magit)
-    (package-vc-install '(magit
-                          :url "https://github.com/magit/magit.git"
-                          :branch "v4.1.3"
-                          :lisp-dir "lisp"
-                          :make '("lisp" "info")
-                          :doc "docs/magit.texi")))
-  ;; For some reason this is still needed even after using `package-vc-install'
-  (push (file-name-concat user-emacs-directory "elpa/magit/lisp") load-path))
-
 (use-package magit
   :commands (magit-status-setup-buffer magit-status magit-project-status)
-  :hook ((magit-pre-refresh . diff-hl-magit-pre-refresh)
-         (magit-post-refresh . diff-hl-magit-post-refresh))
+  :hook ((magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-x g" . magit-status)
          ;; Take over vc-dir
          ("C-x p v" . magit-project-status)
@@ -350,15 +336,17 @@ such directory, in the user's home directory."
 
 (use-package my-fontify-braces)
 
-(use-package nerd-icons
-  :if (display-graphic-p))
+(use-package nerd-icons)
 
 (use-package nerd-icons-completion
-  :if (display-graphic-p)
   :after (marginalia)
   :commands (nerd-icons-completion-mode nerd-icons-completion-marginalia-setup)
   :hook ((after-init . nerd-icons-completion-mode)
          (marginalia-mode nerd-icons-completion-marginalia-setup)))
+
+(use-package nerd-icons-dired
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
 
 (use-package orderless)
 
