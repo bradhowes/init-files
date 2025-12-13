@@ -46,13 +46,13 @@ PathAdd() {
         [[ -d "${each}" ]] || continue
         local check=":${current}:"
         # shellcheck disable=SC2295
-        if [[ "${check%%:${each}:*}" == "${check}" ]]; then
+        if [[ "${check%%:${each}:*}" = "${check}" ]]; then
             if [[ -n "${append}" ]]; then
 	        current="${current}${current:+:}${each}"
             else
                 current="${each}${current:+:}${current}"
             fi
-            if [[ "${var}" == "PATH" ]]; then
+            if [[ "${var}" = "PATH" ]]; then
                 # Update MANPATH and INFOPATH with some possible values
                 local root="${each%/bin}"
                 PathAdd MANPATH "${root}/man" "${root}/share/man"

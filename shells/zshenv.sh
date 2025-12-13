@@ -1,4 +1,7 @@
+# shellcheck shell=bash
+
 export my_cfg="${HOME}/src/Mine/init-files/shells"
+# shellcheck disable=SC2155
 export my_arch="$(uname -s)"
 
 export USER
@@ -11,4 +14,5 @@ export LANG=en_US.UTF-8
 
 export WORKON_HOME="${HOME}/venvs/notebooks"
 
-[[ -f "${HOME}/.local_envs" ]] && source "${HOME}/.local_envs"
+# shellcheck disable=SC1091
+[[ -f "${HOME}/.local_envs" ]] && . "${HOME}/.local_envs"

@@ -3,10 +3,13 @@
 # echo "BEGIN .bashrc" 1>&2
 
 export BASHRC_LOADED="Y"
+
+# shellcheck disable=SC1091
 [[ -z "${PROFILE_LOADED}" ]] && . "${HOME}/.profile"
 
 . "${BRH_INIT_FILES}/aliases"
 
+# shellcheck disable=SC3040
 set -o emacs			# Emacs command-line editing settings
 set -o ignoreeof		# Don't allow CTRL-D to exit shell
 
@@ -17,12 +20,11 @@ export PAGER="less ${LESS}"
 export CLICOLOR=yes
 
 export EDITOR="emacs"
-if [[ "${INSIDE_EMACS}" == "t" ]]; then
+if [[ "${INSIDE_EMACS}" = "t" ]]; then
     if [[ -x $(whence emacsclient) ]]; then
         EDITOR="$(whence emacsclient)"
-        function man
-        {
-            ${EDITOR} --eval "(manual-entry \"${@}\")"
+        man() {
+            ${EDITOR} --eval "(manual-entry \"${*}\")"
         }
     fi
 fi
@@ -42,10 +44,9 @@ esac
 export MANPAGER="${PAGER}"
 export GIT_PAGER="${PAGER}"
 
-[[ -f "${HOME}/.aliases" ]] && . "${HOME}/.aliases"
 alias cd=cdprompt
 
-[[ -x /usr/bin/dircolors ]] && eval $(TERM=xterm-256color dircolors)
+[[ -x /usr/bin/dircolors ]] && eval "$(TERM=xterm-256color dircolors)"
 
 [[ -n "${ENV_INIT}" ]] && . ${ENV_INIT}
 

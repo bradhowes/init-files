@@ -6,6 +6,11 @@
 (require 'my-insert-block-comment)
 (require 'my-fontify-braces)
 
+(use-package flymake-shellcheck
+  :commands flymake-shellcheck-load
+  :init
+  (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
+
 (defun my/sh-insert-block-comment ()
   "Insert block comment."
   (interactive)
@@ -13,6 +18,7 @@
 
 (defun my/sh-mode-hook ()
   "Custom SH mode."
+  (flymake-mode t)
   (font-lock-mode t)
   (auto-fill-mode 1)
   (show-paren-mode t)
