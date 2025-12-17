@@ -109,7 +109,7 @@
  '(package-selected-packages
    '(accent async cape char-menu cmake-mode consult-compile-multi consult-denote consult-dir consult-eglot consult-notes
             corfu-terminal crux dape diff-hl ef-themes eglot-luau eldoc-box embark-consult esup exec-path-from-shell
-            expand-region fancy-compilation flymake flymake-aspell flymake-json flymake-lua flymake-shellcheck
+            expand-region fancy-compilation flymake flymake-aspell flymake-json flymake-lua flymake-shellcheck flyover
             geiser-guile impatient-mode indent-bars jedi jiralib2 js-comint js2-mode json-mode key-chord lsp-jedi
             lsp-pyright lua-mode magit marginalia mode-line-bell mood-line multiple-cursors nerd-icons-completion
             nerd-icons-corfu nerd-icons-dired nerd-icons-grep nerd-icons-ibuffer nerd-icons-xref orderless org-jira

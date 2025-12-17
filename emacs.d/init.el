@@ -1,4 +1,4 @@
-,;;; init.el --- load the full configuration -*- lexical-binding: t; -*-
+;;; init.el --- load the full configuration -*- lexical-binding: t; -*-
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3--
 ;;; Commentary:
 ;;; Code:
@@ -288,6 +288,40 @@ such directory, in the user's home directory."
 (use-package fancy-compilation
   :commands (fancy-compilation-mode)
   :hook ((compilation-mode . fancy-compilation-mode)))
+
+(use-package flyover
+  :ensure t
+  :hook ((flycheck-mode . flyover-mode)
+         (flymake-mode . flyover-mode))
+  :custom
+  ;; Checker settings
+  (flyover-checkers '(flycheck flymake))
+  (flyover-levels '(error warning info))
+
+  ;; Appearance
+  (flyover-use-theme-colors t)
+  (flyover-background-lightness 45)
+  (flyover-percent-darker 40)
+  (flyover-text-tint 'lighter)
+  (flyover-text-tint-percent 50)
+
+  ;; Icons
+  (flyover-info-icon " ")
+  (flyover-warning-icon " ")
+  (flyover-error-icon " ")
+
+  ;; Display settings
+  (flyover-hide-checker-name t)
+  (flyover-show-virtual-line t)
+  (flyover-virtual-line-type 'curved-dotted-arrow)
+  (flyover-line-position-offset 1)
+
+  ;; Message wrapping
+  (flyover-wrap-messages t)
+  (flyover-max-line-length 80)
+
+  ;; Performance
+  (flyover-debounce-interval 0.2))
 
 (use-package hippie-expand
   :bind (("M-/" . hippie-expand)))
