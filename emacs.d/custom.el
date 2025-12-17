@@ -135,6 +135,7 @@
  '(savehist-additional-variables
    '(register-alist kill-ring project-regexp-history-variable corfu-history))
  '(savehist-mode t)
+ '(scroll-preserve-screen-position 1)
  '(search-default-mode t)
  '(send-mail-function 'sendmail-send-it)
  '(sendmail-program "/opt/homebrew/bin/msmtp")
