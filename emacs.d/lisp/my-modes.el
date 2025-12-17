@@ -37,7 +37,7 @@ the items to setup for autoloading from the given file."
  "my-shell-mode" 'my/shell-mode-hook)
 
 (use-package cc-mode
-  :init (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
+  :init (add-to-list 'auto-mode-alist '("\\(\\.inl\\|\\.mm\\)\\'" . c++-mode))
   :hook ((c++-mode . my/c++-mode-hook)))
 
 (use-package consult-eglot
