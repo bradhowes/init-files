@@ -143,6 +143,8 @@ the items to setup for autoloading from the given file."
       (setq explicit-bash-args '("--noediting" "-i"))))
   :hook ((shell-mode . my/shell-mode-hook)))
 
+(use-package swift-mode)
+
 (use-package ws-butler
   :hook ((prog-mode . ws-butler-mode)
          (sh-mode . ws-butler-mode)))

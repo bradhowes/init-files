@@ -36,6 +36,7 @@
   (unless (eq my/dired-hidden-font-lock (car dired-font-lock-keywords))
     (push my/dired-hidden-font-lock dired-font-lock-keywords))
 
+  (keymap-local-unset "l")
   (keymap-local-set "=" #'my/ediff-marked-pair))
 
 (provide 'my-dired-mode)

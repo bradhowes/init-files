@@ -1199,6 +1199,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                            "H-u" #'undo
                            "H-v" #'my/reload-buffer
                            "H-w" #'my/ace-window-prefix
+                           "H-z" #'my/shell
                            "H-;" #'my/matching-paren)))
   (apply #'my/emacs-key-bind global-map hyper-mapping)
   (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mapping))
