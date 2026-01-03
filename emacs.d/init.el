@@ -506,7 +506,7 @@ artifacts such as indentation bars."
 (use-package emacs
   :commands (my/crm-indicator)
   :config
-  (setq read-process-output-max (* 4 1024 1024)
+  (setq read-process-output-max (* 64 1024 1024)
         process-adaptive-read-buffering nil
         custom-file (file-truename (locate-user-emacs-file "custom.el"))
         frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
