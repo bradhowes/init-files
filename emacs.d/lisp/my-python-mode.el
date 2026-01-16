@@ -6,6 +6,7 @@
 (require 'doxygen)
 (require 'my-fontify-braces)
 (require 'yasnippet)
+(require 'yasnippet-snippets)
 
 ;;; Code:
 

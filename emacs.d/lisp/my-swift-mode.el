@@ -7,6 +7,7 @@
 
 (defun my/swift-mode-hook ()
   "Custom Swift mode."
+  (setq swift-mode:basic-offset 2)
   (my/fontify-braces)
   (font-lock-mode t)
   (show-paren-mode t))

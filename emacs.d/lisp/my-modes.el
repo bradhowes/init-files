@@ -57,7 +57,7 @@ the items to setup for autoloading from the given file."
   :commands (eglot-ensure)
   :hook ((c++-mode . eglot-ensure)
          (json-mode . eglot-ensure)
-         (python-mode . eglot-ensure))
+         (python-base-mode . eglot-ensure))
   :custom
   ((eglot-autoshutdown t)
    (eglot-extend-to-xref t)
@@ -123,7 +123,7 @@ the items to setup for autoloading from the given file."
   :hook (markdown-mode . my/markdown-mode-hook))
 
 (use-package python
-  :hook ((python-mode . my/python-mode-hook)
+  :hook ((python-base-mode . my/python-mode-hook)
          (inferior-python-mode . my/inferior-python-mode-hook)))
 
 (use-package sh-mode

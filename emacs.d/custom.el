@@ -112,11 +112,11 @@
             corfu-terminal crux dape diff-hl ef-themes eglot-luau eldoc-box embark-consult esup exec-path-from-shell
             expand-region fancy-compilation flycheck-swift flymake flymake-aspell flymake-json flymake-lua
             flymake-shellcheck flyover geiser-guile impatient-mode indent-bars jedi jiralib2 js-comint js2-mode
-            json-mode key-chord lsp-jedi lsp-pyright lua-mode magit marginalia mode-line-bell mood-line multiple-cursors
-            nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-grep nerd-icons-ibuffer nerd-icons-xref
-            orderless org-jira osx-dictionary pdb-capf popper pyvenv realgud rg scratch swift-mode swift-ts-mode
-            tree-sitter-langs treemacs-nerd-icons verb vertico which-key ws-butler yaml yaml-mode yasnippet-capf
-            yasnippet-snippets))
+            json-mode key-chord lsp-jedi lsp-pyright lsp-sourcekit lsp-ui lua-mode magit marginalia mode-line-bell
+            mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-grep
+            nerd-icons-ibuffer nerd-icons-xref orderless org-jira osx-dictionary pdb-capf popper pyvenv
+            rainbow-delimiters realgud rg scratch swift-mode swift-ts-mode tree-sitter-langs treemacs-nerd-icons
+            treesit-auto verb vertico which-key ws-butler yaml yaml-mode yasnippet-capf yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-echo-mode t)
  '(popper-mode t)

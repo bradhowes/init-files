@@ -6,6 +6,7 @@
 (require 'my-insert-block-comment)
 (require 'my-fontify-braces)
 (require 'yasnippet)
+(require 'yasnippet-snippets)
 
 (defun my/lisp-insert-block-comment ()
   "Insert block comment."
