@@ -140,10 +140,6 @@ the buffer having untrusted content."
 
   :commands (consult-register-format consult-register-window consult-xref consult-register-store consult-register-load)
 
-  ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; relevant when you use the default completion UI.
-  :hook (completion-list-mode . consult-preview-at-point-mode)
-
   ;; The :init configuration is always executed (not lazy).
   :init
 
@@ -169,8 +165,8 @@ the buffer having untrusted content."
   (consult-customize consult-theme :preview-key '(:debounce 0.2 any)
                      consult-ripgrep consult-git-grep consult-grep consult-man
                      consult-bookmark consult-recent-file consult-xref
-                     consult--source-bookmark consult--source-file-register
-                     consult--source-recent-file consult--source-project-recent-file
+                     consult-source-bookmark consult-source-file-register
+                     consult-source-recent-file consult-source-project-recent-file
                      :preview-key '(:debounce 0.4 any))
 
   ;; Optionally configure the narrowing key.
@@ -188,10 +184,10 @@ the buffer having untrusted content."
 (use-package corfu
   :bind (:map corfu-map ("C-SPC" . corfu-insert-separator)))
 
-(use-package corfu-terminal
-  :if my/is-terminal
-  :functions (corfu-terminal-mode)
-  :hook (after-init . (lambda () (corfu-terminal-mode +1))))
+;; (use-package corfu-terminal
+;;   :if my/is-terminal
+;;   :functions (corfu-terminal-mode)
+;;   :hook (after-init . (lambda () (corfu-terminal-mode +1))))
 
 (use-package crm)
 
@@ -275,9 +271,9 @@ such directory, in the user's home directory."
                                        nil
                                        (window-parameters (mode-line-format . none)))))
 
-(use-package embark-consult
-  :after (consult embark)
-  :hook (embark-collect-mode . consult-preview-at-point-mode))
+;; (use-package embark-consult
+;;   :after (consult embark)
+;;   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package esup
   :custom (esup-user-init-file (file-truename "~/.emacs.d/init.el")))
@@ -424,7 +420,7 @@ such directory, in the user's home directory."
          ("M-'" . popper-cycle)))
 
 (use-package project
-  :commands (project--switch-project-command)
+  :commands (project--switch-project-command) ;; used in my/show-project-menu
   :bind (("C-x p $" . project-shell)))
 
 (defun my/show-project-menu ()
@@ -1157,6 +1153,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
                    "C-x h" #'ignore     ; mark-whole-buffer
                    "C-h h" #'ignore     ; show 'Hello' in various fonts
+
+                   "<pinch>" #'ignore
 
                    ;; Disable font size changes via trackpad/scroll-wheel
                    "C-<mouse-4>" #'ignore

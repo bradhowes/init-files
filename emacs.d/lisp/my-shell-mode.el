@@ -2,11 +2,13 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'my-constants)
-(require 'consult)
+(require 'ansi-osc)
 (require 'corfu)
-(require 'shell)
+(require 'comint)
+(require 'consult)
+(require 'my-constants)
 (require 'python)
+(require 'shell)
 
 ;; (require 'native-complete)
 
@@ -16,6 +18,58 @@ If after a prompt, move to end of it. Otherwise move to
 actual beginning of line (same as if there were no prompt)."
   (interactive)
   (comint-bol (= (point) (comint-line-beginning-position))))
+
+(defun my/comint-osc-process-output (_)
+  "Interpret OSC escape sequences in comint output.
+This function is intended to be added to
+`comint-output-filter-functions' in order to interpret escape
+sequences of the forms
+
+    ESC ] command ; text BEL
+    ESC ] command ; text ESC \\
+
+Specifically, every occurrence of such escape sequences is
+removed from the buffer.  Then, if `command' is a key of the
+`ansi-osc-handlers' alist, the corresponding value, which
+should be a function, is called with `command' and `text' as
+arguments, with point where the escape sequence was located."
+  (let ((start (1- comint-last-output-start))
+        ;; Start one char before last output to catch a possibly stray ESC
+        (bound (process-mark (get-buffer-process (current-buffer)))))
+    (my/ansi-osc-apply-on-region start bound)))
+
+(defun my/ansi-osc-apply-on-region (begin end)
+  "Interpret OSC escape sequences in region between BEGIN and END.
+This function searches for escape sequences of the forms
+
+    ESC ] command ; text BEL
+    ESC ] command ; text ESC \\
+
+Every occurrence of such escape sequences is removed from the
+buffer.  Then, if `command' is a key in the alist that is the
+value of the local variable `ansi-osc-handlers', that key's
+value, which should be a function, is called with `command' and
+`text' as arguments, with point where the escape sequence was
+located."
+  (save-excursion
+    (goto-char (or ansi-osc--marker begin))
+    (when (eq (char-before) ?\e) (backward-char))
+    (while (re-search-forward "\e]" end t)
+      (let ((pos0 (match-beginning 0))
+            (code (and (re-search-forward "\\=\\([0-9A-Za-z]*\\);" end t)
+                       (match-string 1)))
+            (pos1 (point)))
+        (if (re-search-forward "\a\\|\e\\\\" end t)
+            (let ((text (buffer-substring-no-properties
+                         pos1 (match-beginning 0))))
+              (setq ansi-osc--marker nil)
+              (delete-region pos0 (point))
+              (let ((inhibit-message t))
+                (message "ansi-osc-apply-on-region - %s %s" code text))
+              (when-let ((fun (cdr (assoc-string code ansi-osc-handlers))))
+                (funcall fun code text)))
+          (put-text-property pos0 end 'invisible t)
+          (setq ansi-osc--marker (copy-marker pos0)))))))
 
 (defun my/shell-mode-hook ()
   "Customize `shell-mode'."
@@ -34,7 +88,7 @@ actual beginning of line (same as if there were no prompt)."
 
   (ansi-color-for-comint-mode-on)
   (python-pdbtrack-setup-tracking)
-  (add-hook 'comint-output-filter-functions #'comint-osc-process-output)
+  (add-hook 'comint-output-filter-functions #'my/comint-osc-process-output)
   (add-hook 'comint-output-filter-functions #'ansi-color-process-output)
   (add-hook 'comint-output-filter-functions #'comint-truncate-buffer)
   (add-hook 'comint-output-filter-functions #'comint-postoutput-scroll-to-bottom)

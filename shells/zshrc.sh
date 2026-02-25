@@ -123,3 +123,11 @@ if [ -f '/Users/howes/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/howes/goo
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/howes/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/howes/google-cloud-sdk/completion.zsh.inc'; fi
+
+z="${HOME}/src/zsh-z/zsh-z.plugin.zsh"
+if [[ -f "${z}" ]]; then
+    # shellcheck disable=SC1090
+    . "${z}"
+    zstyle ':completion:*' menu select
+    autoload -U compinit; compinit
+fi

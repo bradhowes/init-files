@@ -7,6 +7,7 @@ export BASHRC_LOADED="Y"
 # shellcheck disable=SC1091
 [[ -z "${PROFILE_LOADED}" ]] && . "${HOME}/.profile"
 
+# shellcheck disable=SC1091
 . "${BRH_INIT_FILES}/aliases"
 
 # shellcheck disable=SC3040
@@ -48,7 +49,8 @@ alias cd=cdprompt
 
 [[ -x /usr/bin/dircolors ]] && eval "$(TERM=xterm-256color dircolors)"
 
-[[ -n "${ENV_INIT}" ]] && . ${ENV_INIT}
+# shellcheck disable=SC1090
+[[ -n "${ENV_INIT}" ]] && . "${ENV_INIT}"
 
 # Simple prompt
 #
@@ -61,6 +63,7 @@ export CDPATH=".:.."
 
 # Set the titlebar with the current directory.
 #
+# shellcheck disable=SC2164
 cd "${PWD}"
 
 # echo "END .bashrc" 1>&2

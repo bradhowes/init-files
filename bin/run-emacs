@@ -1,10 +1,14 @@
 #!/bin/bash
 
+# shellcheck disable=SC1091
 [[ -z "${my_emacs_root}" ]] && source "${HOME}/.profile"
 
+# shellcheck disable=SC2154
 my_emacs_d="${my_cfg}/emacs.d"
 my_init=""
 [[ -d "${my_emacs_d}" ]] && my_init="--init-directory ${my_emacs_d}"
 
 export DBUS_SESSION_BUS_ADDRESS="unix:path=/dev/null"
+
+# shellcheck disable=SC2086
 exec emacs ${my_init} "$@"

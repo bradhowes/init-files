@@ -123,6 +123,9 @@
  '(popper-reference-buffers
    '("\\*Messages\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
      compilation-mode))
+ '(project-switch-commands
+   '((project-find-file "Find file" nil) (project-find-regexp "Find regexp" nil) (project-find-dir "Find directory" nil)
+     (magit-project-status "Magit" 109) (project-eshell "Eshell" nil) (project-any-command "Other" nil)))
  '(pyvenv-workon ".")
  '(read-extended-command-predicate 'command-completion-default-include-p)
  '(recentf-max-menu-items 50)
@@ -147,6 +150,7 @@
  '(smtpmail-smtp-service 587)
  '(switch-to-prev-buffer-skip t)
  '(tab-always-indent 'complete)
+ '(text-scale-mode-step 1.0)
  '(tool-bar-mode nil)
  '(uniquify-buffer-name-style 'forward nil (uniquify))
  '(use-package-always-defer t)
