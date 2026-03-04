@@ -8,6 +8,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(Info-additional-directory-list '("/opt/homebrew/share/info"))
  '(ace-window-display-mode t)
  '(all-the-icons-completion-mode t)
  '(auto-revert-buffer-list-filter 'magit-auto-revert-repository-buffer-p)
@@ -108,15 +109,15 @@
  '(ns-right-command-modifier 'super)
  '(ns-right-control-modifier 'hyper)
  '(package-selected-packages
-   '(accent async cape char-menu cmake-mode consult-compile-multi consult-denote consult-dir consult-eglot consult-notes
-            corfu-terminal crux dape diff-hl ef-themes eglot-luau eldoc-box embark-consult esup exec-path-from-shell
-            expand-region fancy-compilation flycheck-swift flymake flymake-aspell flymake-json flymake-lua
-            flymake-shellcheck flyover geiser-guile impatient-mode indent-bars jedi jiralib2 js-comint js2-mode
-            json-mode key-chord lsp-jedi lsp-pyright lsp-sourcekit lsp-ui lua-mode magit marginalia mode-line-bell
-            mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-grep
-            nerd-icons-ibuffer nerd-icons-xref orderless org-jira osx-dictionary pdb-capf popper pyvenv
-            rainbow-delimiters realgud rg scratch swift-mode swift-ts-mode tree-sitter-langs treemacs-nerd-icons
-            treesit-auto verb vertico which-key ws-butler yaml yaml-mode yasnippet-capf yasnippet-snippets))
+   '(accent ace-window async cape char-menu cmake-mode consult-compile-multi consult-denote consult-dir consult-eglot
+            consult-notes corfu-terminal crux dape diff-hl ef-themes eglot-luau eldoc-box embark-consult esup
+            exec-path-from-shell expand-region fancy-compilation flycheck-swift flymake flymake-aspell flymake-json
+            flymake-lua flymake-shellcheck flyover geiser-guile impatient-mode indent-bars jedi jiralib2 js-comint
+            js2-mode json-mode key-chord lsp-jedi lsp-pyright lsp-sourcekit lsp-ui lua-mode magit marginalia
+            mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired
+            nerd-icons-grep nerd-icons-ibuffer nerd-icons-xref orderless org-jira osx-dictionary pdb-capf popper pyvenv
+            rainbow-delimiters realgud rg scratch swift-mode swift-ts-mode tree-sitter-langs treesit-auto verb vertico
+            which-key ws-butler yaml yaml-mode yasnippet-capf yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-echo-mode t)
  '(popper-mode t)
