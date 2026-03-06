@@ -91,6 +91,7 @@ the buffer having untrusted content."
          ;; C-x bindings in `ctl-x-map`
          ("C-x M-:" . consult-complex-command)
          ("C-x b" . consult-buffer)
+         ("C-x d" . consult-dir)
          ("C-x f" . consult-recent-file)
          ("C-x 4 b" . consult-buffer-other-window)
          ("C-x 5 b" . consult-buffer-other-frame)
@@ -287,37 +288,20 @@ such directory, in the user's home directory."
 
 (use-package flyover
   :ensure t
-  :hook ((flycheck-mode . flyover-mode)
-         (flymake-mode . flyover-mode))
+  :hook ((flymake-mode . flyover-mode))
   :custom
-  ;; Checker settings
-  (flyover-checkers '(flycheck flymake))
-  (flyover-levels '(error warning info))
-
   ;; Appearance
-  (flyover-use-theme-colors t)
   (flyover-background-lightness 45)
   (flyover-percent-darker 40)
-  (flyover-text-tint 'lighter)
-  (flyover-text-tint-percent 50)
 
   ;; Icons
-  (flyover-info-icon " ")
-  (flyover-warning-icon " ")
-  (flyover-error-icon " ")
+  ;; (flyover-info-icon " ")
+  ;; (flyover-warning-icon " ")
+  ;; (flyover-error-icon " ")
 
   ;; Display settings
-  (flyover-hide-checker-name t)
-  (flyover-show-virtual-line t)
-  (flyover-virtual-line-type 'curved-dotted-arrow)
-  (flyover-line-position-offset 1)
-
-  ;; Message wrapping
-  (flyover-wrap-messages t)
-  (flyover-max-line-length 80)
-
-  ;; Performance
-  (flyover-debounce-interval 0.2))
+  (flyover-display-mode 'hide-on-same-line)
+  (flyover-max-line-length 120))
 
 (use-package hippie-expand
   :bind (("M-/" . hippie-expand)))
@@ -1029,6 +1013,13 @@ This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
     map)
   "Keymap for quick Dired jumps.")
 
+(defun my/customize-search ()
+  "Show the top-level customize screen and move to the search field."
+  (interactive)
+  (customize)
+  (goto-char (point-min))
+  (widget-forward 3))
+
 ;;; --- Key Bindings
 
 (defun my/emacs-make-key-bind (keymap make-key &rest definitions)
@@ -1198,6 +1189,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                            "H-v" #'my/reload-buffer
                            "H-w" #'my/ace-window-prefix
                            "H-z" #'my/shell
+                           "H-," #'my/customize-search
                            "H-;" #'my/matching-paren)))
   (apply #'my/emacs-key-bind global-map hyper-mapping)
   (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mapping))
