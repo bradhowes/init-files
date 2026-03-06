@@ -34,6 +34,11 @@
      ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo"))
  '(completion-styles '(orderless partial-completion basic) nil nil "Customized with use-package orderless")
  '(confirm-kill-emacs 'y-or-n-p)
+ '(consult-dir-default-command 'consult-dir-dired)
+ '(consult-dir-sort-candidates t)
+ '(consult-dir-sources
+   '(consult-dir--source-default consult-dir--source-project consult-dir--source-recentf consult-dir--source-bookmark
+                                 consult-dir--source-tramp-local))
  '(consult-narrow-key "<")
  '(consult-notes-denote-files-function #'denote-directory-files)
  '(consult-notes-denote-mode t)
