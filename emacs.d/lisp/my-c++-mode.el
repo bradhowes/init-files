@@ -307,14 +307,14 @@ line, calling the given P on each one."
   (message "Done."))
 
 (defun my/c++-on-include-line ()
-  "T if point is on a C/C++ include line."
+  "T if point is on a C/C++ include line or Obj-C import line."
   (save-excursion
     (beginning-of-line)
-    (looking-at-p "^#\\s-*include\\s-+[\"<]")))
+    (looking-at-p "^#\\s-*\\(include\\|import\\)\\s-+[\"<]")))
 
 (defun my/flyspell-progmod-verify ()
   "Custom `flyspell-generic-progmode-verify' function for C/C++ modes.
-Does not allow spell-checking in '#include' strings."
+Prohibits spell checking in '#include' strings."
   (and (flyspell-generic-progmode-verify)
        (not (my/c++-on-include-line))))
 

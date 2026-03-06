@@ -29,8 +29,14 @@ the insertion point between the double-quotation marks. Use a PREFIx to insert
     ">")
   \n)
 
+(defun my/get-sysroot ()
+  "Fetch the value of SYSROOT."
+  (let ((path (string-trim-right (shell-command-to-string "xcrun bash -c 'echo $SDKROOT'"))))
+    (message "SDKROOT: %s" path)
+    path))
+
 (defconst my/c++-include-dir
-  "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"
+  (concat (my/get-sysroot) "/usr/include/c++/v1")
   ;; (let ((tmp "/usr/include/c++/4.2.1"))
   ;;   (if (shell-command "gcc -v" "*foo*")
   ;;       (with-current-buffer "*foo*"
@@ -41,7 +47,8 @@ the insertion point between the double-quotation marks. Use a PREFIx to insert
   ;;             (setq tmp (concat (match-string 1) (match-string 2))))))
   ;;   (kill-buffer "*foo*")
   ;;  tmp)
-  "Determine the location of the standard include files.")
+  "Determine the location of the standard include files.
+This is based off of the `SYSROOT` environment value from `xcrun env`.")
 
 (defconst my/c-on-include-line-re
   "#\\(import\\|include\\)[^\"<]+[\"<]\\([^>\"]+\\)[>\"]"
