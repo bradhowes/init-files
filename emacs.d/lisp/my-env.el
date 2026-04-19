@@ -17,36 +17,25 @@ Note that this is also true when running in a terminal window.")
 Note that this is also true when running in a terminal window.")
 
 (defconst my/repos
-  (file-name-as-directory (if my/is-macosx
-                              (file-truename "~/src/Mine")
-                            (file-truename "/apps/home/howesbra/repos")))
+  (file-name-as-directory (file-truename "~/src/Mine"))
   "Location of root of personal source git repositories.")
 
 (defconst my/configurations
-  (let ((repo-cfg (file-name-as-directory (file-name-concat my/repos "configurations")))
-        (home-cfg (file-name-as-directory (file-truename "~/configurations"))))
-    (if (file-directory-p repo-cfg)
-        repo-cfg
-      home-cfg))
+  (file-name-as-directory (file-name-concat my/repos "init-files"))
   "Location of configurations repo.")
 
 (defconst my/is-work
-  (or (string= "howesbra" user-login-name)
-      (string= "sp_qa" user-login-name))
+  nil
+  ;; (or (string= "howesbra" user-login-name)
+  ;;     (string= "sp_qa" user-login-name))
   "This is t if running at work.")
-
-(defconst my/is-dev
-  (and my/is-work (string-suffix-p "d" (system-name)))
-  "T if running on dev box at work.")
 
 (defconst my/is-qa
   (and my/is-work (string-suffix-p "q" (system-name)))
   "T if running on QA box at work.")
 
 (defconst my/emacs.d
-  (if my/is-qa
-      (file-name-as-directory (file-truename "~/.emacs.d"))
-    (file-name-as-directory (file-name-concat my/configurations "emacs.d")))
+  (file-name-as-directory (file-name-concat my/configurations "emacs.d"))
   "Location of emacs.d directory in the configurations repo.
 Note that this is *not* the `user-emacs-directory', but rather the
 location in the git repo where personal files are kept under version

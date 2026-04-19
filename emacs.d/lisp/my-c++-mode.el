@@ -4,6 +4,7 @@
 
 (require 'cc-mode)
 (require 'doxygen)
+(require 'eldoc-box)
 (require 'my-c-mode-common)
 (require 'my-insert-block-comment)
 (require 'flyspell)
@@ -23,7 +24,7 @@
 (define-skeleton my/c++-copyright-skeleton
   "Insert a C++ copyright comment."
   nil
-  "// (C) Copyright 2024 Brad Howes. All rights reserved.\n"
+  "// (C) Copyright 2024, 2026 Brad Howes. All rights reserved.\n"
   "//\n\n"
 )
 
@@ -266,6 +267,22 @@ Setup a namespace with NAMESPACE name if non-nil."
     ;;         (replace-match "#include \"\\2\"")
     ;;       (replace-match "#include <\\2>"))))))
 
+(defun my/c++-forward-doc-comment (arg)
+  "Move to the next ARG comment."
+  (interactive "p")
+  (let ((count (or arg 1)))
+    (when (re-search-forward "/\\*\\*$" nil nil count)
+      (forward-line 1)
+      (recenter))))
+
+(defun my/c++-backward-doc-comment (arg)
+  "Move to the next ARG comment."
+  (interactive "p")
+  (let ((count (- (+ (or arg 1) 1))))
+    (when (re-search-forward "/\\*\\*$" nil nil count)
+      (forward-line 1)
+      (recenter))))
+
 (defun my/c++-use-pragma-once ()
   "Transform #ifdef guard into #pragma once."
   (interactive)
@@ -332,12 +349,14 @@ Prohibits spell checking in '#include' strings."
         c-block-comment-prefix ""
         c-doc-comment-style 'doxygenf
         flyspell-generic-check-word-predicate #'my/flyspell-progmod-verify)
-
+  ;; (eldoc-box-hover-mode)
   (indent-bars-mode 1)
+  (local-set-key [(f1)] #'eldoc-doc-buffer)
   (local-set-key [(f7)] #'compile)
   (local-set-key [(control c)(control i)] #'my/c++-copyright-skeleton)
   (local-set-key [(control meta \;)] #'my/c++-insert-block-comment)
-  (local-set-key [(f1)] #'my/c++-cleanup-include))
+  (local-set-key [(f8)] #'my/c++-forward-doc-comment)
+  (local-set-key [(meta f8)] #'my/c++-backward-doc-comment))
 
 (provide 'my/c++-mode)
 ;;; my-c++-mode.el ends here

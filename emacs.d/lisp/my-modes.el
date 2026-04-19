@@ -36,12 +36,14 @@ the items to setup for autoloading from the given file."
  "my-sh-mode" 'my/sh-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
 
+(use-package cape)
+
 (use-package cc-mode
   :init (add-to-list 'auto-mode-alist '("\\(\\.inl\\|\\.mm\\)\\'" . c++-mode))
   :hook ((c++-mode . my/c++-mode-hook)))
 
-(use-package consult-eglot
-  :after (consult eglot))
+;; (use-package consult-eglot
+;;   :after (consult eglot))
 
 (use-package cmake-mode
   :hook ((cmake-mode . my/cmake-mode-hook)))
@@ -53,15 +55,25 @@ the items to setup for autoloading from the given file."
                           (diff-hl-margin-mode t))
                         )))
 
+(defun my/known-project-eglot-ensure ()
+  "Determine if editing file of a known project."
+  ;; (vc Git "~/Developer/Mine/sidecar/") -> '("~/Developer/Mine/sidecar/")
+  (let ((proj (list (project-root (project-current)))))
+    ;; See if '("~/Developer/Mine/sidecar/" is in `project--list` list.
+    (if (and proj (member proj project--list))
+        (progn
+          (message "Found %s in project--list - starting eglot" proj)
+          (eglot-ensure))
+      (message "Project %s not found project--list - not running eglot" proj))))
+
 (use-package eglot
   :commands (eglot-ensure)
-  :hook ((c++-mode . eglot-ensure)
+  :hook ((c++-mode . my/known-project-eglot-ensure)
          (json-mode . eglot-ensure)
          (python-base-mode . eglot-ensure))
   :custom
   ((eglot-autoshutdown t)
-   (eglot-extend-to-xref t)
-   (eglot-ignore-server-capabilities '(:documentFormattingProvider :documentRangeFormattingProvider)))
+   (eglot-extend-to-xref t))
   :bind (:map eglot-mode-map
               ("C-c c a" . eglot-code-actions)
               ("C-c c e" . eglot-code-action-extract)
@@ -71,6 +83,11 @@ the items to setup for autoloading from the given file."
               ("C-c c q" . eglot-code-action-quickfix)
               ("C-c c r" . eglot-rename)
               ("C-c c w" . eglot-code-action-rewrite)))
+
+(with-eval-after-load 'eglot
+  (setq completion-category-defaults nil))
+
+(advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
 (use-package flymake
   :commands (flymake-show-buffer-diagnostics)
@@ -130,6 +147,21 @@ the items to setup for autoloading from the given file."
   :hook ((sh-mode . my/sh-mode-hook)
          (sh-mode . indent-bars-mode)))
 
+(defun my/eat-exec-hook (args)
+  "Customize `eat-mode'. Arg ARGS is ignored."
+
+  ;; Look for the process that exists for the now-current buffer. Rename buffer to include its process ID.
+  (when-let ((buf (current-buffer))
+             (found (seq-filter (lambda (p) (eq buf (process-buffer p))) (process-list)))
+             (pid (seq-map #'process-id found)))
+    (rename-buffer (format "*eat [%d]*" (car pid))))
+
+  ;; (set-process-coding-system (get-buffer-process (current-buffer)) 'utf-8 'utf-8)
+  )
+
+(use-package eat
+  :hook ((eat-exec . my/eat-exec-hook)))
+
 (use-package shell-mode
   :defines (explicit-bash-args)
   :init
@@ -145,9 +177,17 @@ the items to setup for autoloading from the given file."
 
 (use-package swift-mode)
 
+(use-package tempel)
+
 (use-package ws-butler
   :hook ((prog-mode . ws-butler-mode)
          (sh-mode . ws-butler-mode)))
+
+(defun my/eglot-capf ()
+  "Custom CAPF for use with Eglot."
+  (setq-local completion-at-point-functions
+              (list (cape-capf-super #'eglot-completion-at-point #'tempel-expand))))
+(add-hook 'eglot-managed-mode-hook #'my/eglot-capf)
 
 (provide 'my-modes)
 

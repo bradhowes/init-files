@@ -11,6 +11,15 @@
 (require 'my-layout)
 (require 'my-modes)
 
+(set-charset-priority 'unicode)
+(setq locale-coding-system 'utf-8
+      coding-system-for-read 'utf-8
+      coding-system-for-write 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+
 (defun my/trusted-content-p (original-response)
   "Advice for `trusted-content-p' to trust the `*scratch*' buffer.
 Honors ORIGINAL-RESPONSE when not nil and then checks the buffer's name
@@ -28,20 +37,20 @@ the buffer having untrusted content."
   (setq file-notify-debug nil))
 ;; (debug-on-entry 'file-notify-add-watch)
 
-(if (or my/is-macosx (string= (system-name) "ldzls1144d"))
-    (use-package package
-      :custom
-      (package-archive-priorities '(("melpa" . 10)
-                                    ("melpa-stable" . 10)
-                                    ("gnu" . 15)
-                                    ("nongnu" . 20)))
-      :config
-      (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-      (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-      (package-initialize))
-  (use-package package
-    :init
-    (package-initialize)))
+;; (if (or my/is-macosx (string= (system-name) "ldzls1144d"))
+(use-package package
+  :custom
+  (package-archive-priorities '(("melpa" . 10)
+                                ("melpa-stable" . 10)
+                                ("gnu" . 15)
+                                ("nongnu" . 20)))
+  :config
+  (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (package-initialize))
+;; (use-package package
+;;   :init
+;;   (package-initialize)) ;; )
 
 (defvar my/hyper-c-map
   (make-sparse-keymap)
@@ -55,9 +64,6 @@ the buffer having untrusted content."
   :commands (aw-window-list aw-switch-to-window aw-select aw-flip-window ace-display-buffer ace-window)
   :defines (aw-dispatch-always)
   :config (setq aw-make-frame-char ?n))
-
-(use-package cape
-  :commands (cape-file))
 
 (use-package char-menu
   :defines (char-menu)
@@ -91,7 +97,7 @@ the buffer having untrusted content."
          ;; C-x bindings in `ctl-x-map`
          ("C-x M-:" . consult-complex-command)
          ("C-x b" . consult-buffer)
-         ("C-x d" . consult-dir)
+         ("C-x M-d" . consult-dir)
          ("C-x f" . consult-recent-file)
          ("C-x 4 b" . consult-buffer-other-window)
          ("C-x 5 b" . consult-buffer-other-frame)
@@ -621,9 +627,6 @@ buffer."
   (interactive)
   (my/run-shell #'my/in-current-window))
 
-(defalias 'ksh 'my/shell
-  "Legacy alias to start shell in current window.")
-
 (defun my/shell-other-window ()
   "Start a new shell in another window."
   (interactive)
@@ -633,6 +636,27 @@ buffer."
   "Start a new shell in another frame."
   (interactive)
   (my/run-shell #'my/in-other-frame))
+
+(require 'eat)
+
+(defun my/eat ()
+  "Start a new eat shell."
+  (interactive)
+  (eat))
+
+(defalias 'ksh 'my/eat
+  "Legacy alias to start shell in current window.")
+
+(defun my/eat-other-window ()
+  "Start a new eat shell in another window."
+  (interactive)
+  (eat-other-window))
+
+(defun my/eat-other-frame ()
+  "Start a new eat shell in another frame."
+  (interactive)
+  (select-frame (make-frame))
+  (eat))
 
 (defun my/bury-or-kill-current-buffer ()
   "Bury or kill the current buffer without asking. (WIP)
@@ -1104,11 +1128,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                    "M-<f3>" #'my/layout-frame-pos-right
 
                    "C-x 4 c" #'my/customize-other-window
-                   "C-x 4 k" #'my/shell-other-window
+                   "C-x 4 k" #'my/eat-other-window
                    "C-x 4 r" #'my/repl-other-window
 
                    "C-x 5 i" #'my/info-other-frame
-                   "C-x 5 k" #'my/shell-other-frame
+                   "C-x 5 k" #'my/eat-other-frame
 
                    "H-c H-c" #'my/copy-file-name-to-clipboard
                    "H-c H-k" #'my/kill-current-buffer
@@ -1183,12 +1207,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                            "H-m" #'consult-bookmark
                            "H-p" project-prefix-map
                            "H-r" #'speedbar
-                           "H-s" #'my/shell
+                           "H-s" #'my/eat
                            "H-t" #'my/htop
                            "H-u" #'undo
                            "H-v" #'my/reload-buffer
                            "H-w" #'my/ace-window-prefix
-                           "H-z" #'my/shell
+                           "H-z" #'my/eat
                            "H-," #'my/customize-search
                            "H-;" #'my/matching-paren)))
   (apply #'my/emacs-key-bind global-map hyper-mapping)

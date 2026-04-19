@@ -6,25 +6,20 @@
 
 [[ "${my_arch}" = "Darwin" ]] && ulimit -n 8096
 
-export GEM_HOME="${HOME}/.gem"
-
 export PATH
 PathAdd PATH \
         /opt/homebrew/opt/grep/libexec/gnubin \
         /Applications/Emacs.app/Contents/MacOS/bin \
         /opt/homebrew/bin \
         /opt/homebrew/sbin \
-        /opt/homebrew/Cellar/ruby/3.2.2_1/bin \
-        "${GEM_HOME}/bin" \
         "${HOME}/bin"
 
-HISTSIZE=10000
+HISTSIZE=100000
 # shellcheck disable=SC2034
 SAVEHIST=${HISTSIZE}
 HISTFILE="${HOME}/.history"
 
 setopt EXTENDED_HISTORY
-setopt INC_APPEND_HISTORY
 setopt SHARE_HISTORY
 setopt HIST_EXPIRE_DUPS_FIRST
 setopt HIST_IGNORE_DUPS
@@ -59,11 +54,8 @@ autoload -U add-zsh-hook
 export LESS="-FRX"
 export PAGER="less ${LESS}"
 export CLICOLOR=yes
-
 export TERM=xterm-256color
-
 export EDITOR="emacs"
-
 
 chpwd1 () { osc7_cwd; }
 chpwd2 () { esc0_cwd; }
@@ -131,3 +123,7 @@ if [[ -f "${z}" ]]; then
     zstyle ':completion:*' menu select
     autoload -U compinit; compinit
 fi
+
+# Perform Emacs `eat` integration if enabled
+# shellcheck disable=SC1090
+[[ -n "${EAT_SHELL_INTEGRATION_DIR}" ]] && . "${EAT_SHELL_INTEGRATION_DIR}"
