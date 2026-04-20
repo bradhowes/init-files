@@ -98,7 +98,6 @@
  '(indicate-empty-lines t)
  '(inhibit-startup-echo-area-message "howes")
  '(inhibit-startup-screen t)
- '(insert-directory-program "gls")
  '(isearch-lazy-count t)
  '(ispell-extra-args
    '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16" "--camel-case"))

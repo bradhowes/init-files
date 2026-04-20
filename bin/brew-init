@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+
+# Install homebrew base
+[[ -d "/opt/homebrew" ]] || curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+
+# Install dependencies
+[[ -x "$(whence aspell)" ]] || brew install aspell
+[[ -x "$(whence gls)" ]] || brew install coreutils
+[[ -x "$(whence ggrep)" ]] || brew install grep
+[[ -x "$(whence rg)" ]] || brew install ripgrep
+
+# Install Emacs
+if [[ ! -d /Applications/Emacs.app ]]; then
+  rm -rf "/Applications/Emacs Client.app"
+  brew tap d12frosted/emacs-plus
+  brew install --cask emacs-plus-app
+fi

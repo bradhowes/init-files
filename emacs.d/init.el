@@ -637,26 +637,8 @@ buffer."
   (interactive)
   (my/run-shell #'my/in-other-frame))
 
-(require 'eat)
-
-(defun my/eat ()
-  "Start a new eat shell."
-  (interactive)
-  (eat))
-
-(defalias 'ksh 'my/eat
+(defalias 'ksh 'my/shell
   "Legacy alias to start shell in current window.")
-
-(defun my/eat-other-window ()
-  "Start a new eat shell in another window."
-  (interactive)
-  (eat-other-window))
-
-(defun my/eat-other-frame ()
-  "Start a new eat shell in another frame."
-  (interactive)
-  (select-frame (make-frame))
-  (eat))
 
 (defun my/bury-or-kill-current-buffer ()
   "Bury or kill the current buffer without asking. (WIP)

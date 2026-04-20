@@ -22,24 +22,23 @@ export CLICOLOR=yes
 
 export EDITOR="emacs"
 if [[ "${INSIDE_EMACS}" = "t" ]]; then
-    if [[ -x $(whence emacsclient) ]]; then
-        EDITOR="$(whence emacsclient)"
-        man() {
-            ${EDITOR} --eval "(manual-entry \"${*}\")"
-        }
-    fi
+  if [[ -x $(whence emacsclient) ]]; then
+    EDITOR="$(whence emacsclient)"
+    man() {
+      ${EDITOR} --eval "(manual-entry \"${*}\")"
+    }
+  fi
 fi
 
 case "${TERM}" in
+  xterm*|rxvt|vt100|screen-*)
+    stty erase '^?'
+    ;;
 
-    xterm*|rxvt|vt100|screen-*)
-	stty erase '^?'
-	;;
-
-    emacs|dumb)
-        export TERM=xterm-256color
-        export PAGER="${HOME}/bin/emacs-pager"
-	;;
+  emacs|dumb)
+    export TERM=xterm-256color
+    export PAGER="${HOME}/bin/emacs-pager"
+    ;;
 esac
 
 export MANPAGER="${PAGER}"

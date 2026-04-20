@@ -36,17 +36,17 @@ HISTORY_IGNORE="(cd|ls|ps|pwd|history|exit)"
 export ZSH_THEME="robbyrussell"
 
 osc7_cwd() {
-    # NOTE: need to fix ansi-osc.el with `(string= (url-host url) (downcase (system-name)))))`
-    # to make Emacs see the changes in directory.
-    # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=68632
-    print -P "\e]7;file://${HOST}${PWD}\e\\"
+  # NOTE: need to fix ansi-osc.el with `(string= (url-host url) (downcase (system-name)))))`
+  # to make Emacs see the changes in directory.
+  # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=68632
+  print -P "\e]7;file://${HOST}${PWD}\e\\"
 }
 
 esc0_cwd() {
-    # NOTE: need to fix ansi-osc.el with `(string= (url-host url) (downcase (system-name)))))`
-    # to make Emacs see the changes in directory.
-    # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=68632
-    print -P "\e]0;${PWD}\007"
+  # NOTE: need to fix ansi-osc.el with `(string= (url-host url) (downcase (system-name)))))`
+  # to make Emacs see the changes in directory.
+  # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=68632
+  print -P "\e]0;${PWD}\007"
 }
 
 autoload -U add-zsh-hook
@@ -61,29 +61,29 @@ chpwd1 () { osc7_cwd; }
 chpwd2 () { esc0_cwd; }
 
 if [[ -n "${INSIDE_EMACS}" ]]; then
-    if [[ -x "$(whence emacsclient)" ]]; then
-        EDITOR="$(whence emacsclient)"
+  if [[ -x "$(whence emacsclient)" ]]; then
+    EDITOR="$(whence emacsclient)"
 
-        man() {
-            ${EDITOR} --eval "(manual-entry \"${*}\")"
-        }
-    fi
-    export PAGER="${HOME}/bin/emacs-pager"
+    man() {
+      ${EDITOR} --eval "(manual-entry \"${*}\")"
+    }
+  fi
+  export PAGER="${HOME}/bin/emacs-pager"
 
-    add-zsh-hook -Uz chpwd chpwd1
+  add-zsh-hook -Uz chpwd chpwd1
 elif [[ -n "${TERM}" ]]; then
-    add-zsh-hook -Uz chpwd chpwd2
+  add-zsh-hook -Uz chpwd chpwd2
 fi
 
 case "${TERM}" in
-    xterm*|rxvt|vt100)
-	stty erase '^?'
-	;;
+  xterm*|rxvt|vt100)
+    stty erase '^?'
+    ;;
 
-    emacs|dumb)
-        export TERM=xterm-256color
-        export PAGER="${HOME}/bin/emacs-pager"
-	;;
+  emacs|dumb)
+    export TERM=xterm-256color
+    export PAGER="${HOME}/bin/emacs-pager"
+    ;;
 esac
 
 export MANPAGER="${PAGER}"
@@ -118,10 +118,10 @@ if [ -f '/Users/howes/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/how
 
 z="${HOME}/src/zsh-z/zsh-z.plugin.zsh"
 if [[ -f "${z}" ]]; then
-    # shellcheck disable=SC1090
-    . "${z}"
-    zstyle ':completion:*' menu select
-    autoload -U compinit; compinit
+  # shellcheck disable=SC1090
+  . "${z}"
+  zstyle ':completion:*' menu select
+  autoload -U compinit; compinit
 fi
 
 # Perform Emacs `eat` integration if enabled

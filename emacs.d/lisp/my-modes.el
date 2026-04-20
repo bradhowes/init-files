@@ -147,21 +147,6 @@ the items to setup for autoloading from the given file."
   :hook ((sh-mode . my/sh-mode-hook)
          (sh-mode . indent-bars-mode)))
 
-(defun my/eat-exec-hook (args)
-  "Customize `eat-mode'. Arg ARGS is ignored."
-
-  ;; Look for the process that exists for the now-current buffer. Rename buffer to include its process ID.
-  (when-let ((buf (current-buffer))
-             (found (seq-filter (lambda (p) (eq buf (process-buffer p))) (process-list)))
-             (pid (seq-map #'process-id found)))
-    (rename-buffer (format "*eat [%d]*" (car pid))))
-
-  ;; (set-process-coding-system (get-buffer-process (current-buffer)) 'utf-8 'utf-8)
-  )
-
-(use-package eat
-  :hook ((eat-exec . my/eat-exec-hook)))
-
 (use-package shell-mode
   :defines (explicit-bash-args)
   :init
