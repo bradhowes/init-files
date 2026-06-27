@@ -128,18 +128,18 @@ Probably a better way to figure this out."
     my/layout-frame-pixel-width-laptop))
 
 (defun my/layout--frame-left (layout display)
-  "The `left' position on LAYOUT and DISPLAY for a `left' frame.
+  "Obtain the `left` position for a `left' frame for LAYOUT and DISPLAY index.
 The position value will place the frame flush with the left-hand side of the
 display. This is used in a frame alist, in particular the `initial-frame-alist'
 configuration."
   (declare (side-effect-free t))
   ;; Use an external monitor if there is one.
   (if (memq layout '(my/layout--screens-laptop-4k my/layout--screens-laptop-4k-4k))
-      (+ my/layout--laptop-screen-width (* display  my/layout--4k-screen-width))
+      (+ my/layout--laptop-screen-width (* display my/layout--4k-screen-width))
     0))
 
 (defun my/layout--frame-center (layout display)
-  "The `left' position on LAYOUT and DISPLAY for a `center' frame.
+  "Obtain the `left` position for a `center' frame for LAYOUT and DISPLAY index.
 The position value will place the frame such that it does not overlap with
 another frame in the `left' position.
 This is used in a frame alist, in particular the `default-frame-alist'
@@ -148,7 +148,7 @@ configuration."
   (+ (my/layout--frame-left layout display) (my/layout--frame-pixel-width layout)))
 
 (defun my/layout--frame-right (layout display)
-  "The `left' position on LAYOUT and DISPLAY for a `right' frame.
+  "Obtain the `left` position for a `right' frame for LAYOUT and DISPLAY index.
 The position value will place the frame flush with the right-hand side
 of the display. This is not used in any particular `*-frame-alist' but
 it is used by custom commands."
@@ -159,42 +159,43 @@ it is used by custom commands."
           my/layout--4k-screen-width))
      (my/layout--frame-pixel-width layout)))
 
-(defun my/layout--frame-top ()
-  "The top of the display area.
-NOTE: this assumes that the laptop display, if present,
-is on the left of any monitors."
+(defun my/layout--frame-top (layout display)
+  "Obtain the `top` position for a frame for LAYOUT and DISPLAY index.
+The position value will place the frame such that the top of the frame
+aligns with the top of the DISPLAY."
   (declare (side-effect-free t))
-  (let* ((settings (display-monitor-attributes-list))
-         (top (nth 1 (alist-get 'geometry (car settings))))
+  (let* ((index (if (eq layout my/layout--screens-laptop) 0 (+ 1 display)))
+         (settings (nth index (display-monitor-attributes-list)))
+         (top (nth 1 (alist-get 'geometry settings)))
          (offset (if my/is-x-windows-on-win 30 0)))
     (list '+ (+ offset top))))
+
+(defun my/layout--frame-alist (left layout display)
+  "Make alist to use for a frame on LAYOUT and DISPLAY with LEFT position.
+Frame's left side is flush with the left side of the DISPLAY."
+  (declare (side-effect-free t))
+  (list (cons 'width (my/layout--cols layout))
+        (cons 'height (my/layout--rows layout))
+        (cons 'top (my/layout--frame-top layout display))
+        (cons 'left (funcall left layout display))))
 
 (defun my/layout--frame-left-alist (layout display)
   "Make alist to use for the `initial' frame on LAYOUT and DISPLAY.
 Frame's left side is flush with the left side of the DISPLAY."
   (declare (side-effect-free t))
-  (list (cons 'width (my/layout--cols layout))
-        (cons 'height (my/layout--rows layout))
-        (cons 'top (my/layout--frame-top))
-        (cons 'left (my/layout--frame-left layout display))))
+  (my/layout--frame-alist 'my/layout--frame-left layout display))
 
 (defun my/layout--frame-center-alist (layout display)
   "Make alist to use for the `default' frame on LAYOUT and DISPLAY.
 Frame's left side is next to the right side of the initial frame."
   (declare (side-effect-free t))
-  (list (cons 'width (my/layout--cols layout))
-        (cons 'height (my/layout--rows layout))
-        (cons 'top (my/layout--frame-top))
-        (cons 'left (my/layout--frame-center layout display))))
+  (my/layout--frame-alist 'my/layout--frame-center layout display))
 
 (defun my/layout--frame-right-alist (layout display)
   "Make alist to use for the `right' frame on LAYOUT and DISPLAY.
 Frame's right side is flush with the right side of the main display."
   (declare (side-effect-free t))
-  (list (cons 'width (my/layout--cols layout))
-        (cons 'height (my/layout--rows layout))
-        (cons 'top (my/layout--frame-top))
-        (cons 'left (my/layout--frame-right layout display))))
+  (my/layout--frame-alist 'my/layout--frame-right layout display))
 
 (defun my/layout--update-screen-frame-alists (layout)
   "Update frame alists for current LAYOUT and DISPLAY."
