@@ -165,9 +165,7 @@ NOTE: this assumes that the laptop display, if present,
 is on the left of any monitors."
   (declare (side-effect-free t))
   (let* ((settings (display-monitor-attributes-list))
-         (top (nth 2 (if (eq (length settings) 1)
-                         (car (car settings))
-                       (car (car (cdr settings))))))
+         (top (nth 1 (alist-get 'geometry (car settings))))
          (offset (if my/is-x-windows-on-win 30 0)))
     (list '+ (+ offset top))))
 
