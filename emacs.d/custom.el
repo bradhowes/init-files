@@ -80,6 +80,7 @@
  '(enable-recursive-minibuffers t)
  '(fill-column 120)
  '(find-file-visit-truename t)
+ '(flymake-show-diagnostics-at-end-of-line nil)
  '(flyspell-mode-line-string "s ")
  '(frame-resize-pixelwise t)
  '(global-corfu-mode t)
@@ -98,6 +99,7 @@
  '(indicate-empty-lines t)
  '(inhibit-startup-echo-area-message "howes")
  '(inhibit-startup-screen t)
+ '(insert-directory-program "gls")
  '(isearch-lazy-count t)
  '(ispell-extra-args
    '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16" "--camel-case"))
@@ -128,10 +130,9 @@
             flymake-lua flymake-shellcheck flyover geiser-guile impatient-mode indent-bars jedi jiralib2 js-comint
             js2-mode json-mode key-chord lsp-jedi lsp-pyright lsp-sourcekit lsp-ui lua-mode magit marginalia
             mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired
-            nerd-icons-grep nerd-icons-ibuffer nerd-icons-xref orderless org-jira osx-dictionary pdb-capf popper pyvenv
-            rainbow-delimiters realgud realgud-lldb rg scratch swift-mode swift-ts-mode tempel tempel-collection
-            tree-sitter-langs treesit-auto verb vertico which-key ws-butler yaml yaml-mode yasnippet-capf
-            yasnippet-snippets))
+            nerd-icons-grep nerd-icons-ibuffer nerd-icons-xref orderless org-jira osm osx-dictionary pdb-capf popper
+            pyvenv rainbow-delimiters rg scratch swift-mode swift-ts-mode tempel tempel-collection tree-sitter-langs
+            treesit-auto verb vertico which-key ws-butler yaml yaml-mode yasnippet-capf yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-echo-mode t)
  '(popper-mode t)
@@ -141,6 +142,7 @@
  '(project-switch-commands
    '((project-find-file "Find file" nil) (project-find-regexp "Find regexp" nil) (project-find-dir "Find directory" nil)
      (magit-project-status "Magit" 109) (project-eshell "Eshell" nil) (project-any-command "Other" nil)))
+ '(python-indent-guess-indent-offset-verbose nil)
  '(pyvenv-workon ".")
  '(read-extended-command-predicate 'command-completion-default-include-p)
  '(recentf-max-menu-items 50)
@@ -156,7 +158,6 @@
    '(register-alist kill-ring project-regexp-history-variable corfu-history))
  '(savehist-mode t)
  '(scroll-preserve-screen-position 1)
- '(search-default-mode t)
  '(send-mail-function 'sendmail-send-it)
  '(sendmail-program "/opt/homebrew/bin/msmtp")
  '(sentence-end "[.?!][]\"')]*\\($\\|\11\\| \\)[\12]*")
@@ -167,6 +168,7 @@
  '(tab-always-indent 'complete)
  '(text-scale-mode-step 1.0)
  '(tool-bar-mode nil)
+ '(truncate-string-ellipsis "…" t)
  '(uniquify-buffer-name-style 'forward nil (uniquify))
  '(use-package-always-defer t)
  '(user-mail-address "bradhowes@mac.com")

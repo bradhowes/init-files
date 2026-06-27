@@ -368,7 +368,12 @@ such directory, in the user's home directory."
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
-(use-package orderless)
+(use-package orderless
+  :custom
+  (completion-styles '(partial-completion orderless flex))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion))
+                                   (minibuffer (initials orderless)))))
 
 (use-package org
   :commands (org-store-link)
@@ -1110,11 +1115,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                    "M-<f3>" #'my/layout-frame-pos-right
 
                    "C-x 4 c" #'my/customize-other-window
-                   "C-x 4 k" #'my/eat-other-window
+                   "C-x 4 k" #'my/shell-other-window
                    "C-x 4 r" #'my/repl-other-window
 
                    "C-x 5 i" #'my/info-other-frame
-                   "C-x 5 k" #'my/eat-other-frame
+                   "C-x 5 k" #'my/shell-other-frame
 
                    "H-c H-c" #'my/copy-file-name-to-clipboard
                    "H-c H-k" #'my/kill-current-buffer
@@ -1189,12 +1194,12 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                            "H-m" #'consult-bookmark
                            "H-p" project-prefix-map
                            "H-r" #'speedbar
-                           "H-s" #'my/eat
+                           "H-s" #'my/shell
                            "H-t" #'my/htop
                            "H-u" #'undo
                            "H-v" #'my/reload-buffer
                            "H-w" #'my/ace-window-prefix
-                           "H-z" #'my/eat
+                           "H-z" #'my/shell
                            "H-," #'my/customize-search
                            "H-;" #'my/matching-paren)))
   (apply #'my/emacs-key-bind global-map hyper-mapping)
