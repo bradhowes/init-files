@@ -1,0 +1,21 @@
+#!/bin/bash
+
+DIR="${2}"
+ARG="${3}"
+VAL="${4}"
+
+function error #
+{
+    echo "** ${*}"
+    exit 1
+}
+
+
+echo "-- DIR: ${2}"
+echo "-- ARG: ${3}"
+echo "-- VAL: ${4}"
+echo "-- CMD: python3 scripts/bumpVersions.py '${ARG}' '${VAL}'"
+
+cd "${DIR}" || error "Invalid directory '${DIR}'"
+
+python3 scripts/bumpVersions.py "${ARG}" ${VAL}
