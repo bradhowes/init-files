@@ -248,20 +248,6 @@ ARG is an optional integer which defaults to 2."
     (modify-frame-parameters frame frame-alist)
     (redraw-frame frame)))
 
-(defun my/layout--frame-pos-display-left (display)
-  "Reset frame size and position for left frame on DISPLAY."
-  (my/layout--frame-set-alist (my/layout--frame-left-alist (my/layout--active-screens) display)))
-
-(defun my/layout--frame-pos-display-center (display)
-  "Reset frame size and position for right frame on DISPLAY."
-  (my/layout--frame-set-alist (my/layout--frame-center-alist (my/layout--active-screens) display)))
-
-(defun my/layout--frame-pos-display-right (display)
-  "Reset frame size and position for alternative right position on DISPLAY.
-This will shift the frame to the left so that it does not overlap with any
-frame that is abutting the right edge of the display."
-  (my/layout--frame-set-alist (my/layout--frame-right-alist (my/layout--active-screens) display)))
-
 (defun my/layout--pick-display (display)
   "Convert a DISPLAY integer 0, 1 into a display symbol value.
 If 0, returns `my/layout--use-4k-display-1' else returns `my/layout--use-4k-display-1'."
@@ -276,7 +262,7 @@ frame will be that found in `my/layout-default-display-4k'. A specific screen
 can be chosen by providing a prefix value where 0 is the first display, and 1
 is the second, etc."
   (interactive "P")
-  (my/layout--frame-pos-display-left (my/layout--pick-display display)))
+  (my/layout--frame-set-alist (my/layout--frame-left-alist (my/layout--active-screens) (my/layout--pick-display display))))
 
 (defun my/layout-frame-pos-center (&optional display)
   "Reset frame size and position for center frame on DISPLAY.
@@ -285,7 +271,7 @@ frame will be that found in `my/layout-default-display-4k'. A specific screen
 can be chosen by providing a prefix value where 0 is the first display, and 1
 is the second, etc."
   (interactive "P")
-  (my/layout--frame-pos-display-center (my/layout--pick-display display)))
+  (my/layout--frame-set-alist (my/layout--frame-center-alist (my/layout--active-screens) (my/layout--pick-display display))))
 
 (defun my/layout-frame-pos-right (&optional display)
   "Reset frame size and position for right frame on DISPLAY.
@@ -294,7 +280,7 @@ frame will be that found in `my/layout-default-display-4k'. A specific screen
 can be chosen by providing a prefix value where 0 is the first display, and 1
 is the second, etc."
   (interactive "P")
-  (my/layout--frame-pos-display-right (my/layout--pick-display display)))
+  (my/layout--frame-set-alist (my/layout--frame-right-alist (my/layout--active-screens) (my/layout--pick-display display))))
 
 (defun my/layout-reset-frame-width ()
   "Reset the current frame width to function `my/cols'."
