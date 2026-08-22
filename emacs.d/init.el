@@ -663,12 +663,11 @@ artifacts such as indentation bars."
                   (car args))
           (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror))
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
-         (after-init . abbrev-mode)
-         (after-init . (lambda ()
-                         (when (file-exists-p custom-file)
-                           (load custom-file 'noerror))))))
+         (after-init . abbrev-mode)))
 
 (use-package window
   :init
