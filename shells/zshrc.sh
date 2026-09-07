@@ -99,7 +99,7 @@ precmd() { vcs_info; }
 zstyle ':vcs_info:git:*' formats '%b|'
 setopt PROMPT_SUBST
 
-export PROMPT="${vcs_info_msg_0_}%B%F{green}%n%#%f%b "
+export PROMPT="${vcs_info_msg_0_}%B%F{green}%#%f%b "
 
 # export PS1="\e]0;\u@\h:\w\007[\e[1;32m\]$(parse_git_branch)\u%\[\033[0m\] "
 # export PS1="%B%F{green}%n%#%f%b "

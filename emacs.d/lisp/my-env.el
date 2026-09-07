@@ -6,6 +6,8 @@
 ;;;
 ;;; Code:
 
+(require 'info)
+
 (defconst my/is-macosx
   (eq system-type 'darwin)
   "T if running on macOS.
@@ -55,36 +57,38 @@ control.")
   (file-name-concat my/venv "bin/python")
   "The path to the Python executable to use for eglot.")
 
-(when (null Info-default-directory-list)
-  (let* ((common-paths (list (file-truename "~/bin")
-                             (file-name-concat my/venv "bin")))
-         (macosx-paths (if my/is-macosx
-                           (list "/opt/homebrew/sqlite/bin"
-                                 "/opt/homebrew/opt/grep/libexec/gnubin"
-                                 "/opt/homebrew/bin")
-                         '()))
-         ;; Collection of valid 'bin' paths
-         (bin-paths (seq-filter #'file-directory-p (append common-paths macosx-paths)))
-         ;; Collection of parent paths from the `bin' paths (valid because the children are)
-         (root-paths (mapcar #'file-name-parent-directory bin-paths))
-         ;; Collection of valid `info' paths
-         (info-paths (append (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "info")) root-paths))
-                             (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "share/info")) root-paths))))
-         ;; Collection of valid `man' paths
-         (man-paths (append (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "man")) root-paths))
-                            (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "share/man")) root-paths)))))
-    ;; Set exec-path to contain the above paths
-    (setq exec-path (append bin-paths exec-path))
-    (setq Info-additional-directory-list '("/opt/homebrew/share/info"))
-    (setq Info-default-directory-list (append info-paths Info-default-directory-list))
-    (message "Info-default-directory-list: %s" Info-default-directory-list)
+(message "Info-default-directory-list: %s" Info-default-directory-list)
 
-    ;; (unless (null Info-directory-list)
-    ;;   (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))
-    ;; Same for PATH environment variable
-    (setenv "PATH" (concat (string-join bin-paths ":") ":" (getenv "PATH")))
-    (setenv "INFOPATH" (concat (string-join info-paths ":") ":" (getenv "INFOPATH")))
-    (setenv "MANPATH" (concat (string-join man-paths ":") ":" (getenv "MANPATH")))))
+(let* ((common-paths (list (file-truename "~/bin")
+                           (file-name-concat my/venv "bin")))
+       (macosx-paths (if my/is-macosx
+                         (list "/opt/homebrew/sqlite/bin"
+                               "/opt/homebrew/opt/grep/libexec/gnubin"
+                               "/opt/homebrew/bin")
+                       '()))
+       ;; Collection of valid 'bin' paths
+       (bin-paths (seq-filter #'file-directory-p (append common-paths macosx-paths)))
+       ;; Collection of parent paths from the `bin' paths (valid because the children are)
+       (root-paths (mapcar #'file-name-parent-directory bin-paths))
+       ;; Collection of valid `info' paths
+       (info-paths (append (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "info")) root-paths))
+                           (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "share/info")) root-paths))))
+       ;; Collection of valid `man' paths
+       (man-paths (append (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "man")) root-paths))
+                          (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "share/man")) root-paths)))))
+  ;; Set exec-path to contain the above paths
+  (setq exec-path (append bin-paths exec-path))
+  (message "exec-path: %s" exec-path)
+  (setq Info-additional-directory-list '("/opt/homebrew/share/info"))
+  (setq Info-default-directory-list (append info-paths Info-default-directory-list))
+  (message "Info-default-directory-list: %s" Info-default-directory-list)
+
+  ;; (unless (null Info-directory-list)
+  ;;   (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))
+  ;; Same for PATH environment variable
+  (setenv "PATH" (concat (string-join bin-paths ":") ":" (getenv "PATH")))
+  (setenv "INFOPATH" (concat (string-join info-paths ":") ":" (getenv "INFOPATH")))
+  (setenv "MANPATH" (concat (string-join man-paths ":") ":" (getenv "MANPATH"))))
 
 (provide 'my-env)
 

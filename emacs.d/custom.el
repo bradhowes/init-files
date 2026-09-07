@@ -56,8 +56,7 @@
    '("967c23e9ba179b80560774419f081df22e7674aac23c5c550b817e4a1ce7d058"
      "6dcf1ca4c7432773084b9d52649ee5eb2c663131c4c06859f648dea98d9acb3e"
      "69f7e8101867cfac410e88140f8c51b4433b93680901bb0b52014144366a08c8"
-     "183dfa34e360f5bc2ee4a6b3f4236e6664f4cfce40de1d43c984e0e8fc5b51ae"
-     default))
+     "183dfa34e360f5bc2ee4a6b3f4236e6664f4cfce40de1d43c984e0e8fc5b51ae" default))
  '(delete-by-moving-to-trash t)
  '(delete-old-versions t)
  '(denote-rename-buffer-mode t)
@@ -71,8 +70,6 @@
  '(dynamic-completion-mode t)
  '(eat-enable-auto-line-mode t)
  '(eat-line-input-history-isearch 'dwim)
- '(eglot-autoshutdown t)
- '(eglot-extend-to-xref t)
  '(eglot-ignored-server-capabilities '(:documentHighlightProvider))
  '(eglot-send-changes-idle-time 0.1)
  '(eldoc-box--mouse-support-mode nil)
@@ -122,19 +119,21 @@
  '(mouse-yank-at-point t)
  '(ns-alternate-modifier 'alt)
  '(ns-command-modifier 'meta)
+ '(ns-function-modifier 'hyper)
  '(ns-right-alternate-modifier 'hyper)
  '(ns-right-command-modifier 'super)
  '(ns-right-control-modifier 'hyper)
  '(package-selected-packages
    '(accent ace-window async cape char-menu cmake-mode consult-compile-multi consult-denote consult-dir consult-eglot
             consult-notes corfu-terminal crux dape diff-hl eat ef-themes eglot-luau eldoc-box embark-consult esup
-            exec-path-from-shell expand-region fancy-compilation flycheck-swift flymake flymake-aspell flymake-json
-            flymake-lua flymake-shellcheck flyover geiser-guile impatient-mode indent-bars jedi jiralib2 js-comint
-            js2-mode json-mode key-chord lsp-jedi lsp-pyright lsp-sourcekit lsp-ui lua-mode magit marginalia
-            mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired
-            nerd-icons-grep nerd-icons-ibuffer nerd-icons-xref orderless org-jira osm osx-dictionary pdb-capf popper
-            pyvenv rainbow-delimiters rg scratch swift-mode swift-ts-mode tempel tempel-collection tree-sitter-langs
-            treesit-auto verb vertico which-key ws-butler yaml yaml-mode yasnippet-capf yasnippet-snippets))
+            exec-path-from-shell expand-region fancy-compilation flycheck flycheck-swift flymake flymake-aspell
+            flymake-json flymake-lua flymake-shellcheck flyover geiser-guile impatient-mode indent-bars jedi jiralib2
+            js-comint js2-mode json-mode key-chord lisp-mode lsp-jedi lsp-pyright lsp-sourcekit lsp-ui lua-mode magit
+            marginalia markdown-mode mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu
+            nerd-icons-dired nerd-icons-grep nerd-icons-ibuffer nerd-icons-xref orderless org-jira osm osx-dictionary
+            pdb-capf popper pyvenv rainbow-delimiters rg scratch swift-mode swift-ts-mode tempel tempel-collection
+            tree-sitter-langs treesit-auto verb vertico which-key ws-butler yaml yaml-mode yasnippet yasnippet-capf
+            yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-echo-mode t)
  '(popper-mode t)

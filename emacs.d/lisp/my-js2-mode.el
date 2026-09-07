@@ -2,7 +2,11 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'js2-mode)
+(use-package js2-mode
+  :commands (js-send-last-sexp js-send-buffer)
+  :defines (js2-basic-offset)
+  :ensure t)
+
 (require 'font-lock)
 (require 'my-insert-block-comment)
 (require 'my-fontify-braces)

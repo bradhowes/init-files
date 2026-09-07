@@ -3,13 +3,14 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'flymake)
 (require 'seq)
 (require 'my-constants)
 (require 'my-customizations)
 (require 'my-env)
 (require 'my-functions)
 (require 'my-layout)
-(require 'my-modes)
+(require 'wid-edit)
 
 (set-charset-priority 'unicode)
 (setq locale-coding-system 'utf-8
@@ -37,7 +38,6 @@ the buffer having untrusted content."
   (setq file-notify-debug nil))
 ;; (debug-on-entry 'file-notify-add-watch)
 
-;; (if (or my/is-macosx (string= (system-name) "ldzls1144d"))
 (use-package package
   :custom
   (package-archive-priorities '(("melpa" . 10)
@@ -48,24 +48,144 @@ the buffer having untrusted content."
   (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
   (package-initialize))
-;; (use-package package
-;;   :init
-;;   (package-initialize)) ;; )
 
 (defvar my/hyper-c-map
   (make-sparse-keymap)
   "Keymap for Hyper-c actions.")
 (keymap-set global-map "H-c" my/hyper-c-map)
 
-(use-package accent
-  :bind ("H-c a" . accent-menu))
+;; (use-package accent
+;;   :ensure t
+;;   :bind ("H-x a" . accent-menu))
+
+;;; ===== ace-window =====
 
 (use-package ace-window
+  :ensure t
   :commands (aw-window-list aw-switch-to-window aw-select aw-flip-window ace-display-buffer ace-window)
   :defines (aw-dispatch-always)
   :config (setq aw-make-frame-char ?n))
 
+(defun my/do-next-window (wins)
+  "Jump to next window in WINS after the current one."
+  (when-let* ((current-window (get-buffer-window))
+              (current-index (seq-position wins current-window #'eq))
+              (next-index (and current-index (1+ current-index)))
+              (final-index (if my/next-window-wrap-around
+                               (% next-index (length wins))
+                             (and (length> wins next-index) next-index))))
+    (aw-switch-to-window (nth final-index wins))))
+
+(defun my/aw-make-frame ()
+  "Make a new frame using layout settings for the current display.
+The first frame always takes on `initial-frame-alist', and subsequent frames
+use `default-frame-alist' by default. If there are already two frames active
+then subsequent ones will be at `my/align-right-frame-alist' which aligns with
+the right-edge of the screen, but may overlap with the middle frame."
+  (let ((num-frames (length (visible-frame-list))))
+    (if (< num-frames 2)
+        (make-frame)
+      (make-frame (my/layout--frame-right-alist (my/layout--active-screens) (my/layout--which-4k-display))))))
+
+(advice-add 'aw-make-frame :override #'my/aw-make-frame)
+
+(defun my/ace-window-always-dispatch ()
+  "Invoke `ace-window' after setting `aw-dispatch-always' to T.
+When `aw-dispatch-always' is nil, `ace-window' does not invoke
+its dispatching mechanism if there are 2 or fewer windows. This
+command guarantees that dispatching will always happen."
+  (interactive)
+  (let ((current-aw-dispatch-always aw-dispatch-always))
+    (unwind-protect
+        (let ((aw-dispatch-always t))
+          (call-interactively #'ace-window))
+      (setq aw-dispatch-always current-aw-dispatch-always))))
+
+(defun my/ace-window-next ()
+  "Jump to next window according to `ace-window'."
+  (interactive)
+  (my/do-next-window (aw-window-list)))
+
+(defun my/ace-window-previous ()
+  "Jump to previous window according to `ace-window'."
+  (interactive)
+  (my/do-next-window (reverse (aw-window-list))))
+
+(defun my/next-buffer-skip-filter (_ buffer bury-or-kill)
+  "Return t if BUFFER should be skipped in WINDOW.
+This is used by `my/prev-buffer-current-window' and
+`my/next-buffer-current-window' methods so that only desired
+buffers will be available for changing to in the current
+window. If BURY-OR-KILL is not nil then the operation will result
+in the buffer being buried or killed, and in this case buffers
+are never filtered out. Otherwise, skip buffers that start with
+'*' in their name, `dired' buffers, `help' buffers, and buffers
+that are already visible somewhere."
+  (if bury-or-kill
+      nil
+    ;; Taken from http://xahlee.info/emacs/emacs/elisp_next_prev_user_buffer.html
+    (with-current-buffer buffer
+      (cond
+       ((string-match "^\*" (buffer-name)) t)
+       ((eq major-mode 'dired-mode) t)
+       ((eq major-mode 'help-mode) t)
+       ((get-buffer-window nil 'visible) t)
+       (t nil)))))
+
+(defun my/next-buffer-current-window ()
+  "Switch to `next' buffer in current window with filtering.
+Only switch to a buffer that passes the filter defined in
+`my/next-buffer-skip-filter'."
+  (interactive)
+  (let ((switch-to-prev-buffer-skip #'my/next-buffer-skip-filter))
+    (next-buffer)))
+
+(defun my/prev-buffer-current-window ()
+  "Switch to `previous' buffer in current window with filtering.
+Only switch to a buffer that passes the filter defined in
+`my/next-buffer-skip-filter'."
+  (interactive)
+  (let ((switch-to-prev-buffer-skip #'my/next-buffer-skip-filter))
+    (previous-buffer)))
+
+(defun my/ace-window-one-command ()
+  "Run an action in a chosen window.
+Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch."
+  (interactive)
+  (when-let* ((aw-dispatch-always t)
+              (win (aw-select " ACE"))
+              (windowp win))
+    (with-selected-window win
+      (let* ((command (key-binding
+                       (read-key-sequence
+                        (format "Run in %s..." (buffer-name)))))
+             (this-command command))
+        (call-interactively command)))))
+
+(defun my/display-buffer-pre-func (buffer alist)
+  "Method to use for `display-buffer-overriding-action'.
+The BUFFER and ALIST are ignored."
+  (let* ((_ (cons buffer alist))
+         (type 'reuse)
+         (aw-dispatch-always t)
+         (window (aw-select (propertize " ACE" 'face 'mode-line-highlight))))
+    (cons window type)))
+
+(defun my/ace-window-prefix ()
+  "Use `ace-window' to display the buffer of the next command.
+The next buffer is the buffer displayed by the next command invoked
+immediately after this command (ignoring reading from the minibuffer).
+Creates a new window before displaying the buffer.
+When `switch-to-buffer-obey-display-actions' is non-nil,
+`switch-to-buffer' commands are also supported."
+  (interactive)
+  (display-buffer-override-next-command #'my/display-buffer-pre-func nil "[ace-window]")
+  (message "Command to execute: "))
+
+(keymap-global-set "C-x 4 o" #'my/ace-window-prefix)
+
 (use-package char-menu
+  :ensure t
   :defines (char-menu)
   :bind (("C-z" . char-menu))
   :config
@@ -77,14 +197,17 @@ the buffer having untrusted content."
           ("Greek"      "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
 
 (use-package compile
+  :ensure t
   :config
   (add-to-list 'compilation-error-regexp-alist
                '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2))) ; I think this is from pyright
 
 (use-package xref
+  :ensure t
   :defines (xref-show-xrefs-function xref-show-definitions-function))
 
 (use-package consult
+  :ensure t
   :after (project xref)
   :commands (consult--customize-put consult-flymake)
   :bind (("H-c M-x" . consult-mode-command)
@@ -180,7 +303,31 @@ the buffer having untrusted content."
   ;; Both < and C-+ work reasonably well.
   (setq consult-narrow-key "<"))
 
+(use-package denote
+  :ensure t
+  :commands (denote-dired-mode-in-directories)
+  :hook (dired-mode . denote-dired-mode-in-directories)
+  :bind (("H-n n" . denote))
+  :custom
+  (denote-directory (file-truename "~/Documents/notes/"))
+  :config
+  (setq denote-file-types (cons
+                           '(markdown-brh
+                             :extension ".md"
+                             :date-function (lambda (date) (format-time-string "%F %T"))
+                             :front-matter denote-yaml-front-matter
+                             :title-key-regexp "^title\\s-*:"
+                             :title-value-function denote-trim-whitespace
+                             :title-value-reverse-function denote-trim-whitespace
+                             :keywords-key-regexp "^tags\\s-*:"
+                             :keywords-value-function denote-format-keywords-for-text-front-matter
+                             :keywords-value-reverse-function denote-extract-keywords-from-front-matter
+                             :link denote-md-link-format
+                             :link-in-context-regexp denote-md-link-in-context-regexp)
+                           denote-file-types)))
+
 (use-package consult-notes
+  :ensure t
   :after (consult denote)
   :defines (consult-notes-denote-files-function)
   :commands (consult-notes-denote-mode denote-directory-files)
@@ -189,16 +336,13 @@ the buffer having untrusted content."
   :bind (("H-n b" . consult-notes)))
 
 (use-package corfu
+  :ensure t
   :bind (:map corfu-map ("C-SPC" . corfu-insert-separator)))
-
-;; (use-package corfu-terminal
-;;   :if my/is-terminal
-;;   :functions (corfu-terminal-mode)
-;;   :hook (after-init . (lambda () (corfu-terminal-mode +1))))
 
 (use-package crm)
 
 (use-package crux
+  :ensure t
   :defer nil                            ; load now due to dependencies below
   :bind (("C-a" . crux-move-beginning-of-line)
          ("H-c d" . crux-duplicate-current-line-or-region)
@@ -228,28 +372,6 @@ such directory, in the user's home directory."
         (message "Editing existing file %s" found-file)
       (message "Editing new file %s" found-file))))
 
-(use-package denote
-  :commands (denote-dired-mode-in-directories)
-  :hook (dired-mode . denote-dired-mode-in-directories)
-  :bind (("H-n n" . denote))
-  :custom
-  (denote-directory (file-truename "~/Documents/notes/"))
-  :config
-  (setq denote-file-types (cons
-                           '(markdown-brh
-                             :extension ".md"
-                             :date-function (lambda (date) (format-time-string "%F %T"))
-                             :front-matter denote-yaml-front-matter
-                             :title-key-regexp "^title\\s-*:"
-                             :title-value-function denote-trim-whitespace
-                             :title-value-reverse-function denote-trim-whitespace
-                             :keywords-key-regexp "^tags\\s-*:"
-                             :keywords-value-function denote-format-keywords-for-text-front-matter
-                             :keywords-value-reverse-function denote-extract-keywords-from-front-matter
-                             :link denote-md-link-format
-                             :link-in-context-regexp denote-md-link-in-context-regexp)
-                           denote-file-types)))
-
 (use-package dired
   :config
   :bind (:map dired-mode-map
@@ -262,6 +384,7 @@ such directory, in the user's home directory."
   :hook (dired-mode . my/dired-mode-hook))
 
 (use-package eldoc-box
+  :ensure t
   :if my/is-terminal)
 ;; :hook (prog-mode . eldoc-box-hover-mode)))
 
@@ -270,6 +393,7 @@ such directory, in the user's home directory."
 
 ;; FYI: Embark's default action binding of "RET" fails if a mode binds to <return>.
 (use-package embark
+  :ensure t
   :bind (("C-." . embark-act)
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
@@ -278,19 +402,21 @@ such directory, in the user's home directory."
                                        nil
                                        (window-parameters (mode-line-format . none)))))
 
-;; (use-package embark-consult
-;;   :after (consult embark)
-;;   :hook (embark-collect-mode . consult-preview-at-point-mode))
+(use-package embark-consult
+  :ensure t
+  :after (consult embark)
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package esup
+  :ensure t
   :custom (esup-user-init-file (file-truename "~/.emacs.d/init.el")))
 
 (use-package expand-region
+  :ensure t
   :bind ("C-\\" . er/expand-region))
 
-(use-package fancy-compilation
-  :commands (fancy-compilation-mode)
-  :hook ((compilation-mode . fancy-compilation-mode)))
+(use-package flycheck
+  :ensure t)
 
 (use-package flyover
   :ensure t
@@ -312,7 +438,8 @@ such directory, in the user's home directory."
 (use-package hippie-expand
   :bind (("M-/" . hippie-expand)))
 
-(use-package hl-line)
+(use-package hl-line
+  :ensure t)
 
 ;; Unbind the ibuffer use of "M-o" so as not to conflict with my global definition using `ace-window'
 (use-package ibuffer
@@ -322,10 +449,11 @@ such directory, in the user's home directory."
   :bind-keymap ("H-8" . iso-transl-ctl-x-8-map)) ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
 
 (use-package key-chord
-  :vc (:url "https://github.com/emacsorphanage/key-chord" :rev :newest)
+  ;; :vc (:url "https://github.com/emacsorphanage/key-chord" :rev :newest)
   :commands (key-chord-define))
 
 (use-package magit
+  :ensure t
   :commands (magit-status-setup-buffer magit-status magit-project-status)
   :hook ((magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (("C-x g" . magit-status)
@@ -337,38 +465,45 @@ such directory, in the user's home directory."
   :custom (magit-process-find-password-functions '(my/read-gitlab-password)))
 
 (use-package marginalia
+  :ensure t
   :commands (marginalia-mode)
   :bind (:map minibuffer-local-map
               ("C-M-<tab>" . marginalia-cycle))
   :hook (after-init . marginalia-mode))
 
-(use-package mode-line-bell)
+(use-package mode-line-bell
+  :ensure t)
 
 (use-package mood-line
+  :ensure t
   :if (display-graphic-p)
   :commands (mood-line-mode)
   :hook (after-init . mood-line-mode))
 
 (use-package multiple-cursors
+  :ensure t
   :bind (("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          ("H-c ." . mc/mark-all-like-this)))
 
 (use-package my-fontify-braces)
 
-(use-package nerd-icons)
+(use-package nerd-icons :ensure t)
 
 (use-package nerd-icons-completion
+  :ensure t
   :after (marginalia)
   :commands (nerd-icons-completion-mode nerd-icons-completion-marginalia-setup)
   :hook ((after-init . nerd-icons-completion-mode)
          (marginalia-mode nerd-icons-completion-marginalia-setup)))
 
 (use-package nerd-icons-dired
+  :ensure t
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
 (use-package orderless
+  :ensure t
   :custom
   (completion-styles '(partial-completion orderless flex))
   (completion-category-defaults nil)
@@ -389,25 +524,12 @@ such directory, in the user's home directory."
   :bind-keymap ("H-o" . my/org-key-map))
 
 (use-package osx-dictionary
+  :ensure t
   :if my/is-macosx
   :bind (("H-c l" . osx-dictionary-search-pointer)))
 
-(use-package password-cache
-  :defines (password-cache password-cache-expiry)
-  :commands (password-cache-add password-read password-read-from-cache)
-  :custom
-  (password-cache t)
-  (password-cache-expiry nil))
-
-(defun my/read-gitlab-password (host)
-  "Inject password into `password-cache' for HOST."
-  (if-let ((password (password-read-from-cache host)))
-      password
-    (let ((password (password-read "Gitlab password: " host)))
-      (password-cache-add host password)
-      password)))
-
 (use-package popper
+  :ensure t
   :defer nil                            ; load now due to dependencies below
   :commands (popper-kill-latest-popup)
   :functions (popper--delete-popup)
@@ -431,15 +553,18 @@ Bound to \\`C-x p s'.")
 (keymap-set project-prefix-map "s" my/project-search-map)
 
 (use-package rg
+  :ensure t
   :after (project)
   :commands (rg-enable-default-bindings rg-project)
   :bind ("C-x p s r" . #'rg-project)
   :hook (after-init . rg-enable-default-bindings))
 
 (use-package scratch
+  :ensure t
   :bind (("H-c s" . scratch)))
 
 (use-package tempo
+  :ensure t
   :commands (tempo-define-template))
 
 (defun tempo-template-my/org-emacs-lisp-source (&optional _)
@@ -450,17 +575,26 @@ Bound to \\`C-x p s'.")
                        "Insert an Emacs Lisp source block in an org document.")
 
 (use-package vertico
+  :ensure t
   :commands (vertico-mode)
   :hook ((rfn-eshadow-update-overlay . vertico-directory-tidy)))
 
-(use-package which-key)
+(use-package which-key
+  :ensure t)
 
 (use-package winner
+  :ensure t
   :bind (("C-<left>" . winner-undo)
          ("C-<right>" . winner-redo)
          ("H-c u" . winner-undo)
          ("H-c C-u" . winner-undo)
          ("H-c C-r" . winner-redo)))
+
+(use-package yasnippet
+  :ensure t)
+
+(use-package yasnippet-snippets
+  :ensure t)
 
 (defun my/org-emacs-lisp-source-with-indent ()
   "Execute `my/org-emacs-lisp-source' and then indent block."
@@ -498,9 +632,9 @@ artifacts such as indentation bars."
   :commands (my/crm-indicator)
   :config
   (setq read-process-output-max (* 64 1024 1024)
-        process-adaptive-read-buffering nil
-        custom-file (file-truename (locate-user-emacs-file "custom.el"))
-        frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
+	process-adaptive-read-buffering nil
+	custom-file (file-truename (locate-user-emacs-file "custom.el"))
+	frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
                              (if my/is-terminal (list (concat (system-name) " ") buffer-directory)
                                buffer-directory)))
   (ffap-bindings)
@@ -716,9 +850,9 @@ Otherwise just bury them."
 (defun my/copy-file-name-to-clipboard ()
   "Copy the current buffer file name to the clipboard."
   (interactive)
-  (when-let ((filename (if (equal major-mode 'dired-mode)
-                           default-directory
-                         (buffer-file-name))))
+  (when-let* ((filename (if (equal major-mode 'dired-mode)
+                            default-directory
+                          (buffer-file-name))))
     (kill-new filename)
     (message "Copied buffer file name '%s' to the clipboard." filename)))
 
@@ -733,124 +867,6 @@ Otherwise just bury them."
   (let ((tmp (get-buffer-create "*ielm*")))
     (switch-to-buffer-other-window tmp)
     (ielm)))
-
-(defun my/do-next-window (wins)
-  "Jump to next window in WINS after the current one."
-  (when-let ((current-window (get-buffer-window))
-             (current-index (seq-position wins current-window #'eq))
-             (next-index (and current-index (1+ current-index)))
-             (final-index (if my/next-window-wrap-around
-                              (% next-index (length wins))
-                            (and (length> wins next-index) next-index))))
-    (aw-switch-to-window (nth final-index wins))))
-
-(defun my/aw-make-frame ()
-  "Make a new frame using layout settings for the current display.
-The first frame always takes on `initial-frame-alist', and subsequent frames
-use `default-frame-alist' by default. If there are already two frames active
-then subsequent ones will be at `my/align-right-frame-alist' which aligns with
-the right-edge of the screen, but may overlap with the middle frame."
-  (let ((num-frames (length (visible-frame-list))))
-    (if (< num-frames 2)
-        (make-frame)
-      (make-frame (my/layout--frame-right-alist (my/layout--active-screens) (my/layout--which-4k-display))))))
-
-(advice-add 'aw-make-frame :override #'my/aw-make-frame)
-
-(defun my/ace-window-always-dispatch ()
-  "Invoke `ace-window' after setting `aw-dispatch-always' to T.
-When `aw-dispatch-always' is nil, `ace-window' does not invoke
-its dispatching mechanism if there are 2 or fewer windows. This
-command guarantees that dispatching will always happen."
-  (interactive)
-  (let ((current-aw-dispatch-always aw-dispatch-always))
-    (unwind-protect
-        (let ((aw-dispatch-always t))
-          (call-interactively #'ace-window))
-      (setq aw-dispatch-always current-aw-dispatch-always))))
-
-(defun my/ace-window-next ()
-  "Jump to next window according to `ace-window'."
-  (interactive)
-  (my/do-next-window (aw-window-list)))
-
-(defun my/ace-window-previous ()
-  "Jump to previous window according to `ace-window'."
-  (interactive)
-  (my/do-next-window (reverse (aw-window-list))))
-
-(defun my/next-buffer-skip-filter (_ buffer bury-or-kill)
-  "Return t if BUFFER should be skipped in WINDOW.
-This is used by `my/prev-buffer-current-window' and
-`my/next-buffer-current-window' methods so that only desired
-buffers will be available for changing to in the current
-window. If BURY-OR-KILL is not nil then the operation will result
-in the buffer being buried or killed, and in this case buffers
-are never filtered out. Otherwise, skip buffers that start with
-'*' in their name, `dired' buffers, `help' buffers, and buffers
-that are already visible somewhere."
-  (if bury-or-kill
-      nil
-    ;; Taken from http://xahlee.info/emacs/emacs/elisp_next_prev_user_buffer.html
-    (with-current-buffer buffer
-      (cond
-       ((string-match "^\*" (buffer-name)) t)
-       ((eq major-mode 'dired-mode) t)
-       ((eq major-mode 'help-mode) t)
-       ((get-buffer-window nil 'visible) t)
-       (t nil)))))
-
-(defun my/next-buffer-current-window ()
-  "Switch to `next' buffer in current window with filtering.
-Only switch to a buffer that passes the filter defined in
-`my/next-buffer-skip-filter'."
-  (interactive)
-  (let ((switch-to-prev-buffer-skip #'my/next-buffer-skip-filter))
-    (next-buffer)))
-
-(defun my/prev-buffer-current-window ()
-  "Switch to `previous' buffer in current window with filtering.
-Only switch to a buffer that passes the filter defined in
-`my/next-buffer-skip-filter'."
-  (interactive)
-  (let ((switch-to-prev-buffer-skip #'my/next-buffer-skip-filter))
-    (previous-buffer)))
-
-(defun my/ace-window-one-command ()
-  "Run an action in a chosen window.
-Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch."
-  (interactive)
-  (when-let ((aw-dispatch-always t)
-             (win (aw-select " ACE"))
-             (windowp win))
-    (with-selected-window win
-      (let* ((command (key-binding
-                       (read-key-sequence
-                        (format "Run in %s..." (buffer-name)))))
-             (this-command command))
-        (call-interactively command)))))
-
-(defun my/display-buffer-pre-func (buffer alist)
-  "Method to use for `display-buffer-overriding-action'.
-The BUFFER and ALIST are ignored."
-  (let* ((_ (cons buffer alist))
-         (type 'reuse)
-         (aw-dispatch-always t)
-         (window (aw-select (propertize " ACE" 'face 'mode-line-highlight))))
-    (cons window type)))
-
-(defun my/ace-window-prefix ()
-  "Use `ace-window' to display the buffer of the next command.
-The next buffer is the buffer displayed by the next command invoked
-immediately after this command (ignoring reading from the minibuffer).
-Creates a new window before displaying the buffer.
-When `switch-to-buffer-obey-display-actions' is non-nil,
-`switch-to-buffer' commands are also supported."
-  (interactive)
-  (display-buffer-override-next-command #'my/display-buffer-pre-func nil "[ace-window]")
-  (message "Command to execute: "))
-
-(keymap-global-set "C-x 4 o" #'my/ace-window-prefix)
 
 (defun my/describe-symbol-at-point ()
   "Immediately show help for symbol at point if it exists.
@@ -936,7 +952,7 @@ The map is made up of tiny functions that invoke `dired' on a path.")
 (defun my/all-git-sync ()
   "Sync the configurations repo found in various locations at work."
   (interactive)
-  (when-let ((buf (get-buffer my/git-sync-buffer-name)))
+  (when-let* ((buf (get-buffer my/git-sync-buffer-name)))
     (kill-buffer buf))
   (let ((local (file-name-concat my/repos "configurations"))
         (home (file-truename "~/configurations")))
@@ -1325,6 +1341,8 @@ process has its own server connection."
     (server-start)))
 
 (add-hook 'after-init-hook #'my/start-emacs-server)
+
+(require 'my-modes)
 
 (provide 'init)
 

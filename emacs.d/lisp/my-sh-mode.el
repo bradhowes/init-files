@@ -5,6 +5,7 @@
 (require 'font-lock)
 (require 'my-insert-block-comment)
 (require 'my-fontify-braces)
+(require 'sh-script)
 
 (use-package flymake-shellcheck
   :commands flymake-shellcheck-load
@@ -23,7 +24,7 @@
   (auto-fill-mode 1)
   (show-paren-mode t)
   (my/fontify-braces)
-  (setq sh-indentation 2)
+  (setq sh-basic-offset 2)
   (font-lock-add-keywords nil
 			  '(("${*\\([A-Za-z0-9_]+\\)}*" 1
 			     font-lock-variable-name-face t)))

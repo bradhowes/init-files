@@ -29,6 +29,7 @@
 ;; Our personal Emacs files are found in the `lisp' directory in the `user-emacs-directory'.
 (let ((my/lisp (file-name-as-directory (file-name-concat user-emacs-directory "lisp"))))
   (push my/lisp load-path)
+  (push (file-name-concat my/lisp "key-chord") load-path)
   (push my/lisp trusted-content)
   (push user-emacs-directory trusted-content))
 

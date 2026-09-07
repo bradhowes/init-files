@@ -8,10 +8,9 @@
 
 (use-package impatient-mode
   :ensure t
+  :commands (impatient-mode imp-set-user-filter)
   :config
   (setq-default imp-user-filter #'my/markdown-to-html))
-
-(require 'impatient-mode)
 
 (defun my/point-min-after-front-matter ()
   "Skip any front matter in current buffer and return POINT.
@@ -107,7 +106,7 @@ Otherwise, return the current point and max point."
   (save-excursion
     (if (use-region-p)
         (cons (use-region-beginning) (use-region-end))
-      (if-let ((block (markdown-code-block-at-pos (point))))
+      (if-let* ((block (markdown-code-block-at-pos (point))))
           (cons (car block) (cadr block))
         (cons (point) (point-max))))))
 

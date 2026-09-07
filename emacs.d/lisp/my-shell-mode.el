@@ -66,7 +66,7 @@ located."
               (delete-region pos0 (point))
               (let ((inhibit-message t))
                 (message "ansi-osc-apply-on-region - %s %s" code text))
-              (when-let ((fun (cdr (assoc-string code ansi-osc-handlers))))
+              (when-let* ((fun (cdr (assoc-string code ansi-osc-handlers))))
                 (funcall fun code text)))
           (put-text-property pos0 end 'invisible t)
           (setq ansi-osc--marker (copy-marker pos0)))))))
@@ -75,9 +75,9 @@ located."
   "Customize `shell-mode'."
 
   ;; Look for the process that exists for the now-current buffer. Rename buffer to include its process ID.
-  (when-let ((buf (current-buffer))
-             (found (seq-filter (lambda (p) (eq buf (process-buffer p))) (process-list)))
-             (pid (seq-map #'process-id found)))
+  (when-let* ((buf (current-buffer))
+              (found (seq-filter (lambda (p) (eq buf (process-buffer p))) (process-list)))
+              (pid (seq-map #'process-id found)))
     (rename-buffer (format "*Shell [%d]*" (car pid))))
 
   (set-process-coding-system (get-buffer-process (current-buffer)) 'utf-8 'utf-8)

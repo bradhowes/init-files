@@ -36,7 +36,8 @@ the items to setup for autoloading from the given file."
  "my-sh-mode" 'my/sh-mode-hook
  "my-shell-mode" 'my/shell-mode-hook)
 
-(use-package cape)
+(use-package cape
+  :ensure t)
 
 (use-package cc-mode
   :init (add-to-list 'auto-mode-alist '("\\(\\.inl\\|\\.mm\\)\\'" . c++-mode))
@@ -46,9 +47,11 @@ the items to setup for autoloading from the given file."
 ;;   :after (consult eglot))
 
 (use-package cmake-mode
+  :ensure t
   :hook ((cmake-mode . my/cmake-mode-hook)))
 
 (use-package diff-hl
+  :ensure t
   :commands (diff-hl-show-hunk diff-hl-margin-mode)
   :hook (after-init . (lambda ()
                         (when my/is-terminal
@@ -90,6 +93,7 @@ the items to setup for autoloading from the given file."
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
 (use-package flymake
+  :ensure t
   :commands (flymake-show-buffer-diagnostics)
   :config
   (setq elisp-flymake-byte-compile-load-path load-path)
@@ -100,26 +104,32 @@ the items to setup for autoloading from the given file."
               ("M-n" . flymake-goto-next-error)
               ("M-p" . flymake-goto-prev-error)))
 
-(use-package flymake-json)
+(use-package flymake-json
+  :ensure t)
 
 (use-package flymake-shellcheck
+  :ensure t
   :if (executable-find "shellcheck")
   :hook (sh-mode . flymake-shellcheck-load))
 
 (use-package flyspell
+  :ensure t
   :hook ((prog-mode . flyspell-prog-mode)
-         (sh-mode . ws-butler-mode)
+         ;; (sh-mode . ws-butler-mode)
          (text-mode . flyspell-mode)))
 
 (use-package indent-bars
+  :ensure t
   ;; :if (not my/is-terminal)
   :hook (prog-mode . indent-bars-mode))
 
 (use-package json-mode
+  :ensure t
   :init (add-to-list 'auto-mode-alist '("\\.yagconf\\'" . json-mode))
   :hook ((json-mode . my/json-mode-hook)))
 
 (use-package js
+  :ensure t
   :config (setq js-indent-level 2))
 
 ;; (use-package js2-mode
@@ -137,6 +147,7 @@ the items to setup for autoloading from the given file."
          (makefile-mode . indent-bars-mode)))
 
 (use-package markdown-mode
+  :ensure t
   :hook (markdown-mode . my/markdown-mode-hook))
 
 (use-package python
@@ -160,13 +171,12 @@ the items to setup for autoloading from the given file."
       (setq explicit-bash-args '("--noediting" "-i"))))
   :hook ((shell-mode . my/shell-mode-hook)))
 
-(use-package swift-mode)
+;; (use-package swift-mode
+;;   :ensure t)
 
-(use-package tempel)
-
-(use-package ws-butler
-  :hook ((prog-mode . ws-butler-mode)
-         (sh-mode . ws-butler-mode)))
+;;(use-package ws-butler
+;; :hook ((prog-mode . ws-butler-mode)
+;; (sh-mode . ws-butler-mode)))
 
 (defun my/eglot-capf ()
   "Custom CAPF for use with Eglot."

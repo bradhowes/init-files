@@ -38,9 +38,17 @@
   1
   "Symbol to indicate second 4k display.")
 
-(defconst my/layout--laptop-screen-width
+(defconst my/layout--laptop-screen-width-16
   2056
   "MacBook Pro 16\" M1 screen width in pixels.")
+
+(defconst my/layout--laptop-screen-width-14
+  1800
+  "MacBook Pro 14\" M5 screen width in pixels.")
+
+(defun my/layout--laptop-screen-width ()
+  "Obtain the width of the laptop display."
+  (nth 3 (nth 1 (nth 0 (display-monitor-attributes-list)))))
 
 (defconst my/layout--4k-screen-width
   3840
@@ -63,15 +71,15 @@ Returns one of the follow symbols based on width:
   (declare (side-effect-free t))
   (let* ((width (display-pixel-width nil))
          (value (cond
-                 ((= width my/layout--laptop-screen-width)
+                 ((= width (my/layout--laptop-screen-width))
                   my/layout--screens-laptop)
                  ((= width my/layout--4k-screen-width)
                   my/layout--screens-4k)
-                 ((= width (+ my/layout--laptop-screen-width my/layout--4k-screen-width))
+                 ((= width (+ (my/layout--laptop-screen-width) my/layout--4k-screen-width))
                   my/layout--screens-laptop-4k)
                  ((= width (* my/layout--4k-screen-width 2))
                   my/layout--screens-4k-4k)
-                 ((= width (+ my/layout--laptop-screen-width (* 2 my/layout--4k-screen-width)))
+                 ((= width (+ (my/layout--laptop-screen-width) (* 2 my/layout--4k-screen-width)))
                   my/layout--screens-laptop-4k-4k)
                  (t my/layout--screens-terminal))))
     (message "my/layout-active-screens: %s" value)
@@ -135,7 +143,7 @@ configuration."
   (declare (side-effect-free t))
   ;; Use an external monitor if there is one.
   (if (memq layout '(my/layout--screens-laptop-4k my/layout--screens-laptop-4k-4k))
-      (+ my/layout--laptop-screen-width (* display my/layout--4k-screen-width))
+      (+ (my/layout--laptop-screen-width) (* display my/layout--4k-screen-width))
     0))
 
 (defun my/layout--frame-center (layout display)
@@ -155,7 +163,7 @@ it is used by custom commands."
   (declare (side-effect-free t))
   (- (+ (my/layout--frame-left layout display)
         (if (eq layout my/layout--screens-laptop)
-            my/layout--laptop-screen-width
+            (my/layout--laptop-screen-width)
           my/layout--4k-screen-width))
      (my/layout--frame-pixel-width layout)))
 

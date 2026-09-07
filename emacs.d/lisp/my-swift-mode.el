@@ -5,6 +5,9 @@
 (require 'my-fontify-braces)
 (require 'font-lock)
 
+(use-package swift-mode
+  :ensure t)
+
 (defun my/swift-mode-hook ()
   "Custom Swift mode."
   (setq swift-mode:basic-offset 2)
