@@ -12,15 +12,19 @@
 
 (defconst my/layout--screens-4k
   (intern "my/layout--screens-4k")
-  "Symbol to indicate display is 4K screen.")
+  "Symbol to indicate display is 4K screen (laptop closed).")
+
+(defconst my/layout--screens-4k-4k
+  (intern "my/layout--screens-4k-4k")
+  "Symbol to indicate display width is 2 4K screens (laptop closed).")
 
 (defconst my/layout--screens-laptop-4k
   (intern "my/layout--screens-laptop-4k")
   "Symbol to indicate display width is laptop and 1 4K screen.")
 
-(defconst my/layout--screens-4k-4k
-  (intern "my/layout--screens-4k-4k")
-  "Symbol to indicate display width is 2 4K screens.")
+(defconst my/layout--screens-laptop-4k-vertical
+  (intern "my/layout--screens-laptop-4k-vertical")
+  "Symbol to indicate display width is 1 4K screen and height is 1 4K screen and laptop.")
 
 (defconst my/layout--screens-laptop-4k-4k
   (intern "my/layout--screens-laptop-4k-4k")
@@ -29,6 +33,14 @@
 (defconst my/layout--screens-terminal
   (intern "my/layout--screens-terminal")
   "Symbol to indicate display is a terminal.")
+
+(defconst my/layout--orientation-horizontal
+  (intern "my/layout--orientation-horizontal")
+  "Symbol to indicate a horizontal orientation of the laptop and 4K screens.")
+
+(defconst my/layout--orientation-vertical
+  (intern "my/layout--orientation-vertical")
+  "Symbol to indicate a vertical orientation of the laptop and 4K screens.")
 
 (defconst my/layout--use-4k-display-1
   0
@@ -40,48 +52,90 @@
 
 (defconst my/layout--laptop-screen-width-16
   2056
-  "MacBook Pro 16\" M1 screen width in pixels.")
+  "MacBook Pro 16\" M1 screen width in pixels. Not used anymore.")
 
 (defconst my/layout--laptop-screen-width-14
   1800
-  "MacBook Pro 14\" M5 screen width in pixels.")
-
-(defun my/layout--laptop-screen-width ()
-  "Obtain the width of the laptop display."
-  (nth 3 (nth 1 (nth 0 (display-monitor-attributes-list)))))
+  "MacBook Pro 14\" M5 screen width in pixels. Not used.")
 
 (defconst my/layout--4k-screen-width
   3840
   "4K external display width in pixels.")
 
-(defun my/layout--active-screens ()
-  "Identify current screen layout.
-Uses result from `display-pixel-width' to determine what monitors
-there are.  Better would be to use `display-monitor-attributes-list'
-like done in `my/frame-top'.
+(defconst my/layout--4k-screen-height
+  2160
+  "4K external display height in pixels.")
 
-Returns one of the follow symbols based on width:
+(defun my/layout--laptop-attributes-list ()
+  "Obtain the geometry of the laptop screen."
+  (declare (side-effect-free t))
+  (seq-find (lambda (v) (string= "Built-in Retina Display" (alist-get 'name v))) (display-monitor-attributes-list)))
 
-- `my/layout--laptop' -- only laptop screen
-- `my/layout--4k' -- only 4K monitor.
-- `my/layout--laptop-4k' -- laptop screen + 4K monitor.
-- `my/layout--4k-4k' -- two 4K monitors.
-- `my/layout--laptop-4k-4k' -- laptop screen + 2 4K monitors.
-- `my/layout--terminal' -- unknown screen."
+(defun my/layout--geometry-width (geometry)
+  "Obtain the width of the given GEOMETRY value."
+  (declare (side-effect-free t))
+  (nth 2 geometry))
+
+(defun my/layout--geometry-height (geometry)
+  "Obtain the width of the given GEOMETRY value."
+  (declare (side-effect-free t))
+  (nth 3 geometry))
+
+(defun my/layout--laptop-screen-width ()
+  "Obtain the width of the laptop display."
+  (declare (side-effect-free t))
+  (my/layout--geometry-width (alist-get 'geometry (my/layout--laptop-attributes-list))))
+
+(defun my/layout--laptop-screen-height ()
+  "Obtain the height of the laptop display."
+  (declare (side-effect-free t))
+  (my/layout--geometry-height (alist-get 'geometry (my/layout--laptop-attributes-list))))
+
+(defun my/layout--active-orientation ()
+  "Identify the current screen orientation.
+Returns `my/layout--orientation-horizontal' or `my/layout--orientation-vertical`."
   (declare (side-effect-free t))
   (let* ((width (display-pixel-width nil))
-         (value (cond
-                 ((= width (my/layout--laptop-screen-width))
-                  my/layout--screens-laptop)
-                 ((= width my/layout--4k-screen-width)
-                  my/layout--screens-4k)
-                 ((= width (+ (my/layout--laptop-screen-width) my/layout--4k-screen-width))
-                  my/layout--screens-laptop-4k)
-                 ((= width (* my/layout--4k-screen-width 2))
-                  my/layout--screens-4k-4k)
-                 ((= width (+ (my/layout--laptop-screen-width) (* 2 my/layout--4k-screen-width)))
-                  my/layout--screens-laptop-4k-4k)
-                 (t my/layout--screens-terminal))))
+         (height (display-pixel-height nil)))
+    ;; Only one case of a vertical setup for now. Assume anything else is horizontal.
+    (if (= height (+ my/layout--4k-screen-height (my/layout--laptop-screen-height)))
+        my/layout--orientation-vertical
+      my/layout--orientation-horizontal)))
+
+(defun my/layout--active-screens ()
+  "Identify the current screen layout.
+Uses results from `display-pixel-width' and `display-pixel-height` to
+determine what monitors there are and how they are laid out. There are a
+limited number of combinations being considered here, not an exhaustive
+search.
+
+ Returns one of the follow symbols based on width/height:
+
+- `my/layout--screens-laptop' -- only laptop screen
+- `my/layout--screens-4k' -- only 4K monitor.
+- `my/layout--screens-laptop-4k' -- laptop screen + 4K monitor.
+- `my/layout--screens-laptop-4k-vertical` -- laptop screen below 1 4K monitor.
+- `my/layout--screens-4k-4k' -- two 4K monitors.
+- `my/layout--screens-laptop-4k-4k' -- laptop screen + 2 4K monitors.
+- `my/layout--screens-terminal' -- unknown screen."
+  (declare (side-effect-free t))
+  (let* ((width (display-pixel-width nil))
+         (height (display-pixel-height nil))
+         (orientation (my/layout--active-orientation))
+         (value (if (eq orientation my/layout--orientation-vertical)
+                    my/layout--screens-laptop-4k-vertical
+                  (cond
+                   ((= width (my/layout--laptop-screen-width))
+                    my/layout--screens-laptop)
+                   ((= width my/layout--4k-screen-width)
+                    my/layout--screens-4k)
+                   ((= width (+ (my/layout--laptop-screen-width) my/layout--4k-screen-width))
+                    my/layout--screens-laptop-4k)
+                   ((= width (* my/layout--4k-screen-width 2))
+                    my/layout--screens-4k-4k)
+                   ((= width (+ (my/layout--laptop-screen-width) (* 2 my/layout--4k-screen-width)))
+                    my/layout--screens-laptop-4k-4k)
+                   (t my/layout--screens-terminal)))))
     (message "my/layout-active-screens: %s" value)
     value))
 
@@ -106,7 +160,11 @@ of the call."
 (defun my/layout--has-4k (layout)
   "T if LAYOUT is kind with at least one 4K area."
   (declare (side-effect-free t))
-  (memq layout '(my/layout--screens-4k my/layout--screens-laptop-4k my/layout--screens-4k-4k my/layout--screens-laptop-4k-4k)))
+  (memq layout '(my/layout--screens-4k
+                 my/layout--screens-laptop-4k
+                 my/layout--screens-laptop-4k-vertical
+                 my/layout--screens-4k-4k
+                 my/layout--screens-laptop-4k-4k)))
 
 (defun my/layout--rows (layout)
   "The number of rows to show in a frame shown on LAYOUT."
@@ -139,7 +197,12 @@ Probably a better way to figure this out."
   "Obtain the `left` position for a `left' frame for LAYOUT and DISPLAY index.
 The position value will place the frame flush with the left-hand side of the
 display. This is used in a frame alist, in particular the `initial-frame-alist'
-configuration."
+configuration.
+
+The preference is to use a 4K display. In the horizontal orientation
+offset the left position by the width of the laptop. In the vertical
+orientation, assume that the 4K display is above the laptop and use 0
+\(same as default)."
   (declare (side-effect-free t))
   ;; Use an external monitor if there is one.
   (if (memq layout '(my/layout--screens-laptop-4k my/layout--screens-laptop-4k-4k))
@@ -172,11 +235,15 @@ it is used by custom commands."
 The position value will place the frame such that the top of the frame
 aligns with the top of the DISPLAY."
   (declare (side-effect-free t))
-  (let* ((index (if (eq layout my/layout--screens-laptop) 0 (+ 1 display)))
-         (settings (nth index (display-monitor-attributes-list)))
-         (top (nth 1 (alist-get 'geometry settings)))
-         (offset (if my/is-x-windows-on-win 30 0)))
-    (list '+ (+ offset top))))
+  ;; Assume that the vertical orientation always has the 4K monitor on top.
+  (if (eq layout my/layout--screens-laptop-4k-vertical)
+      (list '+ 0)
+    ;; NOTE: this assumes an ordering that is not guaranteed: the first entry is the laptop followed by 4K displays.
+    (let* ((index (if (eq layout my/layout--screens-laptop) 0 (+ 1 display)))
+           (settings (nth index (display-monitor-attributes-list)))
+           (top (nth 1 (alist-get 'geometry settings)))
+           (offset (if my/is-x-windows-on-win 30 0)))
+      (list '+ (+ offset top)))))
 
 (defun my/layout--frame-alist (left layout display)
   "Make alist to use for a frame on LAYOUT and DISPLAY with LEFT position.

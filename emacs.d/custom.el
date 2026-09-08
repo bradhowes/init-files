@@ -59,6 +59,7 @@
      "183dfa34e360f5bc2ee4a6b3f4236e6664f4cfce40de1d43c984e0e8fc5b51ae" default))
  '(delete-by-moving-to-trash t)
  '(delete-old-versions t)
+ '(denote-directory "~/Documents/notes/")
  '(denote-rename-buffer-mode t)
  '(diff-hl-flydiff-mode t)
  '(dired-auto-revert-buffer t)

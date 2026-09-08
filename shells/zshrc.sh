@@ -111,10 +111,12 @@ cd "${PWD}" || :
 [[ -f "${HOME}/.iterm2_shell_integration.zsh" ]] && . "${HOME}/.iterm2_shell_integration.zsh"
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/howes/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/howes/google-cloud-sdk/path.zsh.inc'; fi
+# shellcheck disable=SC1091
+[[ -f '/Users/howes/google-cloud-sdk/path.zsh.inc' ]] && . '/Users/howes/google-cloud-sdk/path.zsh.inc'
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/Users/howes/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/howes/google-cloud-sdk/completion.zsh.inc'; fi
+# shellcheck disable=SC1091
+[[ -f '/Users/howes/google-cloud-sdk/completion.zsh.inc' ]] && . '/Users/howes/google-cloud-sdk/completion.zsh.inc'
 
 z="${HOME}/src/zsh-z/zsh-z.plugin.zsh"
 if [[ -f "${z}" ]]; then
@@ -127,3 +129,5 @@ fi
 # Perform Emacs `eat` integration if enabled
 # shellcheck disable=SC1090
 [[ -n "${EAT_SHELL_INTEGRATION_DIR}" ]] && . "${EAT_SHELL_INTEGRATION_DIR}"
+
+[[ -f "${HOME}/.ssh/id_ed25519" ]] && ssh-add -q --apple-use-keychain "${HOME}/.ssh/id_ed25519"

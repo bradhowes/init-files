@@ -23,10 +23,10 @@ the items to setup for autoloading from the given file."
 
 (my/autoloads
  "emacs-pager" 'emacs-pager
- "my-find-known-bindings" 'my/find-known-bindings
  "my-cmake-mode" 'my/cmake-mode-hook
  "my-c++-mode" 'my/c++-mode-hook
  "my-dired-mode" 'my/dired-mode-hook
+ "my-find-known-bindings" 'my/find-known-bindings
  "my-js2-mode" 'my/js2-mode-hook
  "my-json-mode" 'my/json-mode-hook
  "my-lisp-mode" '(my/lisp-mode-hook my/lisp-data-mode-hook)
@@ -42,9 +42,6 @@ the items to setup for autoloading from the given file."
 (use-package cc-mode
   :init (add-to-list 'auto-mode-alist '("\\(\\.inl\\|\\.mm\\)\\'" . c++-mode))
   :hook ((c++-mode . my/c++-mode-hook)))
-
-;; (use-package consult-eglot
-;;   :after (consult eglot))
 
 (use-package cmake-mode
   :ensure t
@@ -69,11 +66,26 @@ the items to setup for autoloading from the given file."
           (eglot-ensure))
       (message "Project %s not found project--list - not running eglot" proj))))
 
+(defun my/eglot-capf ()
+  "Custom CAPF for use with Eglot."
+  (setq-local completion-at-point-functions
+              (list (cape-capf-super #'eglot-completion-at-point #'tempel-expand))))
+
 (use-package eglot
+  :ensure t
+  :after (tempel)                       ; Due to tempel soft dependency
   :commands (eglot-ensure)
   :hook ((c++-mode . my/known-project-eglot-ensure)
-         (json-mode . eglot-ensure)
-         (python-base-mode . eglot-ensure))
+         (js-mode . eglot-ensure)
+         (js-ts-mode . eglot-ensure)
+         (kotlin-ts-mode . eglot-ensure)
+         (markdown-mode . eglot-ensure)
+         (markdown-ts-mode . eglot-ensure)
+         (python-base-mode . eglot-ensure)
+         (scala-mode . eglot-ensure)
+         (yaml-mode . eglot-ensure)
+         (yaml-ts-mode . eglot-ensure)
+         (eglot-managed-mode . my/eglot-capf))
   :custom
   ((eglot-autoshutdown t)
    (eglot-extend-to-xref t))
@@ -89,6 +101,10 @@ the items to setup for autoloading from the given file."
 
 (with-eval-after-load 'eglot
   (setq completion-category-defaults nil))
+
+(use-package consult-eglot
+  :ensure t
+  :after (consult eglot))
 
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
@@ -115,7 +131,6 @@ the items to setup for autoloading from the given file."
 (use-package flyspell
   :ensure t
   :hook ((prog-mode . flyspell-prog-mode)
-         ;; (sh-mode . ws-butler-mode)
          (text-mode . flyspell-mode)))
 
 (use-package indent-bars
@@ -174,15 +189,14 @@ the items to setup for autoloading from the given file."
 ;; (use-package swift-mode
 ;;   :ensure t)
 
-;;(use-package ws-butler
-;; :hook ((prog-mode . ws-butler-mode)
-;; (sh-mode . ws-butler-mode)))
+(use-package tempel
+  :ensure t
+  :commands (tempel-expand))
 
-(defun my/eglot-capf ()
-  "Custom CAPF for use with Eglot."
-  (setq-local completion-at-point-functions
-              (list (cape-capf-super #'eglot-completion-at-point #'tempel-expand))))
-(add-hook 'eglot-managed-mode-hook #'my/eglot-capf)
+(use-package ws-butler
+  :ensure t
+  :hook ((prog-mode . ws-butler-mode)
+         (sh-mode . ws-butler-mode)))
 
 (provide 'my-modes)
 
