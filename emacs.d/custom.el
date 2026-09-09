@@ -60,6 +60,7 @@
  '(delete-by-moving-to-trash t)
  '(delete-old-versions t)
  '(denote-directory "~/Documents/notes/")
+ '(denote-file-type 'markdown-yaml)
  '(denote-rename-buffer-mode t)
  '(diff-hl-flydiff-mode t)
  '(dired-auto-revert-buffer t)

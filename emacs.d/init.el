@@ -303,13 +303,28 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   ;; Both < and C-+ work reasonably well.
   (setq consult-narrow-key "<"))
 
+(defun my/denote-format-keywords-for-md-front-matter (keywords)
+  "Custom KEYWORDS formatter for keystrokecountdown.com markdown files.
+The default Markdown keyword formatter puts each keyword in double-quotes,
+separates them with a \", \" and surrounds the result with square brackets.
+Here, we just separate them by a comma."
+  (format "%s" (mapconcat (lambda (k) k) keywords ", ")))
+
 (use-package denote
   :ensure t
   :commands (denote-dired-mode-in-directories)
-  :hook (dired-mode . denote-dired-mode-in-directories)
-  :bind (("H-n n" . denote))
+  :hook (dired-mode . denote-dired-mode)
+  :bind (("H-n b" . denote-backlinks)
+         ("H-n d" . denote-dired)
+         ("H-n g" . denote-grep)
+         ("H-n l" . denote-link)
+         ("H-n n" . denote)
+         ("H-n r" . denote-rename-file))
   :custom
-  (denote-directory (file-truename "~/Documents/notes/"))
+  (denote-directory (expand-file-name "~/Documents/notes/"))
+  (denote-file-type 'markdown-brh)
+  (denote-rename-buffer-mode 1)
+  (denote-sort-keywords t)
   :config
   (setq denote-file-types (cons
                            '(markdown-brh
@@ -320,7 +335,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                              :title-value-function denote-trim-whitespace
                              :title-value-reverse-function denote-trim-whitespace
                              :keywords-key-regexp "^tags\\s-*:"
-                             :keywords-value-function denote-format-keywords-for-text-front-matter
+                             :keywords-value-function my/denote-format-keywords-for-md-front-matter
                              :keywords-value-reverse-function denote-extract-keywords-from-front-matter
                              :link denote-md-link-format
                              :link-in-context-regexp denote-md-link-in-context-regexp)
@@ -333,7 +348,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   :commands (consult-notes-denote-mode denote-directory-files)
   :config
   (require 'consult-notes-denote)
-  :bind (("H-n b" . consult-notes)))
+  :bind (("H-n c" . consult-notes)))
 
 (use-package corfu
   :ensure t
