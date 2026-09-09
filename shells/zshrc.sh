@@ -8,6 +8,7 @@
 
 export PATH
 PathAdd PATH \
+        /opt/homebrew/opt/python@3.14/libexec/bin/ \
         /opt/homebrew/opt/grep/libexec/gnubin \
         /Applications/Emacs.app/Contents/MacOS/bin \
         /opt/homebrew/bin \
