@@ -113,9 +113,7 @@ the items to setup for autoloading from the given file."
   :commands (flymake-show-buffer-diagnostics)
   :config
   (setq elisp-flymake-byte-compile-load-path load-path)
-  :hook ((emacs-lisp-mode . flymake-mode)
-         (sh-mode . flymake-mode)
-         (python-mode . flymake-mode))
+  :hook (prog-mode . flymake-mode)
   :bind (:map flymake-mode-map
               ("M-n" . flymake-goto-next-error)
               ("M-p" . flymake-goto-prev-error)))
@@ -134,8 +132,6 @@ the items to setup for autoloading from the given file."
          (text-mode . flyspell-mode)))
 
 (use-package indent-bars
-  :ensure t
-  ;; :if (not my/is-terminal)
   :ensure t
   :hook (prog-mode . indent-bars-mode))
 
@@ -171,8 +167,7 @@ the items to setup for autoloading from the given file."
          (inferior-python-mode . my/inferior-python-mode-hook)))
 
 (use-package sh-mode
-  :hook ((sh-mode . my/sh-mode-hook)
-         (sh-mode . indent-bars-mode)))
+  :hook (sh-mode . my/sh-mode-hook))
 
 (use-package shell-mode
   :defines (explicit-bash-args)
