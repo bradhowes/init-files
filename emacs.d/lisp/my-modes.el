@@ -136,6 +136,7 @@ the items to setup for autoloading from the given file."
 (use-package indent-bars
   :ensure t
   ;; :if (not my/is-terminal)
+  :ensure t
   :hook (prog-mode . indent-bars-mode))
 
 (use-package json-mode

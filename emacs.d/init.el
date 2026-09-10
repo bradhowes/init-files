@@ -54,9 +54,9 @@ the buffer having untrusted content."
   "Keymap for Hyper-c actions.")
 (keymap-set global-map "H-c" my/hyper-c-map)
 
-;; (use-package accent
-;;   :ensure t
-;;   :bind ("H-x a" . accent-menu))
+(use-package accent
+  :ensure t
+  :bind ("H-c a" . accent-menu))
 
 ;;; ===== ace-window =====
 
@@ -433,6 +433,11 @@ such directory, in the user's home directory."
 (use-package flycheck
   :ensure t)
 
+(use-package fancy-compilation
+  :ensure t
+  :commands (fancy-compilation-mode)
+  :hook ((compilation-mode . fancy-compilation-mode)))
+
 (use-package flyover
   :ensure t
   :hook ((flymake-mode . flyover-mode))
@@ -503,7 +508,8 @@ such directory, in the user's home directory."
 
 (use-package my-fontify-braces)
 
-(use-package nerd-icons :ensure t)
+(use-package nerd-icons
+  :ensure t)
 
 (use-package nerd-icons-completion
   :ensure t
