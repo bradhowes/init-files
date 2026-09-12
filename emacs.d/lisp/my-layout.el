@@ -24,7 +24,7 @@
 
 (defconst my/layout--screens-laptop-4k-vertical
   (intern "my/layout--screens-laptop-4k-vertical")
-  "Symbol to indicate display width is 1 4K screen and height is 1 4K screen and laptop.")
+  "Symbol to indicate display width is 4K screen, height is 4K screen and laptop.")
 
 (defconst my/layout--screens-laptop-4k-4k
   (intern "my/layout--screens-laptop-4k-4k")
@@ -68,7 +68,7 @@
 
 (defun my/layout--laptop-attributes-list ()
   "Obtain the attributes of the laptop screen.
-This should include a 'geometry' section. See
+This should include a `geometry' section. See
 `my/layout--laptop-screen-width` and `my/layout--laptop-screen-height`
 for examples of its use."
   (declare (side-effect-free t))
@@ -97,10 +97,10 @@ for examples of its use."
 
 (defun my/layout--active-orientation ()
   "Identify the current screen orientation.
-Returns `my/layout--orientation-horizontal' or `my/layout--orientation-vertical`."
+Returns `my/layout--orientation-horizontal' or
+`my/layout--orientation-vertical`."
   (declare (side-effect-free t))
-  (let* ((width (display-pixel-width nil))
-         (height (display-pixel-height nil)))
+  (let* ((height (display-pixel-height nil)))
     ;; Only one case of a vertical setup for now. Assume anything else is horizontal.
     (if (= height (+ my/layout--4k-screen-height (my/layout--laptop-screen-height)))
         my/layout--orientation-vertical
@@ -124,7 +124,6 @@ search.
 - `my/layout--screens-terminal' -- unknown screen."
   (declare (side-effect-free t))
   (let* ((width (display-pixel-width nil))
-         (height (display-pixel-height nil))
          (orientation (my/layout--active-orientation))
          (value (if (eq orientation my/layout--orientation-vertical)
                     my/layout--screens-laptop-4k-vertical
@@ -221,8 +220,8 @@ The position value will place the frame such that it does not overlap with
 another frame in the `left' position when possible. For instance, a small laptop
 width will result in a `left' position that leaves the right edge of the frame
 flush with the right-hand side of the display, just like the
-`my/layout--frame-right` function. This is used in a frame alist, in particular the
-`default-frame-alist' configuration."
+`my/layout--frame-right` function. This is used in a frame alist, in particular
+the `default-frame-alist' configuration."
   (declare (side-effect-free t))
   (let* ((left (+ (my/layout--frame-left layout display) (my/layout--frame-pixel-width layout)))
          (right (+ left (my/layout--frame-pixel-width layout)))
@@ -338,7 +337,8 @@ ARG is an optional integer which defaults to 2."
 
 (defun my/layout--pick-display (display)
   "Convert a DISPLAY integer 0, 1 into a display symbol value.
-If 0, returns `my/layout--use-4k-display-1' else returns `my/layout--use-4k-display-1'."
+If 0, returns `my/layout--use-4k-display-1' else returns
+`my/layout--use-4k-display-1'."
   (if (eq 0 (or display (my/layout--which-4k-display)))
       my/layout--use-4k-display-1
     my/layout--use-4k-display-2))

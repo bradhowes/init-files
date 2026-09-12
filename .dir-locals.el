@@ -1,1 +1,1 @@
-((nil . ((compile-command . "make -C emacs/lisp -k "))))
+((nil . ((compile-command . "make -C emacs.d/lisp -k "))))
