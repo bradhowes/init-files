@@ -34,7 +34,12 @@
   :type '(natnum)
   :group 'my/customizations)
 
-(defcustom my/layout-rows-laptop 88
+(defcustom my/layout-rows-laptop-14 77
+  "Number of rows in a new frame on a laptop desktop."
+  :type '(natnum)
+  :group 'my/customizations)
+
+(defcustom my/layout-rows-laptop-16 88
   "Number of rows in a new frame on a laptop desktop."
   :type '(natnum)
   :group 'my/customizations)
@@ -61,13 +66,17 @@
 
 (defcustom my/layout-frame-pixel-width-4k 1338
   "Width of a frame in pixels on a 4K desktop.
-NOTE: this should be calculated instead of being a constant."
+NOTE: this should be calculated instead of being a constant.
+We want 132 columns of mono text in the font size for a 4k
+display (`my/layout-font-size-4k`)."
   :type '(natnum)
   :group 'my/customizations)
 
 (defcustom my/layout-frame-pixel-width-laptop 944
-  "Width of a frame in pixels on a 4K desktop.
-NOTE: this should be calculated instead of being a constant."
+  "Width of a frame in pixels on a laptop desktop.
+NOTE: this should be calculated instead of being a constant.
+We want 132 columns of mono text in the font size for a Retina
+laptop display (`my/layout-font-size-laptop`)."
   :type '(natnum)
   :group 'my/customizations)
 

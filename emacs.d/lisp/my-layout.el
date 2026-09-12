@@ -52,11 +52,11 @@
 
 (defconst my/layout--laptop-screen-width-16
   2056
-  "MacBook Pro 16\" M1 screen width in pixels. Not used anymore.")
+  "MacBook Pro 16\" M1 screen width in pixels.")
 
 (defconst my/layout--laptop-screen-width-14
   1800
-  "MacBook Pro 14\" M5 screen width in pixels. Not used.")
+  "MacBook Pro 14\" M5 screen width in pixels.")
 
 (defconst my/layout--4k-screen-width
   3840
@@ -67,9 +67,13 @@
   "4K external display height in pixels.")
 
 (defun my/layout--laptop-attributes-list ()
-  "Obtain the geometry of the laptop screen."
+  "Obtain the attributes of the laptop screen.
+This should include a 'geometry' section. See
+`my/layout--laptop-screen-width` and `my/layout--laptop-screen-height`
+for examples of its use."
   (declare (side-effect-free t))
-  (seq-find (lambda (v) (string= "Built-in Retina Display" (alist-get 'name v))) (display-monitor-attributes-list)))
+  (seq-find (lambda (v) (string= "Built-in Retina Display" (alist-get 'name v)))
+            (display-monitor-attributes-list)))
 
 (defun my/layout--geometry-width (geometry)
   "Obtain the width of the given GEOMETRY value."
@@ -172,7 +176,9 @@ of the call."
   (if (my/layout--has-4k layout)
       my/layout-rows-4k
     (if (my/layout--is-laptop layout)
-        my/layout-rows-laptop
+        (if (>= (my/layout--laptop-screen-height) 1329)
+            my/layout-rows-laptop-16
+          my/layout-rows-laptop-14)
       my/layout-rows-terminal)))
 
 (defun my/layout--cols (layout)
@@ -212,11 +218,18 @@ orientation, assume that the 4K display is above the laptop and use 0
 (defun my/layout--frame-center (layout display)
   "Obtain the `left` position for a `center' frame for LAYOUT and DISPLAY index.
 The position value will place the frame such that it does not overlap with
-another frame in the `left' position.
-This is used in a frame alist, in particular the `default-frame-alist'
-configuration."
+another frame in the `left' position when possible. For instance, a small laptop
+width will result in a `left' position that leaves the right edge of the frame
+flush with the right-hand side of the display, just like the
+`my/layout--frame-right` function. This is used in a frame alist, in particular the
+`default-frame-alist' configuration."
   (declare (side-effect-free t))
-  (+ (my/layout--frame-left layout display) (my/layout--frame-pixel-width layout)))
+  (let* ((left (+ (my/layout--frame-left layout display) (my/layout--frame-pixel-width layout)))
+         (right (+ left (my/layout--frame-pixel-width layout)))
+         (overrun (max 0 (if (my/layout--is-laptop layout)
+                             (- right (my/layout--laptop-screen-width))
+                           0))))
+    (- left overrun)))
 
 (defun my/layout--frame-right (layout display)
   "Obtain the `left` position for a `right' frame for LAYOUT and DISPLAY index.
