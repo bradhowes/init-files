@@ -288,7 +288,7 @@ Frame's right side is flush with the right side of the main display."
   "Install the desired font in the default face for LAYOUT."
   (set-face-attribute 'default nil :font (font-spec :family my/font-name :size (my/layout--font-size layout))))
 
-(defun my/layout--screens-layout-changed ()
+(defun my/layout-screen-layout-changed ()
   "Recalculate values based on screen layout."
   (interactive)
   (let ((layout (my/layout--active-screens)))
@@ -302,9 +302,9 @@ It does not affect existing frames."
   (interactive "NScreen:")
   (custom-set-variables (list 'my/layout-default-display-4k screen))
   (custom-save-all)
-  (my/layout--screens-layout-changed))
+  (my/layout-screen-layout-changed))
 
-(add-hook 'after-init-hook #'my/layout--screens-layout-changed)
+(add-hook 'after-init-hook #'my/layout-screen-layout-changed)
 
 (defun my/layout-share-screen-font-size (&optional arg)
   "Set font scaling to ARG when sharing screen.

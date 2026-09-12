@@ -1166,6 +1166,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                    "<end>" #'end-of-buffer
                    "<delete>" #'delete-char
                    "S-<f12>" #'package-list-packages
+                   "S-<f11>" #'my/layout-screen-layout-changed
 
                    "M-z" #'zap-up-to-char
                    "M-[" #'previous-buffer ; NOTE: this conflicts with terminal escape sequences (see below)

@@ -15,21 +15,24 @@ else
   export_function() { :; }
 fi
 
-dbg() { : echo "--" "${@}" 1>&2; }
+dbg() { echo "--" "${@}" 1>&2; }
 
 is_function() { > /dev/null declare -f -F "${1}"; }
 
 # Add a value to a ':' separated variable value (eg PATH) as long as it does not
 # already exist in the given variable's value.
 #
+# \param append optional flag (-a) to append to variable instead of prepending
+# \param append optional flag (-f) to force addition of value even if it exists in VAR
 # \param VAR the name of the variable to change, such as PATH or LD_LIBRARY_PATH
 # \param VALUE value to add
 #
 PathAdd() { 
-  local append=""
+  local append="" force=""
   while [[ "${1#-}" != "${1}" ]]; do # Process anything that begins with a '-' character
     case "${1}" in
-      -a) append="1" ;;
+      -a) append="-a" ;;
+      -f) force="-f" ;;
       *) echo "*** invalid option - '${1}' ***" ;;
     esac
     shift 1
@@ -49,18 +52,22 @@ PathAdd() {
     fi
     local check=":${current}:"
     # shellcheck disable=SC2295
-    if [[ "${check%%:${each}:*}" = "${check}" ]]; then
+    if [[ "${check%%:${each}:*}" = "${check}" || -n "${force}" ]]; then
       if [[ -n "${append}" ]]; then
+        dbg "appending ${each}"
 	current="${current}${current:+:}${each}"
       else
+        dbg "prepending ${each}"
         current="${each}${current:+:}${current}"
       fi
       if [[ "${var}" = "PATH" ]]; then
         # Update MANPATH and INFOPATH with some possible values
         local root="${each%/bin}"
-        PathAdd MANPATH "${root}/man" "${root}/share/man"
-        PathAdd INFOPATH "${root}/info" "${root}/share/info"
+        PathAdd ${append} ${force} MANPATH "${root}/man" "${root}/share/man"
+        PathAdd ${append} ${force} INFOPATH "${root}/info" "${root}/share/info"
       fi
+    else
+      dbg "path '${each}' already exists in ${var}"
     fi
   done
 

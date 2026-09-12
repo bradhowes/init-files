@@ -1,0 +1,25 @@
+#!/bin/bash
+
+PATH="/opt/homebrew/bin:${PATH}"
+name="${1}"
+
+if [[ ! -x /opt/homebrew/bin/blueutil ]]; then
+  brew install blueutil jq
+fi
+
+export BLUEUTIL_USE_SYSTEM_PROFILER=1
+paired_args="--paired --format json-pretty"
+
+if [[ -z "${name}" ]]; then
+  # shellcheck disable=SC2086
+  blueutil ${paired_args} | jq ".[] | {name: .name, address: .address}"
+else
+  # shellcheck disable=SC2046,SC2086
+  set -- $(blueutil ${paired_args} | jq -r ".[] | select(.name | test(\"${name}\")).address")
+  if [[ -n "${1}" ]]; then
+    blueutil --connect "${1}"
+  else
+    echo "*** device ${name} is not paired"
+    exit 1
+  fi
+fi

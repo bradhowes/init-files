@@ -35,6 +35,7 @@ done
 brew install --no-ask coreutils
 brew install --no-ask ispell
 brew install --no-ask shellcheck
+brew install --no-ask switchaudio-osx
 
 # Create tap to d12frosted/emacs-plus and install pre-built binaries
 

@@ -1,0 +1,23 @@
+#!/bin/bash
+# shellcheck shell=bash # -*- Mode: Sh; -*-
+
+proxy="teleport.internal.corp.traderepublic.com:443"
+
+function enable()
+{
+  # shellcheck disable=SC2086
+  tsh --proxy="${proxy}" --auth okta login ${1}
+}
+
+function disable()
+{
+  tsh logout --user=brad.howes@traderepublic.com --proxy="${proxy}"
+}
+
+case "${1}" in
+  1|on) enable ;;
+  d*) enable development ;;
+  s*) enable staging ;;
+  p*) enable production ;;
+  *) disable ;;
+esac
