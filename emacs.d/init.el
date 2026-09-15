@@ -400,8 +400,8 @@ such directory, in the user's home directory."
   :hook (dired-mode . my/dired-mode-hook))
 
 (use-package eldoc-box
-  :ensure t
-  :if my/is-terminal)
+  :ensure t)
+  ;; :if my/is-terminal)
 ;; :hook (prog-mode . eldoc-box-hover-mode)))
 
 (use-package emacs-pager
@@ -461,7 +461,7 @@ such directory, in the user's home directory."
   :bind (("C-h f" . helpful-callable)
          ("C-h v" . helpful-variable)
          ("C-h k" . helpful-key)
-         ("C-h M-h" . helpful-at-point)
+         ("C-h ." . helpful-at-point)
          ("C-h M-f" . helpful-function)
          ("C-h M-c" . helpful-command)))
 
@@ -1212,7 +1212,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 
                    "<f1>" #'my/layout-normal-screen-font-size
                    "<f2>" #'my/layout-share-screen-font-size
-                   
+
                    "<insert>" #'ignore  ; disable key for toggling overwrite-mode
                    "<insertchar>" #'ignore  ; disable key for toggling overwrite-mode
                    "C-x C-z" #'ignore   ; suspend-frame

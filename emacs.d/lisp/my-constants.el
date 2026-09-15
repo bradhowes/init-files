@@ -21,30 +21,20 @@
   "T if running in VcXsrv on Windows.
 Hacky but for now it works since we are always starting up an initial xterm.")
 
-(defconst my/workspace-name
-  (or (getenv "WORKSPACE_NAME") "N/A")
-  "The value of WORKSPACE_NAME environment variable.")
-
 (defconst my/font-name
   "Berkeley Mono"
   "The name of the font to use.")
-
-(defconst my/dev-tmp
-  "/apps/home/howesbra/tmp"
-  "The directory to use for temporary files.")
 
 (defun my/is-valid-directory (dir)
   "Check if DIR is valid, returning it if so or nil if not.
 Note that `file-directory-p' returns t if the (string) length of DIR is
 zero (0), so we detect that and report that as false."
-  (and (file-directory-p dir)
-       (> (length dir) 0)
+  (and (> (length dir) 0)
+       (file-directory-p dir)
        dir))
 
 (defconst my/tmp-dir
-  (let* ((work-tmp (my/is-valid-directory my/dev-tmp))
-         (home-tmp (file-truename "~/tmp"))
-         (tmp (or work-tmp home-tmp)))
+  (let* ((tmp (file-truename "~/tmp")))
     (unless (my/is-valid-directory tmp)
       (make-directory tmp t))
     (file-name-as-directory tmp))

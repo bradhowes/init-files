@@ -152,5 +152,9 @@ autoload -Uz compinit && compinit
 # shellcheck disable=SC1090
 [[ -n "${EAT_SHELL_INTEGRATION_DIR}" ]] && . "${EAT_SHELL_INTEGRATION_DIR}"
 
+# Work-related -- add GitHub SSL key
 [[ -f "${HOME}/.ssh/id_ed25519" ]] && ssh-add -q --apple-use-keychain "${HOME}/.ssh/id_ed25519"
 
+export PYENV_ROOT="${HOME}/.pyenv"
+[[ -d ${PYENV_ROOT}/bin ]] && export PATH="${PYENV_ROOT}/bin:${PATH}"
+eval "$(pyenv init - zsh)"

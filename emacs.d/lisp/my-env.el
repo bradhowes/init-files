@@ -27,14 +27,8 @@ Note that this is also true when running in a terminal window.")
   "Location of configurations repo.")
 
 (defconst my/is-work
-  nil
-  ;; (or (string= "howesbra" user-login-name)
-  ;;     (string= "sp_qa" user-login-name))
-  "This is t if running at work.")
-
-(defconst my/is-qa
-  (and my/is-work (string-suffix-p "q" (system-name)))
-  "T if running on QA box at work.")
+  (string= "bradhowes" user-login-name)
+  "This is t if running under work identity.")
 
 (defconst my/emacs.d
   (file-name-as-directory (file-name-concat my/configurations "emacs.d"))

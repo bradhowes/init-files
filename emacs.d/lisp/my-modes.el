@@ -4,6 +4,9 @@
 ;;; Code:
 
 (require 'my-constants)
+(require 'treesit)
+
+(add-to-list 'treesit-language-source-alist '(kotlin . ("https://github.com/fwcd/tree-sitter-kotlin")))
 
 (defun my/autoloads (&rest definitions)
   "Setup autoloads for my mode customizations.
@@ -67,7 +70,7 @@ the items to setup for autoloading from the given file."
       (message "Project %s not found project--list - not running eglot" proj))))
 
 (defun my/eglot-configure ()
-  "Custom CAPF for use with Eglot."
+  "Custom buffer configuration of Eglot."
   (setq-local completion-at-point-functions
               (list (cape-capf-super #'eglot-completion-at-point #'tempel-expand))
               eldoc-documentation-functions (cons #'flymake-eldoc-function
@@ -76,8 +79,9 @@ the items to setup for autoloading from the given file."
 
 (use-package eglot
   :ensure t
-  :after (tempel)                       ; Due to tempel soft dependency
+  :after (tempel kotlin-ts-mode lsp-pyright)                       ; Due to tempel soft dependency
   :commands (eglot-ensure)
+  :defines (eglot-mode-map)
   :hook ((c++-mode . my/known-project-eglot-ensure)
          (c++-ts-mode . my/known-project-eglot-ensure)
          (js-mode . eglot-ensure)
@@ -94,16 +98,20 @@ the items to setup for autoloading from the given file."
   ((eglot-autoshutdown t)
    (eglot-extend-to-xref t))
   :bind (:map eglot-mode-map
-              ("C-c c a" . eglot-code-actions)
-              ("C-c c e" . eglot-code-action-extract)
-              ("C-c c j" . eglot-code-action-inline)
-              ("C-c c f" . eglot-format)
-              ("C-c c o" . eglot-code-action-organize-imports)
-              ("C-c c q" . eglot-code-action-quickfix)
-              ("C-c c r" . eglot-rename)
-              ("C-c c w" . eglot-code-action-rewrite)))
+              ("a" . eglot-code-actions)
+              ("e" . eglot-code-action-extract)
+              ("j" . eglot-code-action-inline)
+              ("f" . eglot-format)
+              ("o" . eglot-code-action-organize-imports)
+              ("q" . eglot-code-action-quickfix)
+              ("r" . eglot-rename)
+              ("w" . eglot-code-action-rewrite)))
+
+;; (keymap-global-set "C-c c" eglot-mode-map)
 
 (with-eval-after-load 'eglot
+  (setq eglot-server-programs (assoc-delete-all 'kotlin-ts-mode eglot-server-programs))
+  (add-to-list 'eglot-server-programs '(kotlin-ts-mode . ("kotlin-lsp" "--stdio")))
   (setq completion-category-defaults nil))
 
 (use-package consult-eglot
@@ -144,6 +152,11 @@ the items to setup for autoloading from the given file."
   :init (add-to-list 'auto-mode-alist '("\\.yagconf\\'" . json-mode))
   :hook ((json-mode . my/json-mode-hook)))
 
+(use-package kotlin-ts-mode
+  :ensure t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.kts?\\'" . kotlin-ts-mode)))
+
 (use-package js
   :ensure t
   :config (setq js-indent-level 2))
@@ -182,16 +195,13 @@ the items to setup for autoloading from the given file."
   :init
   ;; Special-case QA env -- we are logged in as `sp_qa' user but we want our custom
   ;; environment. Command `bash' to load our custom settings.
-  (let ((rc (file-truename (file-name-concat my/repos "configurations/qa.bashrc"))))
-    (if (and my/is-qa
-             (file-exists-p rc)
-             (string-suffix-p "q" (system-name)))
-        (setq explicit-bash-args (list "--noediting" "--rcfile" rc "-i"))
-      (setq explicit-bash-args '("--noediting" "-i"))))
+  ;; (let ((rc (file-truename (file-name-concat my/repos "configurations/qa.bashrc"))))
+  ;;   (if (and my/is-qa
+  ;;            (file-exists-p rc)
+  ;;            (string-suffix-p "q" (system-name)))
+  ;;       (setq explicit-bash-args (list "--noediting" "--rcfile" rc "-i"))
+  (setq explicit-bash-args '("--noediting" "-i"))
   :hook ((shell-mode . my/shell-mode-hook)))
-
-;; (use-package swift-mode
-;;   :ensure t)
 
 (use-package tempel
   :ensure t

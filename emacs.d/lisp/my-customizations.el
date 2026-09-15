@@ -24,7 +24,9 @@
 ;;          (set-default-toplevel-value 'popper-reference-buffers (append (list value) popper-reference-buffers))))
 
 (defcustom my/layout-default-display-4k 0
-  "The 4K display to use for new Emacs frames."
+  "The 4K display to use for new Emacs frames.
+If there is only one 4K display, then 0 is the only valid option.
+If there are two 4K displays, then 0 or 1 are valid options."
   :type '(natnum)
   :options '(0 1)
   :group 'my/customizations)
@@ -35,17 +37,17 @@
   :group 'my/customizations)
 
 (defcustom my/layout-rows-laptop-14 77
-  "Number of rows in a new frame on a laptop desktop."
+  "Number of rows in a new frame on a 14\" laptop Retina desktop."
   :type '(natnum)
   :group 'my/customizations)
 
 (defcustom my/layout-rows-laptop-16 88
-  "Number of rows in a new frame on a laptop desktop."
+  "Number of rows in a new frame on a 16\" laptop Retina desktop."
   :type '(natnum)
   :group 'my/customizations)
 
 (defcustom my/layout-rows-terminal 40
-  "Number of rows in a terminal."
+  "Number of rows in a terminal window."
   :type '(natnum)
   :group 'my/customizations)
 
@@ -60,14 +62,14 @@
   :group 'my/customizations)
 
 (defcustom my/layout-cols-terminal 80
-  "Number of columns in a terminal."
+  "Number of columns in a terminal window."
   :type '(natnum)
   :group 'my/customizations)
 
 (defcustom my/layout-frame-pixel-width-4k 1338
   "Width of a frame in pixels on a 4K desktop.
 NOTE: this should be calculated instead of being a constant.
-We want 132 columns of mono text in the font size for a 4k
+We want 132 columns of Berkeley mono text in the font size for a 4k
 display (`my/layout-font-size-4k`)."
   :type '(natnum)
   :group 'my/customizations)
@@ -75,7 +77,7 @@ display (`my/layout-font-size-4k`)."
 (defcustom my/layout-frame-pixel-width-laptop 944
   "Width of a frame in pixels on a laptop desktop.
 NOTE: this should be calculated instead of being a constant.
-We want 132 columns of mono text in the font size for a Retina
+We want 132 columns of Berkeley mono text in the font size for a Retina
 laptop display (`my/layout-font-size-laptop`)."
   :type '(natnum)
   :group 'my/customizations)
