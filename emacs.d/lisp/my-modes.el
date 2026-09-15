@@ -66,16 +66,20 @@ the items to setup for autoloading from the given file."
           (eglot-ensure))
       (message "Project %s not found project--list - not running eglot" proj))))
 
-(defun my/eglot-capf ()
+(defun my/eglot-configure ()
   "Custom CAPF for use with Eglot."
   (setq-local completion-at-point-functions
-              (list (cape-capf-super #'eglot-completion-at-point #'tempel-expand))))
+              (list (cape-capf-super #'eglot-completion-at-point #'tempel-expand))
+              eldoc-documentation-functions (cons #'flymake-eldoc-function
+                                                  (remove #'flymake-eldoc-function eldoc-documentation-functions))
+              eldoc-documentation-strategy #'eldoc-documentation-compose))
 
 (use-package eglot
   :ensure t
   :after (tempel)                       ; Due to tempel soft dependency
   :commands (eglot-ensure)
   :hook ((c++-mode . my/known-project-eglot-ensure)
+         (c++-ts-mode . my/known-project-eglot-ensure)
          (js-mode . eglot-ensure)
          (js-ts-mode . eglot-ensure)
          (kotlin-ts-mode . eglot-ensure)
@@ -85,7 +89,7 @@ the items to setup for autoloading from the given file."
          (scala-mode . eglot-ensure)
          (yaml-mode . eglot-ensure)
          (yaml-ts-mode . eglot-ensure)
-         (eglot-managed-mode . my/eglot-capf))
+         (eglot-managed-mode . my/eglot-configure))
   :custom
   ((eglot-autoshutdown t)
    (eglot-extend-to-xref t))
@@ -146,6 +150,10 @@ the items to setup for autoloading from the given file."
 
 ;; (use-package js2-mode
 ;;   :hook ((js2-mode . my/js2-mode-hook)))
+
+(use-package kotlin-ts-mode
+  :ensure t
+  :mode ("\\.kt\\'" "\\.kts\\'"))
 
 (use-package lisp-mode
   :hook ((lisp-mode . my/lisp-mode-hook)

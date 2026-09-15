@@ -5,9 +5,9 @@
 # Reload alias and function definitions
 #
 # shellcheck disable=SC2154
-alias realias=". \${my_cfg}/aliases"
+alias realias=". \${my_cfg}/aliases.sh"
 # shellcheck disable=SC2154
-alias refunc=". \${my_cfg}/functions"
+alias refunc=". \${my_cfg}/functions.sh"
 
 # Shortcut ls aliases
 #
@@ -34,5 +34,12 @@ alias ec="emacsclient -c -n"
 alias scrolling="tput rmcup"
 
 alias cfg="cd \${my_cfg}"
+
+# Obtain the top-level directory for a git repository.
+# NOTE: does not work if inside the '.git' directory.
+alias git-top='git rev-parse --show-toplevel'
+
+# Move to the top-level directory.
+alias cd-top='cd -P -- "$(git-top)" && pwd'
 
 # tracer END aliases.sh

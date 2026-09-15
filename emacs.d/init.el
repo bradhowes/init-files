@@ -292,6 +292,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
     "Start `consult-line' with symbol at point."
     (interactive)
     (consult-line (thing-at-point 'symbol)))
+
   (consult-customize consult-theme :preview-key '(:debounce 0.2 any)
                      consult-ripgrep consult-git-grep consult-grep consult-man
                      consult-bookmark consult-recent-file consult-xref
@@ -301,7 +302,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 
   ;; Optionally configure the narrowing key.
   ;; Both < and C-+ work reasonably well.
-  (setq consult-narrow-key "<"))
+  :custom (consult-narrow-key "<"))
 
 (defun my/denote-format-keywords-for-md-front-matter (keywords)
   "Custom KEYWORDS formatter for keystrokecountdown.com markdown files.
@@ -455,6 +456,15 @@ such directory, in the user's home directory."
   (flyover-display-mode 'hide-on-same-line)
   (flyover-max-line-length 120))
 
+(use-package helpful
+  :ensure t
+  :bind (("C-h f" . helpful-callable)
+         ("C-h v" . helpful-variable)
+         ("C-h k" . helpful-key)
+         ("C-h M-h" . helpful-at-point)
+         ("C-h M-f" . helpful-function)
+         ("C-h M-c" . helpful-command)))
+
 (use-package hippie-expand
   :bind (("M-/" . hippie-expand)))
 
@@ -471,6 +481,27 @@ such directory, in the user's home directory."
 (use-package key-chord
   ;; :vc (:url "https://github.com/emacsorphanage/key-chord" :rev :newest)
   :commands (key-chord-define))
+
+(use-package ligature
+  :ensure t
+  :commands (ligature-set-ligatures global-ligature-mode)
+  :config
+  (ligature-set-ligatures
+   'prog-mode
+   '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+     ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+     "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+     "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+     "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+     "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+     "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+     "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+     ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+     "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+     "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+     "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+     "\\\\" "://" "www"))
+  (global-ligature-mode t))
 
 (use-package magit
   :ensure t
