@@ -51,7 +51,7 @@ control.")
   (file-name-concat my/venv "bin/python")
   "The path to the Python executable to use for eglot.")
 
-(message "Info-default-directory-list: %s" Info-default-directory-list)
+;; (message "Info-default-directory-list: %s" Info-default-directory-list)
 
 (let* ((common-paths (list (file-truename "~/bin")
                            (file-name-concat my/venv "bin")))
@@ -72,10 +72,10 @@ control.")
                           (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "share/man")) root-paths)))))
   ;; Set exec-path to contain the above paths
   (setq exec-path (append bin-paths exec-path))
-  (message "exec-path: %s" exec-path)
+  ;; (message "exec-path: %s" exec-path)
   (setq Info-additional-directory-list '("/opt/homebrew/share/info"))
   (setq Info-default-directory-list (append info-paths Info-default-directory-list))
-  (message "Info-default-directory-list: %s" Info-default-directory-list)
+  ;; (message "Info-default-directory-list: %s" Info-default-directory-list)
 
   ;; (unless (null Info-directory-list)
   ;;   (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))

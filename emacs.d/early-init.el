@@ -36,7 +36,7 @@
 ;; Stop Emacs from flashing a `white' screen when starting up
 (set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")
 
-(message "user-emacs-directory: %s" user-emacs-directory)
+;; (message "user-emacs-directory: %s" user-emacs-directory)
 
 ;; Our personal Emacs files are found in the `lisp' directory in the `user-emacs-directory'.
 (let ((my/lisp (file-name-as-directory (file-name-concat user-emacs-directory "lisp"))))
@@ -45,7 +45,7 @@
   (push my/lisp trusted-content)
   (push user-emacs-directory trusted-content))
 
-(message "trusted-content: %s" trusted-content)
-(message "load-path: %s" load-path)
+;; (message "trusted-content: %s" trusted-content)
+;; (message "load-path: %s" load-path)
 
 ;;; early-init.el ends here.

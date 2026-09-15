@@ -741,7 +741,7 @@ artifacts such as indentation bars."
 (use-package window
   :init
   (let ((window-parameters '(window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))))
-    (message "%s" window-parameters)
+    ;; (message "%s" window-parameters)
     (setq switch-to-buffer-in-dedicated-window 'pop
           switch-to-buffer-obey-display-actions t
           window-resize-pixelwise t
