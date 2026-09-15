@@ -8,8 +8,6 @@
 
 export ASDF_DATA_DIR="${HOME}/.asdf"
 
-echo "PATH=${PATH}"
-
 export PATH
 PathAdd PATH \
         /opt/homebrew/opt/python@3.14/libexec/bin/ \

@@ -15,7 +15,9 @@ else
   export_function() { :; }
 fi
 
-dbg() { echo "--" "${@}" 1>&2; }
+dbg() {
+  : echo "--" "${@}" 1>&2;
+}
 
 is_function() { > /dev/null declare -f -F "${1}"; }
 

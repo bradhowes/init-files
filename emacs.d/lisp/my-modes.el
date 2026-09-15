@@ -6,7 +6,10 @@
 (require 'my-constants)
 (require 'treesit)
 
-(add-to-list 'treesit-language-source-alist '(kotlin . ("https://github.com/fwcd/tree-sitter-kotlin")))
+(add-to-list 'treesit-language-source-alist
+             '(kotlin . ("https://github.com/fwcd/tree-sitter-kotlin")))
+(add-to-list 'treesit-language-source-alist
+             '(python . ("https://github.com/tree-sitter/tree-sitter-python")))
 
 (defun my/autoloads (&rest definitions)
   "Setup autoloads for my mode customizations.
@@ -30,7 +33,6 @@ the items to setup for autoloading from the given file."
  "my-c++-mode" 'my/c++-mode-hook
  "my-dired-mode" 'my/dired-mode-hook
  "my-find-known-bindings" 'my/find-known-bindings
- "my-js2-mode" 'my/js2-mode-hook
  "my-json-mode" 'my/json-mode-hook
  "my-lisp-mode" '(my/lisp-mode-hook my/lisp-data-mode-hook)
  "my-makefile-mode" 'my/makefile-mode-hook
@@ -79,7 +81,6 @@ the items to setup for autoloading from the given file."
 
 (use-package eglot
   :ensure t
-  :after (tempel kotlin-ts-mode lsp-pyright)                       ; Due to tempel soft dependency
   :commands (eglot-ensure)
   :defines (eglot-mode-map)
   :hook ((c++-mode . my/known-project-eglot-ensure)
@@ -94,18 +95,20 @@ the items to setup for autoloading from the given file."
          (yaml-mode . eglot-ensure)
          (yaml-ts-mode . eglot-ensure)
          (eglot-managed-mode . my/eglot-configure))
+  :config
+  (fset #'jsonrpc--log-event #'ignore)
   :custom
   ((eglot-autoshutdown t)
    (eglot-extend-to-xref t))
   :bind (:map eglot-mode-map
-              ("a" . eglot-code-actions)
-              ("e" . eglot-code-action-extract)
-              ("j" . eglot-code-action-inline)
-              ("f" . eglot-format)
-              ("o" . eglot-code-action-organize-imports)
-              ("q" . eglot-code-action-quickfix)
-              ("r" . eglot-rename)
-              ("w" . eglot-code-action-rewrite)))
+              ("C-c c a" . eglot-code-actions)
+              ("C-c c e" . eglot-code-action-extract)
+              ("C-c c f" . eglot-format)
+              ("C-c c j" . eglot-code-action-inline)
+              ("C-c c o" . eglot-code-action-organize-imports)
+              ("C-c c q" . eglot-code-action-quickfix)
+              ("C-c c r" . eglot-rename)
+              ("C-c c w" . eglot-code-action-rewrite)))
 
 ;; (keymap-global-set "C-c c" eglot-mode-map)
 
@@ -130,8 +133,8 @@ the items to setup for autoloading from the given file."
               ("M-n" . flymake-goto-next-error)
               ("M-p" . flymake-goto-prev-error)))
 
-(use-package flymake-json
-  :ensure t)
+;; (use-package flymake-json
+;;   :ensure t)
 
 (use-package flymake-shellcheck
   :ensure t
@@ -147,10 +150,9 @@ the items to setup for autoloading from the given file."
   :ensure t
   :hook (prog-mode . indent-bars-mode))
 
-(use-package json-mode
+(use-package json-ts-mode
   :ensure t
-  :init (add-to-list 'auto-mode-alist '("\\.yagconf\\'" . json-mode))
-  :hook ((json-mode . my/json-mode-hook)))
+  :hook ((json-ts-mode . my/json-mode-hook)))
 
 (use-package kotlin-ts-mode
   :ensure t
@@ -160,9 +162,6 @@ the items to setup for autoloading from the given file."
 (use-package js
   :ensure t
   :config (setq js-indent-level 2))
-
-;; (use-package js2-mode
-;;   :hook ((js2-mode . my/js2-mode-hook)))
 
 (use-package kotlin-ts-mode
   :ensure t
@@ -184,7 +183,7 @@ the items to setup for autoloading from the given file."
   :hook (markdown-mode . my/markdown-mode-hook))
 
 (use-package python
-  :hook ((python-base-mode . my/python-mode-hook)
+  :hook ((python-ts-mode . my/python-mode-hook)
          (inferior-python-mode . my/inferior-python-mode-hook)))
 
 (use-package sh-mode

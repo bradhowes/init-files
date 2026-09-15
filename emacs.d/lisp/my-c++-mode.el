@@ -4,7 +4,7 @@
 
 (require 'cc-mode)
 (require 'doxygen)
-(require 'eldoc-box)
+;; (require 'eldoc-box)
 (require 'my-c-mode-common)
 (require 'my-insert-block-comment)
 (require 'flyspell)

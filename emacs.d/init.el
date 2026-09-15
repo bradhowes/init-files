@@ -10,6 +10,7 @@
 (require 'my-env)
 (require 'my-functions)
 (require 'my-layout)
+(require 'my-modes)
 (require 'wid-edit)
 
 (set-charset-priority 'unicode)
@@ -30,7 +31,8 @@ the buffer having untrusted content."
   (or original-response
       (buffer-name "*scratch*")))
 
-(advice-add 'trusted-content-p :filter-return #'my/trusted-content-p)
+;; NOTE: for some reason, this is breaking cape.
+;; (advice-add 'trusted-content-p :filter-return #'my/trusted-content-p)
 
 ;; Set this to `t` to debug issue involving the filenotify package
 (when nil
@@ -352,8 +354,37 @@ Here, we just separate them by a comma."
   :bind (("H-n c" . consult-notes)))
 
 (use-package corfu
+  :after orderless
   :ensure t
-  :bind (:map corfu-map ("C-SPC" . corfu-insert-separator)))
+  :commands (global-corfu-mode)
+  :bind (:map corfu-map
+              ("C-SPC" . corfu-insert-separator)
+              ("M-p" . corfu-popupinfo-scroll-down)
+              ("M-n" . corfu-popupinfo-scroll-up))
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-auto t)                 ;; Enable auto completion
+  (corfu-separator ?\s)          ;; Orderless field separator
+  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+  (corfu-scroll-margin 5)        ;; Use scroll margin
+  ;; Enable Corfu only for certain modes.
+  :hook ((prog-mode . corfu-mode)
+         (shell-mode . corfu-mode)
+         (eshell-mode . corfu-mode))
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since Dabbrev can be used globally (M-/).
+  ;; See also `corfu-excluded-modes'.
+  :init
+  (global-corfu-mode)                   ; This does not play well in eshell if you run a repl
+  (setq corfu-auto t))
+
+;; (define-key corfu-map (kbd "M-p") #'corfu-popupinfo-scroll-down) ;; corfu-next
+;; (define-key corfu-map (kbd "M-n") #'corfu-popupinfo-scroll-up)  ;; corfu-previous
 
 (use-package crm)
 
@@ -399,8 +430,8 @@ such directory, in the user's home directory."
               ("C-M-s" . dired-isearch-filenames-regexp))
   :hook (dired-mode . my/dired-mode-hook))
 
-(use-package eldoc-box
-  :ensure t)
+;; (use-package eldoc-box
+;;   :ensure t)
   ;; :if my/is-terminal)
 ;; :hook (prog-mode . eldoc-box-hover-mode)))
 
@@ -480,7 +511,8 @@ such directory, in the user's home directory."
 
 (use-package key-chord
   ;; :vc (:url "https://github.com/emacsorphanage/key-chord" :rev :newest)
-  :commands (key-chord-define))
+  :commands (key-chord-define key-chord-mode)
+  :config (key-chord-mode 1))
 
 (use-package ligature
   :ensure t
@@ -1393,8 +1425,6 @@ process has its own server connection."
     (server-start)))
 
 (add-hook 'after-init-hook #'my/start-emacs-server)
-
-(require 'my-modes)
 
 (provide 'init)
 

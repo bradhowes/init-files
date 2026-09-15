@@ -46,9 +46,6 @@
  '(context-menu-mode t)
  '(copyright-query nil)
  '(copyright-year-ranges t)
- '(corfu-history-mode t)
- '(corfu-popupinfo-delay '(0.5 . 0.5))
- '(corfu-popupinfo-mode t)
  '(create-lockfiles nil)
  '(current-language-environment "UTF-8")
  '(custom-enabled-themes '(modus-vivendi))
@@ -74,7 +71,6 @@
  '(eat-line-input-history-isearch 'dwim)
  '(eglot-ignored-server-capabilities '(:documentHighlightProvider))
  '(eglot-send-changes-idle-time 0.1)
- '(eldoc-box--mouse-support-mode nil)
  '(eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
  '(eldoc-echo-area-display-truncation-message nil)
  '(eldoc-echo-area-use-multiline-p 5)
@@ -84,7 +80,6 @@
  '(flymake-show-diagnostics-at-end-of-line nil)
  '(flyspell-mode-line-string "s ")
  '(frame-resize-pixelwise t)
- '(global-corfu-mode t)
  '(global-diff-hl-mode t)
  '(global-diff-hl-show-hunk-mouse-mode t)
  '(global-eldoc-mode t)
@@ -106,7 +101,6 @@
    '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16" "--camel-case"))
  '(ispell-local-dictionary "english")
  '(kept-old-versions 10)
- '(key-chord-mode t)
  '(line-move-visual nil)
  '(magit-diff-refine-hunk t)
  '(magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
@@ -128,13 +122,13 @@
  '(package-selected-packages
    '(accent ace-window async cape char-menu cmake-mode consult-compile-multi consult-denote consult-dir consult-eglot
             consult-notes corfu-terminal crux dape diff-hl ef-themes eldoc-box embark-consult esup exec-path-from-shell
-            expand-region fancy-compilation flycheck flycheck-swift flymake flymake-aspell flymake-json
-            flymake-shellcheck flyover helpful impatient-mode indent-bars jedi js-comint js2-mode json-mode key-chord
-            kotlin-ts-mode lps-pyright lsp-jedi lsp-pyright lsp-sourcekit lsp-ui magit marginalia markdown-mode
-            mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu nerd-icons-dired
-            nerd-icons-grep nerd-icons-ibuffer nerd-icons-xref orderless osx-dictionary pdb-capf popper pyvenv rg
-            scratch swift-mode swift-ts-mode tempel tempel-collection tree-sitter-langs treesit-auto verb vertico
-            which-key ws-butler yaml yaml-mode yasnippet yasnippet-capf yasnippet-snippets))
+            expand-region fancy-compilation flycheck flycheck-swift flymake flymake-aspell flymake-shellcheck flyover
+            helpful impatient-mode indent-bars jedi js-comint js2-mode key-chord kotlin-ts-mode lps-pyright lsp-jedi
+            lsp-pyright lsp-sourcekit lsp-ui magit marginalia markdown-mode mode-line-bell mood-line multiple-cursors
+            nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-grep nerd-icons-ibuffer nerd-icons-xref
+            orderless osx-dictionary pdb-capf popper pyvenv rg scratch swift-mode swift-ts-mode tempel tempel-collection
+            tree-sitter-langs treesit-auto verb vertico which-key ws-butler yaml yaml-mode yasnippet yasnippet-capf
+            yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-echo-mode t)
  '(popper-mode t)
