@@ -112,7 +112,7 @@ export GIT_PAGER="${PAGER}"
 autoload -Uz vcs_info
 precmd() { vcs_info; }
 
-zstyle ':vcs_info:*' actionformats '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
+zstyle ':vcs_info:*' actionformats '%F{2}[%b%F{3}|%F{1}%a%F{2}]%f'
 zstyle ':vcs_info:*' formats '%F{2}[%b]%f'
 zstyle ':vcs_info:*' disable bzr cdv cvs darcs fossil hg mtn p4 svk svn tla
 
