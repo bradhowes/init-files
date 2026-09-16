@@ -156,3 +156,4 @@ autoload -Uz compinit && compinit
 export PYENV_ROOT="${HOME}/.pyenv"
 [[ -d ${PYENV_ROOT}/bin ]] && export PATH="${PYENV_ROOT}/bin:${PATH}"
 eval "$(pyenv init - zsh)"
+eval "$(/Users/bradhowes/.local/bin/mise activate zsh)"
