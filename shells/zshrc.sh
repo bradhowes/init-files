@@ -126,6 +126,7 @@ export PROMPT="\${vcs_info_msg_0_}%B%F{green}%#%f%b "
 # cd "${PWD}" || :
 
 # shellcheck disable=SC1091
+# curl -L https://iterm2.com/shell_integration/install_shell_integration.sh | bash
 [[ -f "${HOME}/.iterm2_shell_integration.zsh" ]] && . "${HOME}/.iterm2_shell_integration.zsh"
 
 # The next line updates PATH for the Google Cloud SDK.

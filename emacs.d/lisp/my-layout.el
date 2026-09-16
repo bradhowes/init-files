@@ -303,10 +303,11 @@ Frame's right side is flush with the right side of the main display."
 (defun my/layout-screen-layout-changed ()
   "Recalculate values based on screen layout."
   (interactive)
-  (let ((layout (my/layout--active-screens)))
-    (message "screen layout: %s" layout)
-    (my/layout--setup-font layout)
-    (my/layout--update-screen-frame-alists layout)))
+  (when my/is-graphical
+    (let ((layout (my/layout--active-screens)))
+      (message "screen layout: %s" layout)
+      (my/layout--setup-font layout)
+      (my/layout--update-screen-frame-alists layout))))
 
 (defun my/layout-pick-default-display-4k (screen)
   "Set the 4K SCREEN to use to host future Emacs frames.

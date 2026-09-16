@@ -124,7 +124,6 @@ the items to setup for autoloading from the given file."
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
 (use-package flymake
-  :ensure t
   :commands (flymake-show-buffer-diagnostics)
   :config
   (setq elisp-flymake-byte-compile-load-path load-path)
@@ -135,11 +134,6 @@ the items to setup for autoloading from the given file."
 
 ;; (use-package flymake-json
 ;;   :ensure t)
-
-(use-package flymake-shellcheck
-  :ensure t
-  :if (executable-find "shellcheck")
-  :hook (sh-mode . flymake-shellcheck-load))
 
 (use-package flyspell
   :ensure t

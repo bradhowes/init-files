@@ -462,9 +462,6 @@ such directory, in the user's home directory."
   :ensure t
   :bind ("C-\\" . er/expand-region))
 
-(use-package flycheck
-  :ensure t)
-
 (use-package fancy-compilation
   :ensure t
   :commands (fancy-compilation-mode)
@@ -717,6 +714,7 @@ artifacts such as indentation bars."
   :config
   (setq read-process-output-max (* 64 1024 1024)
 	process-adaptive-read-buffering nil
+        debug-on-error t
 	custom-file (file-truename (locate-user-emacs-file "custom.el"))
 	frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
                              (if my/is-terminal (list (concat (system-name) " ") buffer-directory)
@@ -732,8 +730,8 @@ artifacts such as indentation bars."
                   (car args))
           (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
-  ;; (when (file-exists-p custom-file)
-  ;;   (load custom-file 'noerror))
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror))
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
          (after-init . abbrev-mode)))
@@ -1283,7 +1281,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                            "H-a" #'ace-window
                            "H-b" #'consult-project-buffer
                            "H-B" #'consult-buffer
-                           ;; "H-c" my/hyper-c-map
+                           ;; "H-c" my/hyper-c-map -- defined above
                            "H-f" #'consult-flymake
                            "H-g" #'magit-status
                            "H-h" #'my/describe-symbol-at-point
@@ -1318,7 +1316,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                      "hb" #'popper-kill-latest-popup
                      "sb" #'speedbar
                      "vv" #'diff-hl-show-hunk
-                     "fm" #'flymake-show-buffer-diagnostics
+                     ;; "fm" #'flymake-show-buffer-diagnostics
                      "jn" #'my/ace-window-next
                      "jp" #'my/ace-window-previous)
 

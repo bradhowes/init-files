@@ -120,14 +120,11 @@
  '(ns-right-command-modifier 'super)
  '(ns-right-control-modifier 'hyper)
  '(package-selected-packages
-   '(accent ace-window async cape char-menu cmake-mode consult-compile-multi consult-denote consult-dir consult-eglot
-            consult-notes corfu-terminal crux dape diff-hl ef-themes eldoc-box embark-consult esup exec-path-from-shell
-            expand-region fancy-compilation flycheck flycheck-swift flymake flymake-aspell flymake-shellcheck flyover
-            helpful impatient-mode indent-bars jedi js-comint js2-mode key-chord kotlin-ts-mode lps-pyright lsp-jedi
-            lsp-pyright lsp-sourcekit lsp-ui magit marginalia markdown-mode mode-line-bell mood-line multiple-cursors
-            nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-grep nerd-icons-ibuffer nerd-icons-xref
-            orderless osx-dictionary pdb-capf popper pyvenv rg scratch swift-mode swift-ts-mode tempel tempel-collection
-            tree-sitter-langs treesit-auto verb vertico which-key ws-butler yaml yaml-mode yasnippet yasnippet-capf
+   '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes corfu crux denote diff-hl eldoc-box
+            embark-consult esup expand-region fancy-compilation flymake-shellcheck flyover helpful impatient-mode
+            indent-bars js2-mode key-chord kotlin-ts-mode ligature lsp-pyright magit marginalia markdown-mode
+            mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-dired nerd-icons-xref orderless
+            osx-dictionary popper rg scratch tempel tempel-collection vertico ws-butler yaml yaml-mode yasnippet
             yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-echo-mode t)

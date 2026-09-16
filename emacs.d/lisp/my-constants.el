@@ -16,6 +16,10 @@
   (eq window-system 'x)
   "T if running in an X windows environment.")
 
+(defconst my/is-graphical
+  (display-graphic-p)
+  "T if running in a graphical display environment.")
+
 (defconst my/is-x-windows-on-win
   (and my/is-x-windows (getenv "XTERM_SHELL"))
   "T if running in VcXsrv on Windows.
