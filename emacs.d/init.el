@@ -732,27 +732,25 @@ artifacts such as indentation bars."
                   (car args))
           (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
-  (when (file-exists-p custom-file)
-    (load custom-file 'noerror))
+  ;; (when (file-exists-p custom-file)
+  ;;   (load custom-file 'noerror))
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
          (after-init . abbrev-mode)))
 
 (use-package window
   :init
-  (let ((window-parameters '(window-parameters . ((no-other-window . t) (no-delete-other-windows . t)))))
-    ;; (message "%s" window-parameters)
-    (setq switch-to-buffer-in-dedicated-window 'pop
-          switch-to-buffer-obey-display-actions t
-          window-resize-pixelwise t
-          window-sides-slots '(0 0 3 1)
-          display-buffer-base-action '((display-buffer-reuse-window ace-display-buffer))
-          display-buffer-alist `(("\\*help\\[R" (display-buffer-reuse-mode-window ace-display-buffer) (reusable-frames . nil))
-                                 ("\\*R" nil (reusable-frames . nil))
-                                 ,(cons "\\*helm" display-buffer-fallback-action)))))
-                                 ;; Show log buffer in something other than the current window
-                                 ;; ("magit-log" nil (inhibit-same-window . t))
-                                 ;; ("magit-diff:" nil (inhibit-same-window . t))))))
+  (setq switch-to-buffer-in-dedicated-window 'pop
+        switch-to-buffer-obey-display-actions t
+        window-resize-pixelwise t
+        window-sides-slots '(0 0 3 1)
+        display-buffer-base-action '((display-buffer-reuse-window ace-display-buffer))
+        display-buffer-alist `(("\\*help\\[R" (display-buffer-reuse-mode-window ace-display-buffer) (reusable-frames . nil))
+                               ("\\*R" nil (reusable-frames . nil))
+                               ,(cons "\\*helm" display-buffer-fallback-action))))
+                               ;; Show log buffer in something other than the current window
+                               ;; ("magit-log" nil (inhibit-same-window . t))
+                               ;; ("magit-diff:" nil (inhibit-same-window . t))))))
 
 ;; My own version of some `crux` routines that use `find-file` instead of `find-file-other-window`
 (defun my/find-user-init-file (arg)

@@ -186,17 +186,22 @@ find-root() {
   return 0
 }
 
-my_bash_history_sync() {
-  builtin history -a          # append new lines to history file
-  HISTFILESIZE=${HISTSIZE}    # purge oldest entries beyond HISTSIZE
-  builtin history -c          # clear history
-  builtin history -r          # reload history
-}
+if ((my_is_zsh)); then
+  # do nothing
+  my_bash_history_sync() { :; }
+else
+  my_bash_history_sync() {
+    builtin history -a          # append new lines to history file
+    HISTFILESIZE=${HISTSIZE}    # purge oldest entries beyond HISTSIZE
+    builtin history -c          # clear history
+    builtin history -r          # reload history
+  }
 
-history() {
-  my_bash_history_sync
-  builtin history "${@}"
-}
+  history() {
+    my_bash_history_sync
+    builtin history "$*"
+  }
+fi
 
 my_prompt_command() {
   my_bash_history_sync
@@ -209,6 +214,14 @@ my_prompt_command() {
 
 parse_git_branch() {
   git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
+hgrep() {
+  if [[ -z "$*" ]]; then
+    builtin history 1
+  else
+    builtin history 1 | ggrep -E --color=auto "$*"
+  fi
 }
 
 # tracer END functions.sh

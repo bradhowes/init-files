@@ -27,21 +27,26 @@ PathAdd -f PATH \
 # Use current Java environment
 eval "$(jenv init -)"
 
-HISTSIZE=100000
+export HISTSIZE=100000
 # shellcheck disable=SC2034
-SAVEHIST=${HISTSIZE}
+export SAVEHIST=${HISTSIZE}
 HISTFILE="${HOME}/.history"
 
 setopt EXTENDED_HISTORY
 setopt SHARE_HISTORY
-setopt HIST_EXPIRE_DUPS_FIRST
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_FIND_NO_DUPS
-setopt HIST_IGNORE_SPACE
-setopt HIST_SAVE_NO_DUPS
-setopt HIST_REDUCE_BLANKS
-setopt HIST_VERIFY
+
+if ((my_is_bash)); then
+  setopt INC_APPEND_HISTORY
+else
+  setopt HIST_EXPIRE_DUPS_FIRST
+  setopt HIST_IGNORE_DUPS
+  setopt HIST_IGNORE_ALL_DUPS
+  setopt HIST_FIND_NO_DUPS
+  setopt HIST_IGNORE_SPACE
+  setopt HIST_SAVE_NO_DUPS
+  setopt HIST_REDUCE_BLANKS
+  setopt HIST_VERIFY
+fi
 
 # shellcheck disable=SC2034
 HISTORY_IGNORE="(cd|ls|ps|pwd|history|exit)"
@@ -104,8 +109,6 @@ export GIT_PAGER="${PAGER}"
 
 # [[ -x /usr/bin/dircolors ]] && eval TERM=$(xterm-color dircolors)
 
-# Simple prompt - green color, show user name, Git branch
-
 # Setup GIT branch info in prompt
 autoload -Uz vcs_info
 precmd() { vcs_info; }
@@ -114,19 +117,13 @@ zstyle ':vcs_info:*' actionformats '%F{2}[%b%F{3}|%F{1}%a%F{2}]%f'
 zstyle ':vcs_info:*' formats '%F{2}[%b]%f'
 zstyle ':vcs_info:*' disable bzr cdv cvs darcs fossil hg mtn p4 svk svn tla
 
-# zstyle ':vcs_info:git:*' formats '%b|'
 setopt PROMPT_SUBST
 
-# zstyle ':vcs_info:git:*' actionformats '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
-# zstyle ':vcs_info:git:*' formats '%b %a|'
+# Show git branch in [] if in a repo directory followed by bland '%' or '#' depending on user.
+export PROMPT="\${vcs_info_msg_0_}%B%F{green}%#%f%b "
 
-PS1='${vcs_info_msg_0_}%B%F{green}%#%f%b '
-
-# export PS1="\e]0;\u@\h:\w\007[\e[1;32m\]$(parse_git_branch)\u%\[\033[0m\] "
-# export PS1="%B%F{green}%n%#%f%b "
-# export PROMPT="${vcs_info_msg_0_}%B%F{green}%n%#%f%b "
-
-cd "${PWD}" || :
+# Force the emission of a path escape sequence for Emacs/term programs. May not be necessary anymore.
+# cd "${PWD}" || :
 
 # shellcheck disable=SC1091
 [[ -f "${HOME}/.iterm2_shell_integration.zsh" ]] && . "${HOME}/.iterm2_shell_integration.zsh"
@@ -153,7 +150,5 @@ autoload -Uz compinit && compinit
 # Work-related -- add GitHub SSL key
 [[ -f "${HOME}/.ssh/id_ed25519" ]] && ssh-add -q --apple-use-keychain "${HOME}/.ssh/id_ed25519"
 
-export PYENV_ROOT="${HOME}/.pyenv"
-[[ -d ${PYENV_ROOT}/bin ]] && export PATH="${PYENV_ROOT}/bin:${PATH}"
-eval "$(pyenv init - zsh)"
-eval "$(/Users/bradhowes/.local/bin/mise activate zsh)"
+mise="/Users/bradhowes/.local/bin/mise"
+[[ -f "${mise}" ]] && eval "$(${mise} activate zsh)"

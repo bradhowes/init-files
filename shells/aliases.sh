@@ -23,8 +23,6 @@ alias r="fc -s"
 
 alias whois="whois -h whois.arin.net"
 
-alias hgrep="history | grep"
-
 alias envgrep='env | grep'
 
 alias sf="cd \${HOME}/src/Mine/SoundFonts"
