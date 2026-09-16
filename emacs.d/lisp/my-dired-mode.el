@@ -36,7 +36,15 @@
   (unless (eq my/dired-hidden-font-lock (car dired-font-lock-keywords))
     (push my/dired-hidden-font-lock dired-font-lock-keywords))
 
+  (keymap-local-unset "M-{")
+  (keymap-local-unset "M-}")
   (keymap-local-unset "l")
+
+  (keymap-local-set "c" #'dired-do-copy)
+  (keymap-local-set "C" #'dired-do-compress)
+  (keymap-local-set "C-s" #'dired-isearch-filenames)
+  (keymap-local-set "C-M-s" #'dired-isearch-filenames-regexp)
+
   (keymap-local-set "=" #'my/ediff-marked-pair))
 
 (provide 'my-dired-mode)
