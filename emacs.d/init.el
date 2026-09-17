@@ -116,8 +116,6 @@ the right-edge of the screen, but may overlap with the middle frame."
 
 (advice-add 'aw-make-frame :override #'my/aw-make-frame)
 
-(keymap-global-set "C-x 4 o" #'my/ace-window-prefix)
-
 (use-package char-menu
   :ensure t
   :defines (char-menu)
@@ -145,62 +143,62 @@ the right-edge of the screen, but may overlap with the middle frame."
   :after (project xref)
   :commands (consult--customize-put consult-flymake)
   :bind (:map ctl-x-map ;; C-x
-         ("M-:" . consult-complex-command)
-         ("b" . consult-buffer)
-         ("f" . consult-recent-file)
-         ("4 b" . consult-buffer-other-window)
-         ("5 b" . consult-buffer-other-frame)
-         ("r b" . consult-bookmark)
-         ("r l" . consult-bookmark)
+              ("M-:" . consult-complex-command)
+              ("b" . consult-buffer)
+              ("f" . consult-recent-file)
+              ("4 b" . consult-buffer-other-window)
+              ("5 b" . consult-buffer-other-frame)
+              ("r b" . consult-bookmark)
+              ("r l" . consult-bookmark)
 
-         ;; ("M-#" . consult-register-load)
-         ;; ("M-'" . consult-register-store)
-         ;; ("C-M-#" . consult-register)
+              ;; ("M-#" . consult-register-load)
+              ;; ("M-'" . consult-register-store)
+              ;; ("C-M-#" . consult-register)
 
-         ("M-y" . consult-yank-replace)
+              ("M-y" . consult-yank-replace)
 
-         :map goto-map ;; M-g
-         ("g" . consult-goto-line)
-         ("M-g" . consult-goto-line)
-         ("o" . consult-outline)
-         ("m" . consult-mark)
-         ("k" . consult-global-mark)
-         ("i" . consult-imenu)
-         ("I" . consult-imenu-multi)
+              :map goto-map ;; M-g
+              ("g" . consult-goto-line)
+              ("M-g" . consult-goto-line)
+              ("o" . consult-outline)
+              ("m" . consult-mark)
+              ("k" . consult-global-mark)
+              ("i" . consult-imenu)
+              ("I" . consult-imenu-multi)
 
-         :map search-map ;; M-s
-         ("d" . consult-find)
-         ("g" . consult-grep)
-         ("G" . consult-git-grep)
-         ("i" . consult-imenu)      ; Duplicate 'M-g i'
-         ("k" . consult-keep-lines)
-         ("l" . consult-line)
-         ("M-s" . my/consult-line-symbol-at-point)
-         ("L" . consult-line-multi)
-         ("r" . consult-ripgrep)
-         ("u" . consult-focus-lines)
-         ;; Isearch integration
-         ("e" . consult-isearch-history)
+              :map search-map ;; M-s
+              ("d" . consult-find)
+              ("g" . consult-grep)
+              ("G" . consult-git-grep)
+              ("i" . consult-imenu)      ; Duplicate 'M-g i'
+              ("k" . consult-keep-lines)
+              ("l" . consult-line)
+              ("M-s" . my/consult-line-symbol-at-point)
+              ("L" . consult-line-multi)
+              ("r" . consult-ripgrep)
+              ("u" . consult-focus-lines)
+              ;; Isearch integration
+              ("e" . consult-isearch-history)
 
-         :map my/hyper-c-map ;; H-c
-         ("M-x" . consult-mode-command)
-         ("h" . consult-history)
-         ;; ("C-h i" . consult-info)
-         ("k" . consult-kmacro)
-         ("m" . consult-man)
-         ("I" . consult-info)
+              :map my/hyper-c-map ;; H-c
+              ("M-x" . consult-mode-command)
+              ("h" . consult-history)
+              ;; ("C-h i" . consult-info)
+              ("k" . consult-kmacro)
+              ("m" . consult-man)
+              ("I" . consult-info)
 
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history)
-         ("M-s e" . consult-isearch-history)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
+              :map isearch-mode-map
+              ("M-e" . consult-isearch-history)
+              ("M-s e" . consult-isearch-history)
+              ("M-s l" . consult-line)
+              ("M-s L" . consult-line-multi)
 
-         :map minibuffer-local-map
-         ("C-s" . consult-history)
+              :map minibuffer-local-map
+              ("C-s" . consult-history)
 
-         :map project-prefix-map
-         ("b" . consult-project-buffer))
+              :map project-prefix-map
+              ("b" . consult-project-buffer))
 
   :commands (consult-register-format consult-register-window consult-xref consult-register-store consult-register-load)
 
@@ -333,9 +331,10 @@ Here, we just separate them by a comma."
   :bind (:map my/hyper-c-map
               ("d" . crux-duplicate-current-line-or-region)
               ("C-i" . crux-indent-defun)
+              :map ctl-x-4-map
+              ("t" . crux-transpose-windows)
               :map global-map
               ("C-a" . crux-move-beginning-of-line)
-              ("C-x 4 t" . crux-transpose-windows)
               ("C-k" . crux-smart-kill-line)
               ("C-^" . crux-top-join-line)))
 
@@ -398,12 +397,13 @@ Here, we just separate them by a comma."
 
 (use-package helpful
   :ensure t
-  :bind (("C-h f" . helpful-callable)
-           ("C-h v" . helpful-variable)
-           ("C-h k" . helpful-key)
-           ("C-h ." . helpful-at-point)
-           ("C-h M-f" . helpful-function)
-           ("C-h M-c" . helpful-command)))
+  :bind (:map help-map
+              ("f" . helpful-callable)
+              ("v" . helpful-variable)
+              ("k" . helpful-key)
+              ("." . helpful-at-point)
+              ("M-f" . helpful-function)
+              ("M-c" . helpful-command)))
 
 (use-package hippie-expand
   :bind (("M-/" . hippie-expand)))
@@ -428,8 +428,8 @@ Here, we just separate them by a comma."
   :commands (ligature-set-ligatures global-ligature-mode)
   :config
   (ligature-set-ligatures
-     'prog-mode
-     '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+   'prog-mode
+   '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
      ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
      "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
      "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
@@ -448,13 +448,14 @@ Here, we just separate them by a comma."
   :ensure t
   :commands (magit-status-setup-buffer magit-status magit-project-status)
   :hook ((magit-post-refresh . diff-hl-magit-post-refresh))
-  :bind (("C-x g" . magit-status)
-         ;; Take over vc-dir
-         ("C-x p v" . magit-project-status)
-         ;; Take over vc-print-log
-         ("C-x v l" . magit-log-buffer-file)
-         :map my/hyper-c-map
-         ("f" . magit-file-dispatch))
+  :bind (:map ctl-x-map
+              ("g" . magit-status)
+              ;; Take over vc-dir
+              ("p v" . magit-project-status)
+              ;; Take over vc-print-log
+              ("v l" . magit-log-buffer-file)
+              :map my/hyper-c-map
+              ("f" . magit-file-dispatch))
   :custom (magit-process-find-password-functions '(my/read-gitlab-password)))
 
 (use-package marginalia
@@ -487,7 +488,7 @@ Here, we just separate them by a comma."
   :after (marginalia)
   :commands (nerd-icons-completion-mode nerd-icons-completion-marginalia-setup)
   :hook ((after-init . nerd-icons-completion-mode)
-           (marginalia-mode nerd-icons-completion-marginalia-setup)))
+         (marginalia-mode nerd-icons-completion-marginalia-setup)))
 
 (use-package nerd-icons-dired
   :ensure t
@@ -500,7 +501,7 @@ Here, we just separate them by a comma."
   (completion-styles '(partial-completion orderless flex))
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles partial-completion))
-                                     (minibuffer (initials orderless)))))
+                                   (minibuffer (initials orderless)))))
 
 (use-package org
   :commands (org-store-link)
@@ -530,20 +531,23 @@ Here, we just separate them by a comma."
 
 (use-package project
   :commands (project--switch-project-command) ;; used in my/show-project-menu
-  :bind (("C-x p $" . project-shell)))
+  :bind (:map project-prefix-map
+              ("$" . project-shell)))
 
 (keymap-set project-prefix-map "m" #'my/show-project-menu)
 
 (defvar my/project-search-map (make-sparse-keymap)
   "A prefix map like that found in projectile.
 Bound to \\`C-x p s'.")
-(keymap-set project-prefix-map "s" my/project-search-map)
 
 (use-package rg
   :ensure t
   :after (project)
   :commands (rg-enable-default-bindings rg-project)
-  :bind ("C-x p s r" . #'rg-project)
+  :bind (:map project-prefix-map
+              ("s" . my/project-search-map)
+              :map my/project-search-map
+              ("r" . #'rg-project))
   :hook (after-init . rg-enable-default-bindings))
 
 (use-package scratch
@@ -663,11 +667,11 @@ artifacts such as indentation bars."
     (mapc (lambda (tuple)
             (let* ((key (elt tuple 0))
                    (path (elt tuple 1))
-                     (name (intern (or (elt tuple 3)
+                   (name (intern (or (elt tuple 3)
                                      (concat "my/jmp-" path)))))
               (fset name (lambda ()
-                             (interactive)
-                             (dired (if (string= "/" (substring path 0 1))
+                           (interactive)
+                           (dired (if (string= "/" (substring path 0 1))
                                       (file-truename path)
                                     (files--splice-dirname-file my/repos path)))))
               (keymap-set map key name)))
@@ -727,117 +731,116 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (mapc (lambda (pair) (key-chord-define keymap (elt pair 0) (elt pair 1))) (seq-split definitions 2)))
 
 (my/emacs-key-bind my/hyper-c-map
-                     "r" #'ielm
-                     "D" #'crux-find-current-directory-dir-locals-file
+                   "i" #'my/find-user-init-file
+                   "j" my/dired-jumps-map
+                   "r" #'ielm
+                   "D" #'crux-find-current-directory-dir-locals-file
+                   "S" #'my/find-shell-init-file
+                   "H-l" #'my/find-user-init-file
+                   "," #'my/find-user-custom-file
+                   "H-c" #'my/copy-file-name-to-clipboard
+                   "H-k" #'my/kill-current-buffer)
 
-                     "i" #'my/find-user-init-file
-                     "H-l" #'my/find-user-init-file
-                     "," #'my/find-user-custom-file
-                     "S" #'my/find-shell-init-file
-                     "H-c" #'my/copy-file-name-to-clipboard
-                     "H-k" #'my/kill-current-buffer
-                     "j" my/dired-jumps-map)
+(my/emacs-key-bind help-map
+                   "C-h" #'my/describe-symbol-at-point
+                   "C-j" #'popper-toggle
+                   "a" #'describe-symbol
+                   "c" #'describe-char
+                   "h" #'ignore         ; show 'Hello' in various fonts
+                   "u" #'apropos-user-option
+                   "F" #'apropos-function
+                   "K" #'describe-keymap
+                   "L" #'apropos-library
+                   "M" #'consult-man
+                   "V" #'apropos-variable)
+
+(my/emacs-key-bind ctl-x-map
+                   "C-b" #'ibuffer
+                   "C-o" #'other-frame
+                   "C-z" #'ignore       ; suspend-frame
+                   "C-+" #'ignore       ; text-scale-adjust
+                   "C-=" #'ignore       ; text-scale-adjust
+                   "C--" #'ignore       ; text-scale-adjust
+                   "0" #'delete-other-windows
+                   "O" #'other-frame
+                   "M-b" #'consult-project-buffer
+                   "M-v" #'my/reload-buffer
+                   "h" #'ignore)        ; mark-whole-buffer
+
+(my/emacs-key-bind ctl-x-4-map
+                   "c" #'my/customize-other-window
+                   "k" #'my/shell-other-window
+                   "o" #'my/ace-window-prefix
+                   "r" #'my/repl-other-window)
+
+(my/emacs-key-bind ctl-x-5-map
+                   "i" #'my/info-other-frame
+                   "k" #'my/shell-other-frame)
 
 (my/emacs-key-bind global-map
-                     "S-<left>" #'my/ace-window-previous
-                     "S-<right>" #'my/ace-window-next
-                     "S-<up>" #'my/ace-window-previous
-                     "S-<down>" #'my/ace-window-next
+                   "S-<left>" #'my/ace-window-previous
+                   "S-<right>" #'my/ace-window-next
+                   "S-<up>" #'my/ace-window-previous
+                   "S-<down>" #'my/ace-window-next
 
-                     ;; NOTE: do not bind RET or <return> -- that breaks Embark maps
-                     "C-h C-h" #'my/describe-symbol-at-point
-                     "C-h C-j" #'popper-kill-latest-popup
-                     "C-h C-j" #'popper-toggle
-                     "C-h a" #'describe-symbol
-                     "C-h c" #'describe-char
-                     "C-h u" #'apropos-user-option
-                     "C-h F" #'apropos-function
-                     "C-h K" #'describe-keymap
-                     "C-h L" #'apropos-library
-                     "C-h M" #'consult-man
-                     "C-h V" #'apropos-variable
+                   "M-g d" #'dired-jump
+                   "M-o" #'other-window
+                   ;; "M-O" #'my/ace-window-always-dispatch
 
-                     "M-g d" #'dired-jump
-                     "M-o" #'other-window
-                     ;; "M-O" #'my/ace-window-always-dispatch
+                   "C-o" #'aw-flip-window
 
-                     "C-o" #'aw-flip-window
+                   ;; "C-s" #'isearch-forward-regexp
+                   ;; "C-M-s" #'isearch-forward-symbol
 
-                     ;; "C-s" #'isearch-forward-regexp
-                     ;; "C-M-s" #'isearch-forward-symbol
+                   "M-{" #'my/prev-buffer-current-window
+                   "M-}" #'my/next-buffer-current-window
 
-                     "C-x 0" #'delete-other-windows
-                     "C-x O" #'other-frame
-                     "C-x C-o" #'other-frame
+                   "M-<f1>" #'my/layout-frame-pos-left
+                   "M-<f2>" #'my/layout-frame-pos-center
+                   "M-<f3>" #'my/layout-frame-pos-right
 
-                     "C-x C-b" #'ibuffer
-                     "C-x M-b" #'consult-project-buffer
-                     "C-x M-v" #'my/reload-buffer
+                   "C-M-\\" #'my/indent-buffer
 
-                     "M-{" #'my/prev-buffer-current-window
-                     "M-}" #'my/next-buffer-current-window
+                   "<home>" #'beginning-of-buffer
+                   "<end>" #'end-of-buffer
+                   "<delete>" #'delete-char
+                   "S-<f12>" #'package-list-packages
+                   "S-<f11>" #'my/layout-screen-layout-changed
 
-                     "M-<f1>" #'my/layout-frame-pos-left
-                     "M-<f2>" #'my/layout-frame-pos-center
-                     "M-<f3>" #'my/layout-frame-pos-right
+                   "M-z" #'zap-up-to-char
+                   "M-_" #'join-line
 
-                     "C-x 4 c" #'my/customize-other-window
-                     "C-x 4 k" #'my/shell-other-window
-                     "C-x 4 r" #'my/repl-other-window
+                   "M-P" #'my/ace-window-previous
+                   "M-N" #'my/ace-window-next
 
-                     "C-x 5 i" #'my/info-other-frame
-                     "C-x 5 k" #'my/shell-other-frame
+                   "C-S-p" #'my/ace-window-previous
+                   "C-S-n" #'my/ace-window-next
 
-                     "C-M-\\" #'my/indent-buffer
+                   "<f1>" #'my/layout-normal-screen-font-size
+                   "<f2>" #'my/layout-share-screen-font-size
 
-                     "<home>" #'beginning-of-buffer
-                     "<end>" #'end-of-buffer
-                     "<delete>" #'delete-char
-                     "S-<f12>" #'package-list-packages
-                     "S-<f11>" #'my/layout-screen-layout-changed
+                   "<insert>" #'ignore  ; disable key for toggling overwrite-mode
+                   "<insertchar>" #'ignore  ; disable key for toggling overwrite-mode
 
-                     "M-z" #'zap-up-to-char
-                     "M-_" #'join-line
+                   "<pinch>" #'ignore
 
-                     "M-P" #'my/ace-window-previous
-                     "M-N" #'my/ace-window-next
+                   ;; Disable font size changes via trackpad/scroll-wheel
+                   "C-<mouse-4>" #'ignore
+                   "C-<mouse-5>" #'ignore
+                   "C-<wheel-up>" #'ignore
+                   "C-<wheel-down>" #'ignore
 
-                     "C-S-p" #'my/ace-window-previous
-                     "C-S-n" #'my/ace-window-next
-
-                     "<f1>" #'my/layout-normal-screen-font-size
-                     "<f2>" #'my/layout-share-screen-font-size
-
-                     "<insert>" #'ignore  ; disable key for toggling overwrite-mode
-                     "<insertchar>" #'ignore  ; disable key for toggling overwrite-mode
-                     "C-x C-z" #'ignore   ; suspend-frame
-
-                     "C-x C-+" #'ignore   ; text-scale-adjust
-                     "C-x C-=" #'ignore   ; text-scale-adjust
-                     "C-x C--" #'ignore   ; text-scale-adjust
-
-                     "C-x h" #'ignore     ; mark-whole-buffer
-                     "C-h h" #'ignore     ; show 'Hello' in various fonts
-
-                     "<pinch>" #'ignore
-
-                     ;; Disable font size changes via trackpad/scroll-wheel
-                     "C-<mouse-4>" #'ignore
-                     "C-<mouse-5>" #'ignore
-                     "C-<wheel-up>" #'ignore
-                     "C-<wheel-down>" #'ignore
-
-                     "C-M-<mouse-4>" #'ignore
-                     "C-M-<mouse-5>" #'ignore
-                     "C-M-<wheel-up>" #'ignore
-                     "C-M-<wheel-down>" #'ignore)
+                   "C-M-<mouse-4>" #'ignore
+                   "C-M-<mouse-5>" #'ignore
+                   "C-M-<wheel-up>" #'ignore
+                   "C-M-<wheel-down>" #'ignore)
 
 (when my/is-graphical
   (my/emacs-key-bind global-map
-                       ;; NOTE: these conflict with terminal escape sequences so only use on graphical displays
-                       "M-O" #'my/ace-window-always-dispatch
-                       "M-[" #'previous-buffer
-                       "M-]" #'next-buffer))
+                     ;; NOTE: these conflict with terminal escape sequences so only use on graphical displays
+                     "M-O" #'my/ace-window-always-dispatch
+                     "M-[" #'previous-buffer
+                     "M-]" #'next-buffer))
 
 (defvar my/hyper-keys-map
   (make-sparse-keymap)
@@ -847,31 +850,31 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 ;; modifier. The second keymap -- my/hyper-keys-map -- holds the mapping that uses a keychord to activate which is
 ;; useful on terminals that do not offer a `Hyper' modifier.
 (let ((hyper-mapping (list "H-SPC" #'my/set-mark-deactivate
-                             "H-." #'my/goto-mark
-                             "H-1" #'delete-other-windows
-                             "H-2" #'split-window-below
-                             "H-4" #'other-window-prefix ; was ctl-x-4-prefix
-                             "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
-                             "H-a" #'ace-window
-                             "H-b" #'consult-project-buffer
-                             "H-B" #'consult-buffer
-                             "H-c" my/hyper-c-map
-                             "H-f" #'consult-flymake
-                             "H-g" #'magit-status
-                             "H-h" #'my/describe-symbol-at-point
-                             "H-j" my/point-jumps-map
-                             "H-k" #'bury-buffer
-                             "H-m" #'consult-bookmark
-                             "H-p" project-prefix-map
-                             "H-r" #'speedbar
-                             "H-s" #'my/shell
-                             "H-t" #'my/htop
-                             "H-u" #'undo
-                             "H-v" #'my/reload-buffer
-                             "H-w" #'my/ace-window-prefix
-                             "H-z" #'my/shell
-                             "H-," #'my/customize-search
-                             "H-;" #'my/matching-paren)))
+                           "H-." #'my/goto-mark
+                           "H-1" #'delete-other-windows
+                           "H-2" #'split-window-below
+                           "H-4" #'other-window-prefix ; was ctl-x-4-prefix
+                           "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
+                           "H-a" #'ace-window
+                           "H-b" #'consult-project-buffer
+                           "H-B" #'consult-buffer
+                           "H-c" my/hyper-c-map
+                           "H-f" #'consult-flymake
+                           "H-g" #'magit-status
+                           "H-h" #'my/describe-symbol-at-point
+                           "H-j" my/point-jumps-map
+                           "H-k" #'bury-buffer
+                           "H-m" #'consult-bookmark
+                           "H-p" project-prefix-map
+                           "H-r" #'speedbar
+                           "H-s" #'my/shell
+                           "H-t" #'my/htop
+                           "H-u" #'undo
+                           "H-v" #'my/reload-buffer
+                           "H-w" #'my/ace-window-prefix
+                           "H-z" #'my/shell
+                           "H-," #'my/customize-search
+                           "H-;" #'my/matching-paren)))
   (apply #'my/emacs-key-bind global-map hyper-mapping)
   (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mapping))
 
@@ -880,19 +883,19 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 ;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to type with
 ;; one or two hands.
 (my/emacs-chord-bind global-map
-                       "qq" #'undo
-                       "aa" #'my/ace-window-always-dispatch
-                       "JJ" #'my/ace-window-previous
-                       "KK" #'my/ace-window-next
-                       "kk" #'my/kill-current-buffer
-                       "hh" my/hyper-keys-map
-                       "HH" #'my/describe-symbol-at-point
-                       "hb" #'popper-kill-latest-popup
-                       "sb" #'speedbar
-                       "vv" #'diff-hl-show-hunk
-                       ;; "fm" #'flymake-show-buffer-diagnostics
-                       "jn" #'my/ace-window-next
-                       "jp" #'my/ace-window-previous)
+                     "qq" #'undo
+                     "aa" #'my/ace-window-always-dispatch
+                     "JJ" #'my/ace-window-previous
+                     "KK" #'my/ace-window-next
+                     "kk" #'my/kill-current-buffer
+                     "hh" my/hyper-keys-map
+                     "HH" #'my/describe-symbol-at-point
+                     "hb" #'popper-kill-latest-popup
+                     "sb" #'speedbar
+                     "vv" #'diff-hl-show-hunk
+                     ;; "fm" #'flymake-show-buffer-diagnostics
+                     "jn" #'my/ace-window-next
+                     "jp" #'my/ace-window-previous)
 
 (defun my/consult-info-emacs ()
   "Search Emacs info."
@@ -914,27 +917,27 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
       (set-face-background 'default "undefined"))
   (when my/is-macosx
     (custom-set-variables
-       '(insert-directory-program "gls")
-       '(frame-resize-pixelwise t)
-       '(mac-command-modifier 'meta)
-       '(mac-option-modifier 'alt)
+     '(insert-directory-program "gls")
+     '(frame-resize-pixelwise t)
+     '(mac-command-modifier 'meta)
+     '(mac-option-modifier 'alt)
 
-       ;; NOTE: hyper use requires Karabiner-Elements mapping from 'caps_lock' to 'right_control'
-       ;;
-       ;; {
-       ;;   "manipulators": [
-       ;;     {
-       ;;       "description": "Change caps_lock to right_control. In Emacs set 'mac_right_control_modifier' to 'hyper.",
-       ;;       "from": {
-       ;;         "key_code": "caps_lock",
-       ;;         "modifiers": { "optional": ["any"] }
-       ;;       },
-       ;;       "to": [{ "key_code": "right_control" }],
-       ;;       "type": "basic"
-       ;;     }
-       ;;   ]
-       ;; }
-       '(mac-right-control-modifier 'hyper))))
+     ;; NOTE: hyper use requires Karabiner-Elements mapping from 'caps_lock' to 'right_control'
+     ;;
+     ;; {
+     ;;   "manipulators": [
+     ;;     {
+     ;;       "description": "Change caps_lock to right_control. In Emacs set 'mac_right_control_modifier' to 'hyper.",
+     ;;       "from": {
+     ;;         "key_code": "caps_lock",
+     ;;         "modifiers": { "optional": ["any"] }
+     ;;       },
+     ;;       "to": [{ "key_code": "right_control" }],
+     ;;       "type": "basic"
+     ;;     }
+     ;;   ]
+     ;; }
+     '(mac-right-control-modifier 'hyper))))
 
 ;; Custom dir-locals
 (dir-locals-set-class-variables 'raze-variables '((nil . ((compile-command . "./build.sh -m Debug ")))))
