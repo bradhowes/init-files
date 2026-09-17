@@ -16,7 +16,7 @@ else
 fi
 
 dbg() {
-  : echo "--" "${@}" 1>&2;
+  echo "--" "${@}" 1>&2;
 }
 
 is_function() { > /dev/null declare -f -F "${1}"; }
@@ -190,7 +190,7 @@ if ((my_is_zsh)); then
   # do nothing
   my_bash_history_sync() { :; }
 else
-  my_bash_history_sync() {
+  my_bash_history_synrc() {
     builtin history -a          # append new lines to history file
     HISTFILESIZE=${HISTSIZE}    # purge oldest entries beyond HISTSIZE
     builtin history -c          # clear history
@@ -204,7 +204,7 @@ else
 fi
 
 my_prompt_command() {
-  my_bash_history_sync
+  # my_bash_history_sync
   if [[ -n "${INSIDE_EMACS}" ]]; then
     printf "\e]7;file://%s%Rs\e\\" "${HOSTNAME}" "${PWD}"
   else

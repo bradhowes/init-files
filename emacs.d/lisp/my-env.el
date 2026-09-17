@@ -19,7 +19,7 @@ Note that this is also true when running in a terminal window.")
 Note that this is also true when running in a terminal window.")
 
 (defconst my/repos
-  (file-name-as-directory (file-truename "~/src/Mine"))
+  (file-name-as-directory "~/src/Mine")
   "Location of root of personal source git repositories.")
 
 (defconst my/configurations
@@ -42,7 +42,7 @@ control.")
   "Location of personal Emacs Lisp files.")
 
 (defconst my/venv
-  (file-truename "~/venv")
+  (file-name-as-directory (file-truename "~/venv"))
   "The Python virtual environment to use for eglot.")
 
 (setenv "WORKON_HOME" my/venv)
@@ -76,6 +76,11 @@ control.")
   (setq Info-additional-directory-list '("/opt/homebrew/share/info"))
   (setq Info-default-directory-list (append info-paths Info-default-directory-list))
   ;; (message "Info-default-directory-list: %s" Info-default-directory-list)
+
+  (push my/configurations trusted-content)
+  (push my/emacs.d trusted-content)
+  (push (file-name-as-directory (file-name-concat my/configurations "shell/")) trusted-content)
+  (push (file-name-as-directory (file-name-concat my/emacs.d "lisp/")) trusted-content)
 
   ;; (unless (null Info-directory-list)
   ;;   (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))

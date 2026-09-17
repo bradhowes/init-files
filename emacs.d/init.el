@@ -246,10 +246,11 @@ the right-edge of the screen, but may overlap with the middle frame."
   :hook (dired-mode . denote-dired-mode)
   :bind (:map my/hyper-n-map
               ("b" . denote-backlinks)
+              ("c" . denote)
               ("d" . denote-dired)
               ("g" . denote-grep)
               ("l" . denote-link)
-              ("n" . denote)
+              ;; ("n" . consult-notes)
               ("r" . denote-rename-file))
   :custom
   (denote-directory (expand-file-name "~/Documents/notes/"))
@@ -288,7 +289,7 @@ Here, we just separate them by a comma."
   :commands (consult-notes-denote-mode denote-directory-files)
   :config
   (require 'consult-notes-denote)
-  :bind (:map my/hyper-n-map ("c" . consult-notes)))
+  :bind (:map my/hyper-n-map ("n" . consult-notes)))
 
 (use-package corfu
   :after orderless
@@ -529,25 +530,28 @@ Here, we just separate them by a comma."
   :bind (("C-'" . popper-toggle)
          ("M-'" . popper-cycle)))
 
-(use-package project
-  :commands (project--switch-project-command) ;; used in my/show-project-menu
-  :bind (:map project-prefix-map
-              ("$" . project-shell)))
-
-(keymap-set project-prefix-map "m" #'my/show-project-menu)
-
 (defvar my/project-search-map (make-sparse-keymap)
   "A prefix map like that found in projectile.
 Bound to \\`C-x p s'.")
+
+;; Need to do this here due to how `use-package(project)` works:
+(keymap-set project-prefix-map "s" my/project-search-map)
+
+(use-package project
+  :commands (project--switch-project-command) ;; used in my/show-project-menu
+  :bind (:map project-prefix-map
+              ("$" . #'project-shell)
+              ("m" . #'my/show-project-menu)
+              ;; Cannot do this here for some reason -- see note above.
+              ;; ("s" . my/project-search-map)))
+              ))
 
 (use-package rg
   :ensure t
   :after (project)
   :commands (rg-enable-default-bindings rg-project)
-  :bind (:map project-prefix-map
-              ("s" . my/project-search-map)
-              :map my/project-search-map
-              ("r" . #'rg-project))
+  :bind (:map my/project-search-map
+              ("r" . rg-project))
   :hook (after-init . rg-enable-default-bindings))
 
 (use-package scratch
@@ -625,7 +629,7 @@ artifacts such as indentation bars."
   :config
   (setq read-process-output-max (* 64 1024 1024)
 	process-adaptive-read-buffering nil
-        ;; debug-on-error t
+        debug-on-error t
 	custom-file (file-truename (locate-user-emacs-file "custom.el"))
 	frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
                              (if my/is-terminal (list (concat (system-name) " ") buffer-directory)
@@ -847,36 +851,37 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   "Keymap for terminal hyper actions.")
 
 ;; Populate two key maps with hyper-key definitions. The first -- global -- holds the mapping that uses the real `Hyper'
-;; modifier. The second keymap -- my/hyper-keys-map -- holds the mapping that uses a keychord to activate which is
+;; modifier. The second keymap -- `my/hyper-keys-map` -- holds the mapping that uses a keychord to activate which is
 ;; useful on terminals that do not offer a `Hyper' modifier.
-(let ((hyper-mapping (list "H-SPC" #'my/set-mark-deactivate
-                           "H-." #'my/goto-mark
-                           "H-1" #'delete-other-windows
-                           "H-2" #'split-window-below
-                           "H-4" #'other-window-prefix ; was ctl-x-4-prefix
-                           "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
-                           "H-a" #'ace-window
-                           "H-b" #'consult-project-buffer
-                           "H-B" #'consult-buffer
-                           "H-c" my/hyper-c-map
-                           "H-f" #'consult-flymake
-                           "H-g" #'magit-status
-                           "H-h" #'my/describe-symbol-at-point
-                           "H-j" my/point-jumps-map
-                           "H-k" #'bury-buffer
-                           "H-m" #'consult-bookmark
-                           "H-p" project-prefix-map
-                           "H-r" #'speedbar
-                           "H-s" #'my/shell
-                           "H-t" #'my/htop
-                           "H-u" #'undo
-                           "H-v" #'my/reload-buffer
-                           "H-w" #'my/ace-window-prefix
-                           "H-z" #'my/shell
-                           "H-," #'my/customize-search
-                           "H-;" #'my/matching-paren)))
-  (apply #'my/emacs-key-bind global-map hyper-mapping)
-  (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mapping))
+(let ((hyper-mappings (list "H-SPC" #'my/set-mark-deactivate
+                            "H-." #'my/goto-mark
+                            "H-1" #'delete-other-windows
+                            "H-2" #'split-window-below
+                            "H-4" #'other-window-prefix ; was ctl-x-4-prefix
+                            "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
+                            "H-a" #'ace-window
+                            "H-b" #'consult-project-buffer
+                            "H-B" #'consult-buffer
+                            "H-c" my/hyper-c-map
+                            "H-f" #'consult-flymake
+                            "H-g" #'magit-status
+                            "H-h" #'my/describe-symbol-at-point
+                            "H-j" my/point-jumps-map
+                            "H-k" #'bury-buffer
+                            "H-m" #'consult-bookmark
+                            "H-n" my/hyper-n-map
+                            "H-p" project-prefix-map
+                            "H-r" #'speedbar
+                            "H-s" #'my/shell
+                            "H-t" #'my/htop
+                            "H-u" #'undo
+                            "H-v" #'my/reload-buffer
+                            "H-w" #'my/ace-window-prefix
+                            "H-z" #'my/shell
+                            "H-," #'my/customize-search
+                            "H-;" #'my/matching-paren)))
+  (apply #'my/emacs-key-bind global-map hyper-mappings)
+  (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mappings))
 
 ;;; --- Key Chords
 

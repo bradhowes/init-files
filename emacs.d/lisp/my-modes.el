@@ -3,7 +3,10 @@
 ;;; Various file modes setup
 ;;; Code:
 
+(require 'cape)
+(require 'eglot)
 (require 'my-constants)
+(require 'project)
 (require 'treesit)
 
 (add-to-list 'treesit-language-source-alist

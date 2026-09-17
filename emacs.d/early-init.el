@@ -2,7 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 
-;; (setq native-comp-speed -1)
+(eval-when-compile
+  (require 'comp))
 
 (when (and (fboundp 'menu-bar-mode) (not (eq system-type 'darwin)))
   (menu-bar-mode 1)
