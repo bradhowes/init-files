@@ -110,20 +110,20 @@ export GIT_PAGER="${PAGER}"
 # [[ -x /usr/bin/dircolors ]] && eval TERM=$(xterm-color dircolors)
 
 # Setup GIT branch info in prompt
-# autoload -Uz vcs_info
-# precmd() { vcs_info; }
+autoload -Uz vcs_info
+precmd() { vcs_info; }
 
-# zstyle ':vcs_info:*' actionformats '%F{2}[%b%F{3}|%F{1}%a%F{2}]%f'
-# zstyle ':vcs_info:*' formats '%F{2}[%b]%f'
-# zstyle ':vcs_info:*' disable bzr cdv cvs darcs fossil hg mtn p4 svk svn tla
+zstyle ':vcs_info:*' actionformats '%F{2}[%b%F{3}|%F{1}%a%F{2}]%f'
+zstyle ':vcs_info:*' formats '%F{2}[%b]%f'
+zstyle ':vcs_info:*' disable bzr cdv cvs darcs fossil hg mtn p4 svk svn tla
 
-# setopt PROMPT_SUBST
+setopt PROMPT_SUBST
 
 # Show git branch in [] if in a repo directory followed by bland '%' or '#' depending on user.
-# export PROMPT="\${vcs_info_msg_0_}%B%F{green}%#%f%b "
+export PROMPT="\${vcs_info_msg_0_}%B%F{green}%#%f%b "
 
 # Force the emission of a path escape sequence for Emacs/term programs. May not be necessary anymore.
-# cd "${PWD}" || :
+cd "${PWD}" || :
 
 # shellcheck disable=SC1091
 # curl -L https://iterm2.com/shell_integration/install_shell_integration.sh | bash

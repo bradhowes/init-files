@@ -16,7 +16,7 @@ else
 fi
 
 dbg() {
-  echo "--" "${@}" 1>&2;
+  : # echo "--" "${*}" 1>&2
 }
 
 is_function() { > /dev/null declare -f -F "${1}"; }
