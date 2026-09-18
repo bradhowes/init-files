@@ -88,9 +88,10 @@ the items to setup for autoloading from the given file."
   :defines (eglot-mode-map)
   :hook ((c++-mode . my/known-project-eglot-ensure)
          (c++-ts-mode . my/known-project-eglot-ensure)
+         (go-mode . my/known-project-eglot-ensure)
+         (kotlin-ts-mode . my/known-project-eglot-ensure)
          (js-mode . eglot-ensure)
          (js-ts-mode . eglot-ensure)
-         (kotlin-ts-mode . eglot-ensure)
          (markdown-mode . eglot-ensure)
          (markdown-ts-mode . eglot-ensure)
          (python-base-mode . eglot-ensure)
@@ -142,6 +143,10 @@ the items to setup for autoloading from the given file."
   :ensure t
   :hook ((prog-mode . flyspell-prog-mode)
          (text-mode . flyspell-mode)))
+
+(use-package go-mode
+  :ensure t
+  :mode ("\\.go\\'" . go-mode))
 
 (use-package indent-bars
   :ensure t

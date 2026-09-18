@@ -296,9 +296,7 @@ Here, we just separate them by a comma."
   :ensure t
   :commands (global-corfu-mode)
   :bind (:map corfu-map
-              ("C-SPC" . corfu-insert-separator)
-              ("M-p" . corfu-popupinfo-scroll-down)
-              ("M-n" . corfu-popupinfo-scroll-up))
+              ("C-SPC" . corfu-insert-separator))
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)                 ;; Enable auto completion
@@ -317,12 +315,8 @@ Here, we just separate them by a comma."
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since Dabbrev can be used globally (M-/).
   ;; See also `corfu-excluded-modes'.
-  :init
-  (global-corfu-mode)                   ; This does not play well in eshell if you run a repl
-  (setq corfu-auto t))
-
-;; (define-key corfu-map (kbd "M-p") #'corfu-popupinfo-scroll-down) ;; corfu-next
-;; (define-key corfu-map (kbd "M-n") #'corfu-popupinfo-scroll-up)  ;; corfu-previous
+  :config
+  (global-corfu-mode))
 
 (use-package crm)
 

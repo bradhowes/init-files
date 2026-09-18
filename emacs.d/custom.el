@@ -46,6 +46,7 @@
  '(context-menu-mode t)
  '(copyright-query nil)
  '(copyright-year-ranges t)
+ '(corfu-popupinfo-mode t)
  '(create-lockfiles nil)
  '(current-language-environment "UTF-8")
  '(custom-enabled-themes '(modus-vivendi))
@@ -121,11 +122,11 @@
  '(ns-right-control-modifier 'hyper)
  '(package-selected-packages
    '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes corfu crux denote diff-hl eldoc-box
-            embark-consult esup expand-region fancy-compilation flymake-shellcheck flyover helpful impatient-mode
-            indent-bars js2-mode key-chord kotlin-ts-mode ligature lsp-pyright magit marginalia markdown-mode
-            mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-dired nerd-icons-xref orderless
-            osx-dictionary popper rg scratch tempel tempel-collection vertico ws-butler yaml yaml-mode yasnippet
-            yasnippet-snippets))
+            embark-consult esup expand-region fancy-compilation flymake-shellcheck flyover go-mode helpful
+            impatient-mode indent-bars js2-mode key-chord kotlin-ts-mode ligature lsp-pyright magit marginalia
+            markdown-mode mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-dired
+            nerd-icons-xref orderless osx-dictionary popper rg scratch tempel tempel-collection vertico ws-butler yaml
+            yaml-mode yasnippet yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-echo-mode t)
  '(popper-mode t)
