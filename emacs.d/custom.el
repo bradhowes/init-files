@@ -122,9 +122,9 @@
  '(ns-right-control-modifier 'hyper)
  '(package-selected-packages
    '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes corfu crux denote diff-hl eldoc-box
-            embark-consult esup expand-region fancy-compilation flymake-shellcheck flyover go-mode helpful
-            impatient-mode indent-bars js2-mode key-chord kotlin-ts-mode ligature lsp-pyright magit marginalia
-            markdown-mode mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-dired
+            embark-consult esup expand-region fancy-compilation flymake-gradle flymake-shellcheck flyover go-mode
+            gradle-mode helpful impatient-mode indent-bars js2-mode key-chord kotlin-ts-mode ligature lsp-pyright magit
+            marginalia markdown-mode mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-dired
             nerd-icons-xref orderless osx-dictionary popper rg scratch tempel tempel-collection vertico ws-butler yaml
             yaml-mode yasnippet yasnippet-snippets))
  '(popper-display-control 'user)
