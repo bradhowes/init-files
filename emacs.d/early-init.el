@@ -5,6 +5,10 @@
 (eval-when-compile
   (require 'comp))
 
+(defun my/add-trusted-content-directory (path)
+  "Add PATH to `trusted-content'."
+  (push (abbreviate-file-name (file-name-as-directory path)) trusted-content))
+
 (when (and (fboundp 'menu-bar-mode) (not (eq system-type 'darwin)))
   (menu-bar-mode 1)
   (push '(menu-bar-lines . 0) default-frame-alist))
@@ -43,8 +47,8 @@
 (let ((my/lisp (file-name-as-directory (file-name-concat user-emacs-directory "lisp"))))
   (push my/lisp load-path)
   (push (file-name-concat my/lisp "key-chord") load-path)
-  (push (abbreviate-file-name my/lisp) trusted-content)
-  (push (abbreviate-file-name user-emacs-directory) trusted-content))
+  (my/add-trusted-content-directory my/lisp)
+  (my/add-trusted-content-directory user-emacs-directory))
 
 ;; (message "trusted-content: %s" trusted-content)
 ;; (message "load-path: %s" load-path)

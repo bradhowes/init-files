@@ -2,6 +2,17 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'my-customizations)
+(require 'my-env)
+(require 'my-constants)
+(require 'ace-window)
+(require 'consult-notes)
+(require 'crux)
+(require 'emacs-pager)
+(require 'popper)
+(require 'project)
+(require 'wid-edit)
+
 (defun my/sort-lines-by-integer-key (pattern &optional direction)
   "Sort lines by an integer value that is found via PATTERN in a line.
 The sort is in increasing numerical order if DIRECTION is nil; otherwise

@@ -11,7 +11,6 @@
 (require 'my-functions)
 (require 'my-layout)
 (require 'my-modes)
-(require 'wid-edit)
 
 (set-charset-priority 'unicode)
 (setq locale-coding-system 'utf-8
@@ -322,8 +321,8 @@ Here, we just separate them by a comma."
   (global-corfu-mode)                   ; This does not play well in eshell if you run a repl
   (setq corfu-auto t))
 
-;; ;; (define-key corfu-map (kbd "M-p") #'corfu-popupinfo-scroll-down) ;; corfu-next
-;; ;; (define-key corfu-map (kbd "M-n") #'corfu-popupinfo-scroll-up)  ;; corfu-previous
+;; (define-key corfu-map (kbd "M-p") #'corfu-popupinfo-scroll-down) ;; corfu-next
+;; (define-key corfu-map (kbd "M-n") #'corfu-popupinfo-scroll-up)  ;; corfu-previous
 
 (use-package crm)
 
@@ -630,7 +629,7 @@ artifacts such as indentation bars."
   :config
   (setq read-process-output-max (* 64 1024 1024)
 	process-adaptive-read-buffering nil
-        debug-on-error t
+        ;; debug-on-error t
 	custom-file (file-truename (locate-user-emacs-file "custom.el"))
 	frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
                              (if my/is-terminal (list (concat (system-name) " ") buffer-directory)

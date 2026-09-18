@@ -8,6 +8,11 @@
 
 (require 'info)
 
+(defun my/add-trusted-content-directory (path)
+  "Add PATH to `trusted-content'.
+NOTE: duplicated in early-init.el"
+  (push (abbreviate-file-name (file-name-as-directory path)) trusted-content))
+
 (defconst my/is-macosx
   (eq system-type 'darwin)
   "T if running on macOS.
@@ -77,7 +82,7 @@ control.")
   (setq Info-default-directory-list (append info-paths Info-default-directory-list))
   ;; (message "Info-default-directory-list: %s" Info-default-directory-list)
 
-  (push (abbreviate-file-name my/configurations) trusted-content)
+  (my/add-trusted-content-directory (abbreviate-file-name my/configurations))
   (push (abbreviate-file-name my/emacs.d) trusted-content)
   (push (abbreviate-file-name (file-name-as-directory (file-name-concat my/configurations "shell/"))) trusted-content)
   (push (abbreviate-file-name (file-name-as-directory (file-name-concat my/emacs.d "lisp/"))) trusted-content)
