@@ -33,6 +33,7 @@
 (autoload 'crux-find-current-directory-dir-locals-file "my-functions")
 (autoload 'my/show-project-menu "my-functions")
 (autoload 'my/find-user-init-file "my-functions")
+(autoload 'my/find-user-custom-file "my-functions")
 (autoload 'my/find-shell-init-file "my-functions")
 (autoload 'my/kill-current-buffer "my-functions")
 (autoload 'my/dump-hashtable "my-functions")

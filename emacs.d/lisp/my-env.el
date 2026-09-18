@@ -19,8 +19,8 @@ Note that this is also true when running in a terminal window.")
 Note that this is also true when running in a terminal window.")
 
 (defconst my/repos
-  (file-name-as-directory "~/src/Mine")
-  "Location of root of personal source git repositories.")
+  (file-name-as-directory (file-truename "~/src/Mine"))
+  "LOCATION of root of personal source git repositories.")
 
 (defconst my/configurations
   (file-name-as-directory (file-name-concat my/repos "init-files"))
@@ -77,10 +77,10 @@ control.")
   (setq Info-default-directory-list (append info-paths Info-default-directory-list))
   ;; (message "Info-default-directory-list: %s" Info-default-directory-list)
 
-  (push my/configurations trusted-content)
-  (push my/emacs.d trusted-content)
-  (push (file-name-as-directory (file-name-concat my/configurations "shell/")) trusted-content)
-  (push (file-name-as-directory (file-name-concat my/emacs.d "lisp/")) trusted-content)
+  (push (abbreviate-file-name my/configurations) trusted-content)
+  (push (abbreviate-file-name my/emacs.d) trusted-content)
+  (push (abbreviate-file-name (file-name-as-directory (file-name-concat my/configurations "shell/"))) trusted-content)
+  (push (abbreviate-file-name (file-name-as-directory (file-name-concat my/emacs.d "lisp/"))) trusted-content)
 
   ;; (unless (null Info-directory-list)
   ;;   (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))
