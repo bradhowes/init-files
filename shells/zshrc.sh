@@ -129,13 +129,6 @@ autoload -Uz compinit && compinit
 # shellcheck disable=SC1091
 [[ -f '/Users/howes/google-cloud-sdk/completion.zsh.inc' ]] && . '/Users/howes/google-cloud-sdk/completion.zsh.inc'
 
-# shellcheck disable=SC2206,SC3030
-fpath=(${ASDF_DATA_DIR}/completions $fpath)
-
-# Perform Emacs `eat` integration if enabled
-# shellcheck disable=SC1090
-[[ -n "${EAT_SHELL_INTEGRATION_DIR}" ]] && . "${EAT_SHELL_INTEGRATION_DIR}"
-
 # Work-related -- add GitHub SSL key
 [[ -f "${HOME}/.ssh/id_ed25519" ]] && ssh-add -q --apple-use-keychain "${HOME}/.ssh/id_ed25519"
 
@@ -147,7 +140,5 @@ dx="/Users/bradhowes/.local/bin/dx"
 [[ -f "${dx}" ]] && eval "$(${dx} completion zsh)"
 
 # >>> dx ai-kit (managed — do not edit) >>>
-[[ -f /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh ]] && . /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh
+# [[ -f /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh ]] && . /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh
 # <<< dx ai-kit <<<
-
-echo "-- zshrc END"

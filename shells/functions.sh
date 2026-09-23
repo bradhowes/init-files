@@ -21,64 +21,6 @@ dbg() {
 
 is_function() { > /dev/null declare -f -F "${1}"; }
 
-# Add a value to a ':' separated variable value (eg PATH) as long as it does not
-# already exist in the given variable's value.
-#
-# \param append optional flag (-a) to append to variable instead of prepending
-# \param append optional flag (-f) to force addition of value even if it exists in VAR
-# \param VAR the name of the variable to change, such as PATH or LD_LIBRARY_PATH
-# \param VALUE value to add
-#
-PathAdd() { 
-  local append="" force=""
-  while [[ "${1#-}" != "${1}" ]]; do # Process anything that begins with a '-' character
-    case "${1}" in
-      -a) append="-a" ;;
-      -f) force="-f" ;;
-      *) echo "*** invalid option - '${1}' ***" ;;
-    esac
-    shift 1
-  done
-
-  local var="${1}"
-  # shellcheck disable=SC2154
-  [[ "${my_arch}" = "Darwin" && "${var}" = "LD_LIBRARY_PATH" ]] && var="DY${var}"
-  shift 1
-
-  eval local current="\$${var}"
-
-  for each in "${@}"; do
-    if [[ "${var}" = "PATH" && ! -d "${each}" ]]; then
-      echo "*** directory '${each}' does not exist -- not adding to PATH"
-      continue
-    fi
-    local check=":${current}:"
-    # shellcheck disable=SC2295
-    if [[ "${check%%:${each}:*}" = "${check}" || -n "${force}" ]]; then
-      if [[ -n "${append}" ]]; then
-        dbg "appending ${each}"
-	current="${current}${current:+:}${each}"
-      else
-        dbg "prepending ${each}"
-        current="${each}${current:+:}${current}"
-      fi
-      if [[ "${var}" = "PATH" ]]; then
-        # Update MANPATH and INFOPATH with some possible values
-        local root="${each%/bin}"
-        PathAdd ${append} ${force} MANPATH "${root}/man" "${root}/share/man"
-        PathAdd ${append} ${force} INFOPATH "${root}/info" "${root}/share/info"
-      fi
-    else
-      dbg "path '${each}' already exists in ${var}"
-    fi
-  done
-
-  # dbg "NEW: ${var} = '${current}'"
-  eval "${var}=\"${current}\""
-}
-
-export_function PathAdd
-
 doScreen() { ssh -o ServerAliveInterval=60 -tt "${1}" execd screen -dRR -U /usr/local/bin/emacs -nw; }
 
 ztart() {
