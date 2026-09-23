@@ -6,26 +6,6 @@
 
 [[ "${my_arch}" = "Darwin" ]] && ulimit -n 8096
 
-export ASDF_DATA_DIR="${HOME}/.asdf"
-
-export PATH
-PathAdd PATH \
-        /opt/homebrew/opt/python@3.14/libexec/bin/ \
-        /opt/homebrew/opt/grep/libexec/gnubin \
-        /opt/podman/bin \
-        /Applications/Emacs.app/Contents/MacOS/bin \
-        "${HOME}/bin" \
-        "${ASDF_DATA_DIR}/shims" \
-        "${HOME}/.jenv/bin" \
-        /usr/local/bin
-
-# Prepend homebrew paths even if already in PATH. This is due to the fact that Homebrew's own policy is to not shadow
-# any Apple bits (wise), but this PATH is only being used in command-line entries, and I *want* to shadow Apple tools
-# such as `jq`.
-PathAdd -f PATH \
-        /opt/homebrew/bin \
-        /opt/homebrew/sbin
-
 # Use current Java environment
 eval "$(jenv init -)"
 
@@ -118,6 +98,7 @@ precmd() { vcs_info; }
 zstyle ':vcs_info:*' actionformats '%F{2}[%b%F{3}|%F{1}%a%F{2}]%f'
 zstyle ':vcs_info:*' formats '%F{2}[%b]%f'
 zstyle ':vcs_info:*' disable bzr cdv cvs darcs fossil hg mtn p4 svk svn tla
+zstyle ':completion:*' menu select
 
 setopt PROMPT_SUBST
 
@@ -126,6 +107,15 @@ export PROMPT="\${vcs_info_msg_0_}%B%F{green}%#%f%b "
 
 # Force the emission of a path escape sequence for Emacs/term programs. May not be necessary anymore.
 cd "${PWD}" || :
+
+# Load in completion facility -- must be done before injecting
+autoload -Uz compinit && compinit
+
+# Use current Java environment
+[[ -d "${HOME}/.jenv/bin" ]] &&  eval "$(jenv init -)"
+
+# Use brew completions
+[[ -x "/opt/homebrew/bin/brew" ]] && eval "$(brew shellenv)"
 
 # shellcheck disable=SC1091
 # curl -L https://iterm2.com/shell_integration/install_shell_integration.sh | bash
@@ -139,12 +129,8 @@ cd "${PWD}" || :
 # shellcheck disable=SC1091
 [[ -f '/Users/howes/google-cloud-sdk/completion.zsh.inc' ]] && . '/Users/howes/google-cloud-sdk/completion.zsh.inc'
 
-zstyle ':completion:*' menu select
-
 # shellcheck disable=SC2206,SC3030
 fpath=(${ASDF_DATA_DIR}/completions $fpath)
-
-autoload -Uz compinit && compinit
 
 # Perform Emacs `eat` integration if enabled
 # shellcheck disable=SC1090
@@ -155,3 +141,13 @@ autoload -Uz compinit && compinit
 
 mise="/Users/bradhowes/.local/bin/mise"
 [[ -f "${mise}" ]] && eval "$(${mise} activate zsh)"
+
+# dx shell completion
+dx="/Users/bradhowes/.local/bin/dx"
+[[ -f "${dx}" ]] && eval "$(${dx} completion zsh)"
+
+# >>> dx ai-kit (managed — do not edit) >>>
+[[ -f /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh ]] && . /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh
+# <<< dx ai-kit <<<
+
+echo "-- zshrc END"

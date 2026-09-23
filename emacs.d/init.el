@@ -364,6 +364,11 @@ Here, we just separate them by a comma."
 ;;   :ensure t
 ;;   :custom (esup-user-init-file (file-truename "~/.emacs.d/init.el")))
 
+(use-package exec-path-from-shell
+  :ensure t
+  :commands (exec-path-from-shell-initialize)
+  :hook (after-init . exec-path-from-shell-initialize))
+
 (use-package expand-region
   :ensure t
   :bind ("C-\\" . er/expand-region))

@@ -76,6 +76,7 @@
  '(eldoc-echo-area-display-truncation-message nil)
  '(eldoc-echo-area-use-multiline-p 5)
  '(enable-recursive-minibuffers t)
+ '(exec-path-from-shell-arguments '("-l"))
  '(fill-column 120)
  '(find-file-visit-truename t)
  '(flymake-show-diagnostics-at-end-of-line nil)
@@ -146,6 +147,7 @@
  '(resize-mini-windows t)
  '(ring-bell-function 'mode-line-bell-flash)
  '(safe-local-variable-directories '("/Users/howes/src/Mine/init-files"))
+ '(safe-local-variable-values '((checkdoc-minor-mode . t)))
  '(save-interprogram-paste-before-kill t)
  '(save-place-mode t)
  '(savehist-additional-variables
