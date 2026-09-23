@@ -75,6 +75,25 @@ for examples of its use."
   (seq-find (lambda (v) (string= "Built-in Retina Display" (alist-get 'name v)))
             (display-monitor-attributes-list)))
 
+(defun my/layout--display-geometry (display)
+  "Obtain the geometry of the DISPLAY screen."
+  (declare (side-effect-free t))
+  (let* ((attrs (seq-filter (lambda (v) (not (string= "Built-in Retina Display" (alist-get 'name v))))
+                            (display-monitor-attributes-list)))
+         (max-index (length attrs)))
+    (alist-get 'geometry
+               (nth (min display (1- max-index)) attrs))))
+
+(defun my/layout--geometry-left (geometry)
+  "Obtain the left (x) position of the given GEOMETRY value."
+  (declare (side-effect-free t))
+  (nth 0 geometry))
+
+(defun my/layout--geometry-top (geometry)
+  "Obtain the top (y) of the given GEOMETRY value."
+  (declare (side-effect-free t))
+  (nth 1 geometry))
+
 (defun my/layout--geometry-width (geometry)
   "Obtain the width of the given GEOMETRY value."
   (declare (side-effect-free t))
@@ -204,15 +223,23 @@ The position value will place the frame flush with the left-hand side of the
 display. This is used in a frame alist, in particular the `initial-frame-alist'
 configuration.
 
+Returns a list where the first element is `+' and the second is the left
+position to use. This is documented way in the Elisp Manual to specify an
+absolute position value.
+
 The preference is to use a 4K display. In the horizontal orientation
 offset the left position by the width of the laptop. In the vertical
 orientation, assume that the 4K display is above the laptop and use 0
 \(same as default)."
   (declare (side-effect-free t))
-  ;; Use an external monitor if there is one.
-  (if (memq layout '(my/layout--screens-laptop-4k my/layout--screens-laptop-4k-4k))
-      (+ (my/layout--laptop-screen-width) (* display my/layout--4k-screen-width))
-    0))
+  (list '+
+        (cond
+         ((eq layout my/layout--screens-laptop-4k-vertical)
+          (my/layout--geometry-left (my/layout--display-geometry display)))
+         ((memq layout '(my/layout--screens-laptop-4k my/layout--screens-laptop-4k-4k))
+          (+ (my/layout--laptop-screen-width) (* display my/layout--4k-screen-width)))
+         (t
+          0))))
 
 (defun my/layout--frame-center (layout display)
   "Obtain the `left` position for a `center' frame for LAYOUT and DISPLAY index.
@@ -221,9 +248,18 @@ another frame in the `left' position when possible. For instance, a small laptop
 width will result in a `left' position that leaves the right edge of the frame
 flush with the right-hand side of the display, just like the
 `my/layout--frame-right` function. This is used in a frame alist, in particular
-the `default-frame-alist' configuration."
+the `default-frame-alist' configuration.
+
+Returns a list where the first element is `+' and the second is the left
+position to use. This is documented way in the Elisp Manual to specify an
+absolute position value.
+
+The preference is to use a 4K display. In the horizontal orientation
+offset the left position by the width of the laptop. In the vertical
+orientation, assume that the 4K display is above the laptop and use 0
+\(same as default)."
   (declare (side-effect-free t))
-  (let* ((left (+ (my/layout--frame-left layout display) (my/layout--frame-pixel-width layout)))
+  (let* ((left (+ (cadr (my/layout--frame-left layout display)) (my/layout--frame-pixel-width layout)))
          (right (+ left (my/layout--frame-pixel-width layout)))
          (overrun (max 0 (if (my/layout--is-laptop layout)
                              (- right (my/layout--laptop-screen-width))
@@ -236,7 +272,7 @@ The position value will place the frame flush with the right-hand side
 of the display. This is not used in any particular `*-frame-alist' but
 it is used by custom commands."
   (declare (side-effect-free t))
-  (- (+ (my/layout--frame-left layout display)
+  (- (+ (cadr (my/layout--frame-left layout display))
         (if (eq layout my/layout--screens-laptop)
             (my/layout--laptop-screen-width)
           my/layout--4k-screen-width))
@@ -247,15 +283,12 @@ it is used by custom commands."
 The position value will place the frame such that the top of the frame
 aligns with the top of the DISPLAY."
   (declare (side-effect-free t))
-  ;; Assume that the vertical orientation always has the 4K monitor on top.
-  (if (eq layout my/layout--screens-laptop-4k-vertical)
-      (list '+ 0)
-    ;; NOTE: this assumes an ordering that is not guaranteed: the first entry is the laptop followed by 4K displays.
-    (let* ((index (if (eq layout my/layout--screens-laptop) 0 (+ 1 display)))
-           (settings (nth index (display-monitor-attributes-list)))
-           (top (nth 1 (alist-get 'geometry settings)))
-           (offset (if my/is-x-windows-on-win 30 0)))
-      (list '+ (+ offset top)))))
+  ;; NOTE: this assumes an ordering that is not guaranteed: the first entry is the laptop followed by 4K displays.
+  (let* ((index (if (eq layout my/layout--screens-laptop) 0 (+ 1 display)))
+         (settings (nth index (display-monitor-attributes-list)))
+         (top (nth 1 (alist-get 'geometry settings)))
+         (offset (if my/is-x-windows-on-win 30 0)))
+    (list '+ (+ offset top))))
 
 (defun my/layout--frame-alist (left layout display)
   "Make alist to use for a frame on LAYOUT and DISPLAY with LEFT position.

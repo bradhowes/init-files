@@ -220,7 +220,7 @@ hgrep() {
   if [[ -z "$*" ]]; then
     builtin history 1
   else
-    builtin history 1 | ggrep -E --color=auto "$*"
+    builtin history 1 | ggrep -E --color=auto -C 5 "$*"
   fi
 }
 
