@@ -175,6 +175,7 @@
  '(vertico-mode t)
  '(vertico-resize t)
  '(which-key-mode t)
+ '(whitespace-line-column 132)
  '(whitespace-style '(face trailing lines-tail empty))
  '(windmove-wrap-around t)
  '(winner-mode t))
