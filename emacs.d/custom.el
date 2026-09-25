@@ -127,7 +127,7 @@
             flyover go-mode gradle-mode helpful impatient-mode indent-bars js2-mode key-chord kotlin-ts-mode ligature
             lsp-pyright magit marginalia markdown-mode mode-line-bell mood-line multiple-cursors nerd-icons-completion
             nerd-icons-dired nerd-icons-xref orderless osx-dictionary popper rg scratch tempel tempel-collection vertico
-            ws-butler yaml yaml-mode yasnippet yasnippet-snippets))
+            yaml yaml-mode yasnippet yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-echo-mode t)
  '(popper-mode t)
@@ -175,6 +175,7 @@
  '(vertico-mode t)
  '(vertico-resize t)
  '(which-key-mode t)
+ '(whitespace-style '(face trailing lines-tail empty))
  '(windmove-wrap-around t)
  '(winner-mode t))
 (custom-set-faces

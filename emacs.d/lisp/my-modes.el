@@ -88,8 +88,8 @@ the items to setup for autoloading from the given file."
   :defines (eglot-mode-map)
   :hook ((c++-mode . my/known-project-eglot-ensure)
          (c++-ts-mode . my/known-project-eglot-ensure)
-         (go-mode . my/known-project-eglot-ensure)
-         (kotlin-ts-mode . my/known-project-eglot-ensure)
+         (go-mode . eglot-ensure)
+         (kotlin-ts-mode . eglot-ensure)
          (js-mode . eglot-ensure)
          (js-ts-mode . eglot-ensure)
          (markdown-mode . eglot-ensure)
@@ -144,9 +144,16 @@ the items to setup for autoloading from the given file."
   :hook ((prog-mode . flyspell-prog-mode)
          (text-mode . flyspell-mode)))
 
+(defun my/go-mode-hook ()
+  "Custom hook for setting up `go-mode'."
+  (add-hook 'before-save-hook #'gofmt-before-save)
+  (setq tab-width 2))
+
 (use-package go-mode
   :ensure t
-  :mode ("\\.go\\'" . go-mode))
+  :functions (gofmt-before-save)
+  :mode ("\\.go\\'" . go-mode)
+  :hook (go-mode . my/go-mode-hook))
 
 (use-package indent-bars
   :ensure t
@@ -208,10 +215,16 @@ the items to setup for autoloading from the given file."
   :ensure t
   :commands (tempel-expand))
 
-(use-package ws-butler
-  :ensure t
-  :hook ((prog-mode . ws-butler-mode)
-         (sh-mode . ws-butler-mode)))
+(use-package whitespace
+  :config
+  (global-whitespace-mode t))
+
+(defun my/prog-mode-hook ()
+  "Custom hook run when `prog-mode' is enabled in buffer."
+  (add-hook 'before-save-hook #'whitespace-cleanup))
+
+(use-package prog-mode
+  :hook (prog-mode . my/prog-mode-hook))
 
 (provide 'my-modes)
 
