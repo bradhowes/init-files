@@ -136,9 +136,6 @@ the items to setup for autoloading from the given file."
               ("M-n" . flymake-goto-next-error)
               ("M-p" . flymake-goto-prev-error)))
 
-;; (use-package flymake-json
-;;   :ensure t)
-
 (use-package flyspell
   :ensure t
   :hook ((prog-mode . flyspell-prog-mode)
