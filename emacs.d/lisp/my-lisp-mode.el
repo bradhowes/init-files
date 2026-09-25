@@ -32,7 +32,7 @@
   (message "Ok"))
 
 (defun my/lisp-mode-hook ()
-  "Custom Lisp mode."
+  "Customize Lisp mode."
   (keymap-local-set "C-c p" #'my/noisy-check-parens)
   (my/fontify-braces)
   (font-lock-mode t)
