@@ -79,7 +79,7 @@
  '(exec-path-from-shell-arguments '("-l"))
  '(fill-column 120)
  '(find-file-visit-truename t)
- '(flymake-show-diagnostics-at-end-of-line nil)
+ '(flymake-inline-diagnostics nil)
  '(flyspell-mode-line-string "s ")
  '(frame-resize-pixelwise t)
  '(global-diff-hl-mode t)
