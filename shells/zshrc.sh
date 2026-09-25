@@ -140,5 +140,9 @@ dx="/Users/bradhowes/.local/bin/dx"
 [[ -f "${dx}" ]] && eval "$(${dx} completion zsh)"
 
 # >>> dx ai-kit (managed — do not edit) >>>
-# [[ -f /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh ]] && . /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh
+[ -f /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh ] && . /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh
 # <<< dx ai-kit <<<
+
+# >>> dx docker (managed — do not edit) >>>
+[ -r /Users/bradhowes/.traderepublic/dx-docker/env.sh ] && . /Users/bradhowes/.traderepublic/dx-docker/env.sh
+# <<< dx docker <<<

@@ -71,7 +71,6 @@ export PATH
 PathAdd PATH \
         /opt/homebrew/opt/python@3.14/libexec/bin/ \
         /opt/homebrew/opt/grep/libexec/gnubin \
-        /opt/podman/bin \
         /Applications/Emacs.app/Contents/MacOS/bin \
         "${HOME}/bin" \
         "${HOME}/.jenv/bin" \
