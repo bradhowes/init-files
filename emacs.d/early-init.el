@@ -47,6 +47,7 @@
 (let ((my/lisp (file-name-as-directory (file-name-concat user-emacs-directory "lisp"))))
   (push my/lisp load-path)
   (push (file-name-concat my/lisp "key-chord") load-path)
+  (my/add-trusted-content-directory "/Applications/Emacs.app/Contents/Resources/lisp/")
   (my/add-trusted-content-directory my/lisp)
   (my/add-trusted-content-directory user-emacs-directory))
 
