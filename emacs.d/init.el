@@ -3,6 +3,7 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'generator)
 (require 'seq)
 (require 'my-constants)
 (require 'my-layout)
@@ -701,6 +702,14 @@ The map is made up of tiny functions that invoke `dired' on a path.")
 
 ;;; --- Key Bindings
 
+(iter-defun my/take-two-iterator (values)
+  "Iterator that yields a `cons' cell for every 2 items in VALUES."
+  (let* ((head values))
+    (while head
+      (let* ((first (pop head))
+             (second (pop head)))
+        (iter-yield (cons first second))))))
+
 (defun my/emacs-make-key-bind (keymap make-key &rest definitions)
   "Apply key binding DEFINITIONS in the given KEYMAP.
 DEFINITIONS is a sequence of string and command pairs given as a sequence,
@@ -715,7 +724,9 @@ less typing."
   (unless (keymapp keymap)
     (error "Expected a `keymap' as first argument"))
   ;; Partition `definitions' into two groups, one with key definitions and another with functions and/or nil values
-  (mapc (lambda (pair) (keymap-set keymap (funcall make-key (elt pair 0)) (elt pair 1))) (seq-split definitions 2)))
+  (let ((iter (my/take-two-iterator definitions)))
+    (iter-do (pair iter)
+      (keymap-set keymap (funcall make-key (car pair)) (cdr pair)))))
 
 (defun my/emacs-key-bind (keymap &rest definitions)
   "Apply key binding DEFINITIONS in the given KEYMAP.
@@ -729,7 +740,9 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     (error "Uneven number of chord+command pairs"))
   (unless (keymapp keymap)
     (error "Expected a `keymap' as first argument"))
-  (mapc (lambda (pair) (key-chord-define keymap (elt pair 0) (elt pair 1))) (seq-split definitions 2)))
+  (let ((iter (my/take-two-iterator definitions)))
+    (iter-do (pair iter)
+      (key-chord-define keymap (car pair) (cdr pair)))))
 
 (my/emacs-key-bind my/hyper-c-map
                    "i" #'my/find-user-init-file

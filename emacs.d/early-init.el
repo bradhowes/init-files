@@ -39,7 +39,7 @@
                                         inhibit-redisplay nil))))
 
 ;; Stop Emacs from flashing a `white' screen when starting up
-;; (set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")
+(set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")
 
 ;; Temporary hack to fix Emacs launching in iTerm2.
 (load "/Applications/Emacs.app/Contents/Resources/site-lisp/site-start" t t)
