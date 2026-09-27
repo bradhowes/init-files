@@ -39,10 +39,7 @@ PathAdd() {
 
   eval local current="\$${var}"
   for each in "${@}"; do
-    if [[ "${var}" = "PATH" && ! -d "${each}" ]]; then
-      echo "*** directory '${each}' does not exist -- not adding to PATH"
-      continue
-    fi
+    [[ "${var}" = "PATH" && ! -d "${each}" ]] && continue
 
     local check=":${current}:"
     # shellcheck disable=SC2295
@@ -79,6 +76,6 @@ PathAdd PATH \
 # Prepend homebrew paths even if already in PATH. This is due to the fact that Homebrew's own policy is to not shadow
 # any Apple bits (wise), but this PATH is only being used in command-line entries, and I *want* to shadow Apple tools
 # such as `jq`.
-PathAdd -f PATH \
-        /opt/homebrew/bin \
-        /opt/homebrew/sbin
+# PathAdd -f PATH \
+#         /opt/homebrew/bin \
+#         /opt/homebrew/sbin

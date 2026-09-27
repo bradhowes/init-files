@@ -5,10 +5,6 @@
 (eval-when-compile
   (require 'comp))
 
-(defun my/add-trusted-content-directory (path)
-  "Add PATH to `trusted-content'."
-  (push (abbreviate-file-name (file-name-as-directory path)) trusted-content))
-
 (when (and (fboundp 'menu-bar-mode) (not (eq system-type 'darwin)))
   (menu-bar-mode 1)
   (push '(menu-bar-lines . 0) default-frame-alist))
@@ -27,30 +23,28 @@
 ;; Resizing the Emacs frame can be an expensive part of changing the font. Inhibit this to reduce startup times with
 ;; fonts that are larger than the system default.
 (setq custom-file nil
+      ;; Doing this to hopefully eliminate null pointer crash in Emacs 31 at startup.
+      ;; inhibit-redisplay t
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t
-      load-prefer-newer t
-      native-comp-speed 2)
+      ;; Load the newer of *.el/*.elc files without warning
+      load-prefer-newer t)
 
 ;; Increase GC threshold to reduce startup times. Restore threshold once emacs is running.
 (let ((threshold gc-cons-threshold)
       (gc-cons-threshold most-positive-fixnum))
   ;; NOTE: needs lexical-binding for this to work and capture the value of `threshold'
-  (add-hook 'emacs-startup-hook (lambda () (setq gc-cons-threshold threshold))))
+  (add-hook 'emacs-startup-hook (lambda ()
+                                  (setq gc-cons-threshold threshold
+                                        inhibit-redisplay nil))))
 
 ;; Stop Emacs from flashing a `white' screen when starting up
-(set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")
+;; (set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")
+
+;; Temporary hack to fix Emacs launching in iTerm2.
+(load "/Applications/Emacs.app/Contents/Resources/site-lisp/site-start" t t)
 
 ;; (message "user-emacs-directory: %s" user-emacs-directory)
-
-;; Our personal Emacs files are found in the `lisp' directory in the `user-emacs-directory'.
-(let ((my/lisp (file-name-as-directory (file-name-concat user-emacs-directory "lisp"))))
-  (push my/lisp load-path)
-  (push (file-name-concat my/lisp "key-chord") load-path)
-  (my/add-trusted-content-directory "/Applications/Emacs.app/Contents/Resources/lisp/")
-  (my/add-trusted-content-directory my/lisp)
-  (my/add-trusted-content-directory user-emacs-directory))
-
 ;; (message "trusted-content: %s" trusted-content)
 ;; (message "load-path: %s" load-path)
 

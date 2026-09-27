@@ -3,12 +3,8 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'flymake)
 (require 'seq)
 (require 'my-constants)
-(require 'my-customizations)
-(require 'my-env)
-(require 'my-functions)
 (require 'my-layout)
 (require 'my-modes)
 
@@ -21,15 +17,16 @@
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 
-(autoload 'my/trusted-content-p "my-functions")
 (autoload 'my/ace-window-always-dispatch "my-functions")
 (autoload 'my/ace-window-next "my-functions")
-(autoload 'my/ace-window-previous "my-functions")
-(autoload 'my/next-buffer-current-window "my-functions")
-(autoload 'my/prev-buffer-current-window "my-functions")
 (autoload 'my/ace-window-one-command "my-functions")
 (autoload 'my/ace-window-prefix "my-functions")
-(autoload 'crux-find-current-directory-dir-locals-file "my-functions")
+(autoload 'my/ace-window-previous "my-functions")
+
+(autoload 'my/next-buffer-current-window "my-functions")
+(autoload 'my/prev-buffer-current-window "my-functions")
+
+(autoload 'my/trusted-content-p "my-functions")
 (autoload 'my/show-project-menu "my-functions")
 (autoload 'my/find-user-init-file "my-functions")
 (autoload 'my/find-user-custom-file "my-functions")
@@ -321,6 +318,7 @@ Here, we just separate them by a comma."
 (use-package crm)
 
 (use-package crux
+  :commands (crux-find-current-directory-dir-locals-file)
   :ensure t
   :defer nil                            ; load now due to dependencies below
   :bind (:map my/hyper-c-map

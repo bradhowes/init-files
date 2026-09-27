@@ -160,9 +160,9 @@ parse_git_branch() {
 
 hgrep() {
   if [[ -z "$*" ]]; then
-    builtin history 1
+    fc -lf 1
   else
-    builtin history 1 | ggrep -E --color=auto -C 5 "$*"
+    fc -lf 1 | ggrep -E --color=auto -C 3 "$*"
   fi
 }
 

@@ -6,9 +6,6 @@
 
 [[ "${my_arch}" = "Darwin" ]] && ulimit -n 8096
 
-# Use current Java environment
-eval "$(jenv init -)"
-
 export HISTSIZE=100000
 # shellcheck disable=SC2034
 export SAVEHIST=${HISTSIZE}
