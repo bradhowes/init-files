@@ -23,8 +23,6 @@
 ;; Resizing the Emacs frame can be an expensive part of changing the font. Inhibit this to reduce startup times with
 ;; fonts that are larger than the system default.
 (setq custom-file nil
-      ;; Doing this to hopefully eliminate null pointer crash in Emacs 31 at startup.
-      ;; inhibit-redisplay t
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t
       ;; Load the newer of *.el/*.elc files without warning
