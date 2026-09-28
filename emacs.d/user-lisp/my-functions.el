@@ -2,7 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'my-env)
 (require 'popper)
 
 ;;;###autoload
@@ -153,15 +152,6 @@ the line, ignoring any whitespace characters. If that fails, then the sort
 will treat the whole line as a value to compare against."
   (interactive "P")
   (my/sort-lines-by-integer-key "^\\s *[0-9]+" arg))
-
-;;;###autoload
-(defun my/tmp-dir ()
-  "The directory to use for temporary purposes - usually $HOME/tmp.
-Creates the directory if it does not exist."
-  (let* ((tmp (file-truename "~/tmp")))
-    (unless (my/is-valid-directory tmp)
-      (make-directory tmp t))
-    (file-name-as-directory tmp)))
 
 ;;;###autoload
 (defun my/trusted-content-p (original-response)

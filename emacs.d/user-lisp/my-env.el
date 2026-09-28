@@ -7,6 +7,7 @@
 ;;; Code:
 
 (require 'my-constants)
+(require 'my-functions)
 (require 'info)
 
 ;;;###autoload
@@ -60,6 +61,15 @@ control."
 (defun my/lisp ()
   "Location of personal Emacs Lisp files."
   (file-name-as-directory (file-name-concat (my/emacs.d) "lisp")))
+
+;;;###autoload
+(defun my/tmp-dir ()
+  "The directory to use for temporary purposes - usually $HOME/tmp.
+Creates the directory if it does not exist."
+  (let* ((tmp (file-truename "~/tmp")))
+    (unless (my/is-valid-directory tmp)
+      (make-directory tmp t))
+    (file-name-as-directory tmp)))
 
 ;;;###autoload
 (defun my/venv ()

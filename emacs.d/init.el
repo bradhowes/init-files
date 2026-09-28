@@ -23,45 +23,25 @@
 ;; Replicating much of what is in user-lisp-autoloads.el in order to silence warnings from flymake.
 ;; The .user-lisp-autoloads.el file is loaded upon startup.
 ;;
-;; (load-file (file-name-concat user-lisp-directory ".user-lisp-autoloads.el"))
 (autoload 'my/is-terminal "my-env")
-(autoload 'my/is-x-windows "my-env")
 (autoload 'my/is-graphical "my-env")
-(autoload 'my/is-x-windows-on-win "my-env")
-(autoload 'my/add-trusted-content-directory "my-env")
 (autoload 'my/repos "my-env")
-(autoload 'my/configurations "my-env")
-(autoload 'my/emacs.d "my-env")
-(autoload 'my/lisp "my-env")
-(autoload 'my/venv "my-env")
-(autoload 'my/venv-python "my-env")
 (autoload 'my/env-setup "my-env")
-
+(autoload 'my/tmp-dir "my-env")
 (autoload 'my/find-shell-init-file "my-finders")
 (autoload 'my/find-user-custom-file "my-finders")
 (autoload 'my/find-user-init-file "my-finders")
-
 (autoload 'my/copy-file-name-to-clipboard "my-functions")
 (autoload 'my/describe-symbol-at-point "my-functions")
-(autoload 'my/display-prefix "my-functions")
 (autoload 'my/goto-mark "my-functions")
 (autoload 'my/indent-buffer "my-functions")
-(autoload 'my/is-valid-directory "my-functions")
-(autoload 'my/mark-line "my-functions")
 (autoload 'my/matching-paren "my-functions")
 (autoload 'my/reload-buffer "my-functions")
-(autoload 'my/remove-all-text-properties "my-functions")
 (autoload 'my/set-mark-deactivate "my-functions")
-(autoload 'my/sort-lines-by-integer-key "my-functions")
-(autoload 'my/sort-lines-by-leading-integer "my-functions")
-(autoload 'my/tmp-dir "my-functions")
 (autoload 'my/trusted-content-p "my-functions")
-
 (autoload 'my/emacs-chord-bind "my-keymaps")
 (autoload 'my/emacs-key-bind "my-keymaps")
 (autoload 'my/emacs-make-key-bind "my-keymaps")
-(autoload 'my/hyper-c-map "my-keymaps")
-
 (autoload 'my/layout-frame-pos-left "my-layout")
 (autoload 'my/layout-frame-pos-center "my-layout")
 (autoload 'my/layout-frame-pos-right "my-layout")
@@ -69,46 +49,24 @@
 (autoload 'my/layout-normal-screen-font-size "my-layout")
 (autoload 'my/layout-screen-layout-changed "my-layout")
 (autoload 'my/layout-share-screen-font-size "my-layout")
-
-(autoload 'my/org-emacs-lisp-source-with-indent "my-org")
 (autoload 'my/org-filter-buffer-substring "my-org")
-
 (autoload 'my/ace-window-always-dispatch "my-navigation")
 (autoload 'my/ace-window-next "my-navigation")
-(autoload 'my/ace-window-one-command "my-navigation")
 (autoload 'my/ace-window-prefix "my-navigation")
 (autoload 'my/ace-window-previous "my-navigation")
-(autoload 'my/bury-current-buffer "my-navigation")
-(autoload 'my/bury-or-kill-current-buffer "my-navigation")
-(autoload 'my/consult-notes-other-frame "my-navigation")
 (autoload 'my/customize-other-window "my-navigation")
 (autoload 'my/customize-search "my-navigation")
-(autoload 'my/do-next-window "my-navigation")
-(autoload 'my/display-buffer-pre-func "my-navigation")
 (autoload 'my/kill-current-buffer "my-navigation")
-(autoload 'my/in-current-window "my-navigation")
-(autoload 'my/in-other-frame "my-navigation")
-(autoload 'my/in-other-window "my-navigation")
 (autoload 'my/info-other-frame "my-navigation")
-(autoload 'my/kill-current-buffer "my-navigation")
-(autoload 'my/next-buffer-skip-filter "my-navigation")
 (autoload 'my/next-buffer-current-window "my-navigation")
 (autoload 'my/prev-buffer-current-window "my-navigation")
-
 (autoload 'my/show-project-menu "my-project")
-
 (autoload 'my/start-emacs-server "my-server")
-
-(autoload 'my/repl "my-shells")
 (autoload 'my/repl-other-window "my-shells")
-(autoload 'my/run-something-in-buffer "my-shells")
-(autoload 'my/run-shell "my-shells")
 (autoload 'my/shell "my-shells")
 (autoload 'my/shell-other-window "my-shells")
 (autoload 'my/shell-other-frame "my-shells")
-
 (autoload 'my/htop "my-tops")
-(autoload 'my/top "my-tops")
 
 (my/env-setup)
 (add-hook 'after-init-hook #'my/layout-screen-layout-changed 98)
@@ -162,11 +120,11 @@
 
 (use-package ace-window
   :ensure t
-  :commands (aw-window-list aw-switch-to-window aw-select aw-flip-window ace-display-buffer ace-window)
+  :commands (ace-window aw-flip-window)
   :defines (aw-dispatch-always)
-  :config (setq aw-make-frame-char ?n))
-
-(advice-add 'aw-make-frame :override #'my/layout-make-frame)
+  :config
+  (setq aw-make-frame-char ?n)
+  (advice-add 'aw-make-frame :override #'my/layout-make-frame))
 
 (use-package char-menu
   :ensure t
@@ -187,7 +145,6 @@
                '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2))) ; I think this is from pyright
 
 (use-package xref
-  :ensure t
   :defines (xref-show-xrefs-function xref-show-definitions-function))
 
 (use-package consult

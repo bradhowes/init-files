@@ -264,6 +264,9 @@ location in the git repo where personal files are kept under version
 control.")
 (autoload 'my/lisp "my-env"
 "Location of personal Emacs Lisp files.")
+(autoload 'my/tmp-dir "my-env"
+"The directory to use for temporary purposes - usually $HOME/tmp.
+Creates the directory if it does not exist.")
 (autoload 'my/venv "my-env"
 "The Python virtual environment to use for eglot.")
 (autoload 'my/venv-python "my-env"
@@ -346,9 +349,6 @@ the line, ignoring any whitespace characters. If that fails, then the sort
 will treat the whole line as a value to compare against.
 
 (fn ARG)" t)
-(autoload 'my/tmp-dir "my-functions"
-"The directory to use for temporary purposes - usually $HOME/tmp.
-Creates the directory if it does not exist.")
 (autoload 'my/trusted-content-p "my-functions"
 "Advice for `trusted-content-p' to trust the `*scratch*' buffer.
 Honors ORIGINAL-RESPONSE when not nil and then checks the buffer's name
