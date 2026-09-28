@@ -105,8 +105,7 @@
                                 ("nongnu" . 20)))
   :config
   (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-  (package-initialize))
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t))
 
 (defvar my/hyper-c-map
   (make-sparse-keymap)

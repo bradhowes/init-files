@@ -1,6 +1,12 @@
 ;;; package -- my-layout -*- Mode: Emacs-Lisp; lexical-binding: t;-*-
 ;;; Commentary:
-;;; Load personal layout definitions.
+;;; Load personal layout definitions for various combinations of a laptop display + 1 or 2 4K displays in
+;;; both horizontal and vertical orientations.
+;;;
+;;; The routine `my/layout-screen-layout-changed' calculates the `initial-frame-alist' and `default-frame-aliat'
+;;; values based on the available screens and how they are arranged. The logic that performs this determination
+;;; is in `my/layout--active-screens' -- it returns a symbol that indicates the recognized arrangement.
+;;;
 ;;; Code:
 
 (require 'my-constants)
@@ -109,19 +115,19 @@ If there are two 4K displays, then 0 or 1 are valid options."
   :type '(natnum)
   :group 'my/customizations)
 
-(defcustom my/layout-frame-pixel-width-4k 1280 ;; 1338
+(defcustom my/layout-frame-pixel-width-4k 1280
   "Width of a frame in pixels on a 4K desktop.
-NOTE: this should be calculated instead of being a constant.
-We want 132 columns of Berkeley mono text in the font size for a 4k
-display (`my/layout-font-size-4k`)."
+NOTE: this should be calculated instead of being a constant. We want
+`my/layout-cols-graphical' columns of Berkeley mono text in the font
+size for a 4k display (`my/layout-font-size-4k`)."
   :type '(natnum)
   :group 'my/customizations)
 
-(defcustom my/layout-frame-pixel-width-laptop 944 ;; TODO revise for narrower frame
+(defcustom my/layout-frame-pixel-width-laptop 902
   "Width of a frame in pixels on a laptop desktop.
-NOTE: this should be calculated instead of being a constant.
-We want 132 columns of Berkeley mono text in the font size for a Retina
-laptop display (`my/layout-font-size-laptop`)."
+NOTE: this should be calculated instead of being a constant. We want
+`my/layout-cols-graphical' columns of Berkeley mono text in the font
+size for a Retina display (`my/layout-font-size-laptop`)."
   :type '(natnum)
   :group 'my/customizations)
 

@@ -667,7 +667,6 @@ buffer.
 (autoload 'my/repl-other-window "my-shells"
 "Start a new repl in another window." t)
 
-
 
 ;;; Generated autoloads from my-finders.el
 
@@ -713,6 +712,7 @@ artifacts such as indentation bars.
 "Run htop in a term buffer." t)
 (autoload 'my/top "my-tops"
 "Run top in a term buffer." t)
+
 
 ;;; End of scraped data
 

@@ -22,7 +22,9 @@ Note that this is also true when running in a terminal window.")
   "The name of the font to use.")
 
 (defconst my/layout-cols-graphical 126
-  "The width in columns to use for a frame.")
+  "The width in columns to use for a frame.
+When used with a 4K display, there can be 3 frames side-by-side.
+On a laptop, the 3rd will overlap quite a bit with the second.")
 
 (provide 'my-constants)
 
