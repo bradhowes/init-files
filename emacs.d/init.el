@@ -1,5 +1,5 @@
 ;;; init.el --- load the full configuration -*- lexical-binding: t; -*-
-;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3--
+;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2------
 ;;; Commentary:
 ;;; Code:
 
@@ -19,6 +19,11 @@
                    #'prefer-coding-system))
     (funcall p coding-system)))
 
+
+;; Replicating much of what is in user-lisp-autoloads.el in order to silence warnings from flymake.
+;; The .user-lisp-autoloads.el file is loaded upon startup.
+;;
+;; (load-file (file-name-concat user-lisp-directory ".user-lisp-autoloads.el"))
 (autoload 'my/is-terminal "my-env")
 (autoload 'my/is-x-windows "my-env")
 (autoload 'my/is-graphical "my-env")
@@ -32,52 +37,30 @@
 (autoload 'my/venv-python "my-env")
 (autoload 'my/env-setup "my-env")
 
-(autoload 'my/ace-window-always-dispatch "my-functions")
-(autoload 'my/ace-window-next "my-functions")
-(autoload 'my/ace-window-one-command "my-functions")
-(autoload 'my/ace-window-prefix "my-functions")
-(autoload 'my/ace-window-previous "my-functions")
-(autoload 'my/bury-current-buffer "my-functions")
-(autoload 'my/bury-or-kill-current-buffer "my-functions")
-(autoload 'my/consult-notes-other-frame "my-functions")
+(autoload 'my/find-shell-init-file "my-finders")
+(autoload 'my/find-user-custom-file "my-finders")
+(autoload 'my/find-user-init-file "my-finders")
+
 (autoload 'my/copy-file-name-to-clipboard "my-functions")
-(autoload 'my/customize-other-window "my-functions")
-(autoload 'my/customize-search "my-functions")
 (autoload 'my/describe-symbol-at-point "my-functions")
-(autoload 'my/env-setup "my-env")
-(autoload 'my/emacs-chord-bind "my-functions")
-(autoload 'my/emacs-key-bind "my-functions")
-(autoload 'my/emacs-make-key-bind "my-functions")
-(autoload 'my/find-shell-init-file "my-functions")
-(autoload 'my/find-user-custom-file "my-functions")
-(autoload 'my/find-user-init-file "my-functions")
+(autoload 'my/display-prefix "my-functions")
 (autoload 'my/goto-mark "my-functions")
-(autoload 'my/kill-current-buffer "my-functions")
-(autoload 'my/htop "my-functions")
 (autoload 'my/indent-buffer "my-functions")
-(autoload 'my/info-other-frame "my-functions")
 (autoload 'my/is-valid-directory "my-functions")
+(autoload 'my/mark-line "my-functions")
 (autoload 'my/matching-paren "my-functions")
-(autoload 'my/next-buffer-current-window "my-functions")
-(autoload 'my/org-emacs-lisp-source-with-indent "my-functions")
-(autoload 'my/org-filter-buffer-substring "my-functions")
-(autoload 'my/prev-buffer-current-window "my-functions")
 (autoload 'my/reload-buffer "my-functions")
 (autoload 'my/remove-all-text-properties "my-functions")
-(autoload 'my/repl "my-functions")
-(autoload 'my/repl-other-window "my-functions")
-(autoload 'my/repos "my-functions")
-(autoload 'my/run-shell "my-functions")
-(autoload 'my/run-something-in-buffer "my-functions")
 (autoload 'my/set-mark-deactivate "my-functions")
-(autoload 'my/shell "my-functions")
-(autoload 'my/shell-other-window "my-functions")
-(autoload 'my/shell-other-frame "my-functions")
-(autoload 'my/show-project-menu "my-functions")
-(autoload 'my/start-emacs-server "my-functions")
+(autoload 'my/sort-lines-by-integer-key "my-functions")
+(autoload 'my/sort-lines-by-leading-integer "my-functions")
 (autoload 'my/tmp-dir "my-functions")
-(autoload 'my/top "my-functions")
 (autoload 'my/trusted-content-p "my-functions")
+
+(autoload 'my/emacs-chord-bind "my-keymaps")
+(autoload 'my/emacs-key-bind "my-keymaps")
+(autoload 'my/emacs-make-key-bind "my-keymaps")
+(autoload 'my/hyper-c-map "my-keymaps")
 
 (autoload 'my/layout-frame-pos-left "my-layout")
 (autoload 'my/layout-frame-pos-center "my-layout")
@@ -87,13 +70,52 @@
 (autoload 'my/layout-screen-layout-changed "my-layout")
 (autoload 'my/layout-share-screen-font-size "my-layout")
 
+(autoload 'my/org-emacs-lisp-source-with-indent "my-org")
+(autoload 'my/org-filter-buffer-substring "my-org")
+
+(autoload 'my/ace-window-always-dispatch "my-navigation")
+(autoload 'my/ace-window-next "my-navigation")
+(autoload 'my/ace-window-one-command "my-navigation")
+(autoload 'my/ace-window-prefix "my-navigation")
+(autoload 'my/ace-window-previous "my-navigation")
+(autoload 'my/bury-current-buffer "my-navigation")
+(autoload 'my/bury-or-kill-current-buffer "my-navigation")
+(autoload 'my/consult-notes-other-frame "my-navigation")
+(autoload 'my/customize-other-window "my-navigation")
+(autoload 'my/customize-search "my-navigation")
+(autoload 'my/do-next-window "my-navigation")
+(autoload 'my/display-buffer-pre-func "my-navigation")
+(autoload 'my/kill-current-buffer "my-navigation")
+(autoload 'my/in-current-window "my-navigation")
+(autoload 'my/in-other-frame "my-navigation")
+(autoload 'my/in-other-window "my-navigation")
+(autoload 'my/info-other-frame "my-navigation")
+(autoload 'my/kill-current-buffer "my-navigation")
+(autoload 'my/next-buffer-skip-filter "my-navigation")
+(autoload 'my/next-buffer-current-window "my-navigation")
+(autoload 'my/prev-buffer-current-window "my-navigation")
+
+(autoload 'my/show-project-menu "my-project")
+
+(autoload 'my/start-emacs-server "my-server")
+
+(autoload 'my/repl "my-shells")
+(autoload 'my/repl-other-window "my-shells")
+(autoload 'my/run-something-in-buffer "my-shells")
+(autoload 'my/run-shell "my-shells")
+(autoload 'my/shell "my-shells")
+(autoload 'my/shell-other-window "my-shells")
+(autoload 'my/shell-other-frame "my-shells")
+
+(autoload 'my/htop "my-tops")
+(autoload 'my/top "my-tops")
+
 (my/env-setup)
 (add-hook 'after-init-hook #'my/layout-screen-layout-changed 98)
 (add-hook 'after-init-hook #'my/start-emacs-server 99)
 
-(require 'generator)
-(require 'seq)
 (require 'my-constants)
+(require 'my-customizations)
 (require 'my-modes)
 
 ;; To keep this file small, we put all customizations in their own file.
@@ -855,8 +877,12 @@ The map is made up of tiny functions that invoke `dired' on a path.")
 
 ;;; --- Key Chords
 
-;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to type with
-;; one or two hands.
+(use-package diff-hl
+  :ensure t
+  :commands (diff-hl-show-hunk))
+
+;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to
+;; type with one or two hands.
 (my/emacs-chord-bind global-map
                      "qq" #'undo
                      "aa" #'my/ace-window-always-dispatch
@@ -915,11 +941,14 @@ The map is made up of tiny functions that invoke `dired' on a path.")
      '(mac-right-control-modifier 'hyper))))
 
 ;; Custom dir-locals
-(dir-locals-set-class-variables 'raze-variables '((nil . ((compile-command . "./build.sh -m Debug ")))))
-(dir-locals-set-directory-class (file-truename "~/repos/raze") 'raze-variables)
-
-(dir-locals-set-class-variables 'x23-variables '((nil . ((compile-command . "cmake -S . -B build && cd build && make tests ")))))
-(dir-locals-set-directory-class (file-truename "~/repos/x23") 'x23-variables)
+(dir-locals-set-class-variables 'raze-variables
+                                '((nil . ((compile-command . "./build.sh -m Debug ")))))
+(dir-locals-set-directory-class (file-truename "~/repos/raze")
+                                'raze-variables)
+(dir-locals-set-class-variables 'x23-variables
+                                '((nil . ((compile-command . "cmake -S . -B build && cd build && make tests ")))))
+(dir-locals-set-directory-class (file-truename "~/repos/x23")
+                                'x23-variables)
 
 ;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097
 ;;

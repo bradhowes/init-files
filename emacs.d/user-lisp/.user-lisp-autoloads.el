@@ -293,159 +293,51 @@ If MODE is nil then apply to the current mode.
 
 ;;; Generated autoloads from my-functions.el
 
+(autoload 'my/copy-file-name-to-clipboard "my-functions"
+"Copy the current buffer file name to the clipboard." t)
+(autoload 'my/describe-symbol-at-point "my-functions"
+"Immediately show help for symbol at point if it exists.
+If help buffer is visible and it is showing help for the
+symbol, then hide it." t)
+(autoload 'my/display-prefix "my-functions"
+"Display the value of the raw prefix ARG.
+
+(fn ARG)" t)
+(autoload 'my/dump-hashtable "my-functions"
+"Show the contents of HASHTABLE.
+
+(fn HASHTABLE)" t)
+(autoload 'my/goto-mark "my-functions"
+"Move back to mark without enabling transient mode.
+This is just a shortcut for \\[universal-argument] \\[set-mark-command]." t)
+(autoload 'my/indent-buffer "my-functions"
+"Reindent the whole buffer." t)
+(autoload 'my/is-valid-directory "my-functions"
+"Check if DIR is valid, returning it if so or nil if not.
+Note that `file-directory-p' returns t if the (string) length of DIR is
+zero (0), so we detect that and report that as false.
+
+(fn DIR)")
+(autoload 'my/mark-line "my-functions"
+"Blah blah ARG blah.
+
+(fn &optional ARG)" t)
+(autoload 'my/matching-paren "my-functions"
+"When point is on a paren-type character, jump to its twin." t)
+(autoload 'my/reload-buffer "my-functions"
+"Reload the current buffer from disk.
+Checks to see if buffer needs saving, aborting the reload if changes not saved." t)
+(autoload 'my/remove-all-text-properties "my-functions"
+"Remove all text properties from the current buffer." t)
+(autoload 'my/set-mark-deactivate "my-functions"
+"Set mark without activating it.
+This is just a shortcut for \\[universal-argument] \\[set-mark-command]." t)
 (autoload 'my/sort-lines-by-integer-key "my-functions"
 "Sort lines by an integer value that is found via PATTERN in a line.
 The sort is in increasing numerical order if DIRECTION is nil; otherwise
 it is in descending order.
 
 (fn PATTERN &optional DIRECTION)")
-(autoload 'my/trusted-content-p "my-functions"
-"Advice for `trusted-content-p' to trust the `*scratch*' buffer.
-Honors ORIGINAL-RESPONSE when not nil and then checks the buffer's name
-if it is `*scratch*'. This is a loosening of security but the risk is
-very small for me, and it remove the obnoxious message at startup about
-the buffer having untrusted content.
-
-(fn ORIGINAL-RESPONSE)")
-(autoload 'my/ace-window-always-dispatch "my-functions"
-"Invoke `ace-window' after setting `aw-dispatch-always' to T.
-When `aw-dispatch-always' is nil, `ace-window' does not invoke
-its dispatching mechanism if there are 2 or fewer windows. This
-command guarantees that dispatching will always happen." t)
-(autoload 'my/do-next-window "my-functions"
-"Jump to next window in WINS after the current one.
-
-(fn WINS)")
-(autoload 'my/ace-window-next "my-functions"
-"Jump to next window according to `ace-window'." t)
-(autoload 'my/ace-window-previous "my-functions"
-"Jump to previous window according to `ace-window'." t)
-(autoload 'my/next-buffer-skip-filter "my-functions"
-"Return t if BUFFER should be skipped in WINDOW.
-This is used by `my/prev-buffer-current-window' and
-`my/next-buffer-current-window' methods so that only desired
-buffers will be available for changing to in the current
-window. If BURY-OR-KILL is not nil then the operation will result
-in the buffer being buried or killed, and in this case buffers
-are never filtered out. Otherwise, skip buffers that start with
-'*' in their name, `dired' buffers, `help' buffers, and buffers
-that are already visible somewhere.
-
-(fn _ BUFFER BURY-OR-KILL)")
-(autoload 'my/next-buffer-current-window "my-functions"
-"Switch to `next' buffer in current window with filtering.
-Only switch to a buffer that passes the filter defined in
-`my/next-buffer-skip-filter'." t)
-(autoload 'my/prev-buffer-current-window "my-functions"
-"Switch to `previous' buffer in current window with filtering.
-Only switch to a buffer that passes the filter defined in
-`my/next-buffer-skip-filter'." t)
-(autoload 'my/ace-window-one-command "my-functions"
-"Run an action in a chosen window.
-Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch." t)
-(autoload 'my/display-buffer-pre-func "my-functions"
-"Method to use for `display-buffer-overriding-action'.
-The BUFFER and ALIST are ignored.
-
-(fn BUFFER ALIST)")
-(autoload 'my/ace-window-prefix "my-functions"
-"Use `ace-window' to display the buffer of the next command.
-The next buffer is the buffer displayed by the next command invoked
-immediately after this command (ignoring reading from the minibuffer).
-Creates a new window before displaying the buffer.
-When `switch-to-buffer-obey-display-actions' is non-nil,
-`switch-to-buffer' commands are also supported." t)
-(autoload 'my/show-project-menu "my-functions"
-"Show the menu that is shown when switching to a new project." t)
-(autoload 'my/find-user-init-file "my-functions"
-"Edit the `user-init-file` when ARG is nil.
-Otherwise, edit the `early-init.el' file instead, creating it if
-necessary.
-
-(fn ARG)" t)
-(autoload 'my/find-user-custom-file "my-functions"
-"Edit the `custom-file` if it exists." t)
-(autoload 'my/find-shell-init-file "my-functions"
-"Edit a shell init file." t)
-(autoload 'my/dump-hashtable "my-functions"
-"Show the contents of HASHTABLE.
-
-(fn HASHTABLE)" t)
-(autoload 'my/reload-buffer "my-functions"
-"Reload the current buffer from disk.
-Checks to see if buffer needs saving, aborting the reload if changes not saved." t)
-(autoload 'my/run-something-in-buffer "my-functions"
-"Run RUN-PROC after running BUFFER-SETUP-PROC in NAME buffer.
-This function receives the buffer to use for the shell. The expectation
-is that the function will setup the display environment to host the
-buffer.
-
-(fn NAME BUFFER-SETUP-PROC RUN-PROC)")
-(autoload 'my/in-current-window "my-functions"
-"Switch to buffer BUF in current window.
-
-(fn BUF)")
-(autoload 'my/in-other-window "my-functions"
-"Switch to buffer BUF in other window.
-
-(fn BUF)")
-(autoload 'my/in-other-frame "my-functions"
-"Switch to buffer BUF in new frame.
-
-(fn BUF)")
-(autoload 'my/run-shell "my-functions"
-"Run a new `shell' after running BUFFER-SETUP-PROC.
-This function receives the buffer to use for the shell. The expectation
-is that the function will setup the display environment to host the
-buffer.
-
-(fn BUFFER-SETUP-PROC)")
-(autoload 'my/shell "my-functions"
-"Start a new shell." t)
-(autoload 'my/shell-other-window "my-functions"
-"Start a new shell in another window." t)
-(autoload 'my/shell-other-frame "my-functions"
-"Start a new shell in another frame." t)
-(autoload 'my/bury-or-kill-current-buffer "my-functions"
-"Bury or kill the current buffer without asking. (WIP)
-Kill buffers that match the pattern '*...*'.
-Otherwise just bury them." t)
-(autoload 'my/bury-current-buffer "my-functions"
-"Bury the current buffer without asking." t)
-(autoload 'my/kill-current-buffer "my-functions"
-"Kill the current buffer without asking." t)
-(autoload 'my/info-other-frame "my-functions"
-"Show Info in a new frame." t)
-(autoload 'my/customize-other-window "my-functions"
-"Show Customize in a new window." t)
-(autoload 'my/consult-notes-other-frame "my-functions"
-"Find note to show in a new frame." t)
-(autoload 'my/remove-all-text-properties "my-functions"
-"Remove all text properties from the current buffer." t)
-(autoload 'my/matching-paren "my-functions"
-"When point is on a paren-type character, jump to its twin." t)
-(autoload 'my/indent-buffer "my-functions"
-"Reindent the whole buffer." t)
-(autoload 'my/copy-file-name-to-clipboard "my-functions"
-"Copy the current buffer file name to the clipboard." t)
-(autoload 'my/repl "my-functions"
-"Simple alias to start ielm." t)
-(autoload 'my/repl-other-window "my-functions"
-"Start a new repl in another window." t)
-(autoload 'my/describe-symbol-at-point "my-functions"
-"Immediately show help for symbol at point if it exists.
-If help buffer is visible and it is showing help for the
-symbol, then hide it." t)
-(autoload 'my/htop "my-functions"
-"Run htop in a term buffer." t)
-(autoload 'my/top "my-functions"
-"Run top in a term buffer." t)
-(autoload 'my/git-sync "my-functions"
-"Execute a git pull on HOST in PATH.
-
-(fn HOST PATH)" t)
-(autoload 'my/all-git-sync "my-functions"
-"Sync the configurations repo found in various locations at work." t)
 (autoload 'my/sort-lines-by-leading-integer "my-functions"
 "Sort lines in current region by extracting integer values from start of line.
 If ARG is not nil, sort in descending order.
@@ -454,70 +346,17 @@ the line, ignoring any whitespace characters. If that fails, then the sort
 will treat the whole line as a value to compare against.
 
 (fn ARG)" t)
-(autoload 'my/set-mark-deactivate "my-functions"
-"Set mark without activating it.
-This is just a shortcut for \\[universal-argument] \\[set-mark-command]." t)
-(autoload 'my/goto-mark "my-functions"
-"Move back to mark without enabling transient mode.
-This is just a shortcut for \\[universal-argument] \\[set-mark-command]." t)
-(autoload 'my/display-prefix "my-functions"
-"Display the value of the raw prefix ARG.
-
-(fn ARG)" t)
-(autoload 'my/mark-line "my-functions"
-"Blah blah ARG blah.
-
-(fn &optional ARG)" t)
-(autoload 'my/customize-search "my-functions"
-"Show the top-level customize screen and move to the search field." t)
-(autoload 'my/start-emacs-server "my-functions"
-"Start up an Emacs server to support `emacsclient' connections.
-Customize `server-name' so that each Emacs
-process has its own server connection." t)
-(autoload 'my/emacs-make-key-bind "my-functions"
-"Apply key binding DEFINITIONS in the given KEYMAP.
-DEFINITIONS is a sequence of string and command pairs given as a sequence,
-where the first element of the pair is a key sequence and the second is the
-function or keymap to bind with. The key sequence is passed to MAKE-KEY and
-the result of the call is used in the key binding.
-
-There is now `bind-keys' method from `use-package' but my version requires
-less typing.
-
-(fn KEYMAP MAKE-KEY &rest DEFINITIONS)")
-(autoload 'my/emacs-key-bind "my-functions"
-"Apply key binding DEFINITIONS in the given KEYMAP.
-DEFINITIONS is a sequence of string and command pairs given as a sequence.
-
-(fn KEYMAP &rest DEFINITIONS)")
-(autoload 'my/emacs-chord-bind "my-functions"
-"Apply chord binding DEFINITIONS in the given KEYMAP.
-DEFINITIONS is a sequence of string and command pairs given as a sequence.
-
-(fn KEYMAP &rest DEFINITIONS)")
-(autoload 'tempo-template-my/org-emacs-lisp-source "my-functions"
-"Define empty function to satisfy flymake/byte-compile (ARG is ignored).
-
-(fn &optional _)")
-(autoload 'my/org-emacs-lisp-source-with-indent "my-functions"
-"Execute `my/org-emacs-lisp-source' and then indent block." t)
-(autoload 'my/org-filter-buffer-substring "my-functions"
-"Custom filter on buffer text from START to END.
-When DELETE is t, delete the contents from the range.
-Otherwise, removes all properties from a span in a buffer.
-Useful when copying code into Org blocks so that the copy does not contain any
-artifacts such as indentation bars.
-
-(fn START END DELETE)")
-(autoload 'my/is-valid-directory "my-functions"
-"Check if DIR is valid, returning it if so or nil if not.
-Note that `file-directory-p' returns t if the (string) length of DIR is
-zero (0), so we detect that and report that as false.
-
-(fn DIR)")
 (autoload 'my/tmp-dir "my-functions"
 "The directory to use for temporary purposes - usually $HOME/tmp.
 Creates the directory if it does not exist.")
+(autoload 'my/trusted-content-p "my-functions"
+"Advice for `trusted-content-p' to trust the `*scratch*' buffer.
+Honors ORIGINAL-RESPONSE when not nil and then checks the buffer's name
+if it is `*scratch*'. This is a loosening of security but the risk is
+very small for me, and it remove the obnoxious message at startup about
+the buffer having untrusted content.
+
+(fn ORIGINAL-RESPONSE)")
 
 
 ;;; Generated autoloads from my-insert-block-comment.el
@@ -601,7 +440,7 @@ The first frame always takes on `initial-frame-alist', and subsequent frames
 use `default-frame-alist' by default. If there are already two frames active
 then subsequent ones will be at `my/align-right-frame-alist' which aligns with
 the right-edge of the screen, but may overlap with the middle frame.")
-(register-definition-prefixes "my-layout" '("my/layout--"))
+(register-definition-prefixes "my-layout" '("my/layout-"))
 
 
 ;;; Generated autoloads from my-lisp-mode.el
@@ -673,6 +512,207 @@ emulator.")
 "Check the setup of native complete and look for common problems." t)
 (register-definition-prefixes "native-complete" '("native-complete-"))
 
+
+;;; Generated autoloads from my-keymaps.el
+
+(autoload 'my/emacs-make-key-bind "my-keymaps"
+"Apply key binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence,
+where the first element of the pair is a key sequence and the second is the
+function or keymap to bind with. The key sequence is passed to MAKE-KEY and
+the result of the call is used in the key binding.
+
+There is now `bind-keys' method from `use-package' but my version requires
+less typing.
+
+(fn KEYMAP MAKE-KEY &rest DEFINITIONS)")
+(autoload 'my/emacs-key-bind "my-keymaps"
+"Apply key binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence.
+
+(fn KEYMAP &rest DEFINITIONS)")
+(autoload 'my/emacs-chord-bind "my-keymaps"
+"Apply chord binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence.
+
+(fn KEYMAP &rest DEFINITIONS)")
+(defvar my/hyper-c-map (make-sparse-keymap)
+"Keymap for Hyper-c actions.")
+
+
+;;; Generated autoloads from my-git.el
+
+(autoload 'my/git-sync "my-git"
+"Execute a git pull on HOST in PATH.
+
+(fn HOST PATH)" t)
+(autoload 'my/all-git-sync "my-git"
+"Sync the configurations repo found in various locations at work." t)
+(register-definition-prefixes "my-git" '("my/git-sync-buffer-name"))
+
+
+;;; Generated autoloads from my-server.el
+
+(autoload 'my/start-emacs-server "my-server"
+"Start up an Emacs server to support `emacsclient' connections.
+Customize `server-name' so that each Emacs
+process has its own server connection." t)
+
+
+;;; Generated autoloads from my-navigation.el
+
+(autoload 'my/ace-window-always-dispatch "my-navigation"
+"Invoke `ace-window' after setting `aw-dispatch-always' to T.
+When `aw-dispatch-always' is nil, `ace-window' does not invoke
+its dispatching mechanism if there are 2 or fewer windows. This
+command guarantees that dispatching will always happen." t)
+(autoload 'my/ace-window-next "my-navigation"
+"Jump to next window according to `ace-window'." t)
+(autoload 'my/ace-window-one-command "my-navigation"
+"Run an action in a chosen window.
+Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch." t)
+(autoload 'my/ace-window-prefix "my-navigation"
+"Use `ace-window' to display the buffer of the next command.
+The next buffer is the buffer displayed by the next command invoked
+immediately after this command (ignoring reading from the minibuffer).
+Creates a new window before displaying the buffer.
+When `switch-to-buffer-obey-display-actions' is non-nil,
+`switch-to-buffer' commands are also supported." t)
+(autoload 'my/ace-window-previous "my-navigation"
+"Jump to previous window according to `ace-window'." t)
+(autoload 'my/bury-current-buffer "my-navigation"
+"Bury the current buffer without asking." t)
+(autoload 'my/bury-or-kill-current-buffer "my-navigation"
+"Bury or kill the current buffer without asking. (WIP)
+Kill buffers that match the pattern '*...*'.
+Otherwise just bury them." t)
+(autoload 'my/consult-notes-other-frame "my-navigation"
+"Find note to show in a new frame." t)
+(autoload 'my/customize-other-window "my-navigation"
+"Show Customize in a new window." t)
+(autoload 'my/customize-search "my-navigation"
+"Show the top-level customize screen and move to the search field." t)
+(autoload 'my/do-next-window "my-navigation"
+"Jump to next window in WINS after the current one.
+
+(fn WINS)")
+(autoload 'my/display-buffer-pre-func "my-navigation"
+"Method to use for `display-buffer-overriding-action'.
+The BUFFER and ALIST are ignored.
+
+(fn BUFFER ALIST)")
+(autoload 'my/in-current-window "my-navigation"
+"Switch to buffer BUF in current window.
+
+(fn BUF)")
+(autoload 'my/in-other-frame "my-navigation"
+"Switch to buffer BUF in new frame.
+
+(fn BUF)")
+(autoload 'my/in-other-window "my-navigation"
+"Switch to buffer BUF in other window.
+
+(fn BUF)")
+(autoload 'my/info-other-frame "my-navigation"
+"Show Info in a new frame." t)
+(autoload 'my/kill-current-buffer "my-navigation"
+"Kill the current buffer without asking." t)
+(autoload 'my/next-buffer-skip-filter "my-navigation"
+"Return t if BUFFER should be skipped in WINDOW.
+This is used by `my/prev-buffer-current-window' and
+`my/next-buffer-current-window' methods so that only desired
+buffers will be available for changing to in the current
+window. If BURY-OR-KILL is not nil then the operation will result
+in the buffer being buried or killed, and in this case buffers
+are never filtered out. Otherwise, skip buffers that start with
+'*' in their name, `dired' buffers, `help' buffers, and buffers
+that are already visible somewhere.
+
+(fn _ BUFFER BURY-OR-KILL)")
+(autoload 'my/next-buffer-current-window "my-navigation"
+"Switch to `next' buffer in current window with filtering.
+Only switch to a buffer that passes the filter defined in
+`my/next-buffer-skip-filter'." t)
+(autoload 'my/prev-buffer-current-window "my-navigation"
+"Switch to `previous' buffer in current window with filtering.
+Only switch to a buffer that passes the filter defined in
+`my/next-buffer-skip-filter'." t)
+(register-definition-prefixes "my-navigation" '("my/next-window-wrap-around"))
+
+
+;;; Generated autoloads from my-shells.el
+
+(autoload 'my/run-something-in-buffer "my-shells"
+"Run RUN-PROC after running BUFFER-SETUP-PROC in NAME buffer.
+This function receives the buffer to use for the shell. The expectation
+is that the function will setup the display environment to host the
+buffer.
+
+(fn NAME BUFFER-SETUP-PROC RUN-PROC)")
+(autoload 'my/run-shell "my-shells"
+"Run a new `shell' after running BUFFER-SETUP-PROC.
+This function receives the buffer to use for the shell. The expectation
+is that the function will setup the display environment to host the
+buffer.
+
+(fn BUFFER-SETUP-PROC)")
+(autoload 'my/shell "my-shells"
+"Start a new shell." t)
+(autoload 'my/shell-other-window "my-shells"
+"Start a new shell in another window." t)
+(autoload 'my/shell-other-frame "my-shells"
+"Start a new shell in another frame." t)
+(autoload 'my/repl "my-shells"
+"Simple alias to start ielm." t)
+(autoload 'my/repl-other-window "my-shells"
+"Start a new repl in another window." t)
+
+
+
+;;; Generated autoloads from my-finders.el
+
+(autoload 'my/find-shell-init-file "my-finders"
+"Edit a shell init file." t)
+(autoload 'my/find-user-init-file "my-finders"
+"Edit the `user-init-file` when ARG is nil.
+Otherwise, edit the `early-init.el' file instead, creating it if
+necessary.
+
+(fn ARG)" t)
+(autoload 'my/find-user-custom-file "my-finders"
+"Edit the `custom-file` if it exists." t)
+
+
+;;; Generated autoloads from my-org.el
+
+(autoload 'tempo-template-my/org-emacs-lisp-source "my-org"
+"Define empty function to satisfy flymake/byte-compile (ARG is ignored).
+
+(fn &optional _)")
+(autoload 'my/org-emacs-lisp-source-with-indent "my-org"
+"Execute `my/org-emacs-lisp-source' and then indent block." t)
+(autoload 'my/org-filter-buffer-substring "my-org"
+"Custom filter on buffer text from START to END.
+When DELETE is t, delete the contents from the range.
+Otherwise, removes all properties from a span in a buffer.
+Useful when copying code into Org blocks so that the copy does not contain any
+artifacts such as indentation bars.
+
+(fn START END DELETE)")
+
+
+;;; Generated autoloads from my-project.el
+
+(autoload 'my/show-project-menu "my-project"
+"Show the menu that is shown when switching to a new project." t)
+
+
+;;; Generated autoloads from my-tops.el
+
+(autoload 'my/htop "my-tops"
+"Run htop in a term buffer." t)
+(autoload 'my/top "my-tops"
+"Run top in a term buffer." t)
 
 ;;; End of scraped data
 

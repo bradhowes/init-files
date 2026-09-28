@@ -93,7 +93,7 @@ declared in variable `eglot--lsp-interface-alist'."
                (if (stringp sig-info-doc)
                  sig-info-doc (eglot--format-markup sig-info-doc))))))
         ;; If there is an active parameter, ...
-        (if-let
+        (if-let*
           ((active-param
              (seq--elt-safe sig-info-params
                (or sig-help-active-param-i sig-info-active-param-i))))
@@ -176,7 +176,7 @@ the variable `eldoc-documentation-functions'."
             ((:activeSignature sig-help-active-sig))
             ((:activeParameter sig-help-active-param-i)))
           (eglot--when-buffer-window buf
-            (if-let
+            (if-let*
               ((sig-help-active-sig
                  (and sig-help-sigs
                    (or

@@ -1,7 +1,7 @@
 ;;; package -- custom.el  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
-;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3--
+;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2-----
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -24,7 +24,6 @@
  '(comint-buffer-maximum-size 10000)
  '(compilation-auto-jump-to-first-error nil)
  '(compilation-scroll-output t)
- '(completion-category-overrides '((file (styles basic partial-completion))) nil nil "Customized with use-package orderless")
  '(completion-cycle-threshold 3)
  '(completion-ignored-extensions
    '(".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".bzr/"
@@ -32,14 +31,12 @@
      ".p64fsl" ".lx64fsl" ".lx32fsl" ".dx64fsl" ".dx32fsl" ".fx64fsl" ".fx32fsl" ".sx64fsl" ".sx32fsl" ".wx64fsl"
      ".wx32fsl" ".fasl" ".ufsl" ".fsl" ".dxl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr"
      ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo"))
- '(completion-styles '(orderless partial-completion basic) nil nil "Customized with use-package orderless")
  '(confirm-kill-emacs 'y-or-n-p)
  '(consult-dir-default-command 'consult-dir-dired)
  '(consult-dir-sort-candidates t)
  '(consult-dir-sources
    '(consult-dir--source-default consult-dir--source-project consult-dir--source-recentf consult-dir--source-bookmark
                                  consult-dir--source-tramp-local))
- '(consult-narrow-key "<")
  '(consult-notes-denote-files-function #'denote-directory-files)
  '(consult-notes-denote-mode t)
  '(consult-notes-use-rg t)
@@ -57,9 +54,6 @@
      "183dfa34e360f5bc2ee4a6b3f4236e6664f4cfce40de1d43c984e0e8fc5b51ae" default))
  '(delete-by-moving-to-trash t)
  '(delete-old-versions t)
- '(denote-directory "~/Documents/notes/")
- '(denote-file-type 'markdown-yaml)
- '(denote-rename-buffer-mode t)
  '(diff-hl-flydiff-mode t)
  '(dired-auto-revert-buffer t)
  '(dired-dwim-target t)
@@ -122,12 +116,12 @@
  '(ns-right-command-modifier 'super)
  '(ns-right-control-modifier 'hyper)
  '(package-selected-packages
-   '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes corfu denote diff-hl eldoc-box embark-consult
-            esup exec-path-from-shell expand-region fancy-compilation flymake-gradle flymake-shellcheck flyover go-mode
-            gradle-mode helpful impatient-mode indent-bars js2-mode key-chord kotlin-ts-mode ligature lsp-pyright magit
-            marginalia markdown-mode mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-dired
-            nerd-icons-xref orderless osx-dictionary popper rg scratch tempel tempel-collection vertico yaml yaml-mode
-            yasnippet yasnippet-snippets))
+   '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes corfu crux denote diff-hl eldoc-box
+            embark-consult esup exec-path-from-shell expand-region fancy-compilation flymake-gradle flymake-shellcheck
+            flyover go-mode gradle-mode helpful impatient-mode indent-bars js2-mode key-chord kotlin-ts-mode ligature
+            lsp-pyright magit marginalia markdown-mode mode-line-bell mood-line multiple-cursors nerd-icons-completion
+            nerd-icons-dired nerd-icons-xref orderless osx-dictionary popper rg scratch tempel tempel-collection vertico
+            yaml yaml-mode yasnippet yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-echo-mode t)
  '(popper-mode t)
@@ -175,7 +169,7 @@
  '(vertico-mode t)
  '(vertico-resize t)
  '(which-key-mode t)
- '(whitespace-line-column 132)
+ '(whitespace-line-column my/layout-cols-graphical)
  '(whitespace-style '(face trailing lines-tail empty))
  '(windmove-wrap-around t)
  '(winner-mode t))

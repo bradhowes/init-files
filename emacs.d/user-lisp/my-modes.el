@@ -3,8 +3,7 @@
 ;;; Various file modes setup
 ;;; Code:
 
-(require 'cape)
-(require 'eglot)
+(require 'jsonrpc)
 (require 'my-constants)
 (require 'project)
 (require 'treesit)
@@ -45,6 +44,8 @@ the items to setup for autoloading from the given file."
  "my-shell-mode" 'my/shell-mode-hook)
 
 (use-package cape
+  :defer nil
+  :commands (cape-capf-super cape-wrap-buster)
   :ensure t)
 
 (use-package cc-mode
@@ -74,18 +75,27 @@ the items to setup for autoloading from the given file."
           (eglot-ensure))
       (message "Project %s not found project--list - not running eglot" proj))))
 
-(defun my/eglot-configure ()
-  "Custom buffer configuration of Eglot."
-  (setq-local completion-at-point-functions
-              (list (cape-capf-super #'eglot-completion-at-point #'tempel-expand))
-              eldoc-documentation-functions (cons #'flymake-eldoc-function
-                                                  (remove #'flymake-eldoc-function eldoc-documentation-functions))
-              eldoc-documentation-strategy #'eldoc-documentation-compose))
+(use-package flymake
+  :commands (flymake-show-buffer-diagnostics flymake-eldoc-function)
+  :config
+  (setq elisp-flymake-byte-compile-load-path load-path)
+  :hook (prog-mode . flymake-mode)
+  :bind (:map flymake-mode-map
+              ("M-n" . flymake-goto-next-error)
+              ("M-p" . flymake-goto-prev-error)))
 
 (use-package eglot
-  :ensure t
-  :commands (eglot-ensure)
+  :commands (eglot-ensure eglot-completion-at-point)
   :defines (eglot-mode-map)
+  :config
+  (defun my/eglot-configure ()
+    "Custom buffer configuration of Eglot."
+    (setq-local completion-at-point-functions
+                (list (cape-capf-super #'eglot-completion-at-point #'tempel-expand))
+                eldoc-documentation-functions (cons #'flymake-eldoc-function
+                                                    (remove #'flymake-eldoc-function eldoc-documentation-functions))
+                eldoc-documentation-strategy #'eldoc-documentation-compose))
+
   :hook ((c++-mode . my/known-project-eglot-ensure)
          (c++-ts-mode . my/known-project-eglot-ensure)
          (go-mode . eglot-ensure)
@@ -127,15 +137,6 @@ the items to setup for autoloading from the given file."
 
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
-(use-package flymake
-  :commands (flymake-show-buffer-diagnostics)
-  :config
-  (setq elisp-flymake-byte-compile-load-path load-path)
-  :hook (prog-mode . flymake-mode)
-  :bind (:map flymake-mode-map
-              ("M-n" . flymake-goto-next-error)
-              ("M-p" . flymake-goto-prev-error)))
-
 (use-package flyspell
   :ensure t
   :hook ((prog-mode . flyspell-prog-mode)
@@ -173,7 +174,7 @@ the items to setup for autoloading from the given file."
   :ensure t
   :mode ("\\.kt\\'" "\\.kts\\'"))
 
-(use-package lisp-mode
+(use-package elisp-mode
   :hook ((lisp-mode . my/lisp-mode-hook)
          (lisp-interaction-mode . my/lisp-mode-hook)
          (lisp-data-mode . my/lisp-data-mode-hook)

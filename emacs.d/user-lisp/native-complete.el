@@ -1,6 +1,6 @@
 ;;; native-complete.el --- Shell completion using native complete mechanisms -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019, 2023, 2024 by Troy Hinckley
+;; Copyright (C) 2019, 2023, 2024, 2026 by Troy Hinckley
 
 ;; Author: Troy Hinckley <troy.hinckley@gmail.com>
 ;; URL: https://github.com/CeleritasCelery/emacs-native-shell-complete
@@ -277,13 +277,13 @@ emulator."
     (unless (save-excursion
               (goto-char prompt-point)
               (native-complete--at-prompt-p comint-prompt-regexp))
-      (user-error "error: current prompt does not match `comint-prompt-regex'.\nprompt -> '%s'\nregex -> %s"
+      (user-error "error: Current prompt does not match `comint-prompt-regex'.\nprompt -> '%s'\nregex -> %s"
                   (buffer-substring (line-beginning-position) prompt-point)comint-prompt-regexp))
     (when (eq 'bash completion-style)
       (when (equal comint-terminfo-terminal "dumb")
         (user-error "error: `native-complete-setup-bash' not called. Bash is not setup")))
     (if (bound-and-true-p company-mode)
-        (unless (native-complete-tree-assoc 'company-native-complete company-backends)
+        (unless (native-complete-tree-assoc 'company-native-complete (symbol-value 'company-backends))
           (user-error "error: `company-native-complete' not one of `company-backends'"))
       (unless (native-complete-tree-assoc 'native-complete-at-point completion-at-point-functions)
         (user-error "error: `native-complete-at-point' not one of `completion-at-point-functions'")))

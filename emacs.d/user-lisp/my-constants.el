@@ -21,6 +21,9 @@ Note that this is also true when running in a terminal window.")
   "Berkeley Mono"
   "The name of the font to use.")
 
+(defconst my/layout-cols-graphical 126
+  "The width in columns to use for a frame.")
+
 (provide 'my-constants)
 
 ;;; my-constants.el ends here
