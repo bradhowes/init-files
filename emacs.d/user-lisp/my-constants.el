@@ -3,47 +3,23 @@
 ;;; Runtime constants that describe various properties of the environment.
 ;;; Code:
 
-(require 'my-env)
+(defconst my/is-macosx
+  (eq system-type 'darwin)
+  "T if running on macOS.
+Note that this is also true when running in a terminal window.")
 
-;; NOTE: do not evaluate from within early-init.el -- it is too early for `display-graphic-p' to return a meaningful
-;; value.
-(defconst my/is-terminal
-  (not (display-graphic-p))
-  "T if running in a terminal.")
+(defconst my/is-linux
+  (eq system-type 'gnu/linux)
+  "T if running on GNU/Linux system.
+Note that this is also true when running in a terminal window.")
 
-;; NOTE: do not evaluate from within early-init.el -- it is too early for `window-system' to return a meaningful value.
-(defconst my/is-x-windows
-  (eq window-system 'x)
-  "T if running in an X windows environment.")
-
-(defconst my/is-graphical
-  (display-graphic-p)
-  "T if running in a graphical display environment.")
-
-(defconst my/is-x-windows-on-win
-  (and my/is-x-windows (getenv "XTERM_SHELL"))
-  "T if running in VcXsrv on Windows.
-Hacky but for now it works since we are always starting up an initial xterm.")
+(defconst my/is-work
+  (string= "bradhowes" user-login-name)
+  "This is t if running under work identity.")
 
 (defconst my/font-name
   "Berkeley Mono"
   "The name of the font to use.")
-
-(defun my/is-valid-directory (dir)
-  "Check if DIR is valid, returning it if so or nil if not.
-Note that `file-directory-p' returns t if the (string) length of DIR is
-zero (0), so we detect that and report that as false."
-  (and (> (length dir) 0)
-       (file-directory-p dir)
-       dir))
-
-(defconst my/tmp-dir
-  (let* ((tmp (file-truename "~/tmp")))
-    (unless (my/is-valid-directory tmp)
-      (make-directory tmp t))
-    (file-name-as-directory tmp))
-  "The directory to use for temporary purposes - usually $HOME/tmp.
-Creates the directory if it does not exist.")
 
 (provide 'my-constants)
 

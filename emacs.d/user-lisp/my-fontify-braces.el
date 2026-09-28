@@ -10,6 +10,7 @@
   "Custom face used to highlight parentheses, braces, and brackets."
   :group 'my/customizations)
 
+;;;###autoload
 (defun my/fontify-braces (&optional mode)
   "Add font-lock for braces ([] {} ()) to MODE.
 If MODE is nil then apply to the current mode."

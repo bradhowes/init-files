@@ -10,6 +10,7 @@
     map)
   "Keymap for Emacs pager mode.")
 
+;;;###autoload
 (defcustom emacs-pager-max-line-coloring 2000
   "Maxiumum number of lines to ansi-color.
 If performance is bad when loading data, reduce this number."

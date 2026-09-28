@@ -18,6 +18,7 @@
   (interactive)
   (my/insert-block-comment 'newline-and-indent "#" "#" "#"))
 
+;;;###autoload
 (defun my/sh-mode-hook ()
   "Custom SH mode."
   (flymake-mode t)

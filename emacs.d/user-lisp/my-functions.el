@@ -9,13 +9,14 @@
 (require 'generator)
 (require 'key-chord)
 (require 'my-customizations)
-(require 'my-constants)
 (require 'my-env)
 (require 'popper)
 (require 'project)
+(require 'server)
 (require 'tempo)
 (require 'wid-edit)
 
+;;;###autoload
 (defun my/sort-lines-by-integer-key (pattern &optional direction)
   "Sort lines by an integer value that is found via PATTERN in a line.
 The sort is in increasing numerical order if DIRECTION is nil; otherwise
@@ -34,6 +35,7 @@ it is in descending order."
                    nil                  ; ENDKEYFUN
                    nil)))))             ; PREDICATE
 
+;;;###autoload
 (defun my/trusted-content-p (original-response)
   "Advice for `trusted-content-p' to trust the `*scratch*' buffer.
 Honors ORIGINAL-RESPONSE when not nil and then checks the buffer's name
@@ -43,6 +45,7 @@ the buffer having untrusted content."
   (or original-response
       (buffer-name "*scratch*")))
 
+;;;###autoload
 (defun my/ace-window-always-dispatch ()
   "Invoke `ace-window' after setting `aw-dispatch-always' to T.
 When `aw-dispatch-always' is nil, `ace-window' does not invoke
@@ -55,6 +58,7 @@ command guarantees that dispatching will always happen."
           (call-interactively #'ace-window))
       (setq aw-dispatch-always current-aw-dispatch-always))))
 
+;;;###autoload
 (defun my/do-next-window (wins)
   "Jump to next window in WINS after the current one."
   (when-let* ((current-window (get-buffer-window))
@@ -65,16 +69,19 @@ command guarantees that dispatching will always happen."
                              (and (length> wins next-index) next-index))))
     (aw-switch-to-window (nth final-index wins))))
 
+;;;###autoload
 (defun my/ace-window-next ()
   "Jump to next window according to `ace-window'."
   (interactive)
   (my/do-next-window (aw-window-list)))
 
+;;;###autoload
 (defun my/ace-window-previous ()
   "Jump to previous window according to `ace-window'."
   (interactive)
   (my/do-next-window (reverse (aw-window-list))))
 
+;;;###autoload
 (defun my/next-buffer-skip-filter (_ buffer bury-or-kill)
   "Return t if BUFFER should be skipped in WINDOW.
 This is used by `my/prev-buffer-current-window' and
@@ -96,6 +103,7 @@ that are already visible somewhere."
        ((get-buffer-window nil 'visible) t)
        (t nil)))))
 
+;;;###autoload
 (defun my/next-buffer-current-window ()
   "Switch to `next' buffer in current window with filtering.
 Only switch to a buffer that passes the filter defined in
@@ -104,6 +112,7 @@ Only switch to a buffer that passes the filter defined in
   (let ((switch-to-prev-buffer-skip #'my/next-buffer-skip-filter))
     (next-buffer)))
 
+;;;###autoload
 (defun my/prev-buffer-current-window ()
   "Switch to `previous' buffer in current window with filtering.
 Only switch to a buffer that passes the filter defined in
@@ -112,6 +121,7 @@ Only switch to a buffer that passes the filter defined in
   (let ((switch-to-prev-buffer-skip #'my/next-buffer-skip-filter))
     (previous-buffer)))
 
+;;;###autoload
 (defun my/ace-window-one-command ()
   "Run an action in a chosen window.
 Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch."
@@ -126,6 +136,7 @@ Taken from https://karthinks.com/software/emacs-window-management-almanac/#windo
              (this-command command))
         (call-interactively command)))))
 
+;;;###autoload
 (defun my/display-buffer-pre-func (buffer alist)
   "Method to use for `display-buffer-overriding-action'.
 The BUFFER and ALIST are ignored."
@@ -135,6 +146,7 @@ The BUFFER and ALIST are ignored."
          (window (aw-select (propertize " ACE" 'face 'mode-line-highlight))))
     (cons window type)))
 
+;;;###autoload
 (defun my/ace-window-prefix ()
   "Use `ace-window' to display the buffer of the next command.
 The next buffer is the buffer displayed by the next command invoked
@@ -146,12 +158,14 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   (display-buffer-override-next-command #'my/display-buffer-pre-func nil "[ace-window]")
   (message "Command to execute: "))
 
+;;;###autoload
 (defun my/show-project-menu ()
   "Show the menu that is shown when switching to a new project."
   (interactive)
   (call-interactively (project--switch-project-command)))
 
 ;; My own version of some `crux` routines that use `find-file` instead of `find-file-other-window`
+;;;###autoload
 (defun my/find-user-init-file (arg)
   "Edit the `user-init-file` when ARG is nil.
 Otherwise, edit the `early-init.el' file instead, creating it if
@@ -159,6 +173,7 @@ necessary."
   (interactive "P")
   (find-file (locate-user-emacs-file (if arg "early-init.el" user-init-file))))
 
+;;;###autoload
 (defun my/find-user-custom-file ()
   "Edit the `custom-file` if it exists."
   (interactive)
@@ -166,6 +181,7 @@ necessary."
       (find-file custom-file)
     (message "No custom file defined.")))
 
+;;;###autoload
 (defun my/find-shell-init-file ()
   "Edit a shell init file."
   (interactive)
@@ -182,6 +198,7 @@ necessary."
         (find-file (completing-read "Choose shell init file: " candidates))
       (find-file (car candidates)))))
 
+;;;###autoload
 (defun my/dump-hashtable (hashtable)
   "Show the contents of HASHTABLE."
   (interactive "Xhash table: ")
@@ -193,6 +210,7 @@ necessary."
                  (insert key " -> " value "\n")) hashtable)
       (emacs-pager-mode))))
 
+;;;###autoload
 (defun my/reload-buffer ()
   "Reload the current buffer from disk.
 Checks to see if buffer needs saving, aborting the reload if changes not saved."
@@ -208,6 +226,7 @@ Checks to see if buffer needs saving, aborting the reload if changes not saved."
       (find-alternate-file filename)
       (message "Reloaded."))))
 
+;;;###autoload
 (defun my/run-something-in-buffer (name buffer-setup-proc run-proc)
   "Run RUN-PROC after running BUFFER-SETUP-PROC in NAME buffer.
 This function receives the buffer to use for the shell. The expectation
@@ -219,19 +238,23 @@ buffer."
     (cd-absolute cwd)
     (funcall run-proc tmp)))
 
+;;;###autoload
 (defun my/in-current-window (buf)
   "Switch to buffer BUF in current window."
   (switch-to-buffer buf nil t))
 
+;;;###autoload
 (defun my/in-other-window (buf)
   "Switch to buffer BUF in other window."
   (switch-to-buffer-other-window buf))
 
+;;;###autoload
 (defun my/in-other-frame (buf)
   "Switch to buffer BUF in new frame."
   (select-frame (make-frame))
   (switch-to-buffer buf))
 
+;;;###autoload
 (defun my/run-shell (buffer-setup-proc)
   "Run a new `shell' after running BUFFER-SETUP-PROC.
 This function receives the buffer to use for the shell. The expectation
@@ -241,21 +264,25 @@ buffer."
                               buffer-setup-proc
                               (lambda (buf) (shell buf))))
 
+;;;###autoload
 (defun my/shell ()
   "Start a new shell."
   (interactive)
   (my/run-shell #'my/in-current-window))
 
+;;;###autoload
 (defun my/shell-other-window ()
   "Start a new shell in another window."
   (interactive)
   (my/run-shell #'my/in-other-window))
 
+;;;###autoload
 (defun my/shell-other-frame ()
   "Start a new shell in another frame."
   (interactive)
   (my/run-shell #'my/in-other-frame))
 
+;;;###autoload
 (defun my/bury-or-kill-current-buffer ()
   "Bury or kill the current buffer without asking. (WIP)
 Kill buffers that match the pattern '*...*'.
@@ -270,16 +297,19 @@ Otherwise just bury them."
     (message "Buried buffer")
     (bury-buffer (current-buffer))))
 
+;;;###autoload
 (defun my/bury-current-buffer ()
   "Bury the current buffer without asking."
   (interactive)
   (bury-buffer (current-buffer)))
 
+;;;###autoload
 (defun my/kill-current-buffer ()
   "Kill the current buffer without asking."
   (interactive)
   (kill-buffer (current-buffer)))
 
+;;;###autoload
 (defun my/info-other-frame ()
   "Show Info in a new frame."
   (interactive)
@@ -288,6 +318,7 @@ Otherwise just bury them."
     (select-frame (make-frame))
     (info nil tmp)))
 
+;;;###autoload
 (defun my/customize-other-window ()
   "Show Customize in a new window."
   (interactive)
@@ -295,18 +326,21 @@ Otherwise just bury them."
     (switch-to-buffer-other-window tmp)
     (customize)))
 
+;;;###autoload
 (defun my/consult-notes-other-frame ()
   "Find note to show in a new frame."
   (interactive)
   (select-frame (make-frame))
   (consult-notes))
 
+;;;###autoload
 (defun my/remove-all-text-properties ()
   "Remove all text properties from the current buffer."
   (interactive)
   (let ((inhibit-read-only t))
     (set-text-properties (point-min) (point-max) nil)))
 
+;;;###autoload
 (defun my/matching-paren ()
   "When point is on a paren-type character, jump to its twin."
   (interactive)
@@ -319,11 +353,13 @@ Otherwise just bury them."
 	(t
 	 nil)))
 
+;;;###autoload
 (defun my/indent-buffer ()
   "Reindent the whole buffer."
   (interactive)
   (indent-region (point-min) (point-max) nil))
 
+;;;###autoload
 (defun my/copy-file-name-to-clipboard ()
   "Copy the current buffer file name to the clipboard."
   (interactive)
@@ -333,11 +369,13 @@ Otherwise just bury them."
     (kill-new filename)
     (message "Copied buffer file name '%s' to the clipboard." filename)))
 
+;;;###autoload
 (defun my/repl ()
   "Simple alias to start ielm."
   (interactive)
   (ielm))
 
+;;;###autoload
 (defun my/repl-other-window ()
   "Start a new repl in another window."
   (interactive)
@@ -345,6 +383,7 @@ Otherwise just bury them."
     (switch-to-buffer-other-window tmp)
     (ielm)))
 
+;;;###autoload
 (defun my/describe-symbol-at-point ()
   "Immediately show help for symbol at point if it exists.
 If help buffer is visible and it is showing help for the
@@ -360,6 +399,7 @@ symbol, then hide it."
         (popper--delete-popup help-window)
       (describe-symbol (symbol-at-point) (help-buffer)))))
 
+;;;###autoload
 (defun my/htop ()
   "Run htop in a term buffer."
   (interactive)
@@ -369,6 +409,7 @@ symbol, then hide it."
         (switch-to-buffer name)
       (ansi-term cmd name))))
 
+;;;###autoload
 (defun my/top ()
   "Run top in a term buffer."
   (interactive)
@@ -377,6 +418,7 @@ symbol, then hide it."
         (switch-to-buffer name)
       (ansi-term "/usr/bin/top" name))))
 
+;;;###autoload
 (defun my/git-sync (host path)
   "Execute a git pull on HOST in PATH."
   (interactive)
@@ -397,12 +439,13 @@ symbol, then hide it."
                     (funcall filt proc (concat (process-name proc) ": " content))))
     proc))
 
+;;;###autoload
 (defun my/all-git-sync ()
   "Sync the configurations repo found in various locations at work."
   (interactive)
   (when-let* ((buf (get-buffer my/git-sync-buffer-name)))
     (kill-buffer buf))
-  (let ((local (file-name-concat my/repos "configurations"))
+  (let ((local (file-name-concat (my/repos) "configurations"))
         (home (file-truename "~/configurations")))
     ;; NOTE: treat `(nil local)` as the master and only update via magit
     (dolist (cfg (list (cons nil home)  ; /lxhome/howesbra/configurations
@@ -416,6 +459,7 @@ symbol, then hide it."
       (my/git-sync (car cfg) (cdr cfg))))
   (display-buffer my/git-sync-buffer-name))
 
+;;;###autoload
 (defun my/sort-lines-by-leading-integer (arg)
   "Sort lines in current region by extracting integer values from start of line.
 If ARG is not nil, sort in descending order.
@@ -437,6 +481,7 @@ will treat the whole line as a value to compare against."
 ;;    (concat "sp_qa@" host)
 ;;    ". /apps/home/howesbra/repos/configurations/qa.profile; exec /opt/third/emacs/30.1.1/emacs"))
 
+;;;###autoload
 (defun my/set-mark-deactivate ()
   "Set mark without activating it.
 This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
@@ -445,17 +490,20 @@ This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
   (when transient-mark-mode
     (deactivate-mark)))
 
+;;;###autoload
 (defun my/goto-mark ()
   "Move back to mark without enabling transient mode.
 This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
   (interactive)
   (set-mark-command 4))
 
+;;;###autoload
 (defun my/display-prefix (arg)
   "Display the value of the raw prefix ARG."
   (interactive "P")
   (message "%s" arg))
 
+;;;###autoload
 (defun my/mark-line (&optional arg)
   "Blah blah ARG blah."
   (interactive "p")
@@ -465,6 +513,7 @@ This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
     (setq mark-active t))
   (forward-line arg))
 
+;;;###autoload
 (defun my/customize-search ()
   "Show the top-level customize screen and move to the search field."
   (interactive)
@@ -472,8 +521,7 @@ This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
   (goto-char (point-min))
   (widget-forward 3))
 
-(require 'server)
-
+;;;###autoload
 (defun my/start-emacs-server ()
   "Start up an Emacs server to support `emacsclient' connections.
 Customize `server-name' so that each Emacs
@@ -496,6 +544,7 @@ process has its own server connection."
              (second (pop head)))
         (iter-yield (cons first second))))))
 
+;;;###autoload
 (defun my/emacs-make-key-bind (keymap make-key &rest definitions)
   "Apply key binding DEFINITIONS in the given KEYMAP.
 DEFINITIONS is a sequence of string and command pairs given as a sequence,
@@ -514,11 +563,13 @@ less typing."
     (iter-do (pair iter)
       (keymap-set keymap (funcall make-key (car pair)) (cdr pair)))))
 
+;;;###autoload
 (defun my/emacs-key-bind (keymap &rest definitions)
   "Apply key binding DEFINITIONS in the given KEYMAP.
 DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (apply #'my/emacs-make-key-bind keymap (lambda (key) key) definitions))
 
+;;;###autoload
 (defun my/emacs-chord-bind (keymap &rest definitions)
   "Apply chord binding DEFINITIONS in the given KEYMAP.
 DEFINITIONS is a sequence of string and command pairs given as a sequence."
@@ -530,6 +581,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
     (iter-do (pair iter)
       (key-chord-define keymap (car pair) (cdr pair)))))
 
+;;;###autoload
 (defun tempo-template-my/org-emacs-lisp-source (&optional _)
   "Define empty function to satisfy flymake/byte-compile (ARG is ignored).")
 
@@ -537,6 +589,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                        "<m"
                        "Insert an Emacs Lisp source block in an org document.")
 
+;;;###autoload
 (defun my/org-emacs-lisp-source-with-indent ()
   "Execute `my/org-emacs-lisp-source' and then indent block."
   (interactive)
@@ -544,6 +597,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   (forward-line -1)
   (org-cycle))
 
+;;;###autoload
 (defun my/org-filter-buffer-substring (start end delete)
   "Custom filter on buffer text from START to END.
 When DELETE is t, delete the contents from the range.
@@ -553,6 +607,24 @@ artifacts such as indentation bars."
   (if delete
       (delete-and-extract-region start end)
     (buffer-substring-no-properties start end)))
+
+;;;###autoload
+(defun my/is-valid-directory (dir)
+  "Check if DIR is valid, returning it if so or nil if not.
+Note that `file-directory-p' returns t if the (string) length of DIR is
+zero (0), so we detect that and report that as false."
+  (and (> (length dir) 0)
+       (file-directory-p dir)
+       dir))
+
+;;;###autoload
+(defun my/tmp-dir ()
+  "The directory to use for temporary purposes - usually $HOME/tmp.
+Creates the directory if it does not exist."
+  (let* ((tmp (file-truename "~/tmp")))
+    (unless (my/is-valid-directory tmp)
+      (make-directory tmp t))
+    (file-name-as-directory tmp)))
 
 (provide 'my-functions)
 

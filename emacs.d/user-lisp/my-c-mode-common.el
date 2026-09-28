@@ -359,6 +359,7 @@ If POS is nil, the current point is used."
   (forward-line -1)
   (indent-according-to-mode))
 
+;;;###autoload
 (defun my/c-mode-common ()
   "Common hook for C/C++ modes."
   (setq c-basic-offset 2

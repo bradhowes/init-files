@@ -20,6 +20,7 @@
     (end-of-defun)
     (eval-last-sexp arg)))
 
+;;;###autoload
 (defun my/lisp-data-mode-hook ()
   "Custom Lisp-Data mode."
   (font-lock-mode t)
@@ -31,6 +32,7 @@
   (check-parens)
   (message "Ok"))
 
+;;;###autoload
 (defun my/lisp-mode-hook ()
   "Customize Lisp mode."
   (keymap-local-set "C-c p" #'my/noisy-check-parens)

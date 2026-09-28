@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
+;;;###autoload
 (defun my/split-string (string &optional sep omit)
   "Split STRING at SEP.
 If OMIT then remove any empty strings."
@@ -59,6 +60,7 @@ If OMIT then remove any empty strings."
 (defvar doxygen-group-history nil
   "Group history.")
 
+;;;###autoload
 (defun doxygen-toggle-insert-summary (arg)
   "Change the setting of the `doxygen-insert-summary' variable.
 If prefix ARG is 1, the value is toggled. If <= 0, then the value is nil.
@@ -364,6 +366,7 @@ block."
 	(insert "\n"))
       (insert prefix "*/\n"))))
 
+;;;###autoload
 (defun doxygen-insert-empty-comment ()
   "Insert an empty Doxygen comment block.
 The point is left at the end of the
@@ -375,6 +378,7 @@ first line. The comment is indented with PREFIX."
     (doxygen-push-marker)
     (save-excursion (insert "\n" prefix "*/\n"))))
 
+;;;###autoload
 (defun doxygen-insert-block-comment ()
   "Insert a Doxygen C/C++ block comment for the next non-blank line."
   (interactive "*")
@@ -387,6 +391,7 @@ first line. The comment is indented with PREFIX."
       (doxygen-insert-empty-comment))
     (doxygen-update-markers)))
 
+;;;###autoload
 (defun doxygen-insert-group (name &optional from to)
   "Insert Doxygen comments to define a Doxygen group.
 The group NAME is read
@@ -408,12 +413,14 @@ argument is present, in which case an empty group is inserted at the point."
   (doxygen-push-marker)
   (doxygen-update-markers))
 
+;;;###autoload
 (defun doxygen-first-marker-greater-than (point markers)
   "Obtain first item in MARKERS greater than POINT."
   (cond ((null markers) nil)
 	((> (car markers) point) (car markers))
 	(t (doxygen-first-marker-greater-than point (cdr markers)))))
 
+;;;###autoload
 (defun doxygen-forward-marker ()
   "Jump to the next mark in `doxygen-markers'."
   (interactive)
@@ -421,6 +428,7 @@ argument is present, in which case an empty group is inserted at the point."
     (if marker (goto-char marker)
       (if doxygen-markers (goto-char (car doxygen-markers))))))
 
+;;;###autoload
 (defun doxygen-first-marker-lesser-than (point markers)
   "Jump to the first marker in MARKERS before POINT."
   (cond ((null markers) nil)
@@ -428,6 +436,7 @@ argument is present, in which case an empty group is inserted at the point."
 	 (or (doxygen-first-marker-lesser-than point (cdr markers)) (car markers)))
 	(t nil)))
 
+;;;###autoload
 (defun doxygen-backward-marker ()
   "Jump to the previous mark in `doxygen-markers'."
   (interactive)
@@ -435,6 +444,7 @@ argument is present, in which case an empty group is inserted at the point."
     (if marker (goto-char marker)
       (if doxygen-markers (goto-char (car (last doxygen-markers)))))))
 
+;;;###autoload
 (defun doxygen-insert-inline-comment ()
   "Insert an inline Doxygen comment.
 This probably only works for C/C++/ObjC
@@ -455,6 +465,7 @@ comments. Maybe Java too."
       (insert "/<")
       (forward-char 1)))))
 
+;;;###autoload
 (defun doxygen-comment-file ()
   "Look for all interesting objects in the current buffer.
 Insert a Doxygen comment block before each."
@@ -473,6 +484,7 @@ Insert a Doxygen comment block before each."
 	(forward-line 1)))
     (set-marker marker nil)))
 
+;;;###autoload
 (defvar doxygen-keymap nil)
 (unless doxygen-keymap
   (define-prefix-command 'doxygen-keymap)

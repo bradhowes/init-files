@@ -278,6 +278,9 @@ it is used by custom commands."
           my/layout--4k-screen-width))
      (my/layout--frame-pixel-width layout)))
 
+(autoload 'my/is-graphical "my-functions")
+(autoload 'my/is-x-windows-on-win "my-functions")
+
 (defun my/layout--frame-top (layout display)
   "Obtain the `top` position for a frame for LAYOUT and DISPLAY index.
 The position value will place the frame such that the top of the frame
@@ -287,7 +290,7 @@ aligns with the top of the DISPLAY."
   (let* ((index (if (eq layout my/layout--screens-laptop) 0 (+ 1 display)))
          (settings (nth index (display-monitor-attributes-list)))
          (top (nth 1 (alist-get 'geometry settings)))
-         (offset (if my/is-x-windows-on-win 30 0)))
+         (offset (if (my/is-x-windows-on-win) 30 0)))
     (list '+ (+ offset top))))
 
 (defun my/layout--frame-alist (left layout display)
@@ -327,21 +330,27 @@ Frame's right side is flush with the right side of the main display."
 (defun my/layout--font-size (layout)
   "The font size to use based on the LAYOUT."
   (declare (side-effect-free t))
-  (if (my/layout--has-4k layout) my/layout-font-size-4k my/layout-font-size-laptop))
+  (if (my/layout--has-4k layout)
+      my/layout-font-size-4k
+    my/layout-font-size-laptop))
 
 (defun my/layout--setup-font (layout)
   "Install the desired font in the default face for LAYOUT."
-  (set-face-attribute 'default nil :font (font-spec :family my/font-name :size (my/layout--font-size layout))))
+  (let ((size (my/layout--font-size layout)))
+    (message "layout %s - font: %s size: %d" layout my/font-name size)
+    (set-face-attribute 'default nil :font (font-spec :family my/font-name :size size))))
 
+;;;###autoload
 (defun my/layout-screen-layout-changed ()
   "Recalculate values based on screen layout."
   (interactive)
-  (when my/is-graphical
+  (when (my/is-graphical)
     (let ((layout (my/layout--active-screens)))
-      (message "screen layout: %s" layout)
+      (message "my/layout-screen-layout-changed - screen layout: %s" layout)
       (my/layout--setup-font layout)
       (my/layout--update-screen-frame-alists layout))))
 
+;;;###autoload
 (defun my/layout-pick-default-display-4k (screen)
   "Set the 4K SCREEN to use to host future Emacs frames.
 It does not affect existing frames."
@@ -350,12 +359,14 @@ It does not affect existing frames."
   (custom-save-all)
   (my/layout-screen-layout-changed))
 
+;;;###autoload
 (defun my/layout-share-screen-font-size (&optional arg)
   "Set font scaling to ARG when sharing screen.
 ARG is an optional integer which defaults to 2."
   (interactive "P")
   (text-scale-set (or arg 2)))
 
+;;;###autoload
 (defun my/layout-normal-screen-font-size ()
   "Remove any font scaling."
   (interactive)
@@ -375,6 +386,7 @@ If 0, returns `my/layout--use-4k-display-1' else returns
       my/layout--use-4k-display-1
     my/layout--use-4k-display-2))
 
+;;;###autoload
 (defun my/layout-frame-pos-left (&optional display)
   "Reset frame size and position for left frame on DISPLAY.
 If there are multiple 4K displays, by default the display to use for the new
@@ -384,6 +396,7 @@ is the second, etc."
   (interactive "P")
   (my/layout--frame-set-alist (my/layout--frame-left-alist (my/layout--active-screens) (my/layout--pick-display display))))
 
+;;;###autoload
 (defun my/layout-frame-pos-center (&optional display)
   "Reset frame size and position for center frame on DISPLAY.
 If there are multiple 4K displays, by default the display to use for the new
@@ -393,6 +406,7 @@ is the second, etc."
   (interactive "P")
   (my/layout--frame-set-alist (my/layout--frame-center-alist (my/layout--active-screens) (my/layout--pick-display display))))
 
+;;;###autoload
 (defun my/layout-frame-pos-right (&optional display)
   "Reset frame size and position for right frame on DISPLAY.
 If there are multiple 4K displays, by default the display to use for the new
@@ -402,12 +416,14 @@ is the second, etc."
   (interactive "P")
   (my/layout--frame-set-alist (my/layout--frame-right-alist (my/layout--active-screens) (my/layout--pick-display display))))
 
+;;;###autoload
 (defun my/layout-reset-frame-width ()
   "Reset the current frame width to function `my/cols'."
   (interactive)
   (let ((layout (my/layout--active-screens)))
     (set-frame-width (window-frame (get-buffer-window)) (my/layout--cols layout))))
 
+;;;###autoload
 (defun my/layout-make-frame ()
   "Make a new frame using layout settings for the current display.
 The first frame always takes on `initial-frame-alist', and subsequent frames

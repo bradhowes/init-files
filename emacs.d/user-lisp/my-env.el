@@ -6,67 +6,86 @@
 ;;;
 ;;; Code:
 
+(require 'my-constants)
 (require 'info)
 
+;;;###autoload
+(defun my/is-terminal ()
+  "T if running in a terminal.
+NOTE: can return false positives if called too early in startup."
+  (not (display-graphic-p)))
+
+;;;###autoload
+(defun my/is-x-windows ()
+  "T if running in an X windows environment.
+NOTE: can return false positives if called too early in startup."
+  (eq window-system 'x))
+
+;;;###autoload
+(defalias 'my/is-graphical #'display-graphic-p
+  "T if running in a graphical display environment.
+NOTE: can return false positives if called too early in startup.")
+
+;;;###autoload
+(defun my/is-x-windows-on-win ()
+  "T if running in VcXsrv on Windows.
+Hacky but for now it works since we are always starting up an initial xterm."
+  (and (my/is-x-windows) (getenv "XTERM_SHELL")))
+
+;;;###autoload
 (defun my/add-trusted-content-directory (path)
   "Add PATH to `trusted-content'.
 NOTE: duplicated in early-init.el"
   (push (abbreviate-file-name (file-name-as-directory path)) trusted-content))
 
-(defconst my/is-macosx
-  (eq system-type 'darwin)
-  "T if running on macOS.
-Note that this is also true when running in a terminal window.")
+;;;###autoload
+(defun my/repos ()
+  "LOCATION of root of personal source git repositories."
+  (file-name-as-directory (file-truename "~/src/Mine")))
 
-(defconst my/is-linux
-  (eq system-type 'gnu/linux)
-  "T if running on GNU/Linux system.
-Note that this is also true when running in a terminal window.")
+;;;###autoload
+(defun my/configurations ()
+  "Location of configurations repo."
+  (file-name-as-directory (file-name-concat (my/repos) "init-files")))
 
-(defconst my/repos
-  (file-name-as-directory (file-truename "~/src/Mine"))
-  "LOCATION of root of personal source git repositories.")
-
-(defconst my/configurations
-  (file-name-as-directory (file-name-concat my/repos "init-files"))
-  "Location of configurations repo.")
-
-(defconst my/is-work
-  (string= "bradhowes" user-login-name)
-  "This is t if running under work identity.")
-
-(defconst my/emacs.d
-  (file-name-as-directory (file-name-concat my/configurations "emacs.d"))
+;;;###autoload
+(defun my/emacs.d ()
   "Location of emacs.d directory in the configurations repo.
 Note that this is *not* the `user-emacs-directory', but rather the
 location in the git repo where personal files are kept under version
-control.")
+control."
+  (file-name-as-directory (file-name-concat (my/configurations) "emacs.d")))
 
-(defconst my/lisp
-  (file-name-as-directory (file-name-concat my/emacs.d "lisp"))
-  "Location of personal Emacs Lisp files.")
+;;;###autoload
+(defun my/lisp ()
+  "Location of personal Emacs Lisp files."
+  (file-name-as-directory (file-name-concat (my/emacs.d) "lisp")))
 
-(defconst my/venv
-  (file-name-as-directory (file-truename "~/venv"))
-  "The Python virtual environment to use for eglot.")
+;;;###autoload
+(defun my/venv ()
+  "The Python virtual environment to use for eglot."
+  (file-name-as-directory (file-truename "~/venv")))
 
-(setenv "WORKON_HOME" my/venv)
-
-(defconst my/venv-python
-  (file-name-concat my/venv "bin/python")
-  "The path to the Python executable to use for eglot.")
+;;;###autoload
+(defun my/venv-python ()
+  "The path to the Python executable to use for eglot."
+  (file-name-concat (my/venv) "bin/python"))
 
 ;; (message "Info-default-directory-list: %s" Info-default-directory-list)
 
-(let* ((common-paths (list (file-truename "~/bin")
-                           (file-name-concat my/venv "bin")))
-       (macosx-paths (if my/is-macosx
-                         (list "/opt/homebrew/sqlite/bin"
-                               "/opt/homebrew/opt/grep/libexec/gnubin"
-                               "/opt/homebrew/bin")
-                       '()))
-       ;; Collection of valid 'bin' paths
-       (bin-paths (seq-filter #'file-directory-p (append common-paths macosx-paths)))
+;;;###autoload
+(defun my/env-setup ()
+  "Setup Emacs to utilize current environment."
+  (setenv "WORKON_HOME" (my/venv))
+  (let* ((common-paths (list (file-truename "~/bin")
+                             (file-name-concat (my/venv) "bin")))
+         (macosx-paths (if my/is-macosx
+                           (list "/opt/homebrew/sqlite/bin"
+                                 "/opt/homebrew/opt/grep/libexec/gnubin"
+                                 "/opt/homebrew/bin")
+                         '()))
+         ;; Collection of valid 'bin' paths
+         (bin-paths (seq-filter #'file-directory-p (append common-paths macosx-paths)))
        ;; Collection of parent paths from the `bin' paths (valid because the children are)
        (root-paths (mapcar #'file-name-parent-directory bin-paths))
        ;; Collection of valid `info' paths
@@ -82,17 +101,17 @@ control.")
   (setq Info-default-directory-list (append info-paths Info-default-directory-list))
   ;; (message "Info-default-directory-list: %s" Info-default-directory-list)
 
-  (my/add-trusted-content-directory (abbreviate-file-name my/configurations))
-  (push (abbreviate-file-name my/emacs.d) trusted-content)
-  (push (abbreviate-file-name (file-name-as-directory (file-name-concat my/configurations "shell/"))) trusted-content)
-  (push (abbreviate-file-name (file-name-as-directory (file-name-concat my/emacs.d "lisp/"))) trusted-content)
+  (my/add-trusted-content-directory (abbreviate-file-name (my/configurations)))
+  (push (abbreviate-file-name (my/emacs.d)) trusted-content)
+  (push (abbreviate-file-name (file-name-as-directory (file-name-concat (my/configurations) "shell/"))) trusted-content)
+  (push (abbreviate-file-name (file-name-as-directory (file-name-concat (my/emacs.d) "lisp/"))) trusted-content)
 
   ;; (unless (null Info-directory-list)
   ;;   (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))
   ;; Same for PATH environment variable
   (setenv "PATH" (concat (string-join bin-paths ":") ":" (getenv "PATH")))
   (setenv "INFOPATH" (concat (string-join info-paths ":") ":" (getenv "INFOPATH")))
-  (setenv "MANPATH" (concat (string-join man-paths ":") ":" (getenv "MANPATH"))))
+  (setenv "MANPATH" (concat (string-join man-paths ":") ":" (getenv "MANPATH")))))
 
 (provide 'my-env)
 

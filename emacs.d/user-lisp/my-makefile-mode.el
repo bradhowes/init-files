@@ -11,6 +11,7 @@
   (interactive)
   (my/insert-block-comment #'newline-and-indent "#" nil "#"))
 
+;;;###autoload
 (defun my/makefile-mode-hook ()
   "Custom Makefile mode."
   (my/fontify-braces)

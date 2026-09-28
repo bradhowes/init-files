@@ -10,6 +10,7 @@
 
 (require 's)
 
+;;;###autoload
 (defun my/find-known-bindings (key)
   "Find all key bindings for KEY.
 Reads in KEY if not provided. Format is what would be

@@ -59,7 +59,7 @@ the items to setup for autoloading from the given file."
   :ensure t
   :commands (diff-hl-show-hunk diff-hl-margin-mode)
   :hook (after-init . (lambda ()
-                        (when my/is-terminal
+                        (when (not (display-graphic-p))
                           (diff-hl-margin-mode t))
                         )))
 

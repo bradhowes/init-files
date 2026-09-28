@@ -4,8 +4,10 @@
 
 (require 'indent-bars)
 (require 'font-lock)
+(require 'json-ts-mode)
 (require 'my-fontify-braces)
 
+;;;###autoload
 (defun my/json-mode-hook ()
   "Custom JSON mode."
   (setq indent-bars-spacing-override 2

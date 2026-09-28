@@ -12,6 +12,7 @@
 (require 'my-fontify-braces)
 
 ;;local
+;;;###autoload
 (defun my/js2-mode-hook ()
   "Custom JS2 mode hook."
   (setq js2-basic-offset 2)

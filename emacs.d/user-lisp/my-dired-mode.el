@@ -19,6 +19,7 @@
 (defconst my/dired-hidden-font-lock (list " \\.[^.]+$" '(".+" (dired-move-to-filename) nil (0 'dired-ignored)))
   "Font-lock keyword specification to colorize hidden files in `dired' mode.")
 
+;;;###autoload
 (defun my/dired-mode-hook ()
   "Custom hook for `dired' mode."
 

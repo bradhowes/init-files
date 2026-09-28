@@ -4,12 +4,14 @@
 
 (require 'my-insert-block-comment)
 
+;;;###autoload
 (defun my/ksh-insert-block-comment ()
   "Insert three indented comment lines.
 Place cursor at end of middle line."
   (interactive)
   (my/insert-block-comment 'reindent-then-newline-and-indent "#" "" "#"))
 
+;;;###autoload
 (defun my/ksh-mode-hook ()
   "Custom KSH mode hook."
   (auto-fill-mode t)

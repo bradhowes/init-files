@@ -88,6 +88,7 @@ The comment is indented with PREFIX."
       (my/python-doxygen-insert-empty-comment))
     (doxygen-update-markers)))
 
+;;;###autoload
 (defun my/python-mode-hook ()
   "Custom hook for Python moode."
   (font-lock-mode t)
@@ -97,6 +98,7 @@ The comment is indented with PREFIX."
   (keymap-local-set "C-M-;" #'my/python-insert-block-comment)
   (keymap-local-set "C-c C-M-;" #'my/python-doxygen-insert-block-comment))
 
+;;;###autoload
 (defun my/inferior-python-mode-hook ()
   "Custom hook for `inferior-python-mode`."
   (keymap-local-set "C-c C-r" #'comint-kill-region))

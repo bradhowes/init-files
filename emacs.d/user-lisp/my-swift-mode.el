@@ -8,6 +8,7 @@
 (use-package swift-mode
   :ensure t)
 
+;;;###autoload
 (defun my/swift-mode-hook ()
   "Custom Swift mode."
   (setq swift-mode:basic-offset 2)

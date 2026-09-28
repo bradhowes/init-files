@@ -130,6 +130,7 @@ lines of a comment block whenever a new line is created."
       ;;
       (newline-and-indent))))
 
+;;;###autoload
 (defun my/cc-refill-block-comment ()
   "Routine to refill a C block comment.
 This leaves alone the '/*' and '*/'
@@ -231,6 +232,7 @@ comment delimiters if they exist on a line by themselves."
                   (fill-region rmin rmax nil t nil)
                   (setq fill-prefix oldp)))))))
 
+;;;###autoload
 (defun my/cc-do-auto-fill ()
   "Function that handles auto filling comment blocks."
   (let ((here (point))
@@ -346,6 +348,7 @@ Returns the argument names as a list."
 (make-variable-buffer-local 'my/cc-header-comment-fields)
 (make-variable-buffer-local 'my/cc-header-comment-field-index)
 
+;;;###autoload
 (defun my/cc-new-header-comment ()
   "Simple routine for inserting a new C function header comment.
 Inserts the function's name it precedes, and individual lines for
@@ -460,6 +463,7 @@ each argument it takes."
     (goto-char prev)
     ))
 
+;;;###autoload
 (defun my/cc-new-block-comment ()
   "Simple function for inserting a new C block comment.
 I originally had a macro, but that was sloooow."
@@ -486,6 +490,7 @@ I originally had a macro, but that was sloooow."
     (goto-char here)                    ; go back to place for comment text
     ))
 
+;;;###autoload
 (defun my/cc-block-comment-install ()
   "Set up current C/C++ mode to use block comment functions."
 

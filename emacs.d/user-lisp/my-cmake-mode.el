@@ -49,6 +49,7 @@
 
 (define-abbrev cmake-mode-abbrev-table "hh" "" 'my/cmake-header)
 
+;;;###autoload
 (defun my/cmake-mode-hook ()
   "CMake mode hook."
   (my/fontify-braces)

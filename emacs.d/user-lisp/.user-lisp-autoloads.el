@@ -9,7 +9,52 @@
 
 ;;; Generated autoloads from doxygen.el
 
-(register-definition-prefixes "doxygen" '("doxygen-" "my/split-string"))
+(autoload 'my/split-string "doxygen"
+"Split STRING at SEP.
+If OMIT then remove any empty strings.
+
+(fn STRING &optional SEP OMIT)")
+(autoload 'doxygen-toggle-insert-summary "doxygen"
+"Change the setting of the `doxygen-insert-summary' variable.
+If prefix ARG is 1, the value is toggled. If <= 0, then the value is nil.
+ Otherwise,
+the value is set to t.
+
+(fn ARG)" t)
+(autoload 'doxygen-insert-empty-comment "doxygen"
+"Insert an empty Doxygen comment block.
+The point is left at the end of the
+first line. The comment is indented with PREFIX.")
+(autoload 'doxygen-insert-block-comment "doxygen"
+"Insert a Doxygen C/C++ block comment for the next non-blank line." t)
+(autoload 'doxygen-insert-group "doxygen"
+"Insert Doxygen comments to define a Doxygen group.
+The group NAME is read
+from the minibuffer. The group will enclose the region FROM TO unless a prefix
+argument is present, in which case an empty group is inserted at the point.
+
+(fn NAME &optional FROM TO)" t)
+(autoload 'doxygen-first-marker-greater-than "doxygen"
+"Obtain first item in MARKERS greater than POINT.
+
+(fn POINT MARKERS)")
+(autoload 'doxygen-forward-marker "doxygen"
+"Jump to the next mark in `doxygen-markers'." t)
+(autoload 'doxygen-first-marker-lesser-than "doxygen"
+"Jump to the first marker in MARKERS before POINT.
+
+(fn POINT MARKERS)")
+(autoload 'doxygen-backward-marker "doxygen"
+"Jump to the previous mark in `doxygen-markers'." t)
+(autoload 'doxygen-insert-inline-comment "doxygen"
+"Insert an inline Doxygen comment.
+This probably only works for C/C++/ObjC
+comments. Maybe Java too." t)
+(autoload 'doxygen-comment-file "doxygen"
+"Look for all interesting objects in the current buffer.
+Insert a Doxygen comment block before each." t)
+(defvar doxygen-keymap nil)
+(register-definition-prefixes "doxygen" '("doxygen-"))
 
 
 ;;; Generated autoloads from eglot-signature-eldoc-talkative.el
@@ -19,6 +64,10 @@
 
 ;;; Generated autoloads from emacs-pager.el
 
+(defvar emacs-pager-max-line-coloring 2000
+"Maxiumum number of lines to ansi-color.
+If performance is bad when loading data, reduce this number.")
+(custom-autoload 'emacs-pager-max-line-coloring "emacs-pager" t)
 (autoload 'emacs-pager-mode "emacs-pager"
 "Mode for viewing data pagd by `emacs-pager`.
 
@@ -128,21 +177,43 @@ If COMMAND is nil, the key-chord is removed.
 
 ;;; Generated autoloads from my-c-mode.el
 
-(register-definition-prefixes "my-c-mode" '("my/c-"))
+(autoload 'my/c-insert-block-comment "my-c-mode"
+"Insert block comment." t)
+(autoload 'my/c-mode-hook "my-c-mode"
+"C mode hook.")
 
 
 ;;; Generated autoloads from my-c-mode-common.el
 
+(autoload 'my/c-mode-common "my-c-mode-common"
+"Common hook for C/C++ modes.")
 (register-definition-prefixes "my-c-mode-common" '("my/" "view-qt-doc"))
 
 
 ;;; Generated autoloads from my-cc-block-comment.el
 
+(autoload 'my/cc-refill-block-comment "my-cc-block-comment"
+"Routine to refill a C block comment.
+This leaves alone the '/*' and '*/'
+comment delimiters if they exist on a line by themselves." t)
+(autoload 'my/cc-do-auto-fill "my-cc-block-comment"
+"Function that handles auto filling comment blocks.")
+(autoload 'my/cc-new-header-comment "my-cc-block-comment"
+"Simple routine for inserting a new C function header comment.
+Inserts the function's name it precedes, and individual lines for
+each argument it takes." t)
+(autoload 'my/cc-new-block-comment "my-cc-block-comment"
+"Simple function for inserting a new C block comment.
+I originally had a macro, but that was sloooow." t)
+(autoload 'my/cc-block-comment-install "my-cc-block-comment"
+"Set up current C/C++ mode to use block comment functions.")
 (register-definition-prefixes "my-cc-block-comment" '("my/cc-"))
 
 
 ;;; Generated autoloads from my-cmake-mode.el
 
+(autoload 'my/cmake-mode-hook "my-cmake-mode"
+"CMake mode hook.")
 (register-definition-prefixes "my-cmake-mode" '("cmake-mode-abbrev-table" "my/cmake-"))
 
 
@@ -158,62 +229,395 @@ If COMMAND is nil, the key-chord is removed.
 
 ;;; Generated autoloads from my-dired-mode.el
 
+(autoload 'my/dired-mode-hook "my-dired-mode"
+"Custom hook for `dired' mode.")
 (register-definition-prefixes "my-dired-mode" '("my/"))
 
 
 ;;; Generated autoloads from my-env.el
 
-(register-definition-prefixes "my-env" '("my/"))
+(autoload 'my/is-terminal "my-env"
+"T if running in a terminal.
+NOTE: can return false positives if called too early in startup.")
+(autoload 'my/is-x-windows "my-env"
+"T if running in an X windows environment.
+NOTE: can return false positives if called too early in startup.")
+(defalias 'my/is-graphical #'display-graphic-p
+"T if running in a graphical display environment.
+NOTE: can return false positives if called too early in startup.")
+(autoload 'my/is-x-windows-on-win "my-env"
+"T if running in VcXsrv on Windows.
+Hacky but for now it works since we are always starting up an initial xterm.")
+(autoload 'my/add-trusted-content-directory "my-env"
+"Add PATH to `trusted-content'.
+NOTE: duplicated in early-init.el
+
+(fn PATH)")
+(autoload 'my/repos "my-env"
+"LOCATION of root of personal source git repositories.")
+(autoload 'my/configurations "my-env"
+"Location of configurations repo.")
+(autoload 'my/emacs.d "my-env"
+"Location of emacs.d directory in the configurations repo.
+Note that this is *not* the `user-emacs-directory', but rather the
+location in the git repo where personal files are kept under version
+control.")
+(autoload 'my/lisp "my-env"
+"Location of personal Emacs Lisp files.")
+(autoload 'my/venv "my-env"
+"The Python virtual environment to use for eglot.")
+(autoload 'my/venv-python "my-env"
+"The path to the Python executable to use for eglot.")
+(autoload 'my/env-setup "my-env"
+"Setup Emacs to utilize current environment.")
 
 
 ;;; Generated autoloads from my-find-known-bindings.el
 
-(register-definition-prefixes "my-find-known-bindings" '("my/find-known-bindings"))
+(autoload 'my/find-known-bindings "my-find-known-bindings"
+"Find all key bindings for KEY.
+Reads in KEY if not provided. Format is what would be
+seen in `describe-key' output (e.g. `C-c' or `C-M-S-u').
+
+(fn KEY)" t)
 
 
 ;;; Generated autoloads from my-fontify-braces.el
 
-(register-definition-prefixes "my-fontify-braces" '("my/fontify-braces"))
+(autoload 'my/fontify-braces "my-fontify-braces"
+"Add font-lock for braces ([] {} ()) to MODE.
+If MODE is nil then apply to the current mode.
+
+(fn &optional MODE)")
 
 
 ;;; Generated autoloads from my-functions.el
 
-(register-definition-prefixes "my-functions" '("my/" "tempo-template-my/org-emacs-lisp-source"))
+(autoload 'my/sort-lines-by-integer-key "my-functions"
+"Sort lines by an integer value that is found via PATTERN in a line.
+The sort is in increasing numerical order if DIRECTION is nil; otherwise
+it is in descending order.
+
+(fn PATTERN &optional DIRECTION)")
+(autoload 'my/trusted-content-p "my-functions"
+"Advice for `trusted-content-p' to trust the `*scratch*' buffer.
+Honors ORIGINAL-RESPONSE when not nil and then checks the buffer's name
+if it is `*scratch*'. This is a loosening of security but the risk is
+very small for me, and it remove the obnoxious message at startup about
+the buffer having untrusted content.
+
+(fn ORIGINAL-RESPONSE)")
+(autoload 'my/ace-window-always-dispatch "my-functions"
+"Invoke `ace-window' after setting `aw-dispatch-always' to T.
+When `aw-dispatch-always' is nil, `ace-window' does not invoke
+its dispatching mechanism if there are 2 or fewer windows. This
+command guarantees that dispatching will always happen." t)
+(autoload 'my/do-next-window "my-functions"
+"Jump to next window in WINS after the current one.
+
+(fn WINS)")
+(autoload 'my/ace-window-next "my-functions"
+"Jump to next window according to `ace-window'." t)
+(autoload 'my/ace-window-previous "my-functions"
+"Jump to previous window according to `ace-window'." t)
+(autoload 'my/next-buffer-skip-filter "my-functions"
+"Return t if BUFFER should be skipped in WINDOW.
+This is used by `my/prev-buffer-current-window' and
+`my/next-buffer-current-window' methods so that only desired
+buffers will be available for changing to in the current
+window. If BURY-OR-KILL is not nil then the operation will result
+in the buffer being buried or killed, and in this case buffers
+are never filtered out. Otherwise, skip buffers that start with
+'*' in their name, `dired' buffers, `help' buffers, and buffers
+that are already visible somewhere.
+
+(fn _ BUFFER BURY-OR-KILL)")
+(autoload 'my/next-buffer-current-window "my-functions"
+"Switch to `next' buffer in current window with filtering.
+Only switch to a buffer that passes the filter defined in
+`my/next-buffer-skip-filter'." t)
+(autoload 'my/prev-buffer-current-window "my-functions"
+"Switch to `previous' buffer in current window with filtering.
+Only switch to a buffer that passes the filter defined in
+`my/next-buffer-skip-filter'." t)
+(autoload 'my/ace-window-one-command "my-functions"
+"Run an action in a chosen window.
+Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch." t)
+(autoload 'my/display-buffer-pre-func "my-functions"
+"Method to use for `display-buffer-overriding-action'.
+The BUFFER and ALIST are ignored.
+
+(fn BUFFER ALIST)")
+(autoload 'my/ace-window-prefix "my-functions"
+"Use `ace-window' to display the buffer of the next command.
+The next buffer is the buffer displayed by the next command invoked
+immediately after this command (ignoring reading from the minibuffer).
+Creates a new window before displaying the buffer.
+When `switch-to-buffer-obey-display-actions' is non-nil,
+`switch-to-buffer' commands are also supported." t)
+(autoload 'my/show-project-menu "my-functions"
+"Show the menu that is shown when switching to a new project." t)
+(autoload 'my/find-user-init-file "my-functions"
+"Edit the `user-init-file` when ARG is nil.
+Otherwise, edit the `early-init.el' file instead, creating it if
+necessary.
+
+(fn ARG)" t)
+(autoload 'my/find-user-custom-file "my-functions"
+"Edit the `custom-file` if it exists." t)
+(autoload 'my/find-shell-init-file "my-functions"
+"Edit a shell init file." t)
+(autoload 'my/dump-hashtable "my-functions"
+"Show the contents of HASHTABLE.
+
+(fn HASHTABLE)" t)
+(autoload 'my/reload-buffer "my-functions"
+"Reload the current buffer from disk.
+Checks to see if buffer needs saving, aborting the reload if changes not saved." t)
+(autoload 'my/run-something-in-buffer "my-functions"
+"Run RUN-PROC after running BUFFER-SETUP-PROC in NAME buffer.
+This function receives the buffer to use for the shell. The expectation
+is that the function will setup the display environment to host the
+buffer.
+
+(fn NAME BUFFER-SETUP-PROC RUN-PROC)")
+(autoload 'my/in-current-window "my-functions"
+"Switch to buffer BUF in current window.
+
+(fn BUF)")
+(autoload 'my/in-other-window "my-functions"
+"Switch to buffer BUF in other window.
+
+(fn BUF)")
+(autoload 'my/in-other-frame "my-functions"
+"Switch to buffer BUF in new frame.
+
+(fn BUF)")
+(autoload 'my/run-shell "my-functions"
+"Run a new `shell' after running BUFFER-SETUP-PROC.
+This function receives the buffer to use for the shell. The expectation
+is that the function will setup the display environment to host the
+buffer.
+
+(fn BUFFER-SETUP-PROC)")
+(autoload 'my/shell "my-functions"
+"Start a new shell." t)
+(autoload 'my/shell-other-window "my-functions"
+"Start a new shell in another window." t)
+(autoload 'my/shell-other-frame "my-functions"
+"Start a new shell in another frame." t)
+(autoload 'my/bury-or-kill-current-buffer "my-functions"
+"Bury or kill the current buffer without asking. (WIP)
+Kill buffers that match the pattern '*...*'.
+Otherwise just bury them." t)
+(autoload 'my/bury-current-buffer "my-functions"
+"Bury the current buffer without asking." t)
+(autoload 'my/kill-current-buffer "my-functions"
+"Kill the current buffer without asking." t)
+(autoload 'my/info-other-frame "my-functions"
+"Show Info in a new frame." t)
+(autoload 'my/customize-other-window "my-functions"
+"Show Customize in a new window." t)
+(autoload 'my/consult-notes-other-frame "my-functions"
+"Find note to show in a new frame." t)
+(autoload 'my/remove-all-text-properties "my-functions"
+"Remove all text properties from the current buffer." t)
+(autoload 'my/matching-paren "my-functions"
+"When point is on a paren-type character, jump to its twin." t)
+(autoload 'my/indent-buffer "my-functions"
+"Reindent the whole buffer." t)
+(autoload 'my/copy-file-name-to-clipboard "my-functions"
+"Copy the current buffer file name to the clipboard." t)
+(autoload 'my/repl "my-functions"
+"Simple alias to start ielm." t)
+(autoload 'my/repl-other-window "my-functions"
+"Start a new repl in another window." t)
+(autoload 'my/describe-symbol-at-point "my-functions"
+"Immediately show help for symbol at point if it exists.
+If help buffer is visible and it is showing help for the
+symbol, then hide it." t)
+(autoload 'my/htop "my-functions"
+"Run htop in a term buffer." t)
+(autoload 'my/top "my-functions"
+"Run top in a term buffer." t)
+(autoload 'my/git-sync "my-functions"
+"Execute a git pull on HOST in PATH.
+
+(fn HOST PATH)" t)
+(autoload 'my/all-git-sync "my-functions"
+"Sync the configurations repo found in various locations at work." t)
+(autoload 'my/sort-lines-by-leading-integer "my-functions"
+"Sort lines in current region by extracting integer values from start of line.
+If ARG is not nil, sort in descending order.
+Nothing fancy about parsing, it just matches any number at the beginning of
+the line, ignoring any whitespace characters. If that fails, then the sort
+will treat the whole line as a value to compare against.
+
+(fn ARG)" t)
+(autoload 'my/set-mark-deactivate "my-functions"
+"Set mark without activating it.
+This is just a shortcut for \\[universal-argument] \\[set-mark-command]." t)
+(autoload 'my/goto-mark "my-functions"
+"Move back to mark without enabling transient mode.
+This is just a shortcut for \\[universal-argument] \\[set-mark-command]." t)
+(autoload 'my/display-prefix "my-functions"
+"Display the value of the raw prefix ARG.
+
+(fn ARG)" t)
+(autoload 'my/mark-line "my-functions"
+"Blah blah ARG blah.
+
+(fn &optional ARG)" t)
+(autoload 'my/customize-search "my-functions"
+"Show the top-level customize screen and move to the search field." t)
+(autoload 'my/start-emacs-server "my-functions"
+"Start up an Emacs server to support `emacsclient' connections.
+Customize `server-name' so that each Emacs
+process has its own server connection." t)
+(autoload 'my/emacs-make-key-bind "my-functions"
+"Apply key binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence,
+where the first element of the pair is a key sequence and the second is the
+function or keymap to bind with. The key sequence is passed to MAKE-KEY and
+the result of the call is used in the key binding.
+
+There is now `bind-keys' method from `use-package' but my version requires
+less typing.
+
+(fn KEYMAP MAKE-KEY &rest DEFINITIONS)")
+(autoload 'my/emacs-key-bind "my-functions"
+"Apply key binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence.
+
+(fn KEYMAP &rest DEFINITIONS)")
+(autoload 'my/emacs-chord-bind "my-functions"
+"Apply chord binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence.
+
+(fn KEYMAP &rest DEFINITIONS)")
+(autoload 'tempo-template-my/org-emacs-lisp-source "my-functions"
+"Define empty function to satisfy flymake/byte-compile (ARG is ignored).
+
+(fn &optional _)")
+(autoload 'my/org-emacs-lisp-source-with-indent "my-functions"
+"Execute `my/org-emacs-lisp-source' and then indent block." t)
+(autoload 'my/org-filter-buffer-substring "my-functions"
+"Custom filter on buffer text from START to END.
+When DELETE is t, delete the contents from the range.
+Otherwise, removes all properties from a span in a buffer.
+Useful when copying code into Org blocks so that the copy does not contain any
+artifacts such as indentation bars.
+
+(fn START END DELETE)")
+(autoload 'my/is-valid-directory "my-functions"
+"Check if DIR is valid, returning it if so or nil if not.
+Note that `file-directory-p' returns t if the (string) length of DIR is
+zero (0), so we detect that and report that as false.
+
+(fn DIR)")
+(autoload 'my/tmp-dir "my-functions"
+"The directory to use for temporary purposes - usually $HOME/tmp.
+Creates the directory if it does not exist.")
 
 
 ;;; Generated autoloads from my-insert-block-comment.el
 
-(register-definition-prefixes "my-insert-block-comment" '("my/insert-block-comment"))
+(autoload 'my/insert-block-comment "my-insert-block-comment"
+"Insert comment block in code.
+NEWLINEANDINDENT -- method to call to create a newline and indent it
+COMMENTBEGIN -- the string to insert to start the comment
+COMMENTMIDDLE -- the string to insert for each line insdie the comment
+COMMENTEND -- the string to insert to close the comment block
+
+(fn NEWLINEANDINDENT COMMENTBEGIN COMMENTMIDDLE COMMENTEND)" t)
 
 
 ;;; Generated autoloads from my-js2-mode.el
 
-(register-definition-prefixes "my-js2-mode" '("my/js2-mode-hook"))
+(autoload 'my/js2-mode-hook "my-js2-mode"
+"Custom JS2 mode hook.")
 
 
 ;;; Generated autoloads from my-json-mode.el
 
-(register-definition-prefixes "my-json-mode" '("my/json-mode-hook"))
+(autoload 'my/json-mode-hook "my-json-mode"
+"Custom JSON mode.")
 
 
 ;;; Generated autoloads from my-ksh-mode.el
 
-(register-definition-prefixes "my-ksh-mode" '("my/ksh-"))
+(autoload 'my/ksh-insert-block-comment "my-ksh-mode"
+"Insert three indented comment lines.
+Place cursor at end of middle line." t)
+(autoload 'my/ksh-mode-hook "my-ksh-mode"
+"Custom KSH mode hook.")
 
 
 ;;; Generated autoloads from my-layout.el
 
-(register-definition-prefixes "my-layout" '("my/layout-"))
+(autoload 'my/layout-screen-layout-changed "my-layout"
+"Recalculate values based on screen layout." t)
+(autoload 'my/layout-pick-default-display-4k "my-layout"
+"Set the 4K SCREEN to use to host future Emacs frames.
+It does not affect existing frames.
+
+(fn SCREEN)" t)
+(autoload 'my/layout-share-screen-font-size "my-layout"
+"Set font scaling to ARG when sharing screen.
+ARG is an optional integer which defaults to 2.
+
+(fn &optional ARG)" t)
+(autoload 'my/layout-normal-screen-font-size "my-layout"
+"Remove any font scaling." t)
+(autoload 'my/layout-frame-pos-left "my-layout"
+"Reset frame size and position for left frame on DISPLAY.
+If there are multiple 4K displays, by default the display to use for the new
+frame will be that found in `my/layout-default-display-4k'. A specific screen
+can be chosen by providing a prefix value where 0 is the first display, and 1
+is the second, etc.
+
+(fn &optional DISPLAY)" t)
+(autoload 'my/layout-frame-pos-center "my-layout"
+"Reset frame size and position for center frame on DISPLAY.
+If there are multiple 4K displays, by default the display to use for the new
+frame will be that found in `my/layout-default-display-4k'. A specific screen
+can be chosen by providing a prefix value where 0 is the first display, and 1
+is the second, etc.
+
+(fn &optional DISPLAY)" t)
+(autoload 'my/layout-frame-pos-right "my-layout"
+"Reset frame size and position for right frame on DISPLAY.
+If there are multiple 4K displays, by default the display to use for the new
+frame will be that found in `my/layout-default-display-4k'. A specific screen
+can be chosen by providing a prefix value where 0 is the first display, and 1
+is the second, etc.
+
+(fn &optional DISPLAY)" t)
+(autoload 'my/layout-reset-frame-width "my-layout"
+"Reset the current frame width to function `my/cols'." t)
+(autoload 'my/layout-make-frame "my-layout"
+"Make a new frame using layout settings for the current display.
+The first frame always takes on `initial-frame-alist', and subsequent frames
+use `default-frame-alist' by default. If there are already two frames active
+then subsequent ones will be at `my/align-right-frame-alist' which aligns with
+the right-edge of the screen, but may overlap with the middle frame.")
+(register-definition-prefixes "my-layout" '("my/layout--"))
 
 
 ;;; Generated autoloads from my-lisp-mode.el
 
+(autoload 'my/lisp-data-mode-hook "my-lisp-mode"
+"Custom Lisp-Data mode.")
+(autoload 'my/lisp-mode-hook "my-lisp-mode"
+"Customize Lisp mode.")
 (register-definition-prefixes "my-lisp-mode" '("my/"))
 
 
 ;;; Generated autoloads from my-makefile-mode.el
 
-(register-definition-prefixes "my-makefile-mode" '("my/makefile-"))
+(autoload 'my/makefile-mode-hook "my-makefile-mode"
+"Custom Makefile mode.")
+(register-definition-prefixes "my-makefile-mode" '("my/makefile-insert-block-comment"))
 
 
 ;;; Generated autoloads from my-markdown-mode.el
@@ -228,22 +632,31 @@ If COMMAND is nil, the key-chord is removed.
 
 ;;; Generated autoloads from my-python-mode.el
 
+(autoload 'my/python-mode-hook "my-python-mode"
+"Custom hook for Python moode.")
+(autoload 'my/inferior-python-mode-hook "my-python-mode"
+"Custom hook for `inferior-python-mode`.")
 (register-definition-prefixes "my-python-mode" '("my/"))
 
 
 ;;; Generated autoloads from my-sh-mode.el
 
-(register-definition-prefixes "my-sh-mode" '("my/sh-"))
+(autoload 'my/sh-mode-hook "my-sh-mode"
+"Custom SH mode.")
+(register-definition-prefixes "my-sh-mode" '("my/sh-insert-block-comment"))
 
 
 ;;; Generated autoloads from my-shell-mode.el
 
+(autoload 'my/shell-mode-hook "my-shell-mode"
+"Customize `shell-mode'.")
 (register-definition-prefixes "my-shell-mode" '("my/"))
 
 
 ;;; Generated autoloads from my-swift-mode.el
 
-(register-definition-prefixes "my-swift-mode" '("my/swift-mode-hook"))
+(autoload 'my/swift-mode-hook "my-swift-mode"
+"Custom Swift mode.")
 
 
 ;;; Generated autoloads from native-complete.el

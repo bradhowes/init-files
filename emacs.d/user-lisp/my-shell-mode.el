@@ -71,6 +71,7 @@ located."
           (put-text-property pos0 end 'invisible t)
           (setq ansi-osc--marker (copy-marker pos0)))))))
 
+;;;###autoload
 (defun my/shell-mode-hook ()
   "Customize `shell-mode'."
 

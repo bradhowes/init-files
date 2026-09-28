@@ -19,6 +19,19 @@
                    #'prefer-coding-system))
     (funcall p coding-system)))
 
+(autoload 'my/is-terminal "my-env")
+(autoload 'my/is-x-windows "my-env")
+(autoload 'my/is-graphical "my-env")
+(autoload 'my/is-x-windows-on-win "my-env")
+(autoload 'my/add-trusted-content-directory "my-env")
+(autoload 'my/repos "my-env")
+(autoload 'my/configurations "my-env")
+(autoload 'my/emacs.d "my-env")
+(autoload 'my/lisp "my-env")
+(autoload 'my/venv "my-env")
+(autoload 'my/venv-python "my-env")
+(autoload 'my/env-setup "my-env")
+
 (autoload 'my/ace-window-always-dispatch "my-functions")
 (autoload 'my/ace-window-next "my-functions")
 (autoload 'my/ace-window-one-command "my-functions")
@@ -31,6 +44,7 @@
 (autoload 'my/customize-other-window "my-functions")
 (autoload 'my/customize-search "my-functions")
 (autoload 'my/describe-symbol-at-point "my-functions")
+(autoload 'my/env-setup "my-env")
 (autoload 'my/emacs-chord-bind "my-functions")
 (autoload 'my/emacs-key-bind "my-functions")
 (autoload 'my/emacs-make-key-bind "my-functions")
@@ -42,6 +56,7 @@
 (autoload 'my/htop "my-functions")
 (autoload 'my/indent-buffer "my-functions")
 (autoload 'my/info-other-frame "my-functions")
+(autoload 'my/is-valid-directory "my-functions")
 (autoload 'my/matching-paren "my-functions")
 (autoload 'my/next-buffer-current-window "my-functions")
 (autoload 'my/org-emacs-lisp-source-with-indent "my-functions")
@@ -51,6 +66,7 @@
 (autoload 'my/remove-all-text-properties "my-functions")
 (autoload 'my/repl "my-functions")
 (autoload 'my/repl-other-window "my-functions")
+(autoload 'my/repos "my-functions")
 (autoload 'my/run-shell "my-functions")
 (autoload 'my/run-something-in-buffer "my-functions")
 (autoload 'my/set-mark-deactivate "my-functions")
@@ -59,6 +75,7 @@
 (autoload 'my/shell-other-frame "my-functions")
 (autoload 'my/show-project-menu "my-functions")
 (autoload 'my/start-emacs-server "my-functions")
+(autoload 'my/tmp-dir "my-functions")
 (autoload 'my/top "my-functions")
 (autoload 'my/trusted-content-p "my-functions")
 
@@ -69,6 +86,10 @@
 (autoload 'my/layout-normal-screen-font-size "my-layout")
 (autoload 'my/layout-screen-layout-changed "my-layout")
 (autoload 'my/layout-share-screen-font-size "my-layout")
+
+(my/env-setup)
+(add-hook 'after-init-hook #'my/layout-screen-layout-changed 98)
+(add-hook 'after-init-hook #'my/start-emacs-server 99)
 
 (require 'generator)
 (require 'seq)
@@ -613,7 +634,8 @@ Bound to \\`C-x p s'.")
         ;; debug-on-error t
 	custom-file (file-truename (locate-user-emacs-file "custom.el"))
 	frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
-                             (if my/is-terminal (list (concat (system-name) " ") buffer-directory)
+                             (if (not (display-graphic-p))
+                                 (list (concat (system-name) " ") buffer-directory)
                                buffer-directory)))
   (ffap-bindings)
   (put 'narrow-to-region 'disabled nil)
@@ -656,7 +678,7 @@ Bound to \\`C-x p s'.")
                            (interactive)
                            (dired (if (string= "/" (substring path 0 1))
                                       (file-truename path)
-                                    (files--splice-dirname-file my/repos path)))))
+                                    (files--splice-dirname-file (my/repos) path)))))
               (keymap-set map key name)))
           ;; Collection of 3-tuples that define a directory to jump to:
           ;; 1 - key to use
@@ -787,7 +809,7 @@ The map is made up of tiny functions that invoke `dired' on a path.")
                    "C-M-<wheel-up>" #'ignore
                    "C-M-<wheel-down>" #'ignore)
 
-(when my/is-graphical
+(when (my/is-graphical)
   (my/emacs-key-bind global-map
                      ;; NOTE: these conflict with terminal escape sequences so only use on graphical displays
                      "M-O" #'my/ace-window-always-dispatch
@@ -865,7 +887,7 @@ The map is made up of tiny functions that invoke `dired' on a path.")
 
 (keymap-set help-map "i" my/info-keys-map)
 
-(if my/is-terminal
+(if (my/is-terminal)
     (when my/is-linux
       (set-face-background 'default "undefined"))
   (when my/is-macosx
@@ -901,8 +923,8 @@ The map is made up of tiny functions that invoke `dired' on a path.")
 
 ;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097
 ;;
-(let ((backup-dir (file-name-concat my/tmp-dir "emacs_backups"))
-      (auto-saves-dir (file-name-concat my/tmp-dir "emacs_autosaves")))
+(let ((backup-dir (file-name-concat (my/tmp-dir) "emacs_backups"))
+      (auto-saves-dir (file-name-concat (my/tmp-dir) "emacs_autosaves")))
   (dolist (dir (list backup-dir auto-saves-dir))
     (unless (file-directory-p dir)
       (make-directory dir t)))
@@ -922,9 +944,6 @@ The map is made up of tiny functions that invoke `dired' on a path.")
   "Blah."
   "Field name: "
   > str " = \"" _ "\"\n")
-
-(add-hook 'after-init-hook #'my/layout-screen-layout-changed 98)
-(add-hook 'after-init-hook #'my/start-emacs-server 99)
 
 (provide 'init)
 
