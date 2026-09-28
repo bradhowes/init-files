@@ -7,98 +7,14 @@
 
 
 
-;;; Generated autoloads from old/cmake-mode.el
-
-(autoload 'cmake-mode "old/cmake-mode"
-"Major mode for editing CMake source files.
-
-In addition to any hooks its parent mode `cmake--parent-mode' might
-have run, this mode runs the hook `cmake-mode-hook', as the final or
-penultimate step during initialization.
-
-\\{cmake-mode-map}" t)
-(autoload 'cmake-command-run "old/cmake-mode"
-"Runs the command cmake with the arguments specified.  The
-optional argument topic will be appended to the argument list.
-
-(fn TYPE &optional TOPIC BUFFER)" t)
-(autoload 'cmake-help-list-commands "old/cmake-mode"
-"Prints out a list of the cmake commands." t)
-(autoload 'cmake-help-command "old/cmake-mode"
-"Prints out the help message for the command the cursor is on." t)
-(autoload 'cmake-help-module "old/cmake-mode"
-"Prints out the help message for the module the cursor is on." t)
-(autoload 'cmake-help-variable "old/cmake-mode"
-"Prints out the help message for the variable the cursor is on." t)
-(autoload 'cmake-help-property "old/cmake-mode"
-"Prints out the help message for the property the cursor is on." t)
-(autoload 'cmake-help "old/cmake-mode"
-"Queries for any of the four available help topics and prints out the approriate page." t)
-(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
-(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
-(register-definition-prefixes "old/cmake-mode" '("cmake-"))
-
-
-;;; Generated autoloads from old/cmake-project.el
-
-(autoload 'cmake-project-configure-project "old/cmake-project"
-"Configure or reconfigure a CMake build tree.
-BUILD-DIRECTORY is the path to the build-tree directory.  If the
-directory does not already exist, it will be created. The source
-directory is found automatically based on the current
-buffer. With a prefix argument additional CMake flags can be
-specified interactively. GENERATOR FLAGS.
-
-(fn BUILD-DIRECTORY GENERATOR &optional FLAGS)" t)
-(autoload 'cmake-project-mode "old/cmake-project"
-"Minor mode that integrates a CMake-based project with Emacs.
-
-This is a minor mode.  If called interactively, toggle the
-`CMake-Project mode' mode.  If the prefix argument is positive, enable
-the mode, and if it is zero or negative, disable the mode.
-
-If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
-mode if ARG is nil, omitted, or is a positive number.  Disable the mode
-if ARG is a negative number.
-
-To check whether the minor mode is enabled in the current buffer,
-evaluate the variable `cmake-project-mode'.
-
-The mode's hook is called both when the mode is enabled and when it is
-disabled.
-
-(fn &optional ARG)" t)
-(register-definition-prefixes "old/cmake-project" '("cmake-project-"))
-
-
-;;; Generated autoloads from old/company-native-complete.el
-
-(autoload 'company-native-complete "old/company-native-complete"
-"Completion for native shell complete functionality.
-Dispatch based on COMMAND.
-
-(fn COMMAND &rest IGNORED)" t)
-(register-definition-prefixes "old/company-native-complete" '("company-native-complete--"))
-
-
 ;;; Generated autoloads from doxygen.el
 
 (register-definition-prefixes "doxygen" '("doxygen-" "my/split-string"))
 
 
-;;; Generated autoloads from old/doxygen.el
-
-(register-definition-prefixes "old/doxygen" '("doxygen-" "my-split-string"))
-
-
 ;;; Generated autoloads from eglot-signature-eldoc-talkative.el
 
 (register-definition-prefixes "eglot-signature-eldoc-talkative" '("eglot-signature-eldoc-talkative"))
-
-
-;;; Generated autoloads from old/emacs-format-file.el
-
-(register-definition-prefixes "old/emacs-format-file" '("emacs-format-function"))
 
 
 ;;; Generated autoloads from emacs-pager.el
@@ -210,19 +126,9 @@ If COMMAND is nil, the key-chord is removed.
 (register-definition-prefixes "my-c++-mode" '("c++-mode-abbrev-table" "my/"))
 
 
-;;; Generated autoloads from old/my-c++-mode.el
-
-(register-definition-prefixes "old/my-c++-mode" '("c++-mode-abbrev-table" "my-c++-"))
-
-
 ;;; Generated autoloads from my-c-mode.el
 
 (register-definition-prefixes "my-c-mode" '("my/c-"))
-
-
-;;; Generated autoloads from old/my-c-mode.el
-
-(register-definition-prefixes "old/my-c-mode" '("my-c-"))
 
 
 ;;; Generated autoloads from my-c-mode-common.el
@@ -230,29 +136,14 @@ If COMMAND is nil, the key-chord is removed.
 (register-definition-prefixes "my-c-mode-common" '("my/" "view-qt-doc"))
 
 
-;;; Generated autoloads from old/my-c-mode-common.el
-
-(register-definition-prefixes "old/my-c-mode-common" '("my-" "view-qt-doc"))
-
-
 ;;; Generated autoloads from my-cc-block-comment.el
 
 (register-definition-prefixes "my-cc-block-comment" '("my/cc-"))
 
 
-;;; Generated autoloads from old/my-cc-block-comment.el
-
-(register-definition-prefixes "old/my-cc-block-comment" '("my-cc-"))
-
-
 ;;; Generated autoloads from my-cmake-mode.el
 
 (register-definition-prefixes "my-cmake-mode" '("cmake-mode-abbrev-table" "my/cmake-"))
-
-
-;;; Generated autoloads from old/my-cmake-mode.el
-
-(register-definition-prefixes "old/my-cmake-mode" '("cmake-mode-abbrev-table" "my-cmake-"))
 
 
 ;;; Generated autoloads from my-constants.el
@@ -268,11 +159,6 @@ If COMMAND is nil, the key-chord is removed.
 ;;; Generated autoloads from my-dired-mode.el
 
 (register-definition-prefixes "my-dired-mode" '("my/"))
-
-
-;;; Generated autoloads from old/my-dired-mode.el
-
-(register-definition-prefixes "old/my-dired-mode" '("my-"))
 
 
 ;;; Generated autoloads from my-env.el
@@ -292,7 +178,7 @@ If COMMAND is nil, the key-chord is removed.
 
 ;;; Generated autoloads from my-functions.el
 
-(register-definition-prefixes "my-functions" '("my/"))
+(register-definition-prefixes "my-functions" '("my/" "tempo-template-my/org-emacs-lisp-source"))
 
 
 ;;; Generated autoloads from my-insert-block-comment.el
@@ -300,24 +186,9 @@ If COMMAND is nil, the key-chord is removed.
 (register-definition-prefixes "my-insert-block-comment" '("my/insert-block-comment"))
 
 
-;;; Generated autoloads from old/my-insert-block-comment.el
-
-(register-definition-prefixes "old/my-insert-block-comment" '("my-insert-block-comment"))
-
-
-;;; Generated autoloads from old/my-java-mode.el
-
-(register-definition-prefixes "old/my-java-mode" '("my-java-mode-hook"))
-
-
 ;;; Generated autoloads from my-js2-mode.el
 
 (register-definition-prefixes "my-js2-mode" '("my/js2-mode-hook"))
-
-
-;;; Generated autoloads from old/my-js2-mode.el
-
-(register-definition-prefixes "old/my-js2-mode" '("my-js2-mode-hook"))
 
 
 ;;; Generated autoloads from my-json-mode.el
@@ -330,11 +201,6 @@ If COMMAND is nil, the key-chord is removed.
 (register-definition-prefixes "my-ksh-mode" '("my/ksh-"))
 
 
-;;; Generated autoloads from old/my-ksh-mode.el
-
-(register-definition-prefixes "old/my-ksh-mode" '("my-ksh-"))
-
-
 ;;; Generated autoloads from my-layout.el
 
 (register-definition-prefixes "my-layout" '("my/layout-"))
@@ -345,24 +211,9 @@ If COMMAND is nil, the key-chord is removed.
 (register-definition-prefixes "my-lisp-mode" '("my/"))
 
 
-;;; Generated autoloads from old/my-lisp-mode.el
-
-(register-definition-prefixes "old/my-lisp-mode" '("my-"))
-
-
 ;;; Generated autoloads from my-makefile-mode.el
 
 (register-definition-prefixes "my-makefile-mode" '("my/makefile-"))
-
-
-;;; Generated autoloads from old/my-makefile-mode.el
-
-(register-definition-prefixes "old/my-makefile-mode" '("my-makefile-"))
-
-
-;;; Generated autoloads from old/my-markdown.el
-
-(register-definition-prefixes "old/my-markdown" '("brh-make-link" "my-markdown-"))
 
 
 ;;; Generated autoloads from my-markdown-mode.el
@@ -375,29 +226,9 @@ If COMMAND is nil, the key-chord is removed.
 (register-definition-prefixes "my-modes" '("my/"))
 
 
-;;; Generated autoloads from old/my-nxml-mode.el
-
-(register-definition-prefixes "old/my-nxml-mode" '("my-nxml-mode-hook"))
-
-
-;;; Generated autoloads from old/my-objc-mode.el
-
-(register-definition-prefixes "old/my-objc-mode" '("my-objc-"))
-
-
 ;;; Generated autoloads from my-python-mode.el
 
 (register-definition-prefixes "my-python-mode" '("my/"))
-
-
-;;; Generated autoloads from old/my-python-mode.el
-
-(register-definition-prefixes "old/my-python-mode" '("my-"))
-
-
-;;; Generated autoloads from old/my-ruby-mode.el
-
-(register-definition-prefixes "old/my-ruby-mode" '("my-ruby-"))
 
 
 ;;; Generated autoloads from my-sh-mode.el
@@ -405,29 +236,14 @@ If COMMAND is nil, the key-chord is removed.
 (register-definition-prefixes "my-sh-mode" '("my/sh-"))
 
 
-;;; Generated autoloads from old/my-sh-mode.el
-
-(register-definition-prefixes "old/my-sh-mode" '("my-sh-"))
-
-
 ;;; Generated autoloads from my-shell-mode.el
 
 (register-definition-prefixes "my-shell-mode" '("my/"))
 
 
-;;; Generated autoloads from old/my-shell-mode.el
-
-(register-definition-prefixes "old/my-shell-mode" '("my-"))
-
-
 ;;; Generated autoloads from my-swift-mode.el
 
 (register-definition-prefixes "my-swift-mode" '("my/swift-mode-hook"))
-
-
-;;; Generated autoloads from old/my-swift-mode.el
-
-(register-definition-prefixes "old/my-swift-mode" '("my-swift-mode-hook"))
 
 
 ;;; Generated autoloads from native-complete.el
@@ -444,112 +260,6 @@ emulator.")
 "Check the setup of native complete and look for common problems." t)
 (register-definition-prefixes "native-complete" '("native-complete-"))
 
-
-;;; Generated autoloads from old/native-complete.el
-
-(autoload 'native-complete-setup-bash "old/native-complete"
-"Setup support for native-complete enabled bash shells.
-This involves not sending the `--noediting' argument as well as
-setting `TERM' to a value other then dumb." t)
-(autoload 'native-complete-at-point "old/native-complete"
-"Get the candidates from the underlying shell.
-This should behave the same as sending TAB in an terminal
-emulator.")
-(autoload 'native-complete-check-config "old/native-complete"
-"Check the configuration." t)
-(register-definition-prefixes "old/native-complete" '("native-complete-"))
-
-
-;;; Generated autoloads from old/startup.el
-
-(register-definition-prefixes "old/startup" '("bcf" "font-lock-brace-face" "is-" "ksh" "my-" "toggle-transparency"))
-
-
-;;; Generated autoloads from old/xterm-frobs.el
-
-(autoload 'xterm-iconify "old/xterm-frobs"
-"Minimize (iconify) xterm window." t)
-(autoload 'xterm-deiconify "old/xterm-frobs"
-"Restore (deiconify) xterm window." t)
-(autoload 'xterm-set-font "old/xterm-frobs"
-"Set the font of the xterm window to FONT.
-When called interactively, prompt for the name of the font to use.
-
-This function is used to change the font of the xterm window in which a
-tty-mode emacs is running.  It should also work if emacs is running under
-`screen' in an xterm window.
-
-Use \\[set-default-font] if this emacs is using the window system directly.
-
-(fn FONT-NAME)" t)
-(autoload 'xterm-set-icon-title "old/xterm-frobs"
-"Set the title in the icon for this xterm window to TITLE.
-This does not change the title of the corresponding window.
-
-(fn TITLE)" t)
-(autoload 'xterm-set-window-title "old/xterm-frobs"
-"Set the title for xterm window to TITLE.
-This does not change the title in the corresponding icon.
-
-(fn TITLE)" t)
-(autoload 'xterm-set-all-titles "old/xterm-frobs"
-"Set the title for xterm window and corresponding icon to TITLE.
-
-(fn TITLE)" t)
-(autoload 'xterm-set-background-color "old/xterm-frobs"
-"
-
-(fn COLOR)" t)
-(autoload 'xterm-set-foreground-color "old/xterm-frobs"
-"
-
-(fn COLOR)" t)
-(autoload 'xterm-set-cursor-color "old/xterm-frobs"
-"
-
-(fn COLOR)" t)
-(autoload 'xterm-set-mouse-foreground-color "old/xterm-frobs"
-"
-
-(fn COLOR)" t)
-(autoload 'xterm-set-mouse-background-color "old/xterm-frobs"
-"
-
-(fn COLOR)" t)
-(autoload 'xterm-set-highlight-color "old/xterm-frobs"
-"
-
-(fn COLOR)" t)
-(autoload 'xterm-reverse-video "old/xterm-frobs"
-"Set xterm to reverse video mode.
-For monochrome xterms, this is white foreground on black background.
-For xterms which support color, this has the effect of swapping the
-foreground and background colors, whatever they may be.
-
-The effect of this command and \\[xterm-normal-video] may be exchanged
-if the XTerm*reverseVideo resource property is set to True." t)
-(autoload 'xterm-normal-video "old/xterm-frobs"
-"Set xterm to normal (i.e. non-reverse) video mode.
-For monochrome xterms, this is black foreground on white background.
-For xterms which support color, this has the effect of restoring the
-original foreground and background colors, whatever they may be.
-
-The effect of this command and \\[xterm-reverse-video] may be exchanged
-if the XTerm*reverseVideo resource property is set to True." t)
-(autoload 'xterm-sync-emacs-colors "old/xterm-frobs"
-"Query xterm for color palette and define color list for Emacs." t)
-(autoload 'xterm-print-formatted-color-alist "old/xterm-frobs"
-"Create a pretty-printed table of the current xterm color map.
-This table is inserted into a new buffer which can be saved to a file and
-reloaded later.
-
-(fn &optional COLOR-ALIST)" t)
-(register-definition-prefixes "old/xterm-frobs" '("xterm-"))
-
-
-;;; Generated autoloads from old/xterm-title.el
-
-(register-definition-prefixes "old/xterm-title" '("xterm-title-"))
 
 ;;; End of scraped data
 

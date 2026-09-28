@@ -180,7 +180,7 @@ the items to setup for autoloading from the given file."
          (scheme-mode . my/lisp-mode-hook)
          (emacs-lisp-mode . my/lisp-mode-hook)))
 
-(use-package makefile-mode
+(use-package make-mode
   :hook ((makefile-mode . my/makefile-mode-hook)
          (makefile-mode . indent-bars-mode)))
 
@@ -192,10 +192,10 @@ the items to setup for autoloading from the given file."
   :hook ((python-ts-mode . my/python-mode-hook)
          (inferior-python-mode . my/inferior-python-mode-hook)))
 
-(use-package sh-mode
+(use-package sh-script
   :hook (sh-mode . my/sh-mode-hook))
 
-(use-package shell-mode
+(use-package shell
   :defines (explicit-bash-args)
   :init
   ;; Special-case QA env -- we are logged in as `sp_qa' user but we want our custom

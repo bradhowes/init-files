@@ -2,15 +2,18 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'my-customizations)
-(require 'my-env)
-(require 'my-constants)
 (require 'ace-window)
 (require 'consult-notes)
 (require 'crux)
 (require 'emacs-pager)
+(require 'generator)
+(require 'key-chord)
+(require 'my-customizations)
+(require 'my-constants)
+(require 'my-env)
 (require 'popper)
 (require 'project)
+(require 'tempo)
 (require 'wid-edit)
 
 (defun my/sort-lines-by-integer-key (pattern &optional direction)
@@ -468,6 +471,88 @@ This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
   (customize)
   (goto-char (point-min))
   (widget-forward 3))
+
+(require 'server)
+
+(defun my/start-emacs-server ()
+  "Start up an Emacs server to support `emacsclient' connections.
+Customize `server-name' so that each Emacs
+process has its own server connection."
+  (interactive)
+  ;; NOTE: `server-running-p` can report `t` even if we are not running it.
+  (unless server-process
+    ;; Make a unique server connection since I run multiple Emacs instances and I want the emacsclient in a comint
+    ;; buffer to connect to the right connection.
+    (setq server-name (format "server-%d" (emacs-pid)))
+    (setenv "EMACS_SERVER_FILE" server-name)
+    (setenv "EMACS_SOCKET_NAME" server-name)
+    (server-start)))
+
+(iter-defun my/take-two-iterator (values)
+  "Iterator that yields a `cons' cell for every 2 items in VALUES."
+  (let* ((head values))
+    (while head
+      (let* ((first (pop head))
+             (second (pop head)))
+        (iter-yield (cons first second))))))
+
+(defun my/emacs-make-key-bind (keymap make-key &rest definitions)
+  "Apply key binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence,
+where the first element of the pair is a key sequence and the second is the
+function or keymap to bind with. The key sequence is passed to MAKE-KEY and
+the result of the call is used in the key binding.
+
+There is now `bind-keys' method from `use-package' but my version requires
+less typing."
+  (unless (zerop (logand (length definitions) 1))
+    (error "Uneven number of key+command pairs"))
+  (unless (keymapp keymap)
+    (error "Expected a `keymap' as first argument"))
+  ;; Partition `definitions' into two groups, one with key definitions and another with functions and/or nil values
+  (let ((iter (my/take-two-iterator definitions)))
+    (iter-do (pair iter)
+      (keymap-set keymap (funcall make-key (car pair)) (cdr pair)))))
+
+(defun my/emacs-key-bind (keymap &rest definitions)
+  "Apply key binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence."
+  (apply #'my/emacs-make-key-bind keymap (lambda (key) key) definitions))
+
+(defun my/emacs-chord-bind (keymap &rest definitions)
+  "Apply chord binding DEFINITIONS in the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs given as a sequence."
+  (unless (zerop (% (length definitions) 2))
+    (error "Uneven number of chord+command pairs"))
+  (unless (keymapp keymap)
+    (error "Expected a `keymap' as first argument"))
+  (let ((iter (my/take-two-iterator definitions)))
+    (iter-do (pair iter)
+      (key-chord-define keymap (car pair) (cdr pair)))))
+
+(defun tempo-template-my/org-emacs-lisp-source (&optional _)
+  "Define empty function to satisfy flymake/byte-compile (ARG is ignored).")
+
+(tempo-define-template "my/org-emacs-lisp-source" '("#+begin_src emacs-lisp" & r % "#+end_src")
+                       "<m"
+                       "Insert an Emacs Lisp source block in an org document.")
+
+(defun my/org-emacs-lisp-source-with-indent ()
+  "Execute `my/org-emacs-lisp-source' and then indent block."
+  (interactive)
+  (tempo-template-my/org-emacs-lisp-source)
+  (forward-line -1)
+  (org-cycle))
+
+(defun my/org-filter-buffer-substring (start end delete)
+  "Custom filter on buffer text from START to END.
+When DELETE is t, delete the contents from the range.
+Otherwise, removes all properties from a span in a buffer.
+Useful when copying code into Org blocks so that the copy does not contain any
+artifacts such as indentation bars."
+  (if delete
+      (delete-and-extract-region start end)
+    (buffer-substring-no-properties start end)))
 
 (provide 'my-functions)
 

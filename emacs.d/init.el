@@ -3,61 +3,83 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'generator)
-(require 'seq)
-(require 'my-constants)
-(require 'my-layout)
-(require 'my-modes)
+;; Always work in the UTF-8 coding system.
+(let ((coding-system 'utf-8))
+  (set-charset-priority 'unicode)
+  (prefer-coding-system coding-system)
 
-(set-charset-priority 'unicode)
-(setq locale-coding-system 'utf-8
-      coding-system-for-read 'utf-8
-      coding-system-for-write 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
+  (dolist (v (list 'locale-coding-system
+                   'coding-system-for-read
+                   'coding-system-for-write))
+    (set v coding-system))
+
+  (dolist (p (list #'set-terminal-coding-system
+                   #'set-keyboard-coding-system
+                   #'set-selection-coding-system
+                   #'prefer-coding-system))
+    (funcall p coding-system)))
 
 (autoload 'my/ace-window-always-dispatch "my-functions")
 (autoload 'my/ace-window-next "my-functions")
 (autoload 'my/ace-window-one-command "my-functions")
 (autoload 'my/ace-window-prefix "my-functions")
 (autoload 'my/ace-window-previous "my-functions")
-
-(autoload 'my/next-buffer-current-window "my-functions")
-(autoload 'my/prev-buffer-current-window "my-functions")
-
-(autoload 'my/trusted-content-p "my-functions")
-(autoload 'my/show-project-menu "my-functions")
-(autoload 'my/find-user-init-file "my-functions")
-(autoload 'my/find-user-custom-file "my-functions")
+(autoload 'my/bury-current-buffer "my-functions")
+(autoload 'my/bury-or-kill-current-buffer "my-functions")
+(autoload 'my/consult-notes-other-frame "my-functions")
+(autoload 'my/copy-file-name-to-clipboard "my-functions")
+(autoload 'my/customize-other-window "my-functions")
+(autoload 'my/customize-search "my-functions")
+(autoload 'my/describe-symbol-at-point "my-functions")
+(autoload 'my/emacs-chord-bind "my-functions")
+(autoload 'my/emacs-key-bind "my-functions")
+(autoload 'my/emacs-make-key-bind "my-functions")
 (autoload 'my/find-shell-init-file "my-functions")
+(autoload 'my/find-user-custom-file "my-functions")
+(autoload 'my/find-user-init-file "my-functions")
+(autoload 'my/goto-mark "my-functions")
 (autoload 'my/kill-current-buffer "my-functions")
-(autoload 'my/dump-hashtable "my-functions")
+(autoload 'my/htop "my-functions")
+(autoload 'my/indent-buffer "my-functions")
+(autoload 'my/info-other-frame "my-functions")
+(autoload 'my/matching-paren "my-functions")
+(autoload 'my/next-buffer-current-window "my-functions")
+(autoload 'my/org-emacs-lisp-source-with-indent "my-functions")
+(autoload 'my/org-filter-buffer-substring "my-functions")
+(autoload 'my/prev-buffer-current-window "my-functions")
 (autoload 'my/reload-buffer "my-functions")
-(autoload 'my/run-something-in-buffer "my-functions")
+(autoload 'my/remove-all-text-properties "my-functions")
+(autoload 'my/repl "my-functions")
+(autoload 'my/repl-other-window "my-functions")
 (autoload 'my/run-shell "my-functions")
+(autoload 'my/run-something-in-buffer "my-functions")
+(autoload 'my/set-mark-deactivate "my-functions")
 (autoload 'my/shell "my-functions")
 (autoload 'my/shell-other-window "my-functions")
 (autoload 'my/shell-other-frame "my-functions")
-(autoload 'my/bury-or-kill-current-buffer "my-functions")
-(autoload 'my/bury-current-buffer "my-functions")
-(autoload 'my/kill-current-buffer "my-functions")
-(autoload 'my/info-other-frame "my-functions")
-(autoload 'my/customize-other-window "my-functions")
-(autoload 'my/consult-notes-other-frame "my-functions")
-(autoload 'my/remove-all-text-properties "my-functions")
-(autoload 'my/matching-paren "my-functions")
-(autoload 'my/indent-buffer "my-functions")
-(autoload 'my/copy-file-name-to-clipboard "my-functions")
-(autoload 'my/repl "my-functions")
-(autoload 'my/repl-other-window "my-functions")
-(autoload 'my/describe-symbol-at-point "my-functions")
-(autoload 'my/htop "my-functions")
+(autoload 'my/show-project-menu "my-functions")
+(autoload 'my/start-emacs-server "my-functions")
 (autoload 'my/top "my-functions")
-(autoload 'my/set-mark-deactivate "my-functions")
-(autoload 'my/goto-mark "my-functions")
-(autoload 'my/customize-search "my-functions")
+(autoload 'my/trusted-content-p "my-functions")
+
+(autoload 'my/layout-frame-pos-left "my-layout")
+(autoload 'my/layout-frame-pos-center "my-layout")
+(autoload 'my/layout-frame-pos-right "my-layout")
+(autoload 'my/layout-make-frame "my-layout")
+(autoload 'my/layout-normal-screen-font-size "my-layout")
+(autoload 'my/layout-screen-layout-changed "my-layout")
+(autoload 'my/layout-share-screen-font-size "my-layout")
+
+(require 'generator)
+(require 'seq)
+(require 'my-constants)
+(require 'my-modes)
+
+;; To keep this file small, we put all customizations in their own file.
+;; But then we need to load it ourselves.
+(setq custom-file (file-name-concat (expand-file-name user-emacs-directory) "custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file 'noerror))
 
 (defalias 'ksh 'my/shell
   "Legacy alias to start shell in current window.")
@@ -65,8 +87,8 @@
 (defalias 'repl 'my/repl
   "Legacy alias to start Elisp read/eval/print loop in current window.")
 
-;; NOTE: for some reason, this is breaking cape.
-;; (advice-add 'trusted-content-p :filter-return #'my/trusted-content-p)
+;; NOTE: for some reason, this may be breaking cape.
+(advice-add 'trusted-content-p :filter-return #'my/trusted-content-p)
 
 ;; Set this to `t` to debug issue involving the filenotify package
 (when nil
@@ -101,18 +123,7 @@
   :defines (aw-dispatch-always)
   :config (setq aw-make-frame-char ?n))
 
-(defun my/aw-make-frame ()
-  "Make a new frame using layout settings for the current display.
-The first frame always takes on `initial-frame-alist', and subsequent frames
-use `default-frame-alist' by default. If there are already two frames active
-then subsequent ones will be at `my/align-right-frame-alist' which aligns with
-the right-edge of the screen, but may overlap with the middle frame."
-  (let ((num-frames (length (visible-frame-list))))
-    (if (< num-frames 2)
-        (make-frame)
-      (make-frame (my/layout--frame-right-alist (my/layout--active-screens) (my/layout--which-4k-display))))))
-
-(advice-add 'aw-make-frame :override #'my/aw-make-frame)
+(advice-add 'aw-make-frame :override #'my/layout-make-frame)
 
 (use-package char-menu
   :ensure t
@@ -138,7 +149,7 @@ the right-edge of the screen, but may overlap with the middle frame."
 
 (use-package consult
   :ensure t
-  :after (project xref)
+  ;; :after (project xref)
   :commands (consult--customize-put consult-flymake)
   :bind (:map ctl-x-map ;; C-x
               ("M-:" . consult-complex-command)
@@ -556,17 +567,6 @@ Bound to \\`C-x p s'.")
   :ensure t
   :bind (:map my/hyper-c-map ("s" . scratch)))
 
-(use-package tempo
-  :ensure t
-  :commands (tempo-define-template))
-
-(defun tempo-template-my/org-emacs-lisp-source (&optional _)
-  "Define empty function to satisfy flymake/byte-compile (ARG is ignored).")
-
-(tempo-define-template "my/org-emacs-lisp-source" '("#+begin_src emacs-lisp" & r % "#+end_src")
-                       "<m"
-                       "Insert an Emacs Lisp source block in an org document.")
-
 (use-package vertico
   :ensure t
   :commands (vertico-mode)
@@ -589,23 +589,6 @@ Bound to \\`C-x p s'.")
 
 (use-package yasnippet-snippets
   :ensure t)
-
-(defun my/org-emacs-lisp-source-with-indent ()
-  "Execute `my/org-emacs-lisp-source' and then indent block."
-  (interactive)
-  (tempo-template-my/org-emacs-lisp-source)
-  (forward-line -1)
-  (org-cycle))
-
-(defun my/org-filter-buffer-substring (start end delete)
-  "Custom filter on buffer text from START to END.
-When DELETE is t, delete the contents from the range.
-Otherwise, removes all properties from a span in a buffer.
-Useful when copying code into Org blocks so that the copy does not contain any
-artifacts such as indentation bars."
-  (if delete
-      (delete-and-extract-region start end)
-    (buffer-substring-no-properties start end)))
 
 ;; NOTE: this is setting a global variable, but we should really just do this when operating in an org buffer.
 (setq filter-buffer-substring-function #'my/org-filter-buffer-substring)
@@ -643,8 +626,6 @@ artifacts such as indentation bars."
                   (car args))
           (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
-  (when (file-exists-p custom-file)
-    (load custom-file 'noerror))
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
          (after-init . abbrev-mode)))
@@ -701,49 +682,6 @@ The map is made up of tiny functions that invoke `dired' on a path.")
   "Keymap for quick Dired jumps.")
 
 ;;; --- Key Bindings
-
-(iter-defun my/take-two-iterator (values)
-  "Iterator that yields a `cons' cell for every 2 items in VALUES."
-  (let* ((head values))
-    (while head
-      (let* ((first (pop head))
-             (second (pop head)))
-        (iter-yield (cons first second))))))
-
-(defun my/emacs-make-key-bind (keymap make-key &rest definitions)
-  "Apply key binding DEFINITIONS in the given KEYMAP.
-DEFINITIONS is a sequence of string and command pairs given as a sequence,
-where the first element of the pair is a key sequence and the second is the
-function or keymap to bind with. The key sequence is passed to MAKE-KEY and
-the result of the call is used in the key binding.
-
-There is now `bind-keys' method from `use-package' but my version requires
-less typing."
-  (unless (zerop (logand (length definitions) 1))
-    (error "Uneven number of key+command pairs"))
-  (unless (keymapp keymap)
-    (error "Expected a `keymap' as first argument"))
-  ;; Partition `definitions' into two groups, one with key definitions and another with functions and/or nil values
-  (let ((iter (my/take-two-iterator definitions)))
-    (iter-do (pair iter)
-      (keymap-set keymap (funcall make-key (car pair)) (cdr pair)))))
-
-(defun my/emacs-key-bind (keymap &rest definitions)
-  "Apply key binding DEFINITIONS in the given KEYMAP.
-DEFINITIONS is a sequence of string and command pairs given as a sequence."
-  (apply #'my/emacs-make-key-bind keymap (lambda (key) key) definitions))
-
-(defun my/emacs-chord-bind (keymap &rest definitions)
-  "Apply chord binding DEFINITIONS in the given KEYMAP.
-DEFINITIONS is a sequence of string and command pairs given as a sequence."
-  (unless (zerop (% (length definitions) 2))
-    (error "Uneven number of chord+command pairs"))
-  (unless (keymapp keymap)
-    (error "Expected a `keymap' as first argument"))
-  (let ((iter (my/take-two-iterator definitions)))
-    (iter-do (pair iter)
-      (key-chord-define keymap (car pair) (cdr pair)))))
-
 (my/emacs-key-bind my/hyper-c-map
                    "i" #'my/find-user-init-file
                    "j" my/dired-jumps-map
@@ -985,23 +923,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
   "Field name: "
   > str " = \"" _ "\"\n")
 
-(require 'server)
-
-(defun my/start-emacs-server ()
-  "Start up an Emacs server to support `emacsclient' connections.
-Customize `server-name' so that each Emacs
-process has its own server connection."
-  (interactive)
-  ;; NOTE: `server-running-p` can report `t` even if we are not running it.
-  (unless server-process
-    ;; Make a unique server connection since I run multiple Emacs instances and I want the emacsclient in a comint
-    ;; buffer to connect to the right connection.
-    (setq server-name (format "server-%d" (emacs-pid)))
-    (setenv "EMACS_SERVER_FILE" server-name)
-    (setenv "EMACS_SOCKET_NAME" server-name)
-    (server-start)))
-
-(add-hook 'after-init-hook #'my/start-emacs-server)
+(add-hook 'after-init-hook #'my/layout-screen-layout-changed 98)
+(add-hook 'after-init-hook #'my/start-emacs-server 99)
 
 (provide 'init)
 

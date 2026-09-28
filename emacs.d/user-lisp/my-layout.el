@@ -350,8 +350,6 @@ It does not affect existing frames."
   (custom-save-all)
   (my/layout-screen-layout-changed))
 
-(add-hook 'after-init-hook #'my/layout-screen-layout-changed)
-
 (defun my/layout-share-screen-font-size (&optional arg)
   "Set font scaling to ARG when sharing screen.
 ARG is an optional integer which defaults to 2."
@@ -409,6 +407,17 @@ is the second, etc."
   (interactive)
   (let ((layout (my/layout--active-screens)))
     (set-frame-width (window-frame (get-buffer-window)) (my/layout--cols layout))))
+
+(defun my/layout-make-frame ()
+  "Make a new frame using layout settings for the current display.
+The first frame always takes on `initial-frame-alist', and subsequent frames
+use `default-frame-alist' by default. If there are already two frames active
+then subsequent ones will be at `my/align-right-frame-alist' which aligns with
+the right-edge of the screen, but may overlap with the middle frame."
+  (let ((num-frames (length (visible-frame-list))))
+    (if (< num-frames 2)
+        (make-frame)
+      (make-frame (my/layout--frame-right-alist (my/layout--active-screens) (my/layout--which-4k-display))))))
 
 (provide 'my-layout)
 
