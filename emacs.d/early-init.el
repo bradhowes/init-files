@@ -5,17 +5,23 @@
 (eval-when-compile
   (require 'comp))
 
-(when (and (fboundp 'menu-bar-mode) (not (eq system-type 'darwin)))
-  (menu-bar-mode 1)
+;; Do not show menu bar if running on TTY
+(when (and (fboundp 'menu-bar-mode)
+           (tty-type))
+  (menu-bar-mode -1)
   (push '(menu-bar-lines . 0) default-frame-alist))
 
+;; Never grew to like tabs
 (when (fboundp 'tab-bar-mode)
   (tool-bar-mode -1)
   (push '(tool-bar-lines . 0) default-frame-alist))
 
+;; ...or toolbars either
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 
+;; Save some space by removing vertical toolbars.
+;; Use `modeline' indicator to gauge buffer position.
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1)
   (push '(vertical-scroll-bars) default-frame-alist))

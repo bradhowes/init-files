@@ -72,8 +72,8 @@
 (autoload 'my/htop "my-tops")
 
 (my/env-setup)
-(add-hook 'after-init-hook #'my/layout-screen-layout-changed 98)
-(add-hook 'after-init-hook #'my/start-emacs-server 99)
+(add-hook 'emacs-startup-hook #'my/layout-screen-layout-changed 98)
+(add-hook 'emacs-startup-hook #'my/start-emacs-server 99)
 
 (require 'my-constants)
 (require 'my-customizations)
@@ -92,7 +92,7 @@
   "Legacy alias to start Elisp read/eval/print loop in current window.")
 
 ;; NOTE: for some reason, this may be breaking cape.
-(advice-add 'trusted-content-p :filter-return #'my/trusted-content-p)
+;; (advice-add 'trusted-content-p :filter-return #'my/trusted-content-p)
 
 ;; Set this to `t` to debug issue involving the filenotify package
 (when nil
@@ -101,6 +101,7 @@
 ;; (debug-on-entry 'file-notify-add-watch)
 
 (use-package package
+  :defer nil
   :custom
   (package-archive-priorities '(("melpa" . 10)
                                 ("melpa-stable" . 10)
@@ -109,6 +110,22 @@
   :config
   (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t))
+
+;; NOTE: hyper use requires Karabiner-Elements mapping from 'caps_lock' to 'right_control'
+;;
+;; {
+;;   "manipulators": [
+;;     {
+;;       "description": "Change caps_lock to right_control. In Emacs set 'mac_right_control_modifier' to 'hyper.",
+;;       "from": {
+;;         "key_code": "caps_lock",
+;;         "modifiers": { "optional": ["any"] }
+;;       },
+;;       "to": [{ "key_code": "right_control" }],
+;;       "type": "basic"
+;;     }
+;;   ]
+;; }
 
 (defvar my/hyper-c-map
   (make-sparse-keymap)
@@ -482,9 +499,15 @@ Here, we just separate them by a comma."
 
 (use-package mood-line
   :ensure t
-  ;; :if (display-graphic-p)
   :commands (mood-line-mode)
+  :custom
+  (mood-line-format mood-line-format-default)
+  (mood-line-glyph-alist mood-line-glyphs-fira-code)
   :hook (after-init . mood-line-mode))
+
+(use-package keycast
+  :ensure t
+  :hook (after-init . keycast-tracking-mode))
 
 (use-package multiple-cursors
   :ensure t
@@ -680,6 +703,7 @@ Bound to \\`C-x p s'.")
             ("c" "AUv3Controls" nil)
             ("i" "init-files" nil)
             ("e" "init-files/emacs.d" "emacs.d")
+            ("E" ,(expand-file-name user-emacs-directory) "~.emacs.d")
             ("l" #'my/find-elpa-directory nil)
             ("L" ,(file-name-concat user-emacs-directory "elpa") "elpa")
             ("p" "SoundFontsPlus" nil)
@@ -891,56 +915,32 @@ The map is made up of tiny functions that invoke `dired' on a path.")
 
 (keymap-set help-map "i" my/info-keys-map)
 
-(if (my/is-terminal)
-    (when my/is-linux
-      (set-face-background 'default "undefined"))
-  (when my/is-macosx
+(when (and (tty-type)
+           my/is-linux)
+  (set-face-background 'default "undefined"))
+
+(when my/is-macosx
+  (custom-set-variables
+   '(insert-directory-program "gls"))
+  (when (display-graphic-p)
     (custom-set-variables
-     '(insert-directory-program "gls")
-     '(frame-resize-pixelwise t)
-     '(mac-command-modifier 'meta)
-     '(mac-option-modifier 'alt)
-
-     ;; NOTE: hyper use requires Karabiner-Elements mapping from 'caps_lock' to 'right_control'
-     ;;
-     ;; {
-     ;;   "manipulators": [
-     ;;     {
-     ;;       "description": "Change caps_lock to right_control. In Emacs set 'mac_right_control_modifier' to 'hyper.",
-     ;;       "from": {
-     ;;         "key_code": "caps_lock",
-     ;;         "modifiers": { "optional": ["any"] }
-     ;;       },
-     ;;       "to": [{ "key_code": "right_control" }],
-     ;;       "type": "basic"
-     ;;     }
-     ;;   ]
-     ;; }
-     '(mac-right-control-modifier 'hyper))))
-
-;; Custom dir-locals
-(dir-locals-set-class-variables 'raze-variables
-                                '((nil . ((compile-command . "./build.sh -m Debug ")))))
-(dir-locals-set-directory-class (file-truename "~/repos/raze")
-                                'raze-variables)
-(dir-locals-set-class-variables 'x23-variables
-                                '((nil . ((compile-command . "cmake -S . -B build && cd build && make tests ")))))
-(dir-locals-set-directory-class (file-truename "~/repos/x23")
-                                'x23-variables)
+     '(frame-resize-pixelwise t))))
 
 ;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097
-;;
+;; Basically, put backup and autosave files in their own directories
+;; inside our own `~/tmp' directory.
 (let ((backup-dir (file-name-concat (my/tmp-dir) "emacs_backups"))
       (auto-saves-dir (file-name-concat (my/tmp-dir) "emacs_autosaves")))
   (dolist (dir (list backup-dir auto-saves-dir))
     (unless (file-directory-p dir)
       (make-directory dir t)))
-  (setq backup-directory-alist `(("." . ,backup-dir))
-        auto-save-file-name-transforms `((".*" ,auto-saves-dir t))
-        auto-save-list-file-prefix (file-name-concat auto-saves-dir ".saves-")
-        ;; Tramp as well but note slight change in pattern
-        tramp-backup-directory-alist `((".*" . ,backup-dir))
-        tramp-auto-save-directory auto-saves-dir))
+  (custom-set-variables
+   `(backup-directory-alist '(("." . ,backup-dir)))
+   `(auto-save-file-name-transforms '((".*" ,auto-saves-dir t)))
+   ;; Tramp as well but note slight change in pattern
+   `(tramp-backup-directory-alist '((".*" . ,backup-dir)))
+   `(tramp-auto-save-directory ,auto-saves-dir))
+  (setq auto-save-list-file-prefix (file-name-concat auto-saves-dir ".saves-")))
 
 (define-skeleton add-message-field
   "Blah."
