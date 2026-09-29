@@ -262,7 +262,7 @@ NOTE: duplicated in early-init.el
 Note that this is *not* the `user-emacs-directory', but rather the
 location in the git repo where personal files are kept under version
 control.")
-(autoload 'my/lisp "my-env"
+(autoload 'my/user-lisp "my-env"
 "Location of personal Emacs Lisp files.")
 (autoload 'my/tmp-dir "my-env"
 "The directory to use for temporary purposes - usually $HOME/tmp.
@@ -680,6 +680,10 @@ necessary.
 (fn ARG)" t)
 (autoload 'my/find-user-custom-file "my-finders"
 "Edit the `custom-file` if it exists." t)
+(autoload 'my/find-user-lisp-file "my-finders"
+"Visit FILENAME in `my/user-lisp' directory.
+
+(fn FILENAME)" t)
 
 
 ;;; Generated autoloads from my-org.el

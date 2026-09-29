@@ -26,11 +26,13 @@
 (autoload 'my/is-terminal "my-env")
 (autoload 'my/is-graphical "my-env")
 (autoload 'my/repos "my-env")
+(autoload 'my/user-lisp "my-env")
 (autoload 'my/env-setup "my-env")
 (autoload 'my/tmp-dir "my-env")
 (autoload 'my/find-shell-init-file "my-finders")
 (autoload 'my/find-user-custom-file "my-finders")
 (autoload 'my/find-user-init-file "my-finders")
+(autoload 'my/find-user-lisp-file "my-finders")
 (autoload 'my/copy-file-name-to-clipboard "my-functions")
 (autoload 'my/describe-symbol-at-point "my-functions")
 (autoload 'my/goto-mark "my-functions")
@@ -74,7 +76,7 @@
 
 (require 'my-constants)
 (require 'my-customizations)
-(require 'my-modes)
+(require 'my-modes)                     ; TODO: rework so that we don't pay cost of loading it all
 
 ;; To keep this file small, we put all customizations in their own file.
 ;; But then we need to load it ourselves.
@@ -610,7 +612,6 @@ Bound to \\`C-x p s'.")
   (setq read-process-output-max (* 64 1024 1024)
 	process-adaptive-read-buffering nil
         ;; debug-on-error t
-	custom-file (file-truename (locate-user-emacs-file "custom.el"))
 	frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
                              (if (not (display-graphic-p))
                                  (list (concat (system-name) " ") buffer-directory)
@@ -650,28 +651,35 @@ Bound to \\`C-x p s'.")
     (mapc (lambda (tuple)
             (let* ((key (elt tuple 0))
                    (path (elt tuple 1))
-                   (name (intern (or (elt tuple 3)
-                                     (concat "my/jmp-" path)))))
+                   (tag (elt tuple 2))
+                   (name (intern (concat "my/jmp-" (or tag path)))))
               (fset name (lambda ()
                            (interactive)
-                           (dired (if (string= "/" (substring path 0 1))
+                           (dired (if (or (string= "/" (substring path 0 1))
+                                          (string= "~" (substring path 0 1)))
                                       (file-truename path)
                                     (files--splice-dirname-file (my/repos) path)))))
+              (message "my/dired-jumps-map: %s -> %s" tuple name)
               (keymap-set map key name)))
           ;; Collection of 3-tuples that define a directory to jump to:
           ;; 1 - key to use
           ;; 2 - the directory to jump to (if not absolute then prepend with value from `my/repos')
           ;; 3 - the name to assign to the utility function (if nil make from directory)
           `(("a" "auv3-support" nil)
-            ("i" "init-files" nil)
             ("c" "AUv3Controls" nil)
-            ("l" "init-files/emacs.d/lisp" "emacs-lisp")
+            ("i" "init-files" nil)
+            ("e" "init-files/emacs.d" "emacs.d")
+            ("l" ,(file-name-concat user-emacs-directory "elpa") "elpa")
             ("p" "SoundFontsPlus" nil)
             ("s" "AUv3Support" nil)
-            ("2" "SF2Lib" "my/jmp-qa")))
+            ("U" ,(my/user-lisp) "user-lisp")
+            ("z" "init-files/shells" "shells")
+            ("2" "SF2Lib" nil)))
     map)
   "Keymap for quick Dired jumps.
 The map is made up of tiny functions that invoke `dired' on a path.")
+
+(keymap-set my/dired-jumps-map "u" #'my/find-user-lisp-file)
 
 ;; "Jump" to a saved position -- "H-j"
 (defvar my/point-jumps-map

@@ -1,1 +1,1 @@
-((nil . ((compile-command . "make -C $(git rev-parse --show-toplevel)/emacs.d/lisp -k "))))
+((nil . ((compile-command . "make -C $(git rev-parse --show-toplevel)/emacs.d/user-lisp -k "))))

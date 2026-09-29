@@ -3,7 +3,11 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'consult)
 (require 'crux)
+(require 'embark)
+(require 'marginalia)
+(require 'my-env)
 
 ;;;###autoload
 (defun my/find-shell-init-file ()
@@ -38,6 +42,26 @@ necessary."
   (if custom-file
       (find-file custom-file)
     (message "No custom file defined.")))
+
+;;;###autoload
+(defun my/find-user-lisp-file (filename)
+  "Visit FILENAME in `my/user-lisp' directory."
+  (interactive
+   (let* ((user-lisp-dir (file-name-concat user-emacs-directory "user-lisp"))
+          (full-dir (file-name-as-directory user-lisp-dir))
+          (short-dir (abbreviate-file-name full-dir)))
+     (list (read-file-name "File: " short-dir nil nil))))
+  (find-file filename))
+
+;;;###autoload
+(defun my/find-elpa-directory (directory)
+  "Visit DIRECTORY in `elpa' directory in `user-emacs-directory'."
+  (interactive
+   (let* ((elpa-dir (file-name-concat user-emacs-directory "elpa"))
+          (full-dir (file-name-as-directory elpa-dir))
+          (short-dir (abbreviate-file-name full-dir)))
+     (list (read-file-name "Name: " short-dir nil t))))
+  (dired directory))
 
 (provide 'my-finders)
 

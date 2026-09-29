@@ -45,7 +45,7 @@ NOTE: duplicated in early-init.el"
   (file-name-as-directory (file-truename "~/src/Mine")))
 
 ;;;###autoload
-(defun my/configurations ()
+(defun my/init-files ()
   "Location of configurations repo."
   (file-name-as-directory (file-name-concat (my/repos) "init-files")))
 
@@ -55,12 +55,12 @@ NOTE: duplicated in early-init.el"
 Note that this is *not* the `user-emacs-directory', but rather the
 location in the git repo where personal files are kept under version
 control."
-  (file-name-as-directory (file-name-concat (my/configurations) "emacs.d")))
+  (file-name-as-directory (file-name-concat (my/init-files) "emacs.d")))
 
 ;;;###autoload
-(defun my/lisp ()
+(defun my/user-lisp ()
   "Location of personal Emacs Lisp files."
-  (file-name-as-directory (file-name-concat (my/emacs.d) "lisp")))
+  (file-name-as-directory (file-name-concat (my/emacs.d) "user-lisp")))
 
 ;;;###autoload
 (defun my/tmp-dir ()
@@ -111,10 +111,10 @@ Creates the directory if it does not exist."
   (setq Info-default-directory-list (append info-paths Info-default-directory-list))
   ;; (message "Info-default-directory-list: %s" Info-default-directory-list)
 
-  (my/add-trusted-content-directory (abbreviate-file-name (my/configurations)))
+  (my/add-trusted-content-directory (abbreviate-file-name (my/init-files)))
   (push (abbreviate-file-name (my/emacs.d)) trusted-content)
-  (push (abbreviate-file-name (file-name-as-directory (file-name-concat (my/configurations) "shell/"))) trusted-content)
-  (push (abbreviate-file-name (file-name-as-directory (file-name-concat (my/emacs.d) "lisp/"))) trusted-content)
+  (push (abbreviate-file-name (file-name-as-directory (file-name-concat (my/init-files) "shell/"))) trusted-content)
+  (push (abbreviate-file-name (my/user-lisp)) trusted-content)
 
   ;; (unless (null Info-directory-list)
   ;;   (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))
