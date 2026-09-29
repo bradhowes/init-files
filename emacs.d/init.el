@@ -29,6 +29,7 @@
 (autoload 'my/user-lisp "my-env")
 (autoload 'my/env-setup "my-env")
 (autoload 'my/tmp-dir "my-env")
+(autoload 'my/find-elpa-directory "my-finders")
 (autoload 'my/find-shell-init-file "my-finders")
 (autoload 'my/find-user-custom-file "my-finders")
 (autoload 'my/find-user-init-file "my-finders")
@@ -645,22 +646,32 @@ Bound to \\`C-x p s'.")
 ;; ("magit-log" nil (inhibit-same-window . t))
 ;; ("magit-diff:" nil (inhibit-same-window . t))))))
 
-;; "Jump" to a well-known directory (eg "H-c j r" => dired buffer in Raze repo)
+;; "Jump" to a well-known directory/file (eg "H-c j a" => dired buffer in "auv3-support" repo)
 (defvar my/dired-jumps-map
   (let ((map (make-sparse-keymap)))
     (mapc (lambda (tuple)
             (let* ((key (elt tuple 0))
                    (path (elt tuple 1))
                    (tag (elt tuple 2))
-                   (name (intern (concat "my/jmp-" (or tag path)))))
-              (fset name (lambda ()
-                           (interactive)
-                           (dired (if (or (string= "/" (substring path 0 1))
-                                          (string= "~" (substring path 0 1)))
-                                      (file-truename path)
-                                    (files--splice-dirname-file (my/repos) path)))))
+                   (name (cond
+                          ;; When given a string, intern it use for name of lambda to execute `dired'
+                          ((stringp path)
+                           (let ((name (intern (concat "my/jmp-" (or tag path)))))
+                             (fset name (lambda ()
+                                          (interactive)
+                                          (dired (if (or (string= "/" (substring path 0 1))
+                                                         (string= "~" (substring path 0 1)))
+                                                     (file-truename path)
+                                                   (files--splice-dirname-file (my/repos) path)))))
+                             name))
+                          ;; Given symbol assume function to execute
+                          ((functionp path)
+                           path)
+                          (t
+                           nil))))
               (message "my/dired-jumps-map: %s -> %s" tuple name)
-              (keymap-set map key name)))
+              (when name
+                (keymap-set map key name))))
           ;; Collection of 3-tuples that define a directory to jump to:
           ;; 1 - key to use
           ;; 2 - the directory to jump to (if not absolute then prepend with value from `my/repos')
@@ -669,9 +680,11 @@ Bound to \\`C-x p s'.")
             ("c" "AUv3Controls" nil)
             ("i" "init-files" nil)
             ("e" "init-files/emacs.d" "emacs.d")
-            ("l" ,(file-name-concat user-emacs-directory "elpa") "elpa")
+            ("l" #'my/find-elpa-directory nil)
+            ("L" ,(file-name-concat user-emacs-directory "elpa") "elpa")
             ("p" "SoundFontsPlus" nil)
             ("s" "AUv3Support" nil)
+            ("u" #'my/find-user-lisp-file nil)
             ("U" ,(my/user-lisp) "user-lisp")
             ("z" "init-files/shells" "shells")
             ("2" "SF2Lib" nil)))
@@ -680,6 +693,7 @@ Bound to \\`C-x p s'.")
 The map is made up of tiny functions that invoke `dired' on a path.")
 
 (keymap-set my/dired-jumps-map "u" #'my/find-user-lisp-file)
+(keymap-set my/dired-jumps-map "l" #'my/find-elpa-directory)
 
 ;; "Jump" to a saved position -- "H-j"
 (defvar my/point-jumps-map

@@ -250,12 +250,11 @@ NOTE: can return false positives if called too early in startup.")
 Hacky but for now it works since we are always starting up an initial xterm.")
 (autoload 'my/add-trusted-content-directory "my-env"
 "Add PATH to `trusted-content'.
-NOTE: duplicated in early-init.el
 
 (fn PATH)")
 (autoload 'my/repos "my-env"
 "LOCATION of root of personal source git repositories.")
-(autoload 'my/configurations "my-env"
+(autoload 'my/init-files "my-env"
 "Location of configurations repo.")
 (autoload 'my/emacs.d "my-env"
 "Location of emacs.d directory in the configurations repo.
@@ -684,6 +683,10 @@ necessary.
 "Visit FILENAME in `my/user-lisp' directory.
 
 (fn FILENAME)" t)
+(autoload 'my/find-elpa-directory "my-finders"
+"Visit DIRECTORY in `elpa' directory in `user-emacs-directory'.
+
+(fn DIRECTORY)" t)
 
 
 ;;; Generated autoloads from my-org.el

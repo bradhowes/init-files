@@ -35,8 +35,7 @@ Hacky but for now it works since we are always starting up an initial xterm."
 
 ;;;###autoload
 (defun my/add-trusted-content-directory (path)
-  "Add PATH to `trusted-content'.
-NOTE: duplicated in early-init.el"
+  "Add PATH to `trusted-content'."
   (push (abbreviate-file-name (file-name-as-directory path)) trusted-content))
 
 ;;;###autoload
