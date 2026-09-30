@@ -103,17 +103,7 @@ the items to setup for autoloading from the given file."
   (flyover-max-line-length 120))
 
 (use-package eglot
-  :commands (eglot-ensure eglot-completion-at-point)
-  :defines (eglot-mode-map)
-  :config
-  (defun my/eglot-configure ()
-    "Custom buffer configuration of Eglot."
-    (setq-local completion-at-point-functions
-                (list (cape-capf-super #'eglot-completion-at-point #'tempel-expand))
-                eldoc-documentation-functions (cons #'flymake-eldoc-function
-                                                    (remove #'flymake-eldoc-function eldoc-documentation-functions))
-                eldoc-documentation-strategy #'eldoc-documentation-compose))
-
+  :commands (eglot-completion-at-point)
   :hook ((c++-mode . my/known-project-eglot-ensure)
          (c++-ts-mode . my/known-project-eglot-ensure)
          (go-mode . eglot-ensure)
@@ -125,10 +115,7 @@ the items to setup for autoloading from the given file."
          (python-base-mode . eglot-ensure)
          (scala-mode . eglot-ensure)
          (yaml-mode . eglot-ensure)
-         (yaml-ts-mode . eglot-ensure)
-         (eglot-managed-mode . my/eglot-configure))
-  :config
-  (fset #'jsonrpc--log-event #'ignore)
+         (yaml-ts-mode . eglot-ensure))
   :custom
   ((eglot-autoshutdown t)
    (eglot-extend-to-xref t))
@@ -144,7 +131,17 @@ the items to setup for autoloading from the given file."
 
 ;; (keymap-global-set "C-c c" eglot-mode-map)
 
+(defun my/eglot-configure ()
+  "Custom buffer configuration of Eglot."
+  (setq-local completion-at-point-functions
+              (list (cape-capf-super #'eglot-completion-at-point #'tempel-expand))
+              eldoc-documentation-functions (cons #'flymake-eldoc-function
+                                                  (remove #'flymake-eldoc-function eldoc-documentation-functions))
+              eldoc-documentation-strategy #'eldoc-documentation-compose))
+
 (with-eval-after-load 'eglot
+  (my/eglot-configure)
+  (fset #'jsonrpc--log-event #'ignore)
   (setq eglot-server-programs (assoc-delete-all 'kotlin-ts-mode eglot-server-programs))
   (add-to-list 'eglot-server-programs '(kotlin-ts-mode . ("kotlin-lsp" "--stdio")))
   (setq completion-category-defaults nil))

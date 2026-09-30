@@ -760,11 +760,6 @@ disabled.
 
 
 
-;;; Generated autoloads from my-packages.el
-
-(register-definition-prefixes "my-packages" '("ffap-bindings" "my/project-search-map"))
-
-
 ;;; End of scraped data
 
 (provide '.user-lisp-autoloads)

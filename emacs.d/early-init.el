@@ -35,12 +35,14 @@
       load-prefer-newer t)
 
 ;; Increase GC threshold to reduce startup times. Restore threshold once emacs is running.
-(let ((threshold gc-cons-threshold)
-      (gc-cons-threshold most-positive-fixnum))
+(let* ((threshold gc-cons-threshold)
+       (percentage gc-cons-percentage)
+       (gc-cons-threshold most-positive-fixnum)
+       (gc-cons-percentage 0.8))
   ;; NOTE: needs lexical-binding for this to work and capture the value of `threshold'
   (add-hook 'emacs-startup-hook (lambda ()
                                   (setq gc-cons-threshold threshold
-                                        inhibit-redisplay nil))))
+                                        gc-cons-percentage percentage))))
 
 ;; Stop Emacs from flashing a `white' screen when starting up
 (set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")

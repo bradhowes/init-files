@@ -4,9 +4,6 @@
 ;;; Code:
 
 ;; Always work in the UTF-8 coding system.
-(defvar load-began (float-time)
-  "Timestamp when load started.")
-
 (let ((coding-system 'utf-8))
   (set-charset-priority 'unicode)
   (prefer-coding-system coding-system)
@@ -21,7 +18,6 @@
                    #'set-selection-coding-system
                    #'prefer-coding-system))
     (funcall p coding-system)))
-
 
 ;; Replicating much of what is in user-lisp-autoloads.el in order to silence warnings from flymake.
 ;; The .user-lisp-autoloads.el file is loaded upon startup.
@@ -78,9 +74,9 @@
 (add-hook 'emacs-startup-hook #'my/layout-screen-layout-changed 98)
 (add-hook 'emacs-startup-hook #'my/start-emacs-server 99)
 
-(require 'my-constants)
-(require 'my-customizations)
-(require 'my-modes)                     ; TODO: rework so that we don't pay cost of loading it all
+(use-package my-constants)
+(use-package my-customizations)
+(use-package my-modes)                  ; TODO: rework so that we don't pay cost of loading it all
 
 ;; To keep this file small, we put all customizations in their own file.
 ;; But then we need to load it ourselves.
@@ -99,7 +95,7 @@
 
 ;; Set this to `t` to debug issue involving the filenotify package
 (when nil
-  (require 'filenotify)
+  (use-package filenotify)
   (setq file-notify-debug nil))
 ;; (debug-on-entry 'file-notify-add-watch)
 
@@ -141,12 +137,11 @@
 ;;; ===== ace-window =====
 
 (use-package ace-window
-  :ensure t
-  :commands (ace-window aw-flip-window)
-  :defines (aw-dispatch-always)
+  :defer t
   :config
   (setq aw-make-frame-char ?n)
-  (advice-add 'aw-make-frame :override #'my/layout-make-frame))
+  (advice-add 'aw-make-frame :override #'my/layout-make-frame)
+  :commands (ace-window aw-flip-window))
 
 (use-package char-menu
   :ensure t
@@ -313,19 +308,23 @@ Here, we just separate them by a comma."
                            denote-file-types)
         denote-file-type 'markdown-brh))
 
+(use-package completion
+  :defer t
+  :hook ((after-init . dynamic-completion-mode)))
+
 (use-package consult-notes
-  :ensure t
+  :defer t
   :after (consult denote)
-  :defines (consult-notes-denote-files-function)
   :commands (consult-notes-denote-mode denote-directory-files)
-  :config
-  (require 'consult-notes-denote)
   :bind (:map my/hyper-n-map ("n" . consult-notes)))
+
+(with-eval-after-load 'consult-notes
+  (require 'consult-notes-denote))
 
 (use-package corfu
   :after orderless
   :ensure t
-  :commands (global-corfu-mode)
+  :commands (global-corfu-mode corfu-popupinfo-mode)
   :bind (:map corfu-map
               ("C-SPC" . corfu-insert-separator))
   :custom
@@ -342,12 +341,10 @@ Here, we just separate them by a comma."
   ;; Enable Corfu only for certain modes.
   :hook ((prog-mode . corfu-mode)
          (shell-mode . corfu-mode)
-         (eshell-mode . corfu-mode))
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-excluded-modes'.
-  :config
-  (global-corfu-mode))
+         (eshell-mode . corfu-mode)
+         (after-init . (lambda ()
+                         (global-corfu-mode)
+                         (corfu-popupinfo-mode)))))
 
 (use-package crm)
 
@@ -490,8 +487,8 @@ Here, we just separate them by a comma."
               ("f" . magit-file-dispatch))
   :custom (magit-process-find-password-functions '(my/read-gitlab-password)))
 
-(use-package marginalia
-  :ensure t
+(use-package marginalia-mode
+  :defer t
   :commands (marginalia-mode)
   :bind (:map minibuffer-local-map
               ("C-M-<tab>" . marginalia-cycle))
@@ -506,7 +503,7 @@ Here, we just separate them by a comma."
   :custom
   (mood-line-format mood-line-format-default)
   (mood-line-glyph-alist mood-line-glyphs-fira-code)
-  :hook (after-init . mood-line-mode))
+  :hook (after-init . (lambda () (mood-line-mode t))))
 
 (use-package keycast)
 
@@ -558,12 +555,14 @@ Here, we just separate them by a comma."
   :bind (:map my/hyper-c-map ("l" . osx-dictionary-search-pointer)))
 
 (use-package popper
-  :ensure t
-  :defer nil                            ; load now due to dependencies below
+  :defer t
   :commands (popper-kill-latest-popup)
   :functions (popper--delete-popup)
   :bind (("C-'" . popper-toggle)
-         ("M-'" . popper-cycle)))
+         ("M-'" . popper-cycle))
+  :hook ((after-init . (lambda ()
+                         (popper-mode)
+                         (popper-echo-mode)))))
 
 (defvar my/project-search-map (make-sparse-keymap)
   "A prefix map like that found in projectile.
@@ -589,20 +588,35 @@ Bound to \\`C-x p s'.")
               ("r" . rg-project))
   :hook (after-init . rg-enable-default-bindings))
 
+(use-package savehist
+  :defer t
+  :hook (after-init . savehist-mode))
+
+(use-package saveplace
+  :defer t
+  :hook ((after-init . save-place-mode)))
+
 (use-package scratch
   :ensure t
   :bind (:map my/hyper-c-map ("s" . scratch)))
 
+(use-package subword
+  :defer t
+  :hook ((after-init . global-subword-mode)))
+
 (use-package vertico
-  :ensure t
+  :defer t
   :commands (vertico-mode)
-  :hook ((rfn-eshadow-update-overlay . vertico-directory-tidy)))
+  :hook ((rfn-eshadow-update-overlay . vertico-directory-tidy)
+         (after-init . vertico-mode)))
 
 (use-package which-key
-  :ensure t)
+  :defer t
+  :hook (after-init . which-key-mode))
 
 (use-package winner
-  :ensure t
+  :defer t
+  :hook (after-init . winner-mode)
   :bind (("C-<left>" . winner-undo)
          ("C-<right>" . winner-redo)
          :map my/hyper-c-map
@@ -881,8 +895,15 @@ The map is made up of tiny functions that invoke `dired' on a path.")
 ;;; --- Key Chords
 
 (use-package diff-hl
-  :ensure t
-  :commands (diff-hl-show-hunk))
+  :defer t
+  :commands (diff-hl-show-hunk diff-hl-flydiff-mode global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode)
+  :hook ((after-init . (lambda ()
+                         (diff-hl-flydiff-mode t)
+                         (global-diff-hl-mode t)
+                         (global-diff-hl-show-hunk-mouse-mode t)))))
+
+(use-package recentf
+  :hook ((after-init . recentf-mode)))
 
 ;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to
 ;; type with one or two hands.
@@ -953,7 +974,11 @@ The map is made up of tiny functions that invoke `dired' on a path.")
   "Field name: "
   > str " = \"" _ "\"\n")
 
-(message "Elapsed load time: %f" (- (float-time) load-began))
+(defun my/display-startup-time ()
+  "Show the elapsed startup time."
+  (message "Elapsed load time: %s" (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))))
+
+(add-hook 'emacs-startup-hook #'my/display-startup-time)
 
 (provide 'init)
 
