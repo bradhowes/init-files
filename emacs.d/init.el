@@ -127,10 +127,6 @@
 ;;   ]
 ;; }
 
-(defvar my/hyper-c-map
-  (make-sparse-keymap)
-  "Keymap for Hyper-c actions.")
-
 (use-package accent
   :ensure t
   :bind (:map my/hyper-c-map ("a" . accent-menu)))
@@ -145,25 +141,19 @@
   :commands (ace-window aw-flip-window))
 
 (use-package char-menu
-  :ensure t
-  :defines (char-menu)
+  :defer t
   :bind (("C-z" . char-menu))
-  :config
-  (setq char-menu
-        '("—" "‘’" "“”" "…" "«»" "–"
-          ("Typography" "•" "©" "†" "‡" "°" "·" "§" "№" "★")
-          ("Math"       "≈" "≡" "≠" "∞" "×" "±" "∓" "÷" "√")
-          ("Arrows"     "←" "→" "↑" "↓" "⇐" "⇒" "⇑" "⇓")
-          ("Greek"      "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
+  :custom
+  (char-menu '("—" "‘’" "“”" "…" "«»" "–"
+               ("Typography" "•" "©" "†" "‡" "°" "·" "§" "№" "★")
+               ("Math" "≈" "≡" "≠" "∞" "×" "±" "∓" "÷" "√")
+               ("Arrows" "←" "→" "↑" "↓" "⇐" "⇒" "⇑" "⇓")
+               ("Greek" "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
 
 (use-package compile
-  :ensure t
   :config
-  (add-to-list 'compilation-error-regexp-alist
-               '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2))) ; I think this is from pyright
-
-(use-package xref
-  :defines (xref-show-xrefs-function xref-show-definitions-function))
+  (push '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2) ; I think this is from pyright
+        compilation-error-regexp-alist))
 
 (use-package consult
   :ensure t
@@ -239,14 +229,9 @@
   (advice-add #'register-preview :override #'consult-register-window)
   (setq register-preview-delay 0.5)
 
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
-
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :config
-
   (defun my/consult-line-symbol-at-point ()
     "Start `consult-line' with symbol at point."
     (interactive)
@@ -263,9 +248,11 @@
   ;; Both < and C-+ work reasonably well.
   :custom (consult-narrow-key "<"))
 
-(defvar my/hyper-n-map
-  (make-sparse-keymap)
-  "Keymap for Hyper-n actions.")
+;; Use Consult to select xref locations with preview
+(use-package xref
+  :custom
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref))
 
 (defun my/denote-format-keywords-for-md-front-matter (keywords)
   "Custom KEYWORDS formatter for keystrokecountdown.com markdown files.
@@ -542,7 +529,6 @@ Here, we just separate them by a comma."
       (define-key map "l" #'org-store-link)
       map)
     "Keymap for my org mode access.")
-
   :bind-keymap ("H-o" . my/org-key-map))
 
 (use-package osx-dictionary
@@ -679,14 +665,6 @@ Bound to \\`C-x p s'.")
 ;; Show log buffer in something other than the current window
 ;; ("magit-log" nil (inhibit-same-window . t))
 ;; ("magit-diff:" nil (inhibit-same-window . t))))))
-
-;; "Jump" to a saved position -- "H-j"
-(defvar my/point-jumps-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map " " #'consult-register-store)
-    (define-key map "j" #'consult-register-load)
-    map)
-  "Keymap for quick Dired jumps.")
 
 ;;; --- Key Bindings
 (my/emacs-key-bind my/hyper-c-map
