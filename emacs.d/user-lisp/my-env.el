@@ -114,6 +114,7 @@ Creates the directory if it does not exist."
   (push (abbreviate-file-name (my/emacs.d)) trusted-content)
   (push (abbreviate-file-name (file-name-as-directory (file-name-concat (my/init-files) "shell/"))) trusted-content)
   (push (abbreviate-file-name (my/user-lisp)) trusted-content)
+  (push "/Applications/Emacs.app/Contents/Resources/lisp/" trusted-content)
 
   ;; (unless (null Info-directory-list)
   ;;   (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))

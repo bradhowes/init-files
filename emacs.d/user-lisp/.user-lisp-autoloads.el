@@ -537,6 +537,13 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence.
 (fn KEYMAP &rest DEFINITIONS)")
 (defvar my/hyper-c-map (make-sparse-keymap)
 "Keymap for Hyper-c actions.")
+(defvar my/hyper-n-map (make-sparse-keymap)
+"Keymap for Hyper-n actions.")
+(defvar my/dired-jumps-map (let ((map (make-sparse-keymap))) (mapc (lambda (tuple) (let* ((key (elt tuple 0)) (path (elt tuple 1)) (tag (elt tuple 2)) (name (cond ((stringp path) (let ((name (intern (concat "my/jmp-" (or tag path))))) (fset name (lambda nil (interactive) (dired (if (or (string= "/" (substring path 0 1)) (string= "~" (substring path 0 1))) (file-truename path) (files--splice-dirname-file (my/repos) path))))) name)) ((functionp path) path) (t nil)))) (message "my/dired-jumps-map: %s -> %s" tuple name) (when name (keymap-set map key name)))) `(("a" "auv3-support" nil) ("c" "AUv3Controls" nil) ("i" "init-files" nil) ("e" "init-files/emacs.d" "emacs.d") ("E" ,(expand-file-name user-emacs-directory) "~.emacs.d") ("l" #'my/find-elpa-directory nil) ("L" ,(file-name-concat user-emacs-directory "elpa") "elpa") ("p" "SoundFontsPlus" nil) ("s" "AUv3Support" nil) ("u" #'my/find-user-lisp-file nil) ("U" ,(my/user-lisp) "user-lisp") ("z" "init-files/shells" "shells") ("2" "SF2Lib" nil))) map)
+"Keymap for quick Dired jumps.
+The map is made up of tiny functions that invoke `dired' on a path.")
+(defvar my/point-jumps-map (let ((map (make-sparse-keymap))) (define-key map " " #'consult-register-store) (define-key map "j" #'consult-register-load) map)
+"Keymap for quick Dired jumps.")
 
 
 ;;; Generated autoloads from my-git.el
@@ -719,6 +726,43 @@ artifacts such as indentation bars.
 "Run htop in a term buffer." t)
 (autoload 'my/top "my-tops"
 "Run top in a term buffer." t)
+
+
+;;; Generated autoloads from mood-line.el
+
+(defvar mood-line-mode nil
+"Non-nil if Mood-Line mode is enabled.
+See the `mood-line-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `mood-line-mode'.")
+(custom-autoload 'mood-line-mode "mood-line" nil)
+(autoload 'mood-line-mode "mood-line"
+"Toggle mood-line on or off.
+
+This is a global minor mode.  If called interactively, toggle the
+`Mood-Line mode' mode.  If the prefix argument is positive, enable the
+mode, and if it is zero or negative, disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
+mode if ARG is nil, omitted, or is a positive number.  Disable the mode
+if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate `(default-value \\='mood-line-mode)'.
+
+The mode's hook is called both when the mode is enabled and when it is
+disabled.
+
+(fn &optional ARG)" t)
+(register-definition-prefixes "mood-line" '("mood-line-"))
+
+
+
+;;; Generated autoloads from my-packages.el
+
+(register-definition-prefixes "my-packages" '("ffap-bindings" "my/project-search-map"))
 
 
 ;;; End of scraped data

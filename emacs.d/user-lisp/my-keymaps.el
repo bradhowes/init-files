@@ -3,8 +3,11 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'consult-register)
 (require 'generator)
 (require 'key-chord)
+(require 'my-env)
+(require 'my-finders)
 
 (iter-defun my/take-two-iterator (values)
   "Iterator that yields a `cons' cell for every 2 items in VALUES."
@@ -55,6 +58,68 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
 (defvar my/hyper-c-map
   (make-sparse-keymap)
   "Keymap for Hyper-c actions.")
+
+;;;###autoload
+(defvar my/hyper-n-map
+  (make-sparse-keymap)
+  "Keymap for Hyper-n actions.")
+
+;; "Jump" to a well-known directory/file (eg "H-c j a" => dired buffer in "auv3-support" repo)
+;;;###autoload
+(defvar my/dired-jumps-map
+  (let ((map (make-sparse-keymap)))
+    (mapc (lambda (tuple)
+            (let* ((key (elt tuple 0))
+                   (path (elt tuple 1))
+                   (tag (elt tuple 2))
+                   (name (cond
+                          ;; When given a string, intern it use for name of lambda to execute `dired'
+                          ((stringp path)
+                           (let ((name (intern (concat "my/jmp-" (or tag path)))))
+                             (fset name (lambda ()
+                                          (interactive)
+                                          (dired (if (or (string= "/" (substring path 0 1))
+                                                         (string= "~" (substring path 0 1)))
+                                                     (file-truename path)
+                                                   (files--splice-dirname-file (my/repos) path)))))
+                             name))
+                          ;; Given symbol assume function to execute
+                          ((functionp path)
+                           path)
+                          (t
+                           nil))))
+              (message "my/dired-jumps-map: %s -> %s" tuple name)
+              (when name
+                (keymap-set map key name))))
+          ;; Collection of 3-tuples that define a directory to jump to:
+          ;; 1 - key to use
+          ;; 2 - the directory to jump to (if not absolute then prepend with value from `my/repos')
+          ;; 3 - the name to assign to the utility function (if nil make from directory)
+          `(("a" "auv3-support" nil)
+            ("c" "AUv3Controls" nil)
+            ("i" "init-files" nil)
+            ("e" "init-files/emacs.d" "emacs.d")
+            ("E" ,(expand-file-name user-emacs-directory) "~.emacs.d")
+            ("l" #'my/find-elpa-directory nil)
+            ("L" ,(file-name-concat user-emacs-directory "elpa") "elpa")
+            ("p" "SoundFontsPlus" nil)
+            ("s" "AUv3Support" nil)
+            ("u" #'my/find-user-lisp-file nil)
+            ("U" ,(my/user-lisp) "user-lisp")
+            ("z" "init-files/shells" "shells")
+            ("2" "SF2Lib" nil)))
+    map)
+  "Keymap for quick Dired jumps.
+The map is made up of tiny functions that invoke `dired' on a path.")
+
+;; "Jump" to a saved position -- "H-j"
+;;;###autoload
+(defvar my/point-jumps-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map " " #'consult-register-store)
+    (define-key map "j" #'consult-register-load)
+    map)
+  "Keymap for quick Dired jumps.")
 
 (provide 'my-keymaps)
 

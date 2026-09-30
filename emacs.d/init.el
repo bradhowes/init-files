@@ -4,6 +4,9 @@
 ;;; Code:
 
 ;; Always work in the UTF-8 coding system.
+(defvar load-began (float-time)
+  "Timestamp when load started.")
+
 (let ((coding-system 'utf-8))
   (set-charset-priority 'unicode)
   (prefer-coding-system coding-system)
@@ -505,9 +508,7 @@ Here, we just separate them by a comma."
   (mood-line-glyph-alist mood-line-glyphs-fira-code)
   :hook (after-init . mood-line-mode))
 
-(use-package keycast
-  :ensure t
-  :hook (after-init . keycast-tracking-mode))
+(use-package keycast)
 
 (use-package multiple-cursors
   :ensure t
@@ -951,6 +952,8 @@ The map is made up of tiny functions that invoke `dired' on a path.")
   "Blah."
   "Field name: "
   > str " = \"" _ "\"\n")
+
+(message "Elapsed load time: %f" (- (float-time) load-began))
 
 (provide 'init)
 

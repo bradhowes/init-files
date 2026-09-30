@@ -84,6 +84,24 @@ the items to setup for autoloading from the given file."
               ("M-n" . flymake-goto-next-error)
               ("M-p" . flymake-goto-prev-error)))
 
+(use-package flyover
+  :ensure t
+  :hook ((flymake-mode . flyover-mode))
+  :custom
+  ;; Appearance
+  (flyover-checkers '(flymake))
+  (flyover-background-lightness 45)
+  (flyover-percent-darker 40)
+
+  ;; Icons
+  ;; (flyover-info-icon " ")
+  ;; (flyover-warning-icon " ")
+  ;; (flyover-error-icon " ")
+
+  ;; Display settings
+  (flyover-display-mode 'hide-on-same-line)
+  (flyover-max-line-length 120))
+
 (use-package eglot
   :commands (eglot-ensure eglot-completion-at-point)
   :defines (eglot-mode-map)
@@ -137,10 +155,10 @@ the items to setup for autoloading from the given file."
 
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
-(use-package flyspell
-  :ensure t
-  :hook ((prog-mode . flyspell-prog-mode)
-         (text-mode . flyspell-mode)))
+;; (use-package flyspell
+;;   :ensure t
+;;   :hook ((prog-mode . flyspell-prog-mode)
+;;          (text-mode . flyspell-mode)))
 
 (defun my/go-mode-hook ()
   "Custom hook for setting up `go-mode'."

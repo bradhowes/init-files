@@ -13,9 +13,10 @@
  '(all-the-icons-completion-mode t)
  '(auto-revert-buffer-list-filter 'magit-auto-revert-repository-buffer-p)
  '(auto-revert-use-notify nil)
+ '(auto-save-file-name-transforms '((".*" "/Users/bradhowes/tmp/emacs_autosaves" t)))
  '(auto-save-list-file-prefix nil)
  '(auto-save-visited-interval 60)
- '(backup-directory-alist '(("." . ".~")))
+ '(backup-directory-alist '(("." . "/Users/bradhowes/tmp/emacs_backups")))
  '(blink-cursor-blinks 0)
  '(bookmark-save-flag 1)
  '(byte-compile-verbose nil)
@@ -118,10 +119,10 @@
  '(package-selected-packages
    '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes corfu crux denote diff-hl eldoc-box
             embark-consult esup exec-path-from-shell expand-region fancy-compilation flymake-gradle flymake-shellcheck
-            flyover go-mode gradle-mode helpful impatient-mode indent-bars js2-mode key-chord keycast kotlin-ts-mode
-            ligature lsp-pyright magit marginalia markdown-mode mode-line-bell mood-line moody multiple-cursors
-            nerd-icons-completion nerd-icons-dired nerd-icons-xref orderless osx-dictionary popper rg scratch tempel
-            tempel-collection vertico yaml yaml-mode yasnippet yasnippet-snippets))
+            flyover go-mode gradle-mode helpful impatient-mode indent-bars js2-mode key-chord kotlin-ts-mode ligature
+            lsp-pyright magit marginalia markdown-mode mode-line-bell mood-line multiple-cursors nerd-icons-completion
+            nerd-icons-dired nerd-icons-xref orderless osx-dictionary popper rg scratch tempel tempel-collection vertico
+            yaml yaml-mode yasnippet yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-echo-mode t)
  '(popper-mode t)
@@ -158,6 +159,8 @@
  '(tab-always-indent 'complete)
  '(text-scale-mode-step 1.0)
  '(tool-bar-mode nil)
+ '(tramp-auto-save-directory "/Users/bradhowes/tmp/emacs_autosaves")
+ '(tramp-backup-directory-alist '((".*" . "/Users/bradhowes/tmp/emacs_backups")))
  '(truncate-string-ellipsis "…" t)
  '(uniquify-buffer-name-style 'forward nil (uniquify))
  '(use-package-always-defer t)

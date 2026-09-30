@@ -20,6 +20,6 @@ process has its own server connection."
     (setenv "EMACS_SOCKET_NAME" server-name)
     (server-start)))
 
-(provide 'my-keymaps)
+(provide 'my-server)
 
 ;;; my-server.el ends here.
