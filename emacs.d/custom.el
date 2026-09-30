@@ -9,7 +9,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(Info-additional-directory-list '("/opt/homebrew/share/info"))
- '(all-the-icons-completion-mode t)
  '(auto-revert-buffer-list-filter 'magit-auto-revert-repository-buffer-p)
  '(auto-revert-use-notify nil)
  '(auto-save-file-name-transforms '((".*" "/Users/bradhowes/tmp/emacs_autosaves" t)))
@@ -38,7 +37,6 @@
    '(consult-dir--source-default consult-dir--source-project consult-dir--source-recentf consult-dir--source-bookmark
                                  consult-dir--source-tramp-local))
  '(consult-notes-denote-files-function #'denote-directory-files)
- '(consult-notes-denote-mode t)
  '(consult-notes-use-rg t)
  '(context-menu-mode t)
  '(copyright-query nil)
@@ -144,7 +142,6 @@
  '(switch-to-prev-buffer-skip t)
  '(tab-always-indent 'complete)
  '(text-scale-mode-step 1.0)
- '(tool-bar-mode nil)
  '(tramp-auto-save-directory "/Users/bradhowes/tmp/emacs_autosaves")
  '(tramp-backup-directory-alist '((".*" . "/Users/bradhowes/tmp/emacs_backups")))
  '(truncate-string-ellipsis "…" t)

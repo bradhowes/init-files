@@ -266,32 +266,14 @@
   (make-sparse-keymap)
   "Keymap for Hyper-n actions.")
 
-(use-package denote
-  :ensure t
-  :commands (denote-dired-mode-in-directories)
-  :hook (dired-mode . denote-dired-mode)
-  :bind (:map my/hyper-n-map
-              ("b" . denote-backlinks)
-              ("c" . denote)
-              ("d" . denote-dired)
-              ("g" . denote-grep)
-              ("l" . denote-link)
-              ;; ("n" . consult-notes)
-              ("r" . denote-rename-file))
-  :custom
-  (denote-directory (expand-file-name "~/Documents/notes/"))
-  (denote-file-type 'markdown-brh)
-  (denote-rename-buffer-mode 1)
-  (denote-sort-keywords t)
-
-  :config
-  (defun my/denote-format-keywords-for-md-front-matter (keywords)
-    "Custom KEYWORDS formatter for keystrokecountdown.com markdown files.
+(defun my/denote-format-keywords-for-md-front-matter (keywords)
+  "Custom KEYWORDS formatter for keystrokecountdown.com markdown files.
 The default Markdown keyword formatter puts each keyword in double-quotes,
 separates them with a \", \" and surrounds the result with square brackets.
 Here, we just separate them by a comma."
-    (format "%s" (mapconcat (lambda (k) k) keywords ", ")))
+  (format "%s" (mapconcat (lambda (k) k) keywords ", ")))
 
+(defun my/denote-configure ()
   (setq denote-file-types (cons
                            '(markdown-brh
                              :extension ".md"
@@ -308,6 +290,25 @@ Here, we just separate them by a comma."
                            denote-file-types)
         denote-file-type 'markdown-brh))
 
+(use-package denote
+  :defer t
+  :commands (denote-dired-mode-in-directories)
+  :hook ((dired-mode . denote-dired-mode)
+         (after-init . my/denote-configure))
+  :bind (:map my/hyper-n-map
+              ("b" . denote-backlinks)
+              ("c" . denote)
+              ("d" . denote-dired)
+              ("g" . denote-grep)
+              ("l" . denote-link)
+              ;; ("n" . consult-notes)
+              ("r" . denote-rename-file))
+  :custom
+  (denote-directory (expand-file-name "~/Documents/notes/"))
+  (denote-file-type 'markdown-brh)
+  (denote-rename-buffer-mode 1)
+  (denote-sort-keywords t))
+
 (use-package completion
   :defer t
   :hook ((after-init . dynamic-completion-mode)))
@@ -316,10 +317,8 @@ Here, we just separate them by a comma."
   :defer t
   :after (consult denote)
   :commands (consult-notes-denote-mode denote-directory-files)
-  :bind (:map my/hyper-n-map ("n" . consult-notes)))
-
-(with-eval-after-load 'consult-notes
-  (require 'consult-notes-denote))
+  :bind (:map my/hyper-n-map ("n" . consult-notes))
+  :hook ((after-init . consult-notes-denote-mode)))
 
 (use-package corfu
   :after orderless
