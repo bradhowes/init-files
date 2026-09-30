@@ -6,9 +6,9 @@
 ;;;
 ;;; Code:
 
+(require 'info)
 (require 'my-constants)
 (require 'my-functions)
-(require 'info)
 
 ;;;###autoload
 (defun my/is-terminal ()

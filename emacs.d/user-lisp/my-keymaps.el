@@ -83,11 +83,8 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                                                      (file-truename path)
                                                    (files--splice-dirname-file (my/repos) path)))))
                              name))
-                          ;; Given symbol assume function to execute
-                          ((functionp path)
-                           path)
                           (t
-                           nil))))
+                           path))))
               (message "my/dired-jumps-map: %s -> %s" tuple name)
               (when name
                 (keymap-set map key name))))
@@ -100,11 +97,11 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
             ("i" "init-files" nil)
             ("e" "init-files/emacs.d" "emacs.d")
             ("E" ,(expand-file-name user-emacs-directory) "~.emacs.d")
-            ("l" #'my/find-elpa-directory nil)
+            ("l" my/find-elpa-directory nil)
             ("L" ,(file-name-concat user-emacs-directory "elpa") "elpa")
             ("p" "SoundFontsPlus" nil)
             ("s" "AUv3Support" nil)
-            ("u" #'my/find-user-lisp-file nil)
+            ("u" my/find-user-lisp-file nil)
             ("U" ,(my/user-lisp) "user-lisp")
             ("z" "init-files/shells" "shells")
             ("2" "SF2Lib" nil)))

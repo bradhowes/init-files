@@ -22,7 +22,7 @@
 ;; Replicating much of what is in user-lisp-autoloads.el in order to silence warnings from flymake.
 ;; The .user-lisp-autoloads.el file is loaded upon startup.
 ;;
-(autoload 'my/is-terminal "my-env")
+;; (autoload 'my/is-terminal "my-env")
 (autoload 'my/is-graphical "my-env")
 (autoload 'my/repos "my-env")
 (autoload 'my/user-lisp "my-env")
@@ -76,6 +76,7 @@
 
 (use-package my-constants)
 (use-package my-customizations)
+(use-package my-keymaps)
 (use-package my-modes)                  ; TODO: rework so that we don't pay cost of loading it all
 
 ;; To keep this file small, we put all customizations in their own file.
@@ -273,28 +274,24 @@ separates them with a \", \" and surrounds the result with square brackets.
 Here, we just separate them by a comma."
   (format "%s" (mapconcat (lambda (k) k) keywords ", ")))
 
-(defun my/denote-configure ()
-  (setq denote-file-types (cons
-                           '(markdown-brh
-                             :extension ".md"
-                             :date-function (lambda (date) (format-time-string "%F %T"))
-                             :front-matter denote-yaml-front-matter
-                             :title-key-regexp "^title\\s-*:"
-                             :title-value-function denote-trim-whitespace
-                             :title-value-reverse-function denote-trim-whitespace
-                             :keywords-key-regexp "^tags\\s-*:"
-                             :keywords-value-function my/denote-format-keywords-for-md-front-matter
-                             :keywords-value-reverse-function denote-extract-keywords-from-front-matter
-                             :link denote-md-link-format
-                             :link-in-context-regexp denote-md-link-in-context-regexp)
-                           denote-file-types)
-        denote-file-type 'markdown-brh))
-
 (use-package denote
   :defer t
   :commands (denote-dired-mode-in-directories)
   :hook ((dired-mode . denote-dired-mode)
-         (after-init . my/denote-configure))
+         (after-init . (lambda ()
+                         (push '(markdown-brh
+                                 :extension ".md"
+                                 :date-function (lambda (date) (format-time-string "%F %T"))
+                                 :front-matter denote-yaml-front-matter
+                                 :title-key-regexp "^title\\s-*:"
+                                 :title-value-function denote-trim-whitespace
+                                 :title-value-reverse-function denote-trim-whitespace
+                                 :keywords-key-regexp "^tags\\s-*:"
+                                 :keywords-value-function my/denote-format-keywords-for-md-front-matter
+                                 :keywords-value-reverse-function denote-extract-keywords-from-front-matter
+                                 :link denote-md-link-format
+                                 :link-in-context-regexp denote-md-link-in-context-regexp)
+                               denote-file-types))))
   :bind (:map my/hyper-n-map
               ("b" . denote-backlinks)
               ("c" . denote)
@@ -555,7 +552,7 @@ Here, we just separate them by a comma."
 
 (use-package popper
   :defer t
-  :commands (popper-kill-latest-popup)
+  :commands (popper-kill-latest-popup popper-mode popper-echo-mode)
   :functions (popper--delete-popup)
   :bind (("C-'" . popper-toggle)
          ("M-'" . popper-cycle))
@@ -682,56 +679,6 @@ Bound to \\`C-x p s'.")
 ;; Show log buffer in something other than the current window
 ;; ("magit-log" nil (inhibit-same-window . t))
 ;; ("magit-diff:" nil (inhibit-same-window . t))))))
-
-;; "Jump" to a well-known directory/file (eg "H-c j a" => dired buffer in "auv3-support" repo)
-(defvar my/dired-jumps-map
-  (let ((map (make-sparse-keymap)))
-    (mapc (lambda (tuple)
-            (let* ((key (elt tuple 0))
-                   (path (elt tuple 1))
-                   (tag (elt tuple 2))
-                   (name (cond
-                          ;; When given a string, intern it use for name of lambda to execute `dired'
-                          ((stringp path)
-                           (let ((name (intern (concat "my/jmp-" (or tag path)))))
-                             (fset name (lambda ()
-                                          (interactive)
-                                          (dired (if (or (string= "/" (substring path 0 1))
-                                                         (string= "~" (substring path 0 1)))
-                                                     (file-truename path)
-                                                   (files--splice-dirname-file (my/repos) path)))))
-                             name))
-                          ;; Given symbol assume function to execute
-                          ((functionp path)
-                           path)
-                          (t
-                           nil))))
-              (message "my/dired-jumps-map: %s -> %s" tuple name)
-              (when name
-                (keymap-set map key name))))
-          ;; Collection of 3-tuples that define a directory to jump to:
-          ;; 1 - key to use
-          ;; 2 - the directory to jump to (if not absolute then prepend with value from `my/repos')
-          ;; 3 - the name to assign to the utility function (if nil make from directory)
-          `(("a" "auv3-support" nil)
-            ("c" "AUv3Controls" nil)
-            ("i" "init-files" nil)
-            ("e" "init-files/emacs.d" "emacs.d")
-            ("E" ,(expand-file-name user-emacs-directory) "~.emacs.d")
-            ("l" #'my/find-elpa-directory nil)
-            ("L" ,(file-name-concat user-emacs-directory "elpa") "elpa")
-            ("p" "SoundFontsPlus" nil)
-            ("s" "AUv3Support" nil)
-            ("u" #'my/find-user-lisp-file nil)
-            ("U" ,(my/user-lisp) "user-lisp")
-            ("z" "init-files/shells" "shells")
-            ("2" "SF2Lib" nil)))
-    map)
-  "Keymap for quick Dired jumps.
-The map is made up of tiny functions that invoke `dired' on a path.")
-
-(keymap-set my/dired-jumps-map "u" #'my/find-user-lisp-file)
-(keymap-set my/dired-jumps-map "l" #'my/find-elpa-directory)
 
 ;; "Jump" to a saved position -- "H-j"
 (defvar my/point-jumps-map
