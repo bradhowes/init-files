@@ -213,15 +213,8 @@ the items to setup for autoloading from the given file."
 
 (use-package shell
   :defines (explicit-bash-args)
-  :init
-  ;; Special-case QA env -- we are logged in as `sp_qa' user but we want our custom
-  ;; environment. Command `bash' to load our custom settings.
-  ;; (let ((rc (file-truename (file-name-concat my/repos "configurations/qa.bashrc"))))
-  ;;   (if (and my/is-qa
-  ;;            (file-exists-p rc)
-  ;;            (string-suffix-p "q" (system-name)))
-  ;;       (setq explicit-bash-args (list "--noediting" "--rcfile" rc "-i"))
-  (setq explicit-bash-args '("--noediting" "-i"))
+  :custom
+  (explicit-bash-args '("--noediting" "-i"))
   :hook ((shell-mode . my/shell-mode-hook)))
 
 (use-package tempel

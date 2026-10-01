@@ -41,9 +41,6 @@
 (autoload 'my/reload-buffer "my-functions")
 (autoload 'my/set-mark-deactivate "my-functions")
 (autoload 'my/trusted-content-p "my-functions")
-(autoload 'my/emacs-chord-bind "my-keymaps")
-(autoload 'my/emacs-key-bind "my-keymaps")
-(autoload 'my/emacs-make-key-bind "my-keymaps")
 (autoload 'my/layout-frame-pos-left "my-layout")
 (autoload 'my/layout-frame-pos-center "my-layout")
 (autoload 'my/layout-frame-pos-right "my-layout")
@@ -76,9 +73,8 @@
 (add-hook 'emacs-startup-hook #'my/layout-screen-layout-changed 98)
 (add-hook 'emacs-startup-hook #'my/start-emacs-server 99)
 
-(use-package my-constants)
-(use-package my-customizations)
-(use-package my-keymaps)
+(require 'my-customizations)
+(require 'my-keymaps)
 (use-package my-modes)                  ; TODO: rework so that we don't pay cost of loading it all
 
 ;; To keep this file small, we put all customizations in their own file.

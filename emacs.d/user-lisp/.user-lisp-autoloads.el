@@ -356,6 +356,7 @@ very small for me, and it remove the obnoxious message at startup about
 the buffer having untrusted content.
 
 (fn ORIGINAL-RESPONSE)")
+(register-definition-prefixes "my-functions" '("my/launch-ssh-emacs"))
 
 
 ;;; Generated autoloads from my-insert-block-comment.el
@@ -643,6 +644,10 @@ Only switch to a buffer that passes the filter defined in
 "Switch to `previous' buffer in current window with filtering.
 Only switch to a buffer that passes the filter defined in
 `my/next-buffer-skip-filter'." t)
+(autoload 'my/show-messages-buffer "my-navigation"
+"Quickly show the *Messages* buffer." t)
+(autoload 'my/show-messages-buffer-other-window "my-navigation"
+"Quickly show the *Messages* buffer." t)
 (register-definition-prefixes "my-navigation" '("my/next-window-wrap-around"))
 
 
