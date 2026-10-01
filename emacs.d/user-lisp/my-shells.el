@@ -34,6 +34,12 @@ buffer."
   (my/run-shell #'my/in-current-window))
 
 ;;;###autoload
+(defun ksh ()
+  "Alternative to my/shell."
+  (interactive)
+  (my/run-shell #'my/in-current-window))
+
+;;;###autoload
 (defun my/shell-other-window ()
   "Start a new shell in another window."
   (interactive)

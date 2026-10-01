@@ -33,7 +33,7 @@
 Otherwise, edit the `early-init.el' file instead, creating it if
 necessary."
   (interactive "P")
-  (find-file (locate-user-emacs-file (if arg "early-init.el" user-init-file))))
+  (find-file (file-truename (locate-user-emacs-file (if arg "early-init.el" user-init-file)))))
 
 ;;;###autoload
 (defun my/find-user-custom-file ()

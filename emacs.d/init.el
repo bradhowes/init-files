@@ -67,6 +67,7 @@
 (autoload 'my/shell "my-shells")
 (autoload 'my/shell-other-window "my-shells")
 (autoload 'my/shell-other-frame "my-shells")
+(autoload 'ksh "my-shells")
 (autoload 'my/htop "my-tops")
 
 (my/env-setup)
@@ -790,7 +791,7 @@ Bound to \\`C-x p s'.")
                             "H-2" #'split-window-below
                             "H-4" #'other-window-prefix ; was ctl-x-4-prefix
                             "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
-                            "H-a" #'ace-window
+                            "H-a" #'my/ace-window-always-dispatch
                             "H-b" #'consult-project-buffer
                             "H-B" #'consult-buffer
                             "H-c" my/hyper-c-map
@@ -799,6 +800,7 @@ Bound to \\`C-x p s'.")
                             "H-h" #'my/describe-symbol-at-point
                             "H-j" my/point-jumps-map
                             "H-k" #'bury-buffer
+                            "H-K" #'my/shell
                             "H-m" #'consult-bookmark
                             "H-M-m" #'my/show-messages-buffer
                             "H-n" my/hyper-n-map

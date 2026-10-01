@@ -35,7 +35,8 @@ command guarantees that dispatching will always happen."
 ;;;###autoload
 (defun my/ace-window-one-command ()
   "Run an action in a chosen window.
-Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch."
+Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch.
+NOTE: this seems to be broken now for `M-x' actions."
   (interactive)
   (when-let* ((aw-dispatch-always t)
               (win (aw-select " ACE"))
