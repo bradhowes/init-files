@@ -62,6 +62,8 @@
 (autoload 'my/info-other-frame "my-navigation")
 (autoload 'my/next-buffer-current-window "my-navigation")
 (autoload 'my/prev-buffer-current-window "my-navigation")
+(autoload 'my/show-messages-buffer "my-navigation")
+(autoload 'my/show-messages-buffer-other-window "my-navigation")
 (autoload 'my/show-project-menu "my-project")
 (autoload 'my/start-emacs-server "my-server")
 (autoload 'my/repl-other-window "my-shells")
@@ -802,6 +804,7 @@ Bound to \\`C-x p s'.")
                             "H-j" my/point-jumps-map
                             "H-k" #'bury-buffer
                             "H-m" #'consult-bookmark
+                            "H-M-m" #'my/show-messages-buffer
                             "H-n" my/hyper-n-map
                             "H-p" project-prefix-map
                             "H-r" #'speedbar

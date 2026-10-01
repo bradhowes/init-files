@@ -201,6 +201,18 @@ Only switch to a buffer that passes the filter defined in
   (let ((switch-to-prev-buffer-skip #'my/next-buffer-skip-filter))
     (previous-buffer)))
 
+;;;###autoload
+(defun my/show-messages-buffer ()
+  "Quickly show the *Messages* buffer."
+  (interactive)
+  (switch-to-buffer "*Messages*"))
+
+;;;###autoload
+(defun my/show-messages-buffer-other-window ()
+  "Quickly show the *Messages* buffer."
+  (interactive)
+  (switch-to-buffer-other-window "*Messages*"))
+
 (provide 'my-navigation)
 
 ;;; my-navigation.el ends here.
