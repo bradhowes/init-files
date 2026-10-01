@@ -20,11 +20,8 @@ When `aw-dispatch-always' is nil, `ace-window' does not invoke
 its dispatching mechanism if there are 2 or fewer windows. This
 command guarantees that dispatching will always happen."
   (interactive)
-  (let ((current-aw-dispatch-always aw-dispatch-always))
-    (unwind-protect
-        (let ((aw-dispatch-always t))
-          (call-interactively #'ace-window))
-      (setq aw-dispatch-always current-aw-dispatch-always))))
+  (let ((aw-dispatch-always t))
+    (call-interactively #'ace-window)))
 
 ;;;###autoload
 (defun my/ace-window-next ()
