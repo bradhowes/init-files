@@ -1,4 +1,4 @@
-;;; init.el --- load the full configuration -*- lexical-binding: t; -*-
+;;; init.el ---  -*- lexical-binding: t; -*-
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2------
 ;;; Commentary:
 ;;; Code:
@@ -153,9 +153,9 @@
                ("Greek" "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
 
 (use-package compile
-  :config
-  (push '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2) ; I think this is from pyright
-        compilation-error-regexp-alist))
+  :custom
+  (compilation-error-regexp-alist (cons '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2) ; from pyright?
+                                        compilation-error-regexp-alist)))
 
 (use-package consult
   :commands (consult--customize-put consult-flymake)
@@ -331,8 +331,8 @@ Here, we just separate them by a comma."
 (use-package crm)
 
 (use-package crux
+  :defer t                            ; load now due to dependencies below
   :commands (crux-find-current-directory-dir-locals-file)
-  :defer nil                            ; load now due to dependencies below
   :bind (:map my/hyper-c-map
               ("d" . crux-duplicate-current-line-or-region)
               ("C-i" . crux-indent-defun)
@@ -343,12 +343,12 @@ Here, we just separate them by a comma."
               ("C-k" . crux-smart-kill-line)
               ("C-^" . crux-top-join-line)))
 
+(autoload 'my/dired-mode-hook "my-dired-mode")
 (use-package dired
   :hook (dired-mode . my/dired-mode-hook))
 
 (autoload 'my/lisp-mode-hook "my-lisp-mode")
 (autoload 'my/lisp-data-mode-hook "my-lisp-mode")
-
 (use-package elisp-mode
   :hook ((lisp-mode . my/lisp-mode-hook)
          (lisp-interaction-mode . my/lisp-mode-hook)
@@ -361,10 +361,12 @@ Here, we just separate them by a comma."
 ;; :hook (prog-mode . eldoc-box-hover-mode)))
 
 (use-package emacs-pager
+  :defer t
   :commands (emacs-pager emacs-pager-mode))
 
 ;; FYI: Embark's default action binding of "RET" fails if a mode binds to <return>.
 (use-package embark
+  :defer t
   :bind (("C-." . embark-act)
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
@@ -374,6 +376,7 @@ Here, we just separate them by a comma."
                                        (window-parameters (mode-line-format . none)))))
 
 (use-package embark-consult
+  :defer t
   :after (consult embark)
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
@@ -381,6 +384,7 @@ Here, we just separate them by a comma."
 ;;   :custom (esup-user-init-file (file-truename "~/.emacs.d/init.el")))
 
 (use-package exec-path-from-shell
+  :defer t
   :commands (exec-path-from-shell-initialize)
   :hook (after-init . exec-path-from-shell-initialize))
 
@@ -388,6 +392,7 @@ Here, we just separate them by a comma."
   :bind ("C-\\" . er/expand-region))
 
 (use-package fancy-compilation
+  :defer t
   :commands (fancy-compilation-mode)
   :hook ((compilation-mode . fancy-compilation-mode)))
 
@@ -398,6 +403,7 @@ Here, we just separate them by a comma."
               ("M-p" . flymake-goto-prev-error)))
 
 (use-package flyover
+  :defer t
   :hook ((flymake-mode . flyover-mode))
   :custom
   (flyover-background-lightness 45)
@@ -413,6 +419,7 @@ Here, we just separate them by a comma."
   (flyover-max-line-length 120))
 
 (use-package helpful
+  :defer t
   :bind (:map help-map
               ("f" . helpful-callable)
               ("v" . helpful-variable)
@@ -425,44 +432,52 @@ Here, we just separate them by a comma."
   :bind (("M-/" . hippie-expand)))
 
 (use-package hl-line
+  :defer t
   :hook ((after-init . global-hl-line-mode)))
 
 ;; Unbind the ibuffer use of "M-o" so as not to conflict with my global definition using `ace-window'
 (use-package ibuffer
-  :config (keymap-unset ibuffer-mode-map "M-o" t))
+  :defer t
+  :config
+  (keymap-unset ibuffer-mode-map "M-o" t))
 
 (use-package indent-bars
+  :defer t
   :hook (prog-mode . indent-bars-mode))
 
 (use-package iso-transl
+  :defer t
   :bind-keymap ("H-8" . iso-transl-ctl-x-8-map)) ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
 
 (use-package key-chord
+  :defer t
   ;; :vc (:url "https://github.com/emacsorphanage/key-chord" :rev :newest)
   :commands (key-chord-define key-chord-mode)
   :config (key-chord-mode 1))
 
 (use-package ligature
+  :defer t
   :commands (ligature-set-ligatures global-ligature-mode)
-  :config
-  (ligature-set-ligatures
-   'prog-mode
-   '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
-     ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
-     "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
-     "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
-     "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
-     "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
-     "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
-     "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
-     ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
-     "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
-     "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
-     "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
-     "\\\\" "://" "www"))
-  (global-ligature-mode t))
+  :hook ((after-init . (lambda ()
+                         (ligature-set-ligatures
+                          'prog-mode
+                          '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                            ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                            "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                            "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                            "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                            "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                            "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                            "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                            ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                            "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                            "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                            "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                            "\\\\" "://" "www"))
+                         (global-ligature-mode t)))))
 
 (use-package magit
+  :defer t
   :commands (magit-status-setup-buffer magit-status magit-project-status)
   :hook ((magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (:map ctl-x-map
@@ -473,7 +488,8 @@ Here, we just separate them by a comma."
               ("v l" . magit-log-buffer-file)
               :map my/hyper-c-map
               ("f" . magit-file-dispatch))
-  :custom (magit-process-find-password-functions '(my/read-gitlab-password)))
+  :custom
+  (magit-process-find-password-functions '(my/read-gitlab-password)))
 
 (use-package marginalia-mode
   :defer t
@@ -483,38 +499,47 @@ Here, we just separate them by a comma."
   :hook (after-init . marginalia-mode))
 
 (use-package markdown-mode
+  :defer t
   :hook (markdown-mode . my/markdown-mode-hook))
 
-(use-package mode-line-bell)
+(use-package mode-line-bell
+  :defer t)
 
 (use-package mood-line
+  :defer t
   :commands (mood-line-mode)
   :custom
   (mood-line-format mood-line-format-default)
   (mood-line-glyph-alist mood-line-glyphs-fira-code)
   :hook (after-init . (lambda () (mood-line-mode t))))
 
-(use-package keycast)
+(use-package keycast
+  :defer t)
 
 (use-package multiple-cursors
+  :defer t
   :bind (("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          :map my/hyper-c-map
          ("." . mc/mark-all-like-this)))
 
-(use-package my-fontify-braces)
+(use-package my-fontify-braces
+  :defer t)
 
 (use-package nerd-icons-completion
+  :defer t
   :after (marginalia)
   :commands (nerd-icons-completion-mode nerd-icons-completion-marginalia-setup)
   :hook ((after-init . nerd-icons-completion-mode)
          (marginalia-mode nerd-icons-completion-marginalia-setup)))
 
 (use-package nerd-icons-dired
+  :defer t
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
 (use-package orderless
+  :defer t
   :custom
   (completion-styles '(partial-completion orderless flex))
   (completion-category-defaults nil)
@@ -522,6 +547,7 @@ Here, we just separate them by a comma."
                                    (minibuffer (initials orderless)))))
 
 (use-package org
+  :defer t
   :commands (org-store-link)
   :config
   (defvar my/org-key-map
@@ -534,6 +560,7 @@ Here, we just separate them by a comma."
   :bind-keymap ("H-o" . my/org-key-map))
 
 (use-package osx-dictionary
+  :defer t
   :if my/is-macosx
   :bind (:map my/hyper-c-map ("l" . osx-dictionary-search-pointer)))
 
@@ -555,6 +582,7 @@ Bound to \\`C-x p s'.")
 (keymap-set project-prefix-map "s" my/project-search-map)
 
 (use-package project
+  :defer t
   :commands (project--switch-project-command) ;; used in my/show-project-menu
   :bind (:map project-prefix-map
               ("$" . #'project-shell)
@@ -564,6 +592,7 @@ Bound to \\`C-x p s'.")
               ))
 
 (use-package rg
+  :defer t
   :after (project)
   :commands (rg-enable-default-bindings rg-project)
   :bind (:map my/project-search-map
@@ -579,14 +608,17 @@ Bound to \\`C-x p s'.")
   :hook ((after-init . save-place-mode)))
 
 (use-package scratch
+  :defer t
   :bind (:map my/hyper-c-map ("s" . scratch)))
 
 (autoload 'my/sh-mode-hook "my-sh-mode")
 (use-package sh-script
+  :defer t
   :hook (sh-mode . my/sh-mode-hook))
 
 (autoload 'my/shell-mode-hook "my-shell-mode")
 (use-package shell
+  :defer t
   :custom
   (explicit-bash-args '("--noediting" "-i"))
   :hook ((shell-mode . my/shell-mode-hook)))
@@ -606,6 +638,7 @@ Bound to \\`C-x p s'.")
   :hook (after-init . which-key-mode))
 
 (use-package whitespace
+  :defer t
   :hook ((after-init . (lambda () (global-whitespace-mode t)))
          (prog-mode . (lambda () (add-hook 'before-save-hook #'whitespace-cleanup)))))
 
@@ -619,8 +652,11 @@ Bound to \\`C-x p s'.")
          ("C-u" . winner-undo)
          ("C-r" . winner-redo)))
 
-(use-package yasnippet)
-(use-package yasnippet-snippets)
+(use-package yasnippet
+    :defer t)
+
+(use-package yasnippet-snippets
+    :defer t)
 
 ;; NOTE: this is setting a global variable, but we should really just do this when operating in an org buffer.
 (setq filter-buffer-substring-function #'my/org-filter-buffer-substring)

@@ -60,7 +60,6 @@ chpwd2 () { esc0_cwd; }
 if [[ -n "${INSIDE_EMACS}" ]]; then
   if [[ -x "$(whence emacsclient)" ]]; then
     EDITOR="$(whence emacsclient)"
-
     man() {
       ${EDITOR} --eval "(manual-entry \"${*}\")"
     }
