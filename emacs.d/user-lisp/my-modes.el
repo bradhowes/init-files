@@ -56,14 +56,6 @@ the items to setup for autoloading from the given file."
   :ensure t
   :hook ((cmake-mode . my/cmake-mode-hook)))
 
-(use-package diff-hl
-  :ensure t
-  :commands (diff-hl-show-hunk diff-hl-margin-mode)
-  :hook (after-init . (lambda ()
-                        (when (not (display-graphic-p))
-                          (diff-hl-margin-mode t))
-                        )))
-
 (defun my/known-project-eglot-ensure ()
   "Determine if editing file of a known project."
   ;; (vc Git "~/Developer/Mine/sidecar/") -> '("~/Developer/Mine/sidecar/")
@@ -74,15 +66,6 @@ the items to setup for autoloading from the given file."
           (message "Found %s in project--list - starting eglot" proj)
           (eglot-ensure))
       (message "Project %s not found project--list - not running eglot" proj))))
-
-(use-package flymake
-  :commands (flymake-show-buffer-diagnostics flymake-eldoc-function)
-  :config
-  (setq elisp-flymake-byte-compile-load-path load-path)
-  :hook (prog-mode . flymake-mode)
-  :bind (:map flymake-mode-map
-              ("M-n" . flymake-goto-next-error)
-              ("M-p" . flymake-goto-prev-error)))
 
 (use-package flyover
   :ensure t
@@ -130,6 +113,7 @@ the items to setup for autoloading from the given file."
               ("C-c c w" . eglot-code-action-rewrite)))
 
 ;; (keymap-global-set "C-c c" eglot-mode-map)
+(require 'flymake)
 
 (defun my/eglot-configure ()
   "Custom buffer configuration of Eglot."
@@ -168,10 +152,6 @@ the items to setup for autoloading from the given file."
   :mode ("\\.go\\'" . go-mode)
   :hook (go-mode . my/go-mode-hook))
 
-(use-package indent-bars
-  :ensure t
-  :hook (prog-mode . indent-bars-mode))
-
 (use-package json-ts-mode
   :ensure t
   :hook ((json-ts-mode . my/json-mode-hook)))
@@ -208,29 +188,16 @@ the items to setup for autoloading from the given file."
   :hook ((python-ts-mode . my/python-mode-hook)
          (inferior-python-mode . my/inferior-python-mode-hook)))
 
-(use-package sh-script
-  :hook (sh-mode . my/sh-mode-hook))
-
-(use-package shell
-  :defines (explicit-bash-args)
-  :custom
-  (explicit-bash-args '("--noediting" "-i"))
-  :hook ((shell-mode . my/shell-mode-hook)))
-
 (use-package tempel
   :ensure t
   :commands (tempel-expand))
-
-(use-package whitespace
-  :config
-  (global-whitespace-mode t))
 
 (defun my/prog-mode-hook ()
   "Custom hook run when `prog-mode' is enabled in buffer."
   (add-hook 'before-save-hook #'whitespace-cleanup))
 
 (use-package prog-mode
-  :hook (prog-mode . my/prog-mode-hook))
+  :hook (prog-mode . (lambda () (add-hook 'before-save-hook #'whitespace-cleanup))))
 
 (provide 'my-modes)
 

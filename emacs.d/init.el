@@ -74,9 +74,13 @@
 (add-hook 'emacs-startup-hook #'my/layout-screen-layout-changed 98)
 (add-hook 'emacs-startup-hook #'my/start-emacs-server 99)
 
-(require 'my-customizations)
+(defgroup my/customizations nil
+  "The customization group for my settings."
+  :prefix "my/"
+  :group 'local)
+
 (require 'my-keymaps)
-(use-package my-modes)                  ; TODO: rework so that we don't pay cost of loading it all
+;; (require 'my-modes)
 
 ;; To keep this file small, we put all customizations in their own file.
 ;; But then we need to load it ourselves.
@@ -127,7 +131,6 @@
 ;; }
 
 (use-package accent
-  :ensure t
   :bind (:map my/hyper-c-map ("a" . accent-menu)))
 
 ;;; ===== ace-window =====
@@ -155,8 +158,6 @@
         compilation-error-regexp-alist))
 
 (use-package consult
-  :ensure t
-  ;; :after (project xref)
   :commands (consult--customize-put consult-flymake)
   :bind (:map ctl-x-map ;; C-x
               ("M-:" . consult-complex-command)
@@ -305,7 +306,6 @@ Here, we just separate them by a comma."
 
 (use-package corfu
   :after orderless
-  :ensure t
   :commands (global-corfu-mode corfu-popupinfo-mode)
   :bind (:map corfu-map
               ("C-SPC" . corfu-insert-separator))
@@ -332,7 +332,6 @@ Here, we just separate them by a comma."
 
 (use-package crux
   :commands (crux-find-current-directory-dir-locals-file)
-  :ensure t
   :defer nil                            ; load now due to dependencies below
   :bind (:map my/hyper-c-map
               ("d" . crux-duplicate-current-line-or-region)
@@ -347,8 +346,17 @@ Here, we just separate them by a comma."
 (use-package dired
   :hook (dired-mode . my/dired-mode-hook))
 
+(autoload 'my/lisp-mode-hook "my-lisp-mode")
+(autoload 'my/lisp-data-mode-hook "my-lisp-mode")
+
+(use-package elisp-mode
+  :hook ((lisp-mode . my/lisp-mode-hook)
+         (lisp-interaction-mode . my/lisp-mode-hook)
+         (lisp-data-mode . my/lisp-data-mode-hook)
+         (scheme-mode . my/lisp-mode-hook)
+         (emacs-lisp-mode . my/lisp-mode-hook)))
+
 ;; (use-package eldoc-box
-;;   :ensure t)
 ;; :if my/is-terminal)
 ;; :hook (prog-mode . eldoc-box-hover-mode)))
 
@@ -357,43 +365,41 @@ Here, we just separate them by a comma."
 
 ;; FYI: Embark's default action binding of "RET" fails if a mode binds to <return>.
 (use-package embark
-  :ensure t
   :bind (("C-." . embark-act)
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
-  :init
+  :config
   (add-to-list 'display-buffer-alist '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                                        nil
                                        (window-parameters (mode-line-format . none)))))
 
 (use-package embark-consult
-  :ensure t
   :after (consult embark)
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; (use-package esup
-;;   :ensure t
 ;;   :custom (esup-user-init-file (file-truename "~/.emacs.d/init.el")))
 
 (use-package exec-path-from-shell
-  :ensure t
   :commands (exec-path-from-shell-initialize)
   :hook (after-init . exec-path-from-shell-initialize))
 
 (use-package expand-region
-  :ensure t
   :bind ("C-\\" . er/expand-region))
 
 (use-package fancy-compilation
-  :ensure t
   :commands (fancy-compilation-mode)
   :hook ((compilation-mode . fancy-compilation-mode)))
 
+(use-package flymake
+  :hook ((prog-mode . flymake-mode))
+  :bind (:map flymake-mode-map
+              ("M-n" . flymake-goto-next-error)
+              ("M-p" . flymake-goto-prev-error)))
+
 (use-package flyover
-  :ensure t
   :hook ((flymake-mode . flyover-mode))
   :custom
-  ;; Appearance
   (flyover-background-lightness 45)
   (flyover-percent-darker 40)
 
@@ -407,7 +413,6 @@ Here, we just separate them by a comma."
   (flyover-max-line-length 120))
 
 (use-package helpful
-  :ensure t
   :bind (:map help-map
               ("f" . helpful-callable)
               ("v" . helpful-variable)
@@ -420,11 +425,14 @@ Here, we just separate them by a comma."
   :bind (("M-/" . hippie-expand)))
 
 (use-package hl-line
-  :ensure t)
+  :hook ((after-init . global-hl-line-mode)))
 
 ;; Unbind the ibuffer use of "M-o" so as not to conflict with my global definition using `ace-window'
 (use-package ibuffer
   :config (keymap-unset ibuffer-mode-map "M-o" t))
+
+(use-package indent-bars
+  :hook (prog-mode . indent-bars-mode))
 
 (use-package iso-transl
   :bind-keymap ("H-8" . iso-transl-ctl-x-8-map)) ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
@@ -435,7 +443,6 @@ Here, we just separate them by a comma."
   :config (key-chord-mode 1))
 
 (use-package ligature
-  :ensure t
   :commands (ligature-set-ligatures global-ligature-mode)
   :config
   (ligature-set-ligatures
@@ -456,7 +463,6 @@ Here, we just separate them by a comma."
   (global-ligature-mode t))
 
 (use-package magit
-  :ensure t
   :commands (magit-status-setup-buffer magit-status magit-project-status)
   :hook ((magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (:map ctl-x-map
@@ -476,11 +482,12 @@ Here, we just separate them by a comma."
               ("C-M-<tab>" . marginalia-cycle))
   :hook (after-init . marginalia-mode))
 
-(use-package mode-line-bell
-  :ensure t)
+(use-package markdown-mode
+  :hook (markdown-mode . my/markdown-mode-hook))
+
+(use-package mode-line-bell)
 
 (use-package mood-line
-  :ensure t
   :commands (mood-line-mode)
   :custom
   (mood-line-format mood-line-format-default)
@@ -490,7 +497,6 @@ Here, we just separate them by a comma."
 (use-package keycast)
 
 (use-package multiple-cursors
-  :ensure t
   :bind (("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          :map my/hyper-c-map
@@ -499,19 +505,16 @@ Here, we just separate them by a comma."
 (use-package my-fontify-braces)
 
 (use-package nerd-icons-completion
-  :ensure t
   :after (marginalia)
   :commands (nerd-icons-completion-mode nerd-icons-completion-marginalia-setup)
   :hook ((after-init . nerd-icons-completion-mode)
          (marginalia-mode nerd-icons-completion-marginalia-setup)))
 
 (use-package nerd-icons-dired
-  :ensure t
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
 (use-package orderless
-  :ensure t
   :custom
   (completion-styles '(partial-completion orderless flex))
   (completion-category-defaults nil)
@@ -531,7 +534,6 @@ Here, we just separate them by a comma."
   :bind-keymap ("H-o" . my/org-key-map))
 
 (use-package osx-dictionary
-  :ensure t
   :if my/is-macosx
   :bind (:map my/hyper-c-map ("l" . osx-dictionary-search-pointer)))
 
@@ -562,7 +564,6 @@ Bound to \\`C-x p s'.")
               ))
 
 (use-package rg
-  :ensure t
   :after (project)
   :commands (rg-enable-default-bindings rg-project)
   :bind (:map my/project-search-map
@@ -578,8 +579,17 @@ Bound to \\`C-x p s'.")
   :hook ((after-init . save-place-mode)))
 
 (use-package scratch
-  :ensure t
   :bind (:map my/hyper-c-map ("s" . scratch)))
+
+(autoload 'my/sh-mode-hook "my-sh-mode")
+(use-package sh-script
+  :hook (sh-mode . my/sh-mode-hook))
+
+(autoload 'my/shell-mode-hook "my-shell-mode")
+(use-package shell
+  :custom
+  (explicit-bash-args '("--noediting" "-i"))
+  :hook ((shell-mode . my/shell-mode-hook)))
 
 (use-package subword
   :defer t
@@ -595,6 +605,10 @@ Bound to \\`C-x p s'.")
   :defer t
   :hook (after-init . which-key-mode))
 
+(use-package whitespace
+  :hook ((after-init . (lambda () (global-whitespace-mode t)))
+         (prog-mode . (lambda () (add-hook 'before-save-hook #'whitespace-cleanup)))))
+
 (use-package winner
   :defer t
   :hook (after-init . winner-mode)
@@ -605,11 +619,8 @@ Bound to \\`C-x p s'.")
          ("C-u" . winner-undo)
          ("C-r" . winner-redo)))
 
-(use-package yasnippet
-  :ensure t)
-
-(use-package yasnippet-snippets
-  :ensure t)
+(use-package yasnippet)
+(use-package yasnippet-snippets)
 
 ;; NOTE: this is setting a global variable, but we should really just do this when operating in an org buffer.
 (setq filter-buffer-substring-function #'my/org-filter-buffer-substring)

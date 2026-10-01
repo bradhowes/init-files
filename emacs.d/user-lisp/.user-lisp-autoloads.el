@@ -577,7 +577,8 @@ command guarantees that dispatching will always happen." t)
 "Jump to next window according to `ace-window'." t)
 (autoload 'my/ace-window-one-command "my-navigation"
 "Run an action in a chosen window.
-Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch." t)
+Taken from https://karthinks.com/software/emacs-window-management-almanac/#window-magic-with-ace-window-dispatch.
+NOTE: this seems to be broken now for `M-x' actions." t)
 (autoload 'my/ace-window-prefix "my-navigation"
 "Use `ace-window' to display the buffer of the next command.
 The next buffer is the buffer displayed by the next command invoked
@@ -669,6 +670,8 @@ buffer.
 (fn BUFFER-SETUP-PROC)")
 (autoload 'my/shell "my-shells"
 "Start a new shell." t)
+(autoload 'ksh "my-shells"
+"Alternative to my/shell." t)
 (autoload 'my/shell-other-window "my-shells"
 "Start a new shell in another window." t)
 (autoload 'my/shell-other-frame "my-shells"
