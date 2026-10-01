@@ -163,17 +163,17 @@ the buffer having untrusted content."
   (or original-response
       (buffer-name "*scratch*")))
 
-;; (defun my/launch-qa-emacs (host)
-;;   "Launch X11 Emacs on QA HOST."
-;;   (interactive)
-;;   (message "Starting QA Emacs on %s..." host)
-;;   (start-process
-;;    "qa-raze"
-;;    " *qa-raze*"
-;;    "/usr/bin/ssh"
-;;    "-Y"
-;;    (concat "sp_qa@" host)
-;;    ". /apps/home/howesbra/repos/configurations/qa.profile; exec /opt/third/emacs/30.1.1/emacs"))
+(defun my/launch-ssh-emacs (host)
+  "Launch X11 Emacs on remote HOST."
+  (interactive)
+  (message "Starting Emacs on %s..." host)
+  (start-process
+   (concat "ssh-" host)
+   (concat " *ssh-" host "*")
+   "/usr/bin/ssh"
+   "-Y"
+   host
+   "exec /opt/homebrew/bin/emacs"))
 
 (provide 'my-functions)
 
