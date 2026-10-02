@@ -3,6 +3,8 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'my-env)
+
 ;; Always work in the UTF-8 coding system.
 (let ((coding-system 'utf-8))
   (set-charset-priority 'unicode)
@@ -45,6 +47,11 @@
 (autoload 'my/reload-buffer "my-functions")
 (autoload 'my/set-mark-deactivate "my-functions")
 (autoload 'my/trusted-content-p "my-functions")
+
+(autoload 'my/dired-jumps-bind "my-keymaps")
+(autoload 'my/emacs-chord-bind "my-keymaps")
+(autoload 'my/emacs-key-bind "my-keymaps")
+(autoload 'my/emacs-make-key-bind "my-keymaps")
 
 (autoload 'my/layout-frame-pos-left "my-layout")
 (autoload 'my/layout-frame-pos-center "my-layout")
@@ -90,7 +97,21 @@
   :prefix "my/"
   :group 'local)
 
-(require 'my-keymaps)
+;;;###autoload
+(defvar my/dired-jumps-map
+  (make-sparse-keymap)
+  "Keymap for quick Dired jumps or file selection in directory.")
+
+;;;###autoload
+(defvar my/hyper-c-map
+  (make-sparse-keymap)
+  "Keymap for Hyper-c actions.")
+
+;;;###autoload
+(defvar my/hyper-n-map
+  (make-sparse-keymap)
+  "Keymap for Hyper-n actions.")
+
 ;; (require 'my-modes)
 
 ;; To keep this file small, we put all customizations in their own file.
@@ -851,6 +872,32 @@ Bound to \\`C-x p s'.")
                    "C-M-<mouse-5>" #'ignore
                    "C-M-<wheel-up>" #'ignore
                    "C-M-<wheel-down>" #'ignore)
+
+(my/dired-jumps-bind my/dired-jumps-map
+                     ;; Collection of 3-tuples that define a directory to jump to:
+                     ;; 1 - key to use
+                     ;; 2 - the directory to jump to (if not absolute then prepend with value from `my/repos')
+                     ;; 3 - the name to assign to the utility function (if nil make from directory)
+                     `(("a" "auv3-support" nil)
+                       ("c" "AUv3Controls" nil)
+                       ("i" "init-files" nil)
+                       ("e" "init-files/emacs.d" "emacs.d")
+                       ("E" ,(expand-file-name user-emacs-directory) "~.emacs.d")
+                       ("l" my/find-elpa-directory nil)
+                       ("L" ,(file-name-concat user-emacs-directory "elpa") "elpa")
+                       ("p" "SoundFontsPlus" nil)
+                       ("s" "AUv3Support" nil)
+                       ("u" my/find-user-lisp-file nil)
+                       ("U" ,(my/user-lisp) "user-lisp")
+                       ("z" "init-files/shells" "shells")
+                       ("2" "SF2Lib" nil)))
+
+(defvar my/point-jumps-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map " " #'consult-register-store)
+    (define-key map "j" #'consult-register-load)
+    map)
+  "Keymap for quick Dired jumps.")
 
 (when (my/is-graphical)
   (my/emacs-key-bind global-map

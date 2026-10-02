@@ -538,15 +538,10 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence.
 DEFINITIONS is a sequence of string and command pairs given as a sequence.
 
 (fn KEYMAP &rest DEFINITIONS)")
-(defvar my/hyper-c-map (make-sparse-keymap)
-"Keymap for Hyper-c actions.")
-(defvar my/hyper-n-map (make-sparse-keymap)
-"Keymap for Hyper-n actions.")
-(defvar my/dired-jumps-map (let ((map (make-sparse-keymap))) (mapc (lambda (tuple) (let* ((key (elt tuple 0)) (path (elt tuple 1)) (tag (elt tuple 2)) (name (cond ((stringp path) (let ((name (intern (concat "my/jmp-" (or tag path))))) (fset name (lambda nil (interactive) (dired (if (or (string= "/" (substring path 0 1)) (string= "~" (substring path 0 1))) (file-truename path) (files--splice-dirname-file (my/repos) path))))) name)) (t path)))) (when name (keymap-set map key name)))) `(("a" "auv3-support" nil) ("c" "AUv3Controls" nil) ("i" "init-files" nil) ("e" "init-files/emacs.d" "emacs.d") ("E" ,(expand-file-name user-emacs-directory) "~.emacs.d") ("l" my/find-elpa-directory nil) ("L" ,(file-name-concat user-emacs-directory "elpa") "elpa") ("p" "SoundFontsPlus" nil) ("s" "AUv3Support" nil) ("u" my/find-user-lisp-file nil) ("U" ,(my/user-lisp) "user-lisp") ("z" "init-files/shells" "shells") ("2" "SF2Lib" nil))) map)
-"Keymap for quick Dired jumps.
-The map is made up of tiny functions that invoke `dired' on a path.")
-(defvar my/point-jumps-map (let ((map (make-sparse-keymap))) (define-key map " " #'consult-register-store) (define-key map "j" #'consult-register-load) map)
-"Keymap for quick Dired jumps.")
+(autoload 'my/dired-jumps-bind "my-keymaps"
+"Install jump DEFS into KEYMAP.
+
+(fn KEYMAP DEFS)")
 
 
 ;;; Generated autoloads from my-git.el

@@ -64,6 +64,7 @@
  '(eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
  '(eldoc-echo-area-display-truncation-message nil)
  '(eldoc-echo-area-use-multiline-p 5)
+ '(eldoc-help-at-pt t)
  '(enable-recursive-minibuffers t)
  '(exchange-point-and-mark-highlight-region nil)
  '(exec-path-from-shell-arguments '("-l"))
