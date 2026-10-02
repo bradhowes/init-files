@@ -4,6 +4,7 @@
 ;;; Code:
 
 (require 'project)
+(require 'mood-line)
 
 ;;;###autoload
 (defun my/show-project-menu ()

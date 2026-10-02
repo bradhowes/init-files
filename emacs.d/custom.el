@@ -65,6 +65,7 @@
  '(eldoc-echo-area-display-truncation-message nil)
  '(eldoc-echo-area-use-multiline-p 5)
  '(enable-recursive-minibuffers t)
+ '(exchange-point-and-mark-highlight-region nil)
  '(exec-path-from-shell-arguments '("-l"))
  '(fill-column 120)
  '(find-file-visit-truename t)
@@ -108,14 +109,15 @@
  '(package-selected-packages
    '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes corfu crux denote diff-hl eldoc-box
             embark-consult esup exec-path-from-shell expand-region fancy-compilation flymake-gradle flymake-shellcheck
-            flyover go-mode gradle-mode helpful impatient-mode indent-bars js2-mode key-chord kotlin-ts-mode ligature
-            lsp-pyright magit marginalia markdown-mode mode-line-bell mood-line multiple-cursors nerd-icons-completion
-            nerd-icons-dired nerd-icons-xref orderless osx-dictionary popper rg scratch tempel tempel-collection vertico
-            yaml yaml-mode yasnippet yasnippet-snippets))
+            flyover go-mode gradle-mode helpful impatient-mode indent-bars js2-mode key-chord keycast kotlin-ts-mode
+            ligature lsp-pyright magit marginalia markdown-mode mode-line-bell mood-line multiple-cursors
+            nerd-icons-completion nerd-icons-dired nerd-icons-xref orderless osx-dictionary popper rg scratch tempel
+            tempel-collection vertico yaml yaml-mode yasnippet yasnippet-snippets))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*Messages\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
      compilation-mode))
+ '(project-mode-line 'non-remote)
  '(project-switch-commands
    '((project-find-file "Find file" nil) (project-find-regexp "Find regexp" nil) (project-find-dir "Find directory" nil)
      (magit-project-status "Magit" 109) (project-eshell "Eshell" nil) (project-any-command "Other" nil)))

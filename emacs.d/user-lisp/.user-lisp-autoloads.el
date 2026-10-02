@@ -310,8 +310,7 @@ symbol, then hide it." t)
 
 (fn HASHTABLE)" t)
 (autoload 'my/goto-mark "my-functions"
-"Move back to mark without enabling transient mode.
-This is just a shortcut for \\[universal-argument] \\[set-mark-command]." t)
+"Move back to mark without enabling transient mode." t)
 (autoload 'my/indent-buffer "my-functions"
 "Reindent the whole buffer." t)
 (autoload 'my/is-valid-directory "my-functions"
@@ -331,9 +330,8 @@ zero (0), so we detect that and report that as false.
 Checks to see if buffer needs saving, aborting the reload if changes not saved." t)
 (autoload 'my/remove-all-text-properties "my-functions"
 "Remove all text properties from the current buffer." t)
-(autoload 'my/set-mark-deactivate "my-functions"
-"Set mark without activating it.
-This is just a shortcut for \\[universal-argument] \\[set-mark-command]." t)
+(autoload 'my/set-mark-no-activate "my-functions"
+"Push `point' to `mark-ring' but does not activate the region." t)
 (autoload 'my/sort-lines-by-integer-key "my-functions"
 "Sort lines by an integer value that is found via PATTERN in a line.
 The sort is in increasing numerical order if DIRECTION is nil; otherwise
@@ -356,6 +354,10 @@ very small for me, and it remove the obnoxious message at startup about
 the buffer having untrusted content.
 
 (fn ORIGINAL-RESPONSE)")
+(autoload 'my/mood-line-segment-project "my-functions"
+"Return `function/project-mode-line-format' if buffer belongs to a project.")
+(autoload 'my/mood-line-segment-keycast "my-functions"
+"Return `keycast-format' if keycast mode enabled.")
 (register-definition-prefixes "my-functions" '("my/launch-ssh-emacs"))
 
 

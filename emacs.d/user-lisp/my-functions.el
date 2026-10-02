@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'keycast)
 (require 'popper)
 
 ;;;###autoload
@@ -49,8 +50,7 @@ symbol, then hide it."
 
 ;;;###autoload
 (defun my/goto-mark ()
-  "Move back to mark without enabling transient mode.
-This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
+  "Move back to mark without enabling transient mode."
   (interactive)
   (set-mark-command 4))
 
@@ -116,13 +116,10 @@ Checks to see if buffer needs saving, aborting the reload if changes not saved."
     (set-text-properties (point-min) (point-max) nil)))
 
 ;;;###autoload
-(defun my/set-mark-deactivate ()
-  "Set mark without activating it.
-This is just a shortcut for \\[universal-argument] \\[set-mark-command]."
+(defun my/set-mark-no-activate ()
+  "Push `point' to `mark-ring' but does not activate the region."
   (interactive)
-  (set-mark-command nil)
-  (when transient-mark-mode
-    (deactivate-mark)))
+  (push-mark (point) t nil))
 
 ;;;###autoload
 (defun my/sort-lines-by-integer-key (pattern &optional direction)
@@ -174,6 +171,23 @@ the buffer having untrusted content."
    "-Y"
    host
    "exec /opt/homebrew/bin/emacs"))
+
+;;;###autoload
+(defun my/mood-line-segment-project ()
+  "Return `function/project-mode-line-format' if buffer belongs to a project."
+  (or
+   (and (fboundp 'project-mode-line-format)
+        (project-current)
+        (project-mode-line-format))
+   (and (fboundp 'projectile-project-name)
+        (projectile-project-name))))
+
+;;;###autoload
+(defun my/mood-line-segment-keycast ()
+  "Return `keycast-format' if keycast mode enabled."
+   (and (fboundp 'keycast-format)
+        keycast-invisible-mode
+        (keycast-format keycast-mode-line-format)))
 
 (provide 'my-functions)
 

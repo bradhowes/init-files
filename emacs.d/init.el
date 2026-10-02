@@ -28,19 +28,24 @@
 (autoload 'my/user-lisp "my-env")
 (autoload 'my/env-setup "my-env")
 (autoload 'my/tmp-dir "my-env")
+
 (autoload 'my/find-elpa-directory "my-finders")
 (autoload 'my/find-shell-init-file "my-finders")
 (autoload 'my/find-user-custom-file "my-finders")
 (autoload 'my/find-user-init-file "my-finders")
 (autoload 'my/find-user-lisp-file "my-finders")
+
 (autoload 'my/copy-file-name-to-clipboard "my-functions")
 (autoload 'my/describe-symbol-at-point "my-functions")
 (autoload 'my/goto-mark "my-functions")
 (autoload 'my/indent-buffer "my-functions")
 (autoload 'my/matching-paren "my-functions")
+(autoload 'my/mood-line-segment-keycast "my-functions")
+(autoload 'my/mood-line-segment-project "my-functions")
 (autoload 'my/reload-buffer "my-functions")
 (autoload 'my/set-mark-deactivate "my-functions")
 (autoload 'my/trusted-content-p "my-functions")
+
 (autoload 'my/layout-frame-pos-left "my-layout")
 (autoload 'my/layout-frame-pos-center "my-layout")
 (autoload 'my/layout-frame-pos-right "my-layout")
@@ -48,7 +53,7 @@
 (autoload 'my/layout-normal-screen-font-size "my-layout")
 (autoload 'my/layout-screen-layout-changed "my-layout")
 (autoload 'my/layout-share-screen-font-size "my-layout")
-(autoload 'my/org-filter-buffer-substring "my-org")
+
 (autoload 'my/ace-window-always-dispatch "my-navigation")
 (autoload 'my/ace-window-next "my-navigation")
 (autoload 'my/ace-window-prefix "my-navigation")
@@ -61,13 +66,19 @@
 (autoload 'my/prev-buffer-current-window "my-navigation")
 (autoload 'my/show-messages-buffer "my-navigation")
 (autoload 'my/show-messages-buffer-other-window "my-navigation")
+
+(autoload 'my/org-filter-buffer-substring "my-org")
+
 (autoload 'my/show-project-menu "my-project")
+
 (autoload 'my/start-emacs-server "my-server")
+
 (autoload 'my/repl-other-window "my-shells")
 (autoload 'my/shell "my-shells")
 (autoload 'my/shell-other-window "my-shells")
 (autoload 'my/shell-other-frame "my-shells")
 (autoload 'ksh "my-shells")
+
 (autoload 'my/htop "my-tops")
 
 (my/env-setup)
@@ -505,16 +516,39 @@ Here, we just separate them by a comma."
 (use-package mode-line-bell
   :defer t)
 
+(use-package keycast
+  :defer t
+  :vc (:url "https://github.com/tarsius/keycast")
+  :custom
+  (keycast-mode-line-format "%2s%k%c%r"))
+
 (use-package mood-line
   :defer t
+  :vc (:url "https://gitlab.com/jessieh/mood-line")
   :commands (mood-line-mode)
   :custom
-  (mood-line-format mood-line-format-default)
   (mood-line-glyph-alist mood-line-glyphs-fira-code)
-  :hook (after-init . (lambda () (mood-line-mode t))))
-
-(use-package keycast
-  :defer t)
+  :hook (after-init . (lambda ()
+                        (require 'mood-line) ; so we can use `mood-line-defformat' macro
+                        (setq mood-line-format
+                              (mood-line-defformat
+                               :left
+                               (((mood-line-segment-modal)                  . " ")
+                                ((or (mood-line-segment-buffer-status) " ") . " ")
+                                ;; Put prefix buffer name with project + "/" if buffer file belongs to project.
+                                ((my/mood-line-segment-project)          . "/")
+                                ((mood-line-segment-buffer-name)            . "  ")
+                                ((mood-line-segment-multiple-cursors)       . "  ")
+                                ((mood-line-segment-cursor-position)        . " ")
+                                ((mood-line-segment-scroll) . " ")
+                                (my/mood-line-segment-keycast))
+                               :right
+                               (((mood-line-segment-vc)         . "  ")
+                                ((mood-line-segment-major-mode) . " ")
+                                ((mood-line-segment-misc-info)  . "  ")
+                                ((mood-line-segment-checker)    . "  ")
+                                ((mood-line-segment-process)    . "  "))))
+                        (mood-line-mode t))))
 
 (use-package multiple-cursors
   :defer t
@@ -860,6 +894,7 @@ Bound to \\`C-x p s'.")
                             "H-w" #'my/ace-window-prefix
                             "H-z" #'my/shell
                             "H-," #'my/customize-search
+                            "H-<f1>" #'keycast-invisible-mode
                             "H-;" #'my/matching-paren)))
   (apply #'my/emacs-key-bind global-map hyper-mappings)
   (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mappings))
