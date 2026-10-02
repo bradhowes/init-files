@@ -35,7 +35,11 @@
 ;;;###autoload
 (defun my/lisp-mode-hook ()
   "Customize Lisp mode."
-  (setq elisp-flymake-byte-compile-load-path load-path)
+  (setq elisp-flymake-byte-compile-load-path load-path
+        eldoc-documentation-functions '(elisp-eldoc-var-docstring
+                                        elisp-eldoc-funcall-with-docstring
+                                        flymake-eldoc-function)
+        elisp-fontify-semantically t)
   (keymap-local-set "C-c p" #'my/noisy-check-parens)
   (my/fontify-braces)
   (font-lock-mode t)
