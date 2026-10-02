@@ -764,6 +764,12 @@ disabled.
 (register-definition-prefixes "mood-line" '("mood-line-"))
 
 
+
+
+;;; Generated autoloads from my-notes.el
+
+(autoload 'my/denote-hook "my-notes"
+"Custom hook for denote.")
 
 ;;; End of scraped data
 

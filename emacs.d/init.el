@@ -74,6 +74,8 @@
 (autoload 'my/show-messages-buffer "my-navigation")
 (autoload 'my/show-messages-buffer-other-window "my-navigation")
 
+(autoload 'my/denote-hook "my-notes")
+
 (autoload 'my/org-filter-buffer-substring "my-org")
 
 (autoload 'my/show-project-menu "my-project")
@@ -295,29 +297,15 @@ Here, we just separate them by a comma."
 
 (use-package denote
   :defer t
-  :commands (denote-dired-mode-in-directories)
   :hook ((dired-mode . denote-dired-mode)
-         (after-init . (lambda ()
-                         (push '(markdown-brh
-                                 :extension ".md"
-                                 :date-function (lambda (date) (format-time-string "%F %T"))
-                                 :front-matter denote-yaml-front-matter
-                                 :title-key-regexp "^title\\s-*:"
-                                 :title-value-function denote-trim-whitespace
-                                 :title-value-reverse-function denote-trim-whitespace
-                                 :keywords-key-regexp "^tags\\s-*:"
-                                 :keywords-value-function my/denote-format-keywords-for-md-front-matter
-                                 :keywords-value-reverse-function denote-extract-keywords-from-front-matter
-                                 :link denote-md-link-format
-                                 :link-in-context-regexp denote-md-link-in-context-regexp)
-                               denote-file-types))))
+         (after-init . my/denote-hook))
   :bind (:map my/hyper-n-map
               ("b" . denote-backlinks)
               ("c" . denote)
               ("d" . denote-dired)
               ("g" . denote-grep)
               ("l" . denote-link)
-              ;; ("n" . consult-notes)
+              ;; ("n" . consult-notes) -- done below
               ("r" . denote-rename-file))
   :custom
   (denote-directory (expand-file-name "~/Documents/notes/"))
@@ -331,7 +319,6 @@ Here, we just separate them by a comma."
 
 (use-package consult-notes
   :defer t
-  :after (consult denote)
   :commands (consult-notes-denote-mode denote-directory-files)
   :bind (:map my/hyper-n-map ("n" . consult-notes))
   :hook ((after-init . consult-notes-denote-mode)))
