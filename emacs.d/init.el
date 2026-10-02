@@ -119,8 +119,6 @@
 ;; To keep this file small, we put all customizations in their own file.
 ;; But then we need to load it ourselves.
 (setq custom-file (file-name-concat (expand-file-name user-emacs-directory) "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file 'noerror))
 
 (defalias 'ksh 'my/shell
   "Legacy alias to start shell in current window.")
@@ -411,19 +409,8 @@
 
 (use-package flyover
   :defer t
-  :hook ((flymake-mode . flyover-mode))
-  :custom
-  (flyover-background-lightness 45)
-  (flyover-percent-darker 40)
-
-  ;; Icons
-  ;; (flyover-info-icon " ")
-  ;; (flyover-warning-icon " ")
-  ;; (flyover-error-icon " ")
-
-  ;; Display settings
-  (flyover-display-mode 'hide-on-same-line)
-  (flyover-max-line-length 120))
+  :hook ((flymake-mode . flyover-mode)
+         (flyover-mode . my/flyover-mode-hook)))
 
 (use-package helpful
   :defer t
@@ -500,9 +487,6 @@
 
 (use-package marginalia-mode
   :defer t
-  :commands (marginalia-mode)
-  :bind (:map minibuffer-local-map
-              ("C-M-<tab>" . marginalia-cycle))
   :hook (after-init . marginalia-mode))
 
 (autoload 'my/markdown-mode-hook "my-markdown-mode")
@@ -728,7 +712,10 @@ Bound to \\`C-x p s'.")
   (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
-         (after-init . abbrev-mode)))
+         (after-init . (lambda ()
+                         (abbrev-mode)
+                         (when (file-exists-p custom-file)
+                           (load custom-file 'noerror))))))
 
 (use-package window
   :init

@@ -773,6 +773,11 @@ disabled.
 (register-definition-prefixes "my-notes" '("my/denote-format-keywords-for-md-front-matter"))
 
 
+;;; Generated autoloads from my-flyover-mode.el
+
+(autoload 'my/flyover-mode-hook "my-flyover-mode"
+"Custom hook for flyover.")
+
 ;;; End of scraped data
 
 (provide '.user-lisp-autoloads)
