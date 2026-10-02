@@ -777,6 +777,12 @@ disabled.
 
 (autoload 'my/flyover-mode-hook "my-flyover-mode"
 "Custom hook for flyover.")
+
+
+;;; Generated autoloads from my-mood-line.el
+
+(autoload 'my/mood-line-hook "my-mood-line"
+"Startup routine for mood-line.")
 
 ;;; End of scraped data
 

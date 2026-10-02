@@ -3,8 +3,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'my-env)
-
 ;; Always work in the UTF-8 coding system.
 (let ((coding-system 'utf-8))
   (set-charset-priority 'unicode)
@@ -114,10 +112,7 @@
   (make-sparse-keymap)
   "Keymap for Hyper-n actions.")
 
-;; (require 'my-modes)
-
 ;; To keep this file small, we put all customizations in their own file.
-;; But then we need to load it ourselves.
 (setq custom-file (file-name-concat (expand-file-name user-emacs-directory) "custom.el"))
 
 (defalias 'ksh 'my/shell
@@ -499,37 +494,16 @@
 
 (use-package keycast
   :defer t
+  :commands(keycast-invisible-mode)
   :vc (:url "https://github.com/tarsius/keycast")
   :custom
   (keycast-mode-line-format "%2s%k%c%r"))
 
+(autoload 'my/mood-line-hook "my-mood-line")
 (use-package mood-line
   :defer t
   :vc (:url "https://gitlab.com/jessieh/mood-line")
-  :commands (mood-line-mode)
-  :custom
-  (mood-line-glyph-alist mood-line-glyphs-fira-code)
-  :hook (after-init . (lambda ()
-                        (require 'mood-line) ; so we can use `mood-line-defformat' macro
-                        (setq mood-line-format
-                              (mood-line-defformat
-                               :left
-                               (((mood-line-segment-modal)                  . " ")
-                                ((or (mood-line-segment-buffer-status) " ") . " ")
-                                ;; Put prefix buffer name with project + "/" if buffer file belongs to project.
-                                ((my/mood-line-segment-project)          . "/")
-                                ((mood-line-segment-buffer-name)            . "  ")
-                                ((mood-line-segment-multiple-cursors)       . "  ")
-                                ((mood-line-segment-cursor-position)        . " ")
-                                ((mood-line-segment-scroll) . " ")
-                                (my/mood-line-segment-keycast))
-                               :right
-                               (((mood-line-segment-vc)         . "  ")
-                                ((mood-line-segment-major-mode) . " ")
-                                ((mood-line-segment-misc-info)  . "  ")
-                                ((mood-line-segment-checker)    . "  ")
-                                ((mood-line-segment-process)    . "  "))))
-                        (mood-line-mode t))))
+  :hook (after-init . my/mood-line-hook))
 
 (use-package multiple-cursors
   :defer t
@@ -957,10 +931,10 @@ Bound to \\`C-x p s'.")
 (keymap-set help-map "i" my/info-keys-map)
 
 (when (and (tty-type)
-           my/is-linux)
+           (eq system-type 'gnu/linux))
   (set-face-background 'default "undefined"))
 
-(when my/is-macosx
+(when (eq system-type 'darwin)
   (custom-set-variables
    '(insert-directory-program "gls"))
   (when (display-graphic-p)
