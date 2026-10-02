@@ -1,1 +1,2 @@
-((nil . ((compile-command . "make -C $(git rev-parse --show-toplevel)/emacs.d/user-lisp -k "))))
+((nil . ((compile-command . "make -C $(git rev-parse --show-toplevel)/emacs.d/user-lisp -k ")
+         (denote-directory . "~/src/Mine/init-files/notes/"))))

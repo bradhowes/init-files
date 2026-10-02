@@ -89,14 +89,6 @@ ends with the same `---' on its own line."
     (delete-region pos1 pos2)
     (insert "[" tag "](" tag ")")))
 
-(defun my/markdown-mode-hook ()
-  "Customization hook for `markdown-mode'."
-  (impatient-mode)
-  (imp-set-user-filter #'my/markdown-to-html)
-  (keymap-local-set "C-c *" #'my/escape-last-word)
-  (keymap-local-set "C-c `" #'my/codify-last-word)
-  (keymap-local-set "C-c <space>" #'my/make-link))
-
 (defun my/fixup-code-region ()
   "Get the region to work on as a CONS cell of start, end.
 If region is active, return that. If point is currently
@@ -177,6 +169,14 @@ transforms into
   "Sort FIX dropcopy lines in region BEG to END."
   (interactive)
   (my/sort-lines-by-integer-key "^\\s *[0-9]+="))
+
+(defun my/markdown-mode-hook ()
+  "Customization hook for `markdown-mode'."
+  (impatient-mode)
+  (imp-set-user-filter #'my/markdown-to-html)
+  (keymap-local-set "C-c *" #'my/escape-last-word)
+  (keymap-local-set "C-c `" #'my/codify-last-word)
+  (keymap-local-set "C-c <space>" #'my/make-link))
 
 (provide 'my-markdown-mode)
 ;;; my-markdown-mode.el ends here

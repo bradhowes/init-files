@@ -770,6 +770,8 @@ disabled.
 
 (autoload 'my/denote-hook "my-notes"
 "Custom hook for denote.")
+(register-definition-prefixes "my-notes" '("my/denote-format-keywords-for-md-front-matter"))
+
 
 ;;; End of scraped data
 

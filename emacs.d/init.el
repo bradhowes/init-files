@@ -288,13 +288,6 @@
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref))
 
-(defun my/denote-format-keywords-for-md-front-matter (keywords)
-  "Custom KEYWORDS formatter for keystrokecountdown.com markdown files.
-The default Markdown keyword formatter puts each keyword in double-quotes,
-separates them with a \", \" and surrounds the result with square brackets.
-Here, we just separate them by a comma."
-  (format "%s" (mapconcat (lambda (k) k) keywords ", ")))
-
 (use-package denote
   :defer t
   :hook ((dired-mode . denote-dired-mode)
@@ -306,12 +299,7 @@ Here, we just separate them by a comma."
               ("g" . denote-grep)
               ("l" . denote-link)
               ;; ("n" . consult-notes) -- done below
-              ("r" . denote-rename-file))
-  :custom
-  (denote-directory (expand-file-name "~/Documents/notes/"))
-  (denote-file-type 'markdown-brh)
-  (denote-rename-buffer-mode 1)
-  (denote-sort-keywords t))
+              ("r" . denote-rename-file)))
 
 (use-package completion
   :defer t
@@ -350,7 +338,7 @@ Here, we just separate them by a comma."
 (use-package crm)
 
 (use-package crux
-  :defer t                            ; load now due to dependencies below
+  :defer t
   :commands (crux-find-current-directory-dir-locals-file)
   :bind (:map my/hyper-c-map
               ("d" . crux-duplicate-current-line-or-region)
@@ -517,6 +505,7 @@ Here, we just separate them by a comma."
               ("C-M-<tab>" . marginalia-cycle))
   :hook (after-init . marginalia-mode))
 
+(autoload 'my/markdown-mode-hook "my-markdown-mode")
 (use-package markdown-mode
   :defer t
   :hook (markdown-mode . my/markdown-mode-hook))
