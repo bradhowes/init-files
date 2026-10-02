@@ -85,7 +85,7 @@ DEFINITIONS is a sequence of string and command pairs given as a sequence."
                              name))
                           (t
                            path))))
-              (message "my/dired-jumps-map: %s -> %s" tuple name)
+              ;; (message "my/dired-jumps-map: %s -> %s" tuple name)
               (when name
                 (keymap-set map key name))))
           ;; Collection of 3-tuples that define a directory to jump to:

@@ -919,6 +919,7 @@ Bound to \\`C-x p s'.")
                      "aa" #'my/ace-window-always-dispatch
                      "JJ" #'my/ace-window-previous
                      "KK" #'my/ace-window-next
+                     "kc" #'keycast-invisible-mode
                      "kk" #'my/kill-current-buffer
                      "hh" my/hyper-keys-map
                      "HH" #'my/describe-symbol-at-point
