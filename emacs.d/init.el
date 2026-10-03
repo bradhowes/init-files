@@ -908,13 +908,11 @@ Bound to \\`C-x p s'.")
   :hook ((after-init . recentf-mode)))
 
 ;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to
-;; type with one or two hands.
+;; type with one or two hands. Not so sure about how useful this is -- I keep encountering issues.
 (my/emacs-chord-bind global-map
                      "qq" #'undo
                      "aa" #'my/ace-window-always-dispatch
-                     "JJ" #'my/ace-window-previous
-                     "KK" #'my/ace-window-next
-                     "kk" #'my/kill-current-buffer
+                     "KK" #'my/kill-current-buffer
                      "hh" my/hyper-keys-map
                      "HH" #'my/describe-symbol-at-point
                      "hb" #'popper-kill-latest-popup
