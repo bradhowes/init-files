@@ -2,7 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'keycast)
 (require 'popper)
 
 ;;;###autoload
@@ -181,13 +180,6 @@ the buffer having untrusted content."
         (project-mode-line-format))
    (and (fboundp 'projectile-project-name)
         (projectile-project-name))))
-
-;;;###autoload
-(defun my/mood-line-segment-keycast ()
-  "Return `keycast-format' if keycast mode enabled."
-   (and (fboundp 'keycast-format)
-        keycast-invisible-mode
-        (keycast-format keycast-mode-line-format)))
 
 (provide 'my-functions)
 

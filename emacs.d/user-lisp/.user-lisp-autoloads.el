@@ -356,8 +356,6 @@ the buffer having untrusted content.
 (fn ORIGINAL-RESPONSE)")
 (autoload 'my/mood-line-segment-project "my-functions"
 "Return `function/project-mode-line-format' if buffer belongs to a project.")
-(autoload 'my/mood-line-segment-keycast "my-functions"
-"Return `keycast-format' if keycast mode enabled.")
 (register-definition-prefixes "my-functions" '("my/launch-ssh-emacs"))
 
 
@@ -781,8 +779,11 @@ disabled.
 
 ;;; Generated autoloads from my-mood-line.el
 
+(autoload 'my/mood-line-segment-keycast "my-mood-line"
+"Return `keycast-format' if keycast mode enabled.")
 (autoload 'my/mood-line-hook "my-mood-line"
 "Startup routine for mood-line.")
+
 
 ;;; End of scraped data
 

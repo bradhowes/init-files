@@ -40,7 +40,7 @@
 (autoload 'my/goto-mark "my-functions")
 (autoload 'my/indent-buffer "my-functions")
 (autoload 'my/matching-paren "my-functions")
-(autoload 'my/mood-line-segment-keycast "my-functions")
+(autoload 'my/mood-line-segment-keycast "my-mood-line")
 (autoload 'my/mood-line-segment-project "my-functions")
 (autoload 'my/reload-buffer "my-functions")
 (autoload 'my/set-mark-deactivate "my-functions")
@@ -168,6 +168,9 @@
   (setq aw-make-frame-char ?n)
   (advice-add 'aw-make-frame :override #'my/layout-make-frame)
   :commands (ace-window aw-flip-window))
+
+(use-package bind-key
+  :bind (:map help-map ("y" . describe-personal-keybindings)))
 
 (use-package char-menu
   :defer t
@@ -494,8 +497,8 @@
 
 (use-package keycast
   :defer t
-  :commands(keycast-invisible-mode)
   :vc (:url "https://github.com/tarsius/keycast")
+  :commands (keycast-invisible-mode)
   :custom
   (keycast-mode-line-format "%2s%k%c%r"))
 
@@ -615,6 +618,15 @@ Bound to \\`C-x p s'.")
 (use-package subword
   :defer t
   :hook ((after-init . global-subword-mode)))
+
+(use-package ultra-scroll
+  :defer t
+  :ensure t
+  :commands (ultra-scroll-mode)
+  :hook ((after-init . (lambda ()
+                         (setq scroll-conservatively 3
+                               scroll-margin 0)
+                         (ultra-scroll-mode 1)))))
 
 (use-package vertico
   :defer t
@@ -884,8 +896,6 @@ Bound to \\`C-x p s'.")
   (apply #'my/emacs-key-bind global-map hyper-mappings)
   (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mappings))
 
-;;; --- Key Chords
-
 (use-package diff-hl
   :defer t
   :commands (diff-hl-show-hunk diff-hl-flydiff-mode global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode)
@@ -904,7 +914,6 @@ Bound to \\`C-x p s'.")
                      "aa" #'my/ace-window-always-dispatch
                      "JJ" #'my/ace-window-previous
                      "KK" #'my/ace-window-next
-                     "kc" #'keycast-invisible-mode
                      "kk" #'my/kill-current-buffer
                      "hh" my/hyper-keys-map
                      "HH" #'my/describe-symbol-at-point
