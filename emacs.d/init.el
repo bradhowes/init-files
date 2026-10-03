@@ -530,6 +530,11 @@
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
+(use-package nerd-icons-xref
+  :defer t
+  :ensure t
+  :hook (after-init . nerd-icons-xref-mode))
+
 (use-package orderless
   :defer t
   :custom
@@ -607,6 +612,9 @@ Bound to \\`C-x p s'.")
 (use-package sh-script
   :defer t
   :hook (sh-mode . my/sh-mode-hook))
+
+(defalias 'ksh #'shell
+  "Alias to satisfy habit from AIX days.")
 
 (autoload 'my/shell-mode-hook "my-shell-mode")
 (use-package shell
