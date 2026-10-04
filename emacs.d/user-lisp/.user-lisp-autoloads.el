@@ -256,6 +256,10 @@ Hacky but for now it works since we are always starting up an initial xterm.")
 "LOCATION of root of personal source git repositories.")
 (autoload 'my/init-files "my-env"
 "Location of configurations repo.")
+(autoload 'my/denote-directory-personal "my-env"
+"Location of personal denote files.")
+(autoload 'my/denote-directory-work "my-env"
+"Location of work denote files.")
 (autoload 'my/emacs.d "my-env"
 "Location of emacs.d directory in the configurations repo.
 Note that this is *not* the `user-emacs-directory', but rather the
@@ -766,9 +770,11 @@ disabled.
 
 ;;; Generated autoloads from my-notes.el
 
-(autoload 'my/denote-hook "my-notes"
+(autoload 'my/notes-denote-hook "my-notes"
 "Custom hook for denote.")
-(register-definition-prefixes "my-notes" '("my/denote-format-keywords-for-md-front-matter"))
+(autoload 'my/notes-consult-notes-hook "my-notes"
+"Custom hook for `consult-notes'.")
+(register-definition-prefixes "my-notes" '("my/notes--"))
 
 
 ;;; Generated autoloads from my-flyover-mode.el

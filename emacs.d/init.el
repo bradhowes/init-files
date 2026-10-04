@@ -72,7 +72,8 @@
 (autoload 'my/show-messages-buffer "my-navigation")
 (autoload 'my/show-messages-buffer-other-window "my-navigation")
 
-(autoload 'my/denote-hook "my-notes")
+(autoload 'my/notes-consult-notes-hook "my-notes")
+(autoload 'my/notes-denote-hook "my-notes")
 
 (autoload 'my/org-filter-buffer-substring "my-org")
 
@@ -286,8 +287,30 @@
 
 (use-package denote
   :defer t
+  :ensure t
+  :custom
+  (denote-directory `(,(my/denote-directory-personal)
+                      ,(my/denote-directory-work)))
+  (denote-known-keywords '(
+                           "AUv3"
+                           "Docker"
+                           "Emacs"
+                           "Markdown"
+                           "Python"
+                           "Qt"
+                           "Swift"
+                           "SwiftUI"
+                           "Xcode"
+                           "algorithms"
+                           "audio"
+                           "macOS"
+                           ))
+  (denote-prompts '(subdirectory title keywords))
+  (denote-file-type 'markdown-brh)
+  (denote-rename-buffer-mode 1)
+  (denote-sort-keywords t)
   :hook ((dired-mode . denote-dired-mode)
-         (after-init . my/denote-hook))
+         (after-init . my/notes-denote-hook))
   :bind (:map my/hyper-n-map
               ("b" . denote-backlinks)
               ("c" . denote)
@@ -303,9 +326,11 @@
 
 (use-package consult-notes
   :defer t
-  :commands (consult-notes-denote-mode denote-directory-files)
+  :ensure t
+  :custom
+  (consult-notes-denote-display-id nil)
   :bind (:map my/hyper-n-map ("n" . consult-notes))
-  :hook ((after-init . consult-notes-denote-mode)))
+  :hook (after-init . my/notes-consult-notes-hook))
 
 (use-package corfu
   :after orderless
@@ -878,8 +903,8 @@ Bound to \\`C-x p s'.")
                             "H-4" #'other-window-prefix ; was ctl-x-4-prefix
                             "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
                             "H-a" #'my/ace-window-always-dispatch
-                            "H-b" #'consult-project-buffer
-                            "H-B" #'consult-buffer
+                            "H-b" #'consult-buffer
+                            "H-B" #'consult-project-buffer
                             "H-c" my/hyper-c-map
                             "H-f" #'consult-flymake
                             "H-g" #'magit-status
@@ -920,7 +945,7 @@ Bound to \\`C-x p s'.")
 (my/emacs-chord-bind global-map
                      "qq" #'undo
                      "aa" #'my/ace-window-always-dispatch
-                     "KK" #'my/kill-current-buffer
+                     ;; "KK" #'my/kill-current-buffer
                      "hh" my/hyper-keys-map
                      "HH" #'my/describe-symbol-at-point
                      "hb" #'popper-kill-latest-popup
@@ -945,14 +970,21 @@ Bound to \\`C-x p s'.")
 
 (keymap-set help-map "i" my/info-keys-map)
 
-(use-package kkp
+(use-package xclip
+  :defer t
   :ensure t
-  :hook (tty-setup . global-kkp-mode)
-  :config
-  ;; (setq kkp-alt-modifier 'alt) ;; use this if you want to map the Alt keyboard modifier to Alt in Emacs (and not to Meta)
-  ;; For C-g aborting blocking subprocesses, see "C-g and blocking
-  ;; subprocesses" in the README.
-  (setq kkp-restore-legacy-keys-around-subprocesses t))
+  :commands (xclip-mode)
+  :hook (tty-setup . (lambda () (xclip-mode 1))))
+
+(use-package kkp
+  :defer t
+  :ensure t
+  :commands (global-kkp-mode)
+  :hook (tty-setup . (lambda ()
+                       ;; (setq kkp-alt-modifier 'alt) ; use to map the Alt keyboard modifier to Alt (and not to Meta)
+                       ;; For C-g aborting blocking subprocesses, see "C-g and blocking subprocesses" in the README.
+                       (setq kkp-restore-legacy-keys-around-subprocesses t)
+                       (global-kkp-mode 1))))
 
 (when (eq system-type 'gnu/linux)
   (set-face-background 'default "undefined"))

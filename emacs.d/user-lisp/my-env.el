@@ -49,6 +49,16 @@ Hacky but for now it works since we are always starting up an initial xterm."
   (file-name-as-directory (file-name-concat (my/repos) "init-files")))
 
 ;;;###autoload
+(defun my/denote-directory-personal ()
+  "Location of personal denote files."
+  (file-name-as-directory (file-name-concat (my/init-files) "notes")))
+
+;;;###autoload
+(defun my/denote-directory-work ()
+  "Location of work denote files."
+  (file-name-as-directory (expand-file-name "~/Documents/notes")))
+
+;;;###autoload
 (defun my/emacs.d ()
   "Location of emacs.d directory in the configurations repo.
 Note that this is *not* the `user-emacs-directory', but rather the

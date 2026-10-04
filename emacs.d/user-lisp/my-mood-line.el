@@ -39,7 +39,6 @@
           ((mood-line-segment-checker)    . "  ")
           ((mood-line-segment-process)    . "  ")))
         mood-line-glyph-alist mood-line-glyphs-fira-code)
-  (message "my/mood-line-hook")
   (mood-line-mode 1))
 
 (provide 'my/mood-line)
