@@ -24,6 +24,7 @@
 ;;
 ;; (autoload 'my/is-terminal "my-env")
 (autoload 'my/is-graphical "my-env")
+(autoload 'my/is-terminal "my-env")
 (autoload 'my/repos "my-env")
 (autoload 'my/user-lisp "my-env")
 (autoload 'my/env-setup "my-env")
@@ -473,6 +474,17 @@
   :commands (key-chord-define key-chord-mode)
   :config (key-chord-mode 1))
 
+(use-package kkp
+  :defer t
+  :ensure t
+  :if (my/is-terminal)
+  :commands (global-kkp-mode)
+  :hook (tty-setup . (lambda ()
+                       ;; (setq kkp-alt-modifier 'alt) ; use to map the Alt keyboard modifier to Alt (and not to Meta)
+                       ;; For C-g aborting blocking subprocesses, see "C-g and blocking subprocesses" in the README.
+                       (setq kkp-restore-legacy-keys-around-subprocesses t)
+                       (global-kkp-mode 1))))
+
 (use-package ligature
   :defer t
   :commands (ligature-set-ligatures global-ligature-mode)
@@ -513,10 +525,14 @@
   :defer t
   :hook (after-init . marginalia-mode))
 
-(autoload 'my/markdown-mode-hook "my-markdown-mode")
-(use-package markdown-mode
+(autoload 'my/markdown-ts-mode-hook "my-markdown-mode")
+(autoload 'my/markdown-ts-setup-hook "my-markdown-mode")
+(use-package markdown-ts-mode
   :defer t
-  :hook (markdown-mode . my/markdown-mode-hook))
+  :ensure nil
+  :mode ("\\.md\\'" "\\.mdx\\'" "\\.markdown\\'")
+  :hook ((markdown-ts-mode . my/markdown-ts-mode-hook))
+         (after-init . my/markdown-ts-setup-hook))
 
 (use-package mode-line-bell
   :defer t)
@@ -686,6 +702,12 @@ Bound to \\`C-x p s'.")
          ("u" . winner-undo)
          ("C-u" . winner-undo)
          ("C-r" . winner-redo)))
+
+(use-package xclip
+  :defer t
+  :ensure t
+  :commands (xclip-mode)
+  :hook (tty-setup . (lambda () (xclip-mode 1))))
 
 (use-package yasnippet
     :defer t)
@@ -969,22 +991,6 @@ Bound to \\`C-x p s'.")
   "Keymap for canned info manual searches.")
 
 (keymap-set help-map "i" my/info-keys-map)
-
-(use-package xclip
-  :defer t
-  :ensure t
-  :commands (xclip-mode)
-  :hook (tty-setup . (lambda () (xclip-mode 1))))
-
-(use-package kkp
-  :defer t
-  :ensure t
-  :commands (global-kkp-mode)
-  :hook (tty-setup . (lambda ()
-                       ;; (setq kkp-alt-modifier 'alt) ; use to map the Alt keyboard modifier to Alt (and not to Meta)
-                       ;; For C-g aborting blocking subprocesses, see "C-g and blocking subprocesses" in the README.
-                       (setq kkp-restore-legacy-keys-around-subprocesses t)
-                       (global-kkp-mode 1))))
 
 (when (eq system-type 'gnu/linux)
   (set-face-background 'default "undefined"))

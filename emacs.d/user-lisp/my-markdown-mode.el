@@ -3,7 +3,8 @@
 ;;; Code:
 
 (require 'font-lock)
-(require 'markdown-mode)
+(require 'markdown-ts-mode)
+(require 'markdown-ts-mode-x)
 (require 'my-functions)
 
 (use-package impatient-mode
@@ -89,94 +90,100 @@ ends with the same `---' on its own line."
     (delete-region pos1 pos2)
     (insert "[" tag "](" tag ")")))
 
-(defun my/fixup-code-region ()
-  "Get the region to work on as a CONS cell of start, end.
-If region is active, return that. If point is currently
-in a code block, return the start and end of the block.
-Otherwise, return the current point and max point."
-  (interactive)
-  (save-excursion
-    (if (use-region-p)
-        (cons (use-region-beginning) (use-region-end))
-      (if-let* ((block (markdown-code-block-at-pos (point))))
-          (cons (car block) (cadr block))
-        (cons (point) (point-max))))))
+;; (defun my/fixup-code-region ()
+;;   "Get the region to work on as a CONS cell of start, end.
+;; If region is active, return that. If point is currently
+;; in a code block, return the start and end of the block.
+;; Otherwise, return the current point and max point."
+;;   (interactive)
+;;   (save-excursion
+;;     (if (use-region-p)
+;;         (cons (use-region-beginning) (use-region-end))
+;;       (if-let* ((block (markdown-ts-code-block-at-pos (point))))
+;;           (cons (car block) (cadr block))
+;;         (cons (point) (point-max))))))
 
-(defun my/fixup-log-paste ()
-  "Fix-up log lines that were copied from terminal.
-If no region is active, see if point is in a markdown code block, and if so
-use the block limits for BEG and END values. Otherwise, work on lines from
-current line to the end of buffer."
-  (interactive)
-  (save-excursion
-    (let* ((re "\\(\\\\\n \\)\\|\\( +$\\)\\|\\(^ +\\)")
-           (region (my/fixup-code-region))
-           (beg (car region))
-           (end (cdr region)))
-      (message "region: %s" region)
-      (goto-char beg)
-      (beginning-of-line 1)
-      (while (re-search-forward re end t)
-        (replace-match "" nil nil)))))
+;; (defun my/fixup-log-paste ()
+;;   "Fix-up log lines that were copied from terminal.
+;; If no region is active, see if point is in a markdown code block, and if so
+;; use the block limits for BEG and END values. Otherwise, work on lines from
+;; current line to the end of buffer."
+;;   (interactive)
+;;   (save-excursion
+;;     (let* ((re "\\(\\\\\n \\)\\|\\( +$\\)\\|\\(^ +\\)")
+;;            (region (my/fixup-code-region))
+;;            (beg (car region))
+;;            (end (cdr region)))
+;;       (message "region: %s" region)
+;;       (goto-char beg)
+;;       (beginning-of-line 1)
+;;       (while (re-search-forward re end t)
+;;         (replace-match "" nil nil)))))
 
-(defun my/format-fixdropcopy ()
-  "Format quickfix dropcopy messages pasted from TCS logs.
-Simply replaces all runs of '^A' (two characters) with a
-newline and 2 spaces."
-  (interactive)
-  (save-excursion
-    (let* ((re "\\^A\\|")
-           (region (my/fixup-code-region))
-           (beg (car region))
-           (end (cdr region)))
-      (goto-char beg)
-      (while (re-search-forward re end t)
-        (replace-match "\n  " nil nil)))))
+;; (defun my/format-fixdropcopy ()
+;;   "Format quickfix dropcopy messages pasted from TCS logs.
+;; Simply replaces all runs of '^A' (two characters) with a
+;; newline and 2 spaces."
+;;   (interactive)
+;;   (save-excursion
+;;     (let* ((re "\\^A\\|")
+;;            (region (my/fixup-code-region))
+;;            (beg (car region))
+;;            (end (cdr region)))
+;;       (goto-char beg)
+;;       (while (re-search-forward re end t)
+;;         (replace-match "\n  " nil nil)))))
 
-(defun my/format-xml ()
-  "Format XML pasted into code block.
-Simply replaces all spaces between attributes in a clause with a
-newline and 2 spaces.
+;; (defun my/format-xml ()
+;;   "Format XML pasted into code block.
+;; Simply replaces all spaces between attributes in a clause with a
+;; newline and 2 spaces.
 
-Example:
+;; Example:
 
-  <foo a=\"1\" b=\"2\"/>
+;;   <foo a=\"1\" b=\"2\"/>
 
-transforms into
+;; transforms into
 
-  <foo
-    a=\"1\"
-    b=\"2\"
-  />"
-  (interactive)
-  (save-excursion
-    (let* ((re "\\( [a-zA-Z0-9_]+=\\)\\|\\(/>\\)")
-           (region (my/fixup-code-region))
-           (beg (car region))
-           (end (cdr region)))
-      (goto-char beg)
-      (while (re-search-forward re end t)
-        (goto-char (match-beginning 0))
-        (insert "\n")
-        (if (match-beginning 2)
-            (forward-char 3)            ; match />
-          (insert " "))                 ; match before attribute
-        (when end
-          (setq end (+ 2 end)))
-        (goto-char (match-end 0))))))
+;;   <foo
+;;     a=\"1\"
+;;     b=\"2\"
+;;   />"
+;;   (interactive)
+;;   (save-excursion
+;;     (let* ((re "\\( [a-zA-Z0-9_]+=\\)\\|\\(/>\\)")
+;;            (region (my/fixup-code-region))
+;;            (beg (car region))
+;;            (end (cdr region)))
+;;       (goto-char beg)
+;;       (while (re-search-forward re end t)
+;;         (goto-char (match-beginning 0))
+;;         (insert "\n")
+;;         (if (match-beginning 2)
+;;             (forward-char 3)            ; match />
+;;           (insert " "))                 ; match before attribute
+;;         (when end
+;;           (setq end (+ 2 end)))
+;;         (goto-char (match-end 0))))))
 
 (defun my/sort-fixdropcopy ()
   "Sort FIX dropcopy lines in region BEG to END."
   (interactive)
   (my/sort-lines-by-integer-key "^\\s *[0-9]+="))
 
-(defun my/markdown-mode-hook ()
-  "Customization hook for `markdown-mode'."
+(defun my/markdown-ts-mode-hook ()
+  "Customization hook for `markdown-ts-mode'."
   (impatient-mode)
   (imp-set-user-filter #'my/markdown-to-html)
   (keymap-local-set "C-c *" #'my/escape-last-word)
   (keymap-local-set "C-c `" #'my/codify-last-word)
   (keymap-local-set "C-c <space>" #'my/make-link))
+
+(defun my/markdown-ts-setup-hook ()
+  "Initialization hook for `markdown-ts-mode'."
+  (setq treesit-auto-install-grammar t
+        treesit-enabled-modes t)
+  (markdown-ts-mode-install-parsers t))
 
 (provide 'my-markdown-mode)
 ;;; my-markdown-mode.el ends here

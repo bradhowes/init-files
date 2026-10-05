@@ -30,7 +30,7 @@ control_, we can also have Emacs differentiate between the left and right modifi
 Protocol"][KKP] to communicate them. The [Emacs kkp package][emacs-kkp] performs the necessary terminal setup with
 iTerm2 to enable KKP:
 
-```
+```elisp
 (use-package kkp
   :defer t
   :ensure t
@@ -53,7 +53,7 @@ Emacs in a term window does not know about clipboards on the host OS. Once again
 that rectifies the situation -- [xclip]. Once installed and enabled via `(xclip-mode 1)`, the contents of the clipboard
 will become available to Emacs when "yanking".
 
-```
+```elisp
 (use-package xclip
   :defer t
   :ensure t
