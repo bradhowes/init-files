@@ -38,11 +38,14 @@
 (let* ((threshold gc-cons-threshold)
        (percentage gc-cons-percentage)
        (gc-cons-threshold most-positive-fixnum)
-       (gc-cons-percentage 0.8))
+       (gc-cons-percentage 0.8)
+       (saved-file-name-handler-alist file-name-handler-alist))
+  (setq file-name-handler-alist nil)
   ;; NOTE: needs lexical-binding for this to work and capture the value of `threshold'
-  (add-hook 'emacs-startup-hook (lambda ()
-                                  (setq gc-cons-threshold threshold
-                                        gc-cons-percentage percentage))))
+  (add-hook 'after-init-hook (lambda ()
+                               (setq gc-cons-threshold threshold
+                                     gc-cons-percentage percentage
+                                     file-name-handler-alist saved-file-name-handler-alist))))
 
 ;; Stop Emacs from flashing a `white' screen when starting up
 (set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")
