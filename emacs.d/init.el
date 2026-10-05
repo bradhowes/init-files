@@ -996,9 +996,8 @@ Bound to \\`C-x p s'.")
     (custom-set-variables
      '(frame-resize-pixelwise t))))
 
-;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097
-;; Basically, put backup and autosave files in their own directories
-;; inside our own `~/tmp' directory.
+;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097 Basically, put backup and autosave files in their
+;; own directories inside our own `~/tmp' directory.
 (let ((backup-dir (file-name-concat (my/tmp-dir) "emacs_backups"))
       (auto-saves-dir (file-name-concat (my/tmp-dir) "emacs_autosaves")))
   (dolist (dir (list backup-dir auto-saves-dir))
