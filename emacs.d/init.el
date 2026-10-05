@@ -438,6 +438,7 @@
 (use-package helpful
   :defer t
   :bind (:map help-map
+              ("a" . helpful-symbol)
               ("f" . helpful-callable)
               ("v" . helpful-variable)
               ("k" . helpful-key)
@@ -943,17 +944,16 @@ Bound to \\`C-x p s'.")
 ;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to
 ;; type with one or two hands. Not so sure about how useful this is -- I keep encountering issues.
 (my/emacs-chord-bind global-map
-                     "qq" #'undo
                      "aa" #'my/ace-window-always-dispatch
-                     ;; "KK" #'my/kill-current-buffer
                      "hh" my/hyper-keys-map
-                     "HH" #'my/describe-symbol-at-point
+                     "HH" #'helpful-at-point
                      "hb" #'popper-kill-latest-popup
+                     "jn" #'my/ace-window-next
+                     "jp" #'my/ace-window-previous
+                     "qq" #'undo
                      "sb" #'speedbar
                      "vv" #'diff-hl-show-hunk
-                     ;; "fm" #'flymake-show-buffer-diagnostics
-                     "jn" #'my/ace-window-next
-                     "jp" #'my/ace-window-previous)
+                     )
 
 (defun my/consult-info-emacs ()
   "Search Emacs info."

@@ -7,29 +7,20 @@ identifier: "20240810T103136"
 
 # Emacs Key Chords
 
+aa -- pick a location to make active
 
-qw -- show the Magit status buffer for the project associated with the current buffer
+hh -- start key processing with my/hyper-keys-map (for times when hyper modifier is not available)
 
-ww -- make the current window the sole window, deleting all others
+HH -- describe symbol at point
 
-hb -- show `consult-buffer` to select a new buffer to show in the current window
+hb -- kill last "popup" window
 
-hh -- show help for the symbol at the current point in the current buffer
+jn -- move to next window according to ace-window order
 
-hj -- hide the last help window
+jp -- move to previous window according to ace-window order
 
-jk -- show the project's `consult-buffer` view
+qq -- undo
+
+sb -- show speedbar
 
 vv -- if in a buffer under version control show the changes
-
-fn -- move to next window according to ace-window order
-
-fp -- move to previous window according to ace-window order
-
-fb -- move back to prior window before the current one
-
-fm -- show flymake buffer diagnostics
-
-kk -- kill the current buffer
-
-l; -- undo
