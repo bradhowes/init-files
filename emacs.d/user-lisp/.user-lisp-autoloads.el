@@ -301,12 +301,9 @@ If MODE is nil then apply to the current mode.
 
 (autoload 'my/copy-file-name-to-clipboard "my-functions"
 "Copy the current buffer file name to the clipboard." t)
-(autoload 'my/describe-symbol-at-point "my-functions"
-"Immediately show help for symbol at point if it exists.
-If help buffer is visible and it is showing help for the
-symbol, then hide it." t)
 (autoload 'my/display-prefix "my-functions"
 "Display the value of the raw prefix ARG.
+For debugging purposes.
 
 (fn ARG)" t)
 (autoload 'my/dump-hashtable "my-functions"
@@ -331,7 +328,8 @@ zero (0), so we detect that and report that as false.
 "When point is on a paren-type character, jump to its twin." t)
 (autoload 'my/reload-buffer "my-functions"
 "Reload the current buffer from disk.
-Checks to see if buffer needs saving, aborting the reload if changes not saved." t)
+Checks to see if buffer needs saving, aborting the reload if changes not saved.
+Useful for Elisp content or changes to mode settings." t)
 (autoload 'my/remove-all-text-properties "my-functions"
 "Remove all text properties from the current buffer." t)
 (autoload 'my/set-mark-no-activate "my-functions"

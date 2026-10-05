@@ -47,9 +47,6 @@
 ;; Stop Emacs from flashing a `white' screen when starting up
 (set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")
 
-;; Temporary hack to fix Emacs launching in iTerm2.
-(load "/Applications/Emacs.app/Contents/Resources/site-lisp/site-start" t t)
-
 ;; (message "user-emacs-directory: %s" user-emacs-directory)
 ;; (message "trusted-content: %s" trusted-content)
 ;; (message "load-path: %s" load-path)

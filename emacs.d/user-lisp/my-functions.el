@@ -79,7 +79,8 @@ zero (0), so we detect that and report that as false."
 ;;;###autoload
 (defun my/reload-buffer ()
   "Reload the current buffer from disk.
-Checks to see if buffer needs saving, aborting the reload if changes not saved."
+Checks to see if buffer needs saving, aborting the reload if changes not saved.
+Useful for Elisp content or changes to mode settings."
   (interactive)
   (let ((filename (buffer-file-name)))
     (when (and (not buffer-read-only)
