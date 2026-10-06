@@ -292,7 +292,10 @@
   :ensure t
   :custom
   (consult-notes-denote-display-id nil)
-  :bind (:map my/hyper-n-map ("n" . consult-notes))
+  :bind (:map my/hyper-n-map
+         ("n" . consult-notes)
+         :map my/hyper-c-map
+         ("n" . consult-notes))
   :hook (after-init . my/notes-consult-notes-hook))
 
 (use-package corfu
