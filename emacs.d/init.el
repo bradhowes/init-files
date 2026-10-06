@@ -24,36 +24,28 @@
 ;; Replicating much of what is in user-lisp-autoloads.el in order to silence warnings from flymake.
 ;; The .user-lisp-autoloads.el file is loaded upon startup.
 ;;
-;; (autoload 'my/is-terminal "my-env")
 (autoload 'my/is-graphical "my-env")
 (autoload 'my/is-terminal "my-env")
-(autoload 'my/repos "my-env")
 (autoload 'my/user-lisp "my-env")
 (autoload 'my/env-setup "my-env")
 (autoload 'my/tmp-dir "my-env")
-
 (autoload 'my/find-elpa-directory "my-finders")
 (autoload 'my/find-shell-init-file "my-finders")
 (autoload 'my/find-user-custom-file "my-finders")
 (autoload 'my/find-user-init-file "my-finders")
 (autoload 'my/find-user-lisp-file "my-finders")
-
 (autoload 'my/copy-file-name-to-clipboard "my-functions")
 (autoload 'my/describe-symbol-at-point "my-functions")
 (autoload 'my/goto-mark "my-functions")
 (autoload 'my/indent-buffer "my-functions")
 (autoload 'my/matching-paren "my-functions")
-(autoload 'my/mood-line-segment-keycast "my-mood-line")
-(autoload 'my/mood-line-segment-project "my-functions")
 (autoload 'my/reload-buffer "my-functions")
 (autoload 'my/set-mark-deactivate "my-functions")
 (autoload 'my/trusted-content-p "my-functions")
-
 (autoload 'my/dired-jumps-bind "my-keymaps")
 (autoload 'my/emacs-chord-bind "my-keymaps")
 (autoload 'my/emacs-key-bind "my-keymaps")
 (autoload 'my/emacs-make-key-bind "my-keymaps")
-
 (autoload 'my/layout-frame-pos-left "my-layout")
 (autoload 'my/layout-frame-pos-center "my-layout")
 (autoload 'my/layout-frame-pos-right "my-layout")
@@ -61,7 +53,6 @@
 (autoload 'my/layout-normal-screen-font-size "my-layout")
 (autoload 'my/layout-screen-layout-changed "my-layout")
 (autoload 'my/layout-share-screen-font-size "my-layout")
-
 (autoload 'my/ace-window-always-dispatch "my-navigation")
 (autoload 'my/ace-window-next "my-navigation")
 (autoload 'my/ace-window-prefix "my-navigation")
@@ -74,22 +65,16 @@
 (autoload 'my/prev-buffer-current-window "my-navigation")
 (autoload 'my/show-messages-buffer "my-navigation")
 (autoload 'my/show-messages-buffer-other-window "my-navigation")
-
 (autoload 'my/notes-consult-notes-hook "my-notes")
 (autoload 'my/notes-denote-hook "my-notes")
-
 (autoload 'my/org-filter-buffer-substring "my-org")
-
 (autoload 'my/show-project-menu "my-project")
-
 (autoload 'my/start-emacs-server "my-server")
-
 (autoload 'my/repl-other-window "my-shells")
 (autoload 'my/shell "my-shells")
 (autoload 'my/shell-other-window "my-shells")
 (autoload 'my/shell-other-frame "my-shells")
 (autoload 'ksh "my-shells")
-
 (autoload 'my/htop "my-tops")
 
 (my/env-setup)
@@ -118,9 +103,6 @@
 
 ;; To keep this file small, we put all customizations in their own file.
 (setq custom-file (file-name-concat (expand-file-name user-emacs-directory) "custom.el"))
-
-(defalias 'ksh 'my/shell
-  "Legacy alias to start shell in current window.")
 
 (defalias 'repl 'my/repl
   "Legacy alias to start Elisp read/eval/print loop in current window.")
