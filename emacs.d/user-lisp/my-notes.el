@@ -16,8 +16,8 @@ Here, we just separate them by a comma."
   (format "%s" (mapconcat (lambda (k) k) keywords ", ")))
 
 ;;;###autoload
-(defun my/notes-denote-hook ()
-  "Custom hook for denote."
+(defun my/notes-denote-configuration ()
+  "Custom configuration for denote."
   (push '(markdown-brh
           :extension ".md"
           :date-value-function denote-date-rfc3339
@@ -31,7 +31,28 @@ Here, we just separate them by a comma."
           :keywords-value-reverse-function denote-extract-keywords-from-front-matter
           :link denote-md-link-format
           :link-in-context-regexp denote-md-link-in-context-regexp)
-        denote-file-types))
+        denote-file-types)
+  (setq denote-directory `(,(my/denote-directory-personal)
+                           ,(my/denote-directory-work))
+        denote-known-keywords '(
+                                "AUv3"
+                                "Docker"
+                                "Emacs"
+                                "Markdown"
+                                "Python"
+                                "Qt"
+                                "Swift"
+                                "SwiftUI"
+                                "Xcode"
+                                "algorithms"
+                                "audio"
+                                "macOS"
+                                )
+        denote-prompts '(subdirectory title keywords)
+        denote-file-type 'markdown-brh
+        denote-rename-buffer-mode 1
+        denote-sort-keywords t)
+  )
 
 (defun my/notes--denote-items (directory)
   "Fetch the denote files in DIRECTORY."
@@ -80,6 +101,7 @@ Here, we just separate them by a comma."
 ;;;###autoload
 (defun my/notes-consult-notes-hook ()
   "Custom hook for `consult-notes'."
+  (my/notes-denote-configuration)
   (let* ((sources `(("personal" ?r ,(my/denote-directory-personal))
                     ("work" ?w ,(my/denote-directory-work)))))
     (dolist (source sources)

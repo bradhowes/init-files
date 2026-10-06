@@ -5,7 +5,7 @@ tags:       dvd  handbrake
 identifier: "20240929T214104"
 ---
 
-```
+```shell
 % brew install autoconf
 % brew install automake
 % cd ~/src

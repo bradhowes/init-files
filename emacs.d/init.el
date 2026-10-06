@@ -3,6 +3,8 @@
 ;;; Commentary:
 ;;; Code:
 
+(setq debug-on-message "Unable to activate package 'lsp-mode'.")
+
 ;; Always work in the UTF-8 coding system.
 (let ((coding-system 'utf-8))
   (set-charset-priority 'unicode)
@@ -286,32 +288,14 @@
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref))
 
+(use-package completion
+  :defer t
+  :hook ((after-init . dynamic-completion-mode)))
+
 (use-package denote
   :defer t
   :ensure t
-  :custom
-  (denote-directory `(,(my/denote-directory-personal)
-                      ,(my/denote-directory-work)))
-  (denote-known-keywords '(
-                           "AUv3"
-                           "Docker"
-                           "Emacs"
-                           "Markdown"
-                           "Python"
-                           "Qt"
-                           "Swift"
-                           "SwiftUI"
-                           "Xcode"
-                           "algorithms"
-                           "audio"
-                           "macOS"
-                           ))
-  (denote-prompts '(subdirectory title keywords))
-  (denote-file-type 'markdown-brh)
-  (denote-rename-buffer-mode 1)
-  (denote-sort-keywords t)
-  :hook ((dired-mode . denote-dired-mode)
-         (after-init . my/notes-denote-hook))
+  :hook ((dired-mode . denote-dired-mode))
   :bind (:map my/hyper-n-map
               ("b" . denote-backlinks)
               ("c" . denote)
@@ -320,10 +304,6 @@
               ("l" . denote-link)
               ;; ("n" . consult-notes) -- done below
               ("r" . denote-rename-file)))
-
-(use-package completion
-  :defer t
-  :hook ((after-init . dynamic-completion-mode)))
 
 (use-package consult-notes
   :defer t
@@ -563,16 +543,17 @@
 (use-package nerd-icons-completion
   :defer t
   :ensure t
-  :commands (nerd-icons-completion-mode nerd-icons-completion-marginalia-setup)
-  :hook ((after-init . nerd-icons-completion-mode)))
+  :commands (nerd-icons-completion-mode)
+  :hook ((after-init . (lambda () (nerd-icons-completion-mode 1)))))
 
 (use-package marginalia
   :defer t
   :ensure t
-  :commands (marginalia-mode)
+  :commands (marginalia-mode marginalia-cycle)
+  :bind (:map minibuffer-local-map
+              ("<f1>" . marginalia-cycle))
   :hook (after-init . (lambda ()
-                        (marginalia-mode t)
-                        (nerd-icons-completion-marginalia-setup))))
+                        (marginalia-mode t))))
 
 (use-package nerd-icons-dired
   :defer t

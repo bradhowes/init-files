@@ -93,7 +93,7 @@ the items to setup for autoloading from the given file."
          (kotlin-ts-mode . eglot-ensure)
          (js-mode . eglot-ensure)
          (js-ts-mode . eglot-ensure)
-         (markdown-mode . eglot-ensure)
+         ;; (markdown-mode . eglot-ensure)
          (markdown-ts-mode . eglot-ensure)
          (python-base-mode . eglot-ensure)
          (scala-mode . eglot-ensure)
@@ -180,9 +180,9 @@ the items to setup for autoloading from the given file."
   :hook ((makefile-mode . my/makefile-mode-hook)
          (makefile-mode . indent-bars-mode)))
 
-(use-package markdown-mode
-  :ensure t
-  :hook (markdown-mode . my/markdown-mode-hook))
+;; (use-package markdown-mode
+;;   :ensure t
+;;   :hook (markdown-mode . my/markdown-mode-hook))
 
 (use-package python
   :hook ((python-ts-mode . my/python-mode-hook)

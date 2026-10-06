@@ -768,8 +768,8 @@ disabled.
 
 ;;; Generated autoloads from my-notes.el
 
-(autoload 'my/notes-denote-hook "my-notes"
-"Custom hook for denote.")
+(autoload 'my/notes-denote-configuration "my-notes"
+"Custom configuration for denote.")
 (autoload 'my/notes-consult-notes-hook "my-notes"
 "Custom hook for `consult-notes'.")
 (register-definition-prefixes "my-notes" '("my/notes--"))
