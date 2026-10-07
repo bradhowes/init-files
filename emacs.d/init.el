@@ -21,8 +21,9 @@
                    #'prefer-coding-system))
     (funcall p coding-system)))
 
-;; Replicating much of what is in user-lisp-autoloads.el in order to silence warnings from flymake.
-;; The .user-lisp-autoloads.el file is loaded upon startup.
+;; Replicating much of what is in user-lisp-autoloads.el in order to silence warnings from flymake. The file is loaded
+;; upon startup but the elisp bytecompiler does not know about that when run in another Emacs process. I think flycheck
+;; does the right thing here.
 ;;
 (autoload 'my/is-graphical "my-env")
 (autoload 'my/is-terminal "my-env")
@@ -117,7 +118,7 @@
 ;; (debug-on-entry 'file-notify-add-watch)
 
 (use-package package
-  :defer nil
+  :defer nil ;; !!!
   :custom
   (package-archive-priorities '(("melpa" . 10)
                                 ("melpa-stable" . 10)
@@ -144,18 +145,22 @@
 ;; }
 
 (use-package accent
+  :defer t
+  :ensure t
   :bind (:map my/hyper-c-map ("a" . accent-menu)))
 
 ;;; ===== ace-window =====
 
 (use-package ace-window
   :defer t
+  :ensure t
   :config
   (setq aw-make-frame-char ?n)
   (advice-add 'aw-make-frame :override #'my/layout-make-frame)
   :commands (ace-window aw-flip-window))
 
 (use-package bind-key
+  :defer t
   :bind (:map help-map ("y" . describe-personal-keybindings)))
 
 (use-package char-menu
@@ -169,11 +174,14 @@
                ("Greek" "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
 
 (use-package compile
+  :defer t
   :custom
   (compilation-error-regexp-alist (cons '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2) ; from pyright?
                                         compilation-error-regexp-alist)))
 
 (use-package consult
+  :defer t
+  :ensure t
   :commands (consult--customize-put consult-flymake)
   :bind (:map ctl-x-map ;; C-x
               ("M-:" . consult-complex-command)
@@ -235,37 +243,30 @@
 
   :commands (consult-register-format consult-register-window consult-xref consult-register-store consult-register-load)
 
-  ;; The :init configuration is always executed (not lazy).
-  :init
+  :hook ((after-init . (lambda ()
+                         ;; Tweak the register preview for `consult-register-load',
+                         ;; `consult-register-store', and the built-in commands. This improves the
+                         ;; register formatting, adds thin separate lines, register sorting and hides
+                         ;; the window mode line.
+                         (advice-add #'register-preview :override #'consult-register-window)
+                         (setq register-preview-delay 0.5)
 
-  ;; Tweak the register preview for `consult-register-load',
-  ;; `consult-register-store', and the built-in commands. This improves the
-  ;; register formatting, adds thin separate lines, register sorting and hides
-  ;; the window mode line.
-  (advice-add #'register-preview :override #'consult-register-window)
-  (setq register-preview-delay 0.5)
+                         (defun my/consult-line-symbol-at-point ()
+                           "Start `consult-line' with symbol at point."
+                           (interactive)
+                           (consult-line (thing-at-point 'symbol)))
 
-  ;; Configure other variables and modes in the :config section,
-  ;; after lazily loading the package.
-  :config
-  (defun my/consult-line-symbol-at-point ()
-    "Start `consult-line' with symbol at point."
-    (interactive)
-    (consult-line (thing-at-point 'symbol)))
-
-  (consult-customize consult-theme :preview-key '(:debounce 0.2 any)
-                     consult-ripgrep consult-git-grep consult-grep consult-man
-                     consult-bookmark consult-recent-file consult-xref
-                     consult-source-bookmark consult-source-file-register
-                     consult-source-recent-file consult-source-project-recent-file
-                     :preview-key '(:debounce 0.4 any))
-
-  ;; Optionally configure the narrowing key.
-  ;; Both < and C-+ work reasonably well.
-  :custom (consult-narrow-key "<"))
+                         (setq consult-narrow-key "<")
+                         (consult-customize consult-theme :preview-key '(:debounce 0.2 any)
+                                            consult-ripgrep consult-git-grep consult-grep consult-man
+                                            consult-bookmark consult-recent-file consult-xref
+                                            consult-source-bookmark consult-source-file-register
+                                            consult-source-recent-file consult-source-project-recent-file
+                                            :preview-key '(:debounce 0.4 any))))))
 
 ;; Use Consult to select xref locations with preview
 (use-package xref
+  :defer t
   :custom
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref))
@@ -298,34 +299,63 @@
          ("n" . consult-notes))
   :hook (after-init . my/notes-consult-notes-hook))
 
+(use-package dabbrev
+  :defer t
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand))
+  :config
+  (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+  (add-to-list 'dabbrev-ignored-buffer-modes 'authinfo-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
+
+(use-package orderless
+  :defer t
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))
+                                   (minibuffer (orderless initials basic))))
+  (completion-category-defaults nil))
+
+(use-package cape
+  :defer t
+  :ensure t
+  :commands (cape-dabbrev cape-file cape-elisp-block)
+  :bind (:map my/hyper-c-map
+              ("p" . cape-prefix-map))
+  :hook (after-init . (lambda ()
+                        (add-hook 'completion-at-point-functions #'cape-dabbrev)
+                        (add-hook 'completion-at-point-functions #'cape-file)
+                        (add-hook 'completion-at-point-functions #'cape-elisp-block))))
+
 (use-package corfu
-  :after orderless
+  :defer t
+  :ensure t
   :commands (global-corfu-mode corfu-popupinfo-mode)
   :bind (:map corfu-map
               ("C-SPC" . corfu-insert-separator))
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  (corfu-separator ?\s)          ;; Orderless field separator
-  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
   ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-  (corfu-scroll-margin 5)        ;; Use scroll margin
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
   ;; Enable Corfu only for certain modes.
-  :hook ((prog-mode . corfu-mode)
-         (shell-mode . corfu-mode)
-         (eshell-mode . corfu-mode)
-         (after-init . (lambda ()
-                         (global-corfu-mode)
-                         (corfu-popupinfo-mode)))))
+  :hook ((after-init . (lambda ()
+                         (global-corfu-mode 1)
+                         (corfu-popupinfo-mode 1)))))
 
 (use-package crm)
 
 (use-package crux
   :defer t
+  :ensure t
   :commands (crux-find-current-directory-dir-locals-file)
   :bind (:map my/hyper-c-map
               ("d" . crux-duplicate-current-line-or-region)
@@ -337,13 +367,24 @@
               ("C-k" . crux-smart-kill-line)
               ("C-^" . crux-top-join-line)))
 
+(use-package diff-hl
+  :defer t
+  :ensure t
+  :commands (diff-hl-show-hunk diff-hl-flydiff-mode global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode)
+  :hook ((after-init . (lambda ()
+                         (diff-hl-flydiff-mode t)
+                         (global-diff-hl-mode t)
+                         (global-diff-hl-show-hunk-mouse-mode t)))))
+
 (autoload 'my/dired-mode-hook "my-dired-mode")
 (use-package dired
+  :defer t
   :hook (dired-mode . my/dired-mode-hook))
 
 (autoload 'my/lisp-mode-hook "my-lisp-mode")
 (autoload 'my/lisp-data-mode-hook "my-lisp-mode")
 (use-package elisp-mode
+  :defer t
   :hook ((lisp-mode . my/lisp-mode-hook)
          (lisp-interaction-mode . my/lisp-mode-hook)
          (lisp-data-mode . my/lisp-data-mode-hook)
@@ -361,6 +402,7 @@
 ;; FYI: Embark's default action binding of "RET" fails if a mode binds to <return>.
 (use-package embark
   :defer t
+  :ensure t
   :bind (("C-." . embark-act)
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
@@ -371,7 +413,7 @@
 
 (use-package embark-consult
   :defer t
-  :after (consult embark)
+  :ensure t
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; (use-package esup
@@ -379,6 +421,7 @@
 
 (use-package exec-path-from-shell
   :defer t
+  :ensure t
   :commands (exec-path-from-shell-initialize)
   :hook (after-init . exec-path-from-shell-initialize))
 
@@ -387,10 +430,12 @@
 
 (use-package fancy-compilation
   :defer t
+  :ensure t
   :commands (fancy-compilation-mode)
   :hook ((compilation-mode . fancy-compilation-mode)))
 
 (use-package flymake
+  :defer t
   :hook ((prog-mode . flymake-mode))
   :bind (:map flymake-mode-map
               ("M-n" . flymake-goto-next-error)
@@ -398,11 +443,13 @@
 
 (use-package flyover
   :defer t
+  :ensure t
   :hook ((flymake-mode . flyover-mode)
          (flyover-mode . my/flyover-mode-hook)))
 
 (use-package helpful
   :defer t
+  :ensure t
   :bind (:map help-map
               ("a" . helpful-symbol)
               ("f" . helpful-callable)
@@ -411,9 +458,6 @@
               ("." . helpful-at-point)
               ("M-f" . helpful-function)
               ("M-c" . helpful-command)))
-
-(use-package hippie-expand
-  :bind (("M-/" . hippie-expand)))
 
 (use-package hl-line
   :defer t
@@ -427,6 +471,7 @@
 
 (use-package indent-bars
   :defer t
+  :ensure t
   :hook (prog-mode . indent-bars-mode))
 
 (use-package iso-transl
@@ -452,6 +497,7 @@
 
 (use-package ligature
   :defer t
+  :ensure t
   :commands (ligature-set-ligatures global-ligature-mode)
   :hook ((after-init . (lambda ()
                          (ligature-set-ligatures
@@ -473,6 +519,7 @@
 
 (use-package magit
   :defer t
+  :ensure t
   :commands (magit-status-setup-buffer magit-status magit-project-status)
   :hook ((magit-post-refresh . diff-hl-magit-post-refresh))
   :bind (:map ctl-x-map
@@ -490,16 +537,17 @@
 (autoload 'my/markdown-ts-setup-hook "my-markdown-mode")
 (use-package markdown-ts-mode
   :defer t
-  :ensure nil
   :mode ("\\.md\\'" "\\.mdx\\'" "\\.markdown\\'")
   :hook ((markdown-ts-mode . my/markdown-ts-mode-hook))
          (after-init . my/markdown-ts-setup-hook))
 
 (use-package mode-line-bell
-  :defer t)
+  :defer t
+  :ensure t)
 
 (use-package keycast
   :defer t
+  :ensure t
   :vc (:url "https://github.com/tarsius/keycast")
   :commands (keycast-invisible-mode)
   :custom
@@ -508,11 +556,13 @@
 (autoload 'my/mood-line-hook "my-mood-line")
 (use-package mood-line
   :defer t
+  :ensure t
   :vc (:url "https://gitlab.com/jessieh/mood-line")
   :hook (after-init . my/mood-line-hook))
 
 (use-package multiple-cursors
   :defer t
+  :ensure t
   :bind (("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          :map my/hyper-c-map
@@ -542,6 +592,7 @@
 
 (use-package nerd-icons-dired
   :defer t
+  :ensure t
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
@@ -552,6 +603,7 @@
 
 (use-package orderless
   :defer t
+  :ensure t
   :custom
   (completion-styles '(partial-completion orderless flex))
   (completion-category-defaults nil)
@@ -573,11 +625,13 @@
 
 (use-package osx-dictionary
   :defer t
+  :ensure t
   :if my/is-macosx
   :bind (:map my/hyper-c-map ("l" . osx-dictionary-search-pointer)))
 
 (use-package popper
   :defer t
+  :ensure t
   :commands (popper-kill-latest-popup popper-mode popper-echo-mode)
   :functions (popper--delete-popup)
   :bind (("C-'" . popper-toggle)
@@ -603,9 +657,13 @@ Bound to \\`C-x p s'.")
               ;; ("s" . my/project-search-map)))
               ))
 
+(use-package recentf
+  :defer t
+  :hook ((after-init . recentf-mode)))
+
 (use-package rg
   :defer t
-  :after (project)
+  :ensure t
   :commands (rg-enable-default-bindings rg-project)
   :bind (:map my/project-search-map
               ("r" . rg-project))
@@ -621,6 +679,7 @@ Bound to \\`C-x p s'.")
 
 (use-package scratch
   :defer t
+  :ensure t
   :bind (:map my/hyper-c-map ("s" . scratch)))
 
 (autoload 'my/sh-mode-hook "my-sh-mode")
@@ -653,12 +712,14 @@ Bound to \\`C-x p s'.")
 
 (use-package vertico
   :defer t
+  :ensure t
   :commands (vertico-mode)
   :hook ((rfn-eshadow-update-overlay . vertico-directory-tidy)
          (after-init . vertico-mode)))
 
 (use-package which-key
   :defer t
+  :ensure t
   :hook (after-init . which-key-mode))
 
 (use-package whitespace
@@ -683,10 +744,12 @@ Bound to \\`C-x p s'.")
   :hook (tty-setup . (lambda () (xclip-mode 1))))
 
 (use-package yasnippet
-    :defer t)
+  :defer t
+  :ensure t)
 
 (use-package yasnippet-snippets
-    :defer t)
+  :defer t
+  :ensure t)
 
 ;; NOTE: this is setting a global variable, but we should really just do this when operating in an org buffer.
 (setq filter-buffer-substring-function #'my/org-filter-buffer-substring)
@@ -924,17 +987,6 @@ Bound to \\`C-x p s'.")
                             "H-;" #'my/matching-paren)))
   (apply #'my/emacs-key-bind global-map hyper-mappings)
   (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mappings))
-
-(use-package diff-hl
-  :defer t
-  :commands (diff-hl-show-hunk diff-hl-flydiff-mode global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode)
-  :hook ((after-init . (lambda ()
-                         (diff-hl-flydiff-mode t)
-                         (global-diff-hl-mode t)
-                         (global-diff-hl-show-hunk-mouse-mode t)))))
-
-(use-package recentf
-  :hook ((after-init . recentf-mode)))
 
 ;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to
 ;; type with one or two hands. Not so sure about how useful this is -- I keep encountering issues.
