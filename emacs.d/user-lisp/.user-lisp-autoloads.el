@@ -172,7 +172,7 @@ If COMMAND is nil, the key-chord is removed.
 
 (autoload 'my/c++-mode-hook "my-c++-mode"
 "Custom C++ mode hook.")
-(register-definition-prefixes "my-c++-mode" '("c++-mode-abbrev-table" "my/"))
+(register-definition-prefixes "my-c++-mode" '("my/"))
 
 
 ;;; Generated autoloads from my-c-mode.el

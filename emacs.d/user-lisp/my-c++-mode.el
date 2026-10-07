@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'cc-mode)
+(require 'c-ts-mode)
 (require 'doxygen)
 ;; (require 'eldoc-box)
 (require 'my-c-mode-common)
@@ -19,7 +19,7 @@
   "{\npublic:\n\n"
   "private:\n};\n")
 
-(define-abbrev c++-mode-abbrev-table "cc" "" 'my/c++-class-skeleton)
+;; (define-abbrev c++-mode-abbrev-table "cc" "" 'my/c++-class-skeleton)
 
 (define-skeleton my/c++-copyright-skeleton
   "Insert a C++ copyright comment."
@@ -28,7 +28,7 @@
   "//\n\n"
 )
 
-(define-abbrev c++-mode-abbrev-table "cr" "" 'my/c++-copyright-skeleton)
+;; (define-abbrev c++-mode-abbrev-table "cr" "" 'my/c++-copyright-skeleton)
 
 (defun my/c++-include-tag (&optional namespace)
   "Insert an include statement.
@@ -217,12 +217,13 @@ Setup a namespace with NAMESPACE name if non-nil."
     (while (re-search-forward "// *
 \\s-*// " nil t)
       (replace-match "// ")
-      (c-fill-paragraph))
+      ;; (c-fill-paragraph))
+      )
 
     ;; Refill any Doxygen comment block. This only refills the first text block
     (goto-char (point-min))
-    (while (re-search-forward "/\\*\\*" nil t)
-      (c-fill-paragraph))
+    ;; (while (re-search-forward "/\\*\\*" nil t)
+    ;;   (c-fill-paragraph))
 
     ;; Remove space after '(' and '[' and before ')' and ']' -- old formatting style that I hate now
     (goto-char (point-min))
@@ -335,20 +336,33 @@ Prohibits spell checking in '#include' strings."
   (and (flyspell-generic-progmode-verify)
        (not (my/c++-on-include-line))))
 
+(defun my/c++--indent-style()
+  "Override the built-in BSD indentation style with some additional rules.
+Docs: https://www.gnu.org/software/emacs/manual/html_node/elisp/Parser_002dbased-Indentation.html
+Notes: `treesit-explore-mode' can be very useful to see where you're at in the tree-sitter tree,
+especially paired with `(setq treesit--indent-verbose t)' to debug what rules is being
+applied at a given point."
+  `(;; do not indent preprocessor statements
+    ((node-is "preproc") column-0 0)
+    ;; do not indent namespace children
+    ((n-p-gp nil nil "namespace_definition") grand-parent 0)
+    ;; append to bsd style
+    ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
+
 ;;;###autoload
 (defun my/c++-mode-hook ()
   "Custom C++ mode hook."
   (my/c-mode-common)
   (abbrev-mode 1)
-  (c-add-style "My C++ Style" my/c-style t)
-  (c-set-offset 'innamespace 0)
-  (setq c-at-vsemi-p-fn 'my/c++-at-vsemi-p
-        indent-bars-spacing-override 4
-        c-basic-offset 2
-	c-vsemi-status-unknown-p-fn 'my/c++-vsemi-status-unknown-p
-        c-block-comment-prefix ""
-        c-doc-comment-style 'doxygenf
-        flyspell-generic-check-word-predicate #'my/flyspell-progmod-verify)
+  ;; (c-add-style "My C++ Style" my/c-style t)
+  ;; (c-set-offset 'innamespace 0)
+  (setq ;; c-at-vsemi-p-fn 'my/c++-at-vsemi-p
+   ;; indent-bars-spacing-override 4
+   ;; c-basic-offset 2
+	;; c-vsemi-status-unknown-p-fn 'my/c++-vsemi-status-unknown-p
+   ;; c-block-comment-prefix ""
+   ;; c-doc-comment-style 'doxygenf
+   flyspell-generic-check-word-predicate #'my/flyspell-progmod-verify)
   ;; (eldoc-box-hover-mode)
   (indent-bars-mode 1)
   (local-set-key [(f1)] #'eldoc-doc-buffer)

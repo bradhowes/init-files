@@ -111,9 +111,9 @@
    '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes consult-zoxide corfu denote diff-hl eldoc-box
             embark-consult esup exec-path-from-shell expand-region fancy-compilation flymake-gradle flymake-shellcheck
             flyover go-mode gradle-mode helpful impatient-mode indent-bars js2-mode key-chord keycast kkp kotlin-ts-mode
-            ligature magit marginalia mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-dired
-            nerd-icons-xref orderless osx-dictionary popper rg scratch tempel tempel-collection ultra-scroll vertico
-            xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
+            ligature magit marginalia mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu
+            nerd-icons-dired nerd-icons-xref orderless osx-dictionary popper rg scratch tempel tempel-collection
+            ultra-scroll vertico xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode

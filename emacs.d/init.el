@@ -163,6 +163,18 @@
   :defer t
   :bind (:map help-map ("y" . describe-personal-keybindings)))
 
+(autoload 'my/c++-mode-hook "my-c++-mode")
+(use-package c-ts-mode
+  :defer t
+  :init
+  (add-to-list 'auto-mode-alist '("\\(\\.inl\\|\\.mm\\)\\'" . c++-ts-mode))
+  (add-to-list 'auto-mode-alist
+               '("\\(\\.ii\\|\\.\\(CC?\\|HH?\\)\\|\\.[ch]\\(pp\\|xx\\|\\+\\+\\)\\|\\.\\(cc\\|hh\\)\\)\\'" . c++-ts-mode))
+  :hook ((c++-ts-mode . my/c++-mode-hook)
+         (after-init . (lambda ()
+                         (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+                         (eglot-ensure)))))
+
 (use-package char-menu
   :defer t
   :bind (("C-z" . char-menu))
@@ -590,6 +602,14 @@
   :hook (after-init . (lambda ()
                         (marginalia-mode t))))
 
+;; (use-package nerd-icons-corfu
+;;   :defer t
+;;   :ensure t
+;;   :commands (nerd-icons-corfu-formatter)
+;;   :hook (after-init . (lambda ()
+;;                         (require 'corfu)
+;;                         (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))))
+
 (use-package nerd-icons-dired
   :defer t
   :ensure t
@@ -605,10 +625,9 @@
   :defer t
   :ensure t
   :custom
-  (completion-styles '(partial-completion orderless flex))
-  (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles partial-completion))
-                                   (minibuffer (initials orderless)))))
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
 
 (use-package org
   :defer t
@@ -714,8 +733,7 @@ Bound to \\`C-x p s'.")
   :defer t
   :ensure t
   :commands (vertico-mode)
-  :hook ((rfn-eshadow-update-overlay . vertico-directory-tidy)
-         (after-init . vertico-mode)))
+  :hook ((after-init . vertico-mode)))
 
 (use-package which-key
   :defer t

@@ -2,9 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'font-lock)
+(require 'c-ts-mode)
 (require 'doxygen)
-(require 'cc-vars)
+(require 'font-lock)
 (require 'my-fontify-braces)
 (require 'subword)
 
@@ -362,8 +362,7 @@ If POS is nil, the current point is used."
 ;;;###autoload
 (defun my/c-mode-common ()
   "Common hook for C/C++ modes."
-  (setq c-basic-offset 2
-        c-doc-comment-style 'doxygen)
+  (setq c-ts-indent-offset 2)
 
   (unless (boundp 'my/c-c-c-4-keymap)
     (define-prefix-command 'my/c-c-c-4-keymap))

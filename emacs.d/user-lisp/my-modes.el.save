@@ -48,10 +48,6 @@ the items to setup for autoloading from the given file."
   :commands (cape-capf-super cape-wrap-buster)
   :ensure t)
 
-(use-package cc-mode
-  :init (add-to-list 'auto-mode-alist '("\\(\\.inl\\|\\.mm\\)\\'" . c++-mode))
-  :hook ((c++-mode . my/c++-mode-hook)))
-
 (use-package cmake-mode
   :ensure t
   :hook ((cmake-mode . my/cmake-mode-hook)))
