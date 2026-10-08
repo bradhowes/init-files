@@ -419,7 +419,8 @@ Prohibits spell checking in '#include' strings."
   (local-set-key [(control meta \;)] #'my/c++-insert-block-comment)
   (local-set-key [(f8)] #'my/c++-forward-doc-comment)
   (local-set-key [(meta f8)] #'my/c++-backward-doc-comment)
-  (eglot-ensure))
+  (when (project-current nil default-directory)
+    (eglot-ensure)))
 
 (provide 'my/c++-mode)
 ;;; my-c++-mode.el ends here

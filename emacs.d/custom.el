@@ -144,6 +144,7 @@
  '(smtpmail-smtp-service 587)
  '(switch-to-prev-buffer-skip t)
  '(tab-always-indent 'complete)
+ '(tab-first-completion 'eol)
  '(text-scale-mode-step 1.0)
  '(tramp-auto-save-directory "/Users/bradhowes/tmp/emacs_autosaves")
  '(tramp-backup-directory-alist '((".*" . "/Users/bradhowes/tmp/emacs_backups")))
