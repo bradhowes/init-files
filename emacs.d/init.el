@@ -619,6 +619,14 @@
                         (require 'corfu)
                         (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))))
 
+(use-package nerd-icons-corfu
+  :defer t
+  :ensure t
+  :commands (nerd-icons-corfu-formatter)
+  :hook (after-init . (lambda ()
+                        (require 'corfu)
+                        (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))))
+
 (use-package nerd-icons-dired
   :defer t
   :ensure t
