@@ -408,7 +408,10 @@ If POS is nil, the current point is used."
   ;; No IMenu support in IDL files.
   ;;
   (unless (string-equal (file-name-extension (buffer-name)) "idl")
-    (imenu-add-menubar-index))
+    (condition-case err (imenu-add-menubar-index)
+      (imenu-unavailable
+       (let ((inhibit-message t))
+         (message "Warning: %s" (error-message-string err))))))
 
   (my/fontify-braces)
 

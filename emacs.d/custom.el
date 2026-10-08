@@ -110,10 +110,10 @@
  '(package-selected-packages
    '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes consult-zoxide corfu denote diff-hl eldoc-box
             embark-consult esup exec-path-from-shell expand-region fancy-compilation flymake-gradle flymake-shellcheck
-            flyover go-mode gradle-mode helpful impatient-mode indent-bars js2-mode key-chord keycast kkp kotlin-ts-mode
-            ligature magit marginalia mode-line-bell mood-line multiple-cursors nerd-icons-completion nerd-icons-corfu
-            nerd-icons-dired nerd-icons-xref orderless osx-dictionary popper rg scratch tempel tempel-collection
-            ultra-scroll vertico xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
+            flyover git-timemachine go-mode gradle-mode helpful impatient-mode indent-bars js2-mode key-chord keycast
+            kkp kotlin-ts-mode ligature magit marginalia mode-line-bell mood-line multiple-cursors nerd-icons-completion
+            nerd-icons-corfu nerd-icons-dired nerd-icons-xref orderless osx-dictionary popper rg scratch tempel
+            tempel-collection ultra-scroll vertico xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
@@ -131,7 +131,7 @@
  '(resize-mini-windows t)
  '(ring-bell-function 'mode-line-bell-flash)
  '(safe-local-variable-directories '("/Users/howes/src/Mine/init-files"))
- '(safe-local-variable-values '((checkdoc-minor-mode . t)))
+ '(safe-local-variable-values '((dired-omit-files . "*.elc") (checkdoc-minor-mode . t)))
  '(save-interprogram-paste-before-kill t)
  '(savehist-additional-variables
    '(register-alist kill-ring project-regexp-history-variable corfu-history))

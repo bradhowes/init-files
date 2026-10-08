@@ -224,7 +224,10 @@ I originally had a macro, but that was sloooow." t)
 
 ;;; Generated autoloads from my-customizations.el
 
-(register-definition-prefixes "my-customizations" '("my/"))
+(let ((loads (get 'my/customizations 'custom-loads))) (if (member '"my-customizations" loads) nil (put 'my/customizations 'custom-loads (cons '"my-customizations" loads)) (put 'local 'custom-loads (cons 'my/customizations (get 'local 'custom-loads)))))
+(defvar my/use-c-ts-mode nil
+"Use `c-ts-mode' when t.")
+(custom-autoload 'my/use-c-ts-mode "my-customizations" t)
 
 
 ;;; Generated autoloads from my-dired-mode.el

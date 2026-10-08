@@ -163,16 +163,26 @@
   :defer t
   :bind (:map help-map ("y" . describe-personal-keybindings)))
 
+(defcustom my/use-c-ts-mode nil
+  "Use `c-ts-mode' when t."
+  :type '(boolean))
+
 (autoload 'my/c++-mode-hook "my-c++-mode")
-(use-package c-ts-mode
-  :defer t
-  :hook ((c++-ts-mode . my/c++-mode-hook)
-         (after-init . (lambda ()
-                         (add-to-list 'auto-mode-alist
-                                      `(,(concat "\\.\\(cc\\|hh\\|ii\\|inl\\|mm\\|"
-                                                 "\\([ch]\\(pp\\|xx\\|\\+\\+\\)\\)\\)\\'")
-                                        . c++-ts-mode))
-                         (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))))))
+(let ((mode (if my/use-c-ts-mode 'c++-ts-mode 'c++-mode)))
+  (add-to-list 'auto-mode-alist
+               `(,(concat "\\.\\(cc\\|hh\\|ii\\|inl\\|mm\\|"
+                          "\\([ch]\\(pp\\|xx\\|\\+\\+\\)\\)\\)\\'")
+                 . ,mode)))
+
+(if my/use-c-ts-mode
+    (use-package c-ts-mode
+      :defer t
+      :hook ((c++-ts-mode . my/c++-mode-hook)
+             (after-init . (lambda ()
+                             (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))))))
+  (use-package cc-mode
+    :defer t
+    :hook ((c++-mode . my/c++-mode-hook))))
 
 (use-package char-menu
   :defer t
@@ -574,11 +584,11 @@
   (keycast-mode-line-format "%2s%k%c%r"))
 
 (autoload 'my/mood-line-hook "my-mood-line")
-(use-package mood-line
-  :defer t
-  :ensure t
-  :vc (:url "https://gitlab.com/jessieh/mood-line")
-  :hook (after-init . my/mood-line-hook))
+;; (use-package mood-line
+;;   :defer t
+;;   :ensure t
+;;   :vc (:url "https://gitlab.com/jessieh/mood-line")
+;;   :hook (after-init . my/mood-line-hook))
 
 (use-package multiple-cursors
   :defer t
@@ -765,6 +775,14 @@ Bound to \\`C-x p s'.")
   :ensure t)
 
 (use-package yasnippet-snippets
+  :defer t
+  :ensure t)
+
+(use-package zoxide
+  :defer t
+  :ensure t)
+
+(use-package consult-zoxide
   :defer t
   :ensure t)
 

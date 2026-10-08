@@ -41,7 +41,7 @@
   (keymap-local-unset "M-}")
   (keymap-local-unset "l")
 
-  (keymap-local-unset "q") ;; no idea where this is being set
+  ;; (keymap-local-unset "q") ;; no idea where this is being set
 
   (keymap-local-set "c" #'dired-do-copy)
   (keymap-local-set "C" #'dired-do-compress)

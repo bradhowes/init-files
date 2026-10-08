@@ -108,11 +108,11 @@ cd "${PWD}" || :
 autoload -Uz compinit && compinit
 
 # shellcheck disable=SC2046
-[[ -x "/opt/homebrew/bin/zoxide" ]] && eval $(zoxide init zsh)
+[[ -x "/opt/homebrew/bin/zoxide" ]] && eval "$(zoxide init zsh)"
 
 # Set up fzf key bindings and fuzzy completion
 # shellcheck disable=SC1090,SC3046,SC3001
-source <(fzf --zsh)
+[[ -x "/opt/homebrew/bin/fzf" ]] && source <(fzf --zsh)
 
 # Use current Java environment
 [[ -d "${HOME}/.jenv/bin" ]] &&  eval "$(jenv init -)"

@@ -2,7 +2,11 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'c-ts-mode)
+(require 'my-customizations)
+(if my/use-c-ts-mode
+    (require 'c-ts-mode)
+  (require 'cc-mode))
+
 (require 'doxygen)
 (require 'eglot)
 ;; (require 'eldoc-box)
@@ -20,8 +24,6 @@
   "{\npublic:\n\n"
   "private:\n};\n")
 
-;; (define-abbrev c++-mode-abbrev-table "cc" "" 'my/c++-class-skeleton)
-
 (define-skeleton my/c++-copyright-skeleton
   "Insert a C++ copyright comment."
   nil
@@ -29,7 +31,11 @@
   "//\n\n"
 )
 
-;; (define-abbrev c++-mode-abbrev-table "cr" "" 'my/c++-copyright-skeleton)
+(when (not my/use-c-ts-mode)
+  (defvar c++-mode-abbrev-table)
+  (define-abbrev-table 'c++-mode-abbrev-table ())
+  (define-abbrev c++-mode-abbrev-table "cc" "" 'my/c++-class-skeleton)
+  (define-abbrev c++-mode-abbrev-table "cr" "" 'my/c++-copyright-skeleton))
 
 (defun my/c++-include-tag (&optional namespace)
   "Insert an include statement.
@@ -371,15 +377,40 @@ Prohibits spell checking in '#include' strings."
     (when (not (assoc-default name auto-mode-alist 'string-match))
       (error (format "Unexpected nil for filename '%s' -- update `init.el'" name)))))
 
+(defun my/c++-cc-mode-hook ()
+  "Custom C++ mode hook for cc-mode."
+  (require 'cc-mode)
+  (require 'cc-vars)
+  (require 'cc-engine)
+  (c-add-style "My C++ Style" my/c-style t)
+  (c-set-offset 'innamespace 0)
+  (setq c-at-vsemi-p-fn 'my/c++-at-vsemi-p
+        indent-bars-spacing-override 4
+        c-basic-offset 2
+	c-vsemi-status-unknown-p-fn 'my/c++-vsemi-status-unknown-p
+        c-block-comment-prefix ""
+        c-doc-comment-style 'doxygenf
+        flyspell-generic-check-word-predicate #'my/flyspell-progmod-verify))
+
+(defun my/c++-c-ts-mode-hook ()
+  "Custom C++ mode hook for `c-ts-mode'."
+  (require 'c-ts-mode)
+  (setopt c-ts-indent-offset 2
+          c-ts-mode-indent-style 'my/c++-ts-mode-indent-style))
+
 ;;;###autoload
 (defun my/c++-mode-hook ()
   "Custom C++ mode hook."
+
   (my/c++-validate-auto-mode-alist)
   (my/c-mode-common)
   (abbrev-mode 1)
   (setq flyspell-generic-check-word-predicate #'my/flyspell-progmod-verify)
-  (setopt c-ts-indent-offset 2
-          c-ts-mode-indent-style 'my/c++-ts-mode-indent-style)
+
+  (if my/use-c-ts-mode
+      (my/c++-c-ts-mode-hook)
+    (my/c++-cc-mode-hook))
+
   ;; (eldoc-box-hover-mode)
   (indent-bars-mode 1)
   (local-set-key [(f1)] #'eldoc-doc-buffer)
