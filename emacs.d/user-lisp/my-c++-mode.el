@@ -350,12 +350,36 @@ Prohibits spell checking in '#include' strings."
 ;;     ;; append to bsd style
 ;;     ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
 
+(defun my/c++-ts-mode-indent-style ()
+  "My custom C++ indentation style."
+  `((cpp
+     ((n-p-gp nil nil "namespace_definition") grand-parent 0)
+     ,@(cdr (car (c-ts-mode--simple-indent-rules 'cpp 'bsd))))))
+
+(defun my/c++-validate-auto-mode-alist ()
+  "Validate that `auto-mode-alist' has expected values."
+  (dolist (name '("a.cc"
+                  "a.hh"
+                  "a.ii"
+                  "a.inl"
+                  "a.mm"
+                  "a.cpp"
+                  "a.c++"
+                  "a.hpp"
+                  "a.hxx"
+                  "a.h++"))
+    (when (not (assoc-default name auto-mode-alist 'string-match))
+      (error (format "Unexpected nil for filename '%s' -- update `init.el'" name)))))
+
 ;;;###autoload
 (defun my/c++-mode-hook ()
   "Custom C++ mode hook."
+  (my/c++-validate-auto-mode-alist)
   (my/c-mode-common)
   (abbrev-mode 1)
   (setq flyspell-generic-check-word-predicate #'my/flyspell-progmod-verify)
+  (setopt c-ts-indent-offset 2
+          c-ts-mode-indent-style 'my/c++-ts-mode-indent-style)
   ;; (eldoc-box-hover-mode)
   (indent-bars-mode 1)
   (local-set-key [(f1)] #'eldoc-doc-buffer)

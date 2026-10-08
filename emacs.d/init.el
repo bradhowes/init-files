@@ -166,16 +166,13 @@
 (autoload 'my/c++-mode-hook "my-c++-mode")
 (use-package c-ts-mode
   :defer t
-  :custom
-  (c-ts-indent-offset 2)
-  (c-ts-mode-indent-style 'google)
   :hook ((c++-ts-mode . my/c++-mode-hook)
          (after-init . (lambda ()
-                         (add-to-list 'auto-mode-alist '("\\(\\.inl\\|\\.mm\\)\\'" . c++-ts-mode))
                          (add-to-list 'auto-mode-alist
-                                      '("\\(\\.ii\\|\\.\\(CC?\\|HH?\\)\\|\\.[ch]\\(pp\\|xx\\|\\+\\+\\)\\|\\.\\(cc\\|hh\\)\\)\\'" . c++-ts-mode))
-                         (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-                         ))))
+                                      `(,(concat "\\.\\(cc\\|hh\\|ii\\|inl\\|mm\\|"
+                                                 "\\([ch]\\(pp\\|xx\\|\\+\\+\\)\\)\\)\\'")
+                                        . c++-ts-mode))
+                         (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))))))
 
 (use-package char-menu
   :defer t
