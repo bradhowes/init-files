@@ -166,14 +166,16 @@
 (autoload 'my/c++-mode-hook "my-c++-mode")
 (use-package c-ts-mode
   :defer t
-  :init
-  (add-to-list 'auto-mode-alist '("\\(\\.inl\\|\\.mm\\)\\'" . c++-ts-mode))
-  (add-to-list 'auto-mode-alist
-               '("\\(\\.ii\\|\\.\\(CC?\\|HH?\\)\\|\\.[ch]\\(pp\\|xx\\|\\+\\+\\)\\|\\.\\(cc\\|hh\\)\\)\\'" . c++-ts-mode))
+  :custom
+  (c-ts-indent-offset 2)
+  (c-ts-mode-indent-style 'google)
   :hook ((c++-ts-mode . my/c++-mode-hook)
          (after-init . (lambda ()
+                         (add-to-list 'auto-mode-alist '("\\(\\.inl\\|\\.mm\\)\\'" . c++-ts-mode))
+                         (add-to-list 'auto-mode-alist
+                                      '("\\(\\.ii\\|\\.\\(CC?\\|HH?\\)\\|\\.[ch]\\(pp\\|xx\\|\\+\\+\\)\\|\\.\\(cc\\|hh\\)\\)\\'" . c++-ts-mode))
                          (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-                         (eglot-ensure)))))
+                         ))))
 
 (use-package char-menu
   :defer t
@@ -311,17 +313,6 @@
          ("n" . consult-notes))
   :hook (after-init . my/notes-consult-notes-hook))
 
-(use-package dabbrev
-  :defer t
-  :bind (("M-/" . dabbrev-completion)
-         ("C-M-/" . dabbrev-expand))
-  :config
-  (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
-  (add-to-list 'dabbrev-ignored-buffer-modes 'authinfo-mode)
-  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
-  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
-  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
-
 (use-package orderless
   :defer t
   :ensure t
@@ -378,6 +369,17 @@
               ("C-a" . crux-move-beginning-of-line)
               ("C-k" . crux-smart-kill-line)
               ("C-^" . crux-top-join-line)))
+
+(use-package dabbrev
+  :defer t
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand))
+  :config
+  (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+  (add-to-list 'dabbrev-ignored-buffer-modes 'authinfo-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 
 (use-package diff-hl
   :defer t
@@ -545,6 +547,15 @@
   :custom
   (magit-process-find-password-functions '(my/read-gitlab-password)))
 
+(use-package marginalia
+  :defer t
+  :ensure t
+  :commands (marginalia-mode marginalia-cycle)
+  :bind (:map minibuffer-local-map
+              ("<f1>" . marginalia-cycle))
+  :hook (after-init . (lambda ()
+                        (marginalia-mode t))))
+
 (autoload 'my/markdown-ts-mode-hook "my-markdown-mode")
 (autoload 'my/markdown-ts-setup-hook "my-markdown-mode")
 (use-package markdown-ts-mode
@@ -593,22 +604,13 @@
   :commands (nerd-icons-completion-mode)
   :hook ((after-init . (lambda () (nerd-icons-completion-mode 1)))))
 
-(use-package marginalia
+(use-package nerd-icons-corfu
   :defer t
   :ensure t
-  :commands (marginalia-mode marginalia-cycle)
-  :bind (:map minibuffer-local-map
-              ("<f1>" . marginalia-cycle))
+  :commands (nerd-icons-corfu-formatter)
   :hook (after-init . (lambda ()
-                        (marginalia-mode t))))
-
-;; (use-package nerd-icons-corfu
-;;   :defer t
-;;   :ensure t
-;;   :commands (nerd-icons-corfu-formatter)
-;;   :hook (after-init . (lambda ()
-;;                         (require 'corfu)
-;;                         (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))))
+                        (require 'corfu)
+                        (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))))
 
 (use-package nerd-icons-dired
   :defer t
