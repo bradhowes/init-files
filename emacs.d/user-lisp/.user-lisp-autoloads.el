@@ -359,8 +359,6 @@ very small for me, and it remove the obnoxious message at startup about
 the buffer having untrusted content.
 
 (fn ORIGINAL-RESPONSE)")
-(autoload 'my/mood-line-segment-project "my-functions"
-"Return `function/project-mode-line-format' if buffer belongs to a project.")
 (register-definition-prefixes "my-functions" '("my/launch-ssh-emacs"))
 
 
@@ -786,10 +784,15 @@ disabled.
 
 ;;; Generated autoloads from my-mood-line.el
 
-(autoload 'my/mood-line-segment-keycast "my-mood-line"
-"Return `keycast-format' if keycast mode enabled.")
 (autoload 'my/mood-line-hook "my-mood-line"
 "Startup routine for mood-line.")
+(register-definition-prefixes "my-mood-line" '("my/mood-line-segment-"))
+
+
+;;; Generated autoloads from my-sleek-modeline.el
+
+(autoload 'my/sleek-modeline-keycast-register "my-sleek-modeline"
+"Register a segment to show `keycast' info when enabled.")
 
 
 ;;; End of scraped data

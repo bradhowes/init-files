@@ -107,12 +107,14 @@ cd "${PWD}" || :
 # Load in completion facility -- must be done before injecting
 autoload -Uz compinit && compinit
 
-# shellcheck disable=SC2046
+export _ZO_ECHO=1
+export _ZO_RESOLVE_SYMLINKS=1
+# sshellcheck disable=SC2046
 [[ -x "/opt/homebrew/bin/zoxide" ]] && eval "$(zoxide init zsh)"
 
 # Set up fzf key bindings and fuzzy completion
-# shellcheck disable=SC1090,SC3046,SC3001
-[[ -x "/opt/homebrew/bin/fzf" ]] && source <(fzf --zsh)
+# shellcheck disable=SC1090,SC3001
+[[ -x "/opt/homebrew/bin/fzf" ]] && . <(fzf --zsh)
 
 # Use current Java environment
 [[ -d "${HOME}/.jenv/bin" ]] &&  eval "$(jenv init -)"

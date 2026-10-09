@@ -3,7 +3,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(setq debug-on-message "Unable to activate package 'lsp-mode'.")
+;; (setq debug-on-message "Unable to activate package 'lsp-mode'.")
 
 ;; Always work in the UTF-8 coding system.
 (let ((coding-system 'utf-8))
@@ -402,23 +402,15 @@
   :defer t
   :hook (dired-mode . my/dired-mode-hook))
 
-;; (use-package doom-modeline
+;; (autoload 'my/sleek-modeline-keycast-register "my-sleek-modeline")
+;; (use-package sleek-modeline
 ;;   :defer t
 ;;   :ensure t
-;;   :hook ((after-init . (lambda () (doom-modeline-mode 1)))))
-
-;; (use-package simple-modeline
-;;   :defer t
-;;   :ensure t
-;;   :hook ((after-init . (lambda () (simple-modeline-mode 1)))))
-
-(use-package sleek-modeline
-  :defer t
-  :ensure t
-  :commands (sleek-modeline-mode)
-  :hook ((after-init . (lambda ()
-                         (setq sleek-modeline-background "OrangeRed4")
-                         (sleek-modeline-mode 1)))))
+;;   :commands (sleek-modeline-mode)
+;;   :hook ((after-init . (lambda ()
+;;                          ;; (setq sleek-modeline-background "dark gray") ;; OrangeRed4")
+;;                          (my/sleek-modeline-keycast-register)
+;;                          (sleek-modeline-mode 1)))))
 
 ;; (use-package timu-line
 ;;   :ensure tw
@@ -610,12 +602,12 @@
   :custom
   (keycast-mode-line-format "%2s%k%c%r"))
 
-;; (autoload 'my/mood-line-hook "my-mood-line")
-;; (use-package mood-line
-;;   :defer t
-;;   :ensure t
-;;   :vc (:url "https://gitlab.com/jessieh/mood-line")
-;;   :hook (after-init . my/mood-line-hook))
+(autoload 'my/mood-line-hook "my-mood-line")
+(use-package mood-line
+  :defer t
+  :ensure t
+  :vc (:url "https://gitlab.com/jessieh/mood-line")
+  :hook (after-init . my/mood-line-hook))
 
 (use-package multiple-cursors
   :defer t
@@ -1104,8 +1096,11 @@ Bound to \\`C-x p s'.")
     (custom-set-variables
      '(frame-resize-pixelwise t))))
 
+;; Hyper modifer on right side.
 (setopt mac-right-command-modifier 'hyper)
+;; Default behavior is Alt (A-) I think. But the documentation is sparse.
 (setopt mac-left-option-modifier 'none)
+;; Default behavior is macOS option
 (setopt mac-right-option-modifier 'none)
 
 ;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097 Basically, put backup and autosave files in their

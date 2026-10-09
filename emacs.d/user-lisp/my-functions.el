@@ -157,16 +157,6 @@ the buffer having untrusted content."
    host
    "exec /opt/homebrew/bin/emacs"))
 
-;;;###autoload
-(defun my/mood-line-segment-project ()
-  "Return `function/project-mode-line-format' if buffer belongs to a project."
-  (or
-   (and (fboundp 'project-mode-line-format)
-        (project-current)
-        (project-mode-line-format))
-   (and (fboundp 'projectile-project-name)
-        (projectile-project-name))))
-
 (provide 'my-functions)
 
 ;;; my-functions.el ends here.
