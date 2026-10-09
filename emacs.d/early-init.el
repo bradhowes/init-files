@@ -2,9 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(eval-when-compile
-  (require 'comp))
-
 ;; Do not show menu bar if running on TTY
 (when (and (fboundp 'menu-bar-mode)
            (tty-type))
