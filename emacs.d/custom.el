@@ -108,12 +108,13 @@
  '(ns-right-command-modifier 'super)
  '(ns-right-control-modifier 'hyper)
  '(package-selected-packages
-   '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes consult-zoxide corfu denote diff-hl eldoc-box
-            embark-consult esup exec-path-from-shell expand-region fancy-compilation flymake-gradle flymake-shellcheck
-            flyover git-timemachine go-mode gradle-mode helpful impatient-mode indent-bars js2-mode key-chord keycast
-            kkp kotlin-ts-mode ligature magit marginalia mode-line-bell mood-line multiple-cursors nerd-icons-completion
-            nerd-icons-corfu nerd-icons-dired nerd-icons-xref orderless osx-dictionary popper rg scratch tempel
-            tempel-collection ultra-scroll vertico xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
+   '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes consult-zoxide corfu crux denote diff-hl
+            doom-modeline eldoc-box embark-consult esup exec-path-from-shell expand-region fancy-compilation
+            flymake-gradle flymake-shellcheck flyover git-timemachine go-mode gradle-mode helpful impatient-mode
+            indent-bars js2-mode key-chord keycast kkp kotlin-ts-mode ligature magit marginalia mode-line-bell mood-line
+            multiple-cursors nano-modeline nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-xref
+            orderless osx-dictionary popper rg scratch simple-modeline sleek-modeline tempel tempel-collection timu-line
+            ultra-scroll vertico xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
@@ -144,7 +145,6 @@
  '(smtpmail-smtp-service 587)
  '(switch-to-prev-buffer-skip t)
  '(tab-always-indent 'complete)
- '(tab-first-completion 'eol)
  '(text-scale-mode-step 1.0)
  '(tramp-auto-save-directory "/Users/bradhowes/tmp/emacs_autosaves")
  '(tramp-backup-directory-alist '((".*" . "/Users/bradhowes/tmp/emacs_backups")))

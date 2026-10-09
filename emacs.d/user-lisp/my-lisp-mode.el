@@ -23,6 +23,7 @@
 ;;;###autoload
 (defun my/lisp-data-mode-hook ()
   "Custom Lisp-Data mode."
+  (my/fontify-braces)
   (font-lock-mode t)
   (show-paren-mode t))
 
