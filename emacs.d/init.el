@@ -573,15 +573,6 @@
   :custom
   (magit-process-find-password-functions '(my/read-gitlab-password)))
 
-(use-package marginalia
-  :defer t
-  :ensure t
-  :commands (marginalia-mode marginalia-cycle)
-  :bind (:map minibuffer-local-map
-              ("<f1>" . marginalia-cycle))
-  :hook ((after-init . marginalia-mode)))
-;; (marginalia-mode . #'nerd-icons-completion-marginalia-setup)))
-
 (autoload 'my/markdown-ts-mode-hook "my-markdown-mode")
 (autoload 'my/markdown-ts-setup-hook "my-markdown-mode")
 (use-package markdown-ts-mode
@@ -627,7 +618,17 @@
 (use-package nerd-icons-completion
   :defer t
   :ensure t
-  :hook ((after-init . nerd-icons-completion-mode)))
+  :commands (nerd-icons-completion-mode))
+
+(use-package marginalia
+  :defer t
+  :ensure t
+  :commands (marginalia-mode marginalia-cycle)
+  :bind (:map minibuffer-local-map
+              ("<f1>" . marginalia-cycle))
+  :hook ((after-init . (lambda ()
+                         (marginalia-mode 1)
+                         (nerd-icons-completion-mode 1)))))
 
 (use-package nerd-icons-corfu
   :defer t

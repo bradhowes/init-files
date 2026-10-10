@@ -4,10 +4,6 @@
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2------
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  '(Info-additional-directory-list '("/opt/homebrew/share/info"))
  '(auto-revert-buffer-list-filter 'magit-auto-revert-repository-buffer-p)
  '(auto-revert-use-notify nil)
