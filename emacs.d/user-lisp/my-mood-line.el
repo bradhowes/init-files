@@ -19,11 +19,12 @@
 (defun my/mood-line-segment-project ()
   "Return `function/project-mode-line-format' if buffer belongs to a project."
   (or
-   (and (fboundp 'project-mode-line-format)
+   (and (fboundp 'project-current)
         (project-current)
-        (project-mode-line-format))
+        (fboundp 'project-name)
+        (concat "«" (project-name (project-current)) "»"))
    (and (fboundp 'projectile-project-name)
-        (projectile-project-name))))
+        (concat "«" (projectile-project-name) "»"))))
 
 (defun my/mood-line-segment-buffer-status ()
   "Return an indicator representing the status of the current buffer."
@@ -40,24 +41,24 @@
 ;;;###autoload
 (defun my/mood-line-hook ()
   "Startup routine for mood-line."
-  (setq mood-line-format
-        (mood-line-defformat
-         :left
-         (((mood-line-segment-modal)                  . " ")
-          ((mood-line-segment-buffer-status)          . " ")
-          ((my/mood-line-segment-project)             . " » ")
-          ((mood-line-segment-buffer-name)            . " ")
-          ((mood-line-segment-multiple-cursors)       . " ")
-          ((mood-line-segment-cursor-position)        . " ")
-          ((mood-line-segment-scroll) . " ")
-          (my/mood-line-segment-keycast))
-         :right
-         (((mood-line-segment-vc)         . " ")
-          ((mood-line-segment-major-mode) . " ")
-          ((mood-line-segment-misc-info)  . " ")
-          ((mood-line-segment-checker)    . " ")
-          ((mood-line-segment-process)    . " ")))
-        mood-line-glyph-alist mood-line-glyphs-fira-code)
+  (setq-default mood-line-format
+                (mood-line-defformat
+                 :left
+                 (((mood-line-segment-modal)                  . " ")
+                  ((mood-line-segment-buffer-status)          . " ")
+                  ((my/mood-line-segment-project)             . " ")
+                  ((mood-line-segment-buffer-name)            . " ")
+                  ((mood-line-segment-multiple-cursors)       . " ")
+                  ((mood-line-segment-cursor-position)        . " ")
+                  ((mood-line-segment-scroll) . " ")
+                  (my/mood-line-segment-keycast))
+                 :right
+                 (((mood-line-segment-vc)         . " ")
+                  ((mood-line-segment-major-mode) . " ")
+                  ((mood-line-segment-misc-info)  . " ")
+                  ((mood-line-segment-checker)    . " ")
+                  ((mood-line-segment-process)    . " ")))
+                mood-line-glyph-alist mood-line-glyphs-unicode)
   (mood-line-mode 1))
 
 (provide 'my/mood-line)

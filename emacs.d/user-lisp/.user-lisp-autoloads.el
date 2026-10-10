@@ -764,8 +764,6 @@ disabled.
 (fn &optional ARG)" t)
 (register-definition-prefixes "mood-line" '("mood-line-"))
 
-
-
 
 ;;; Generated autoloads from my-notes.el
 
@@ -794,6 +792,121 @@ disabled.
 (autoload 'my/sleek-modeline-keycast-register "my-sleek-modeline"
 "Register a segment to show `keycast' info when enabled.")
 
+
+;;; Generated autoloads from multiple-cursors-core.el
+
+(autoload 'activate-cursor-for-undo "multiple-cursors-core"
+"Called when undoing to temporarily activate the fake cursor
+which action is being undone.
+
+(fn ID)")
+(autoload 'multiple-cursors-mode "multiple-cursors-core"
+"Mode while multiple cursors are active.
+
+This is a minor mode.  If called interactively, toggle the
+`Multiple-Cursors mode' mode.  If the prefix argument is positive,
+enable the mode, and if it is zero or negative, disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
+mode if ARG is nil, omitted, or is a positive number.  Disable the mode
+if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate the variable `multiple-cursors-mode'.
+
+The mode's hook is called both when the mode is enabled and when it is
+disabled.
+
+(fn &optional ARG)" t)
+(register-definition-prefixes "multiple-cursors-core" '("deactivate-cursor-after-undo" "mc--" "mc/" "unsupported-cmd"))
+
+
+;;; Generated autoloads from my-icons.el
+
+(defvar my/icons-xref-mode nil
+"Non-nil if My/Icons-Xref mode is enabled.
+See the `my/icons-xref-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `my/icons-xref-mode'.")
+(custom-autoload 'my/icons-xref-mode "my-icons" nil)
+(autoload 'my/icons-xref-mode "my-icons"
+"Display icons for Xref headings.
+
+This is a global minor mode.  If called interactively, toggle the
+`My/Icons-Xref mode' mode.  If the prefix argument is positive, enable
+the mode, and if it is zero or negative, disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
+mode if ARG is nil, omitted, or is a positive number.  Disable the mode
+if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate `(default-value \\='my/icons-xref-mode)'.
+
+The mode's hook is called both when the mode is enabled and when it is
+disabled.
+
+(fn &optional ARG)" t)
+(defvar my/icons-buffer-menu-mode nil
+"Non-nil if My/Icons-Buffer-Menu mode is enabled.
+See the `my/icons-buffer-menu-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `my/icons-buffer-menu-mode'.")
+(custom-autoload 'my/icons-buffer-menu-mode "my-icons" nil)
+(autoload 'my/icons-buffer-menu-mode "my-icons"
+"Display icons for `Buffer-menu-mode' entries.
+
+This is a global minor mode.  If called interactively, toggle the
+`My/Icons-Buffer-Menu mode' mode.  If the prefix argument is positive,
+enable the mode, and if it is zero or negative, disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
+mode if ARG is nil, omitted, or is a positive number.  Disable the mode
+if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate `(default-value \\='my/icons-buffer-menu-mode)'.
+
+The mode's hook is called both when the mode is enabled and when it is
+disabled.
+
+(fn &optional ARG)" t)
+(defvar my/icons-tab-bar-mode nil
+"Non-nil if My/Icons-Tab-Bar mode is enabled.
+See the `my/icons-tab-bar-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `my/icons-tab-bar-mode'.")
+(custom-autoload 'my/icons-tab-bar-mode "my-icons" nil)
+(autoload 'my/icons-tab-bar-mode "my-icons"
+"Display icons for `tab-bar-mode' names.
+
+This is a global minor mode.  If called interactively, toggle the
+`My/Icons-Tab-Bar mode' mode.  If the prefix argument is positive,
+enable the mode, and if it is zero or negative, disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
+mode if ARG is nil, omitted, or is a positive number.  Disable the mode
+if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate `(default-value \\='my/icons-tab-bar-mode)'.
+
+The mode's hook is called both when the mode is enabled and when it is
+disabled.
+
+(fn &optional ARG)" t)
+(register-definition-prefixes "my-icons" '("my/icons-"))
+
+
+;;; Generated autoloads from my-modeline.el
+
+(register-definition-prefixes "my-modeline" '("prot-modeline-"))
 
 ;;; End of scraped data
 
