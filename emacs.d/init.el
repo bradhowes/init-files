@@ -579,8 +579,8 @@
   :commands (marginalia-mode marginalia-cycle)
   :bind (:map minibuffer-local-map
               ("<f1>" . marginalia-cycle))
-  :hook (after-init . (lambda ()
-                        (marginalia-mode t))))
+  :hook ((after-init . marginalia-mode)))
+;; (marginalia-mode . #'nerd-icons-completion-marginalia-setup)))
 
 (autoload 'my/markdown-ts-mode-hook "my-markdown-mode")
 (autoload 'my/markdown-ts-setup-hook "my-markdown-mode")
@@ -620,13 +620,6 @@
 (use-package my-fontify-braces
   :defer t)
 
-;; (use-package nano-modeline
-;;   :defer t
-;;   :ensure t
-;;   :hook ((prog-mode . nano-modeline-prog-mode)
-;;          (term-mode . nano-modeline-term-mode)
-;;          (after-init . (lambda () (nano-modeline-text-mode 1)))))
-
 (use-package nerd-icons
   :defer t
   :ensure t)
@@ -634,16 +627,7 @@
 (use-package nerd-icons-completion
   :defer t
   :ensure t
-  :commands (nerd-icons-completion-mode)
-  :hook ((after-init . (lambda () (nerd-icons-completion-mode 1)))))
-
-(use-package nerd-icons-corfu
-  :defer t
-  :ensure t
-  :commands (nerd-icons-corfu-formatter)
-  :hook (after-init . (lambda ()
-                        (require 'corfu)
-                        (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))))
+  :hook ((after-init . nerd-icons-completion-mode)))
 
 (use-package nerd-icons-corfu
   :defer t
@@ -785,7 +769,7 @@ Bound to \\`C-x p s'.")
 
 (use-package whitespace
   :defer t
-  :hook ((after-init . (lambda () (global-whitespace-mode t)))
+  :hook ((after-init . global-whitespace-mode)
          (prog-mode . (lambda () (add-hook 'before-save-hook #'whitespace-cleanup)))))
 
 (use-package winner
