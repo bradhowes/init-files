@@ -55,7 +55,8 @@
 ;; ---------------------------------- ;;
 
 (eval-when-compile
-  (require 'cl-lib))
+  (require 'cl-lib)
+  (require 'nerd-icons))
 
 ;; ---------------------------------- ;;
 ;; External variable defs

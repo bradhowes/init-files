@@ -784,7 +784,7 @@ disabled.
 
 (autoload 'my/mood-line-hook "my-mood-line"
 "Startup routine for mood-line.")
-(register-definition-prefixes "my-mood-line" '("my/mood-line-segment-"))
+(register-definition-prefixes "my-mood-line" '("my/mood-line-"))
 
 
 ;;; Generated autoloads from my-sleek-modeline.el
