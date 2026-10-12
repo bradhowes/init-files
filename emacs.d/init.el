@@ -402,20 +402,11 @@
   :defer t
   :hook (dired-mode . my/dired-mode-hook))
 
-;; (autoload 'my/sleek-modeline-keycast-register "my-sleek-modeline")
-;; (use-package sleek-modeline
-;;   :defer t
-;;   :ensure t
-;;   :commands (sleek-modeline-mode)
-;;   :hook ((after-init . (lambda ()
-;;                          ;; (setq sleek-modeline-background "dark gray") ;; OrangeRed4")
-;;                          (my/sleek-modeline-keycast-register)
-;;                          (sleek-modeline-mode 1)))))
-
-;; (use-package timu-line
-;;   :ensure tw
-;;   :config
-;;   (timu-line-mode 1))
+(use-package doom-modeline
+  :commands (doom-modeline-mode)
+  :defer t
+  :ensure t
+  :hook ((after-init . (lambda () (doom-modeline-mode t)))))
 
 (autoload 'my/lisp-mode-hook "my-lisp-mode")
 (autoload 'my/lisp-data-mode-hook "my-lisp-mode")
@@ -595,13 +586,30 @@
 (use-package keycast
   :defer t
   :ensure t
-  :vc (:url "https://github.com/tarsius/keycast")
   :commands (keycast-invisible-mode)
+  :vc (:url "https://github.com/tarsius/keycast")
   :custom
   (keycast-mode-line-format "%2s%k%c%r"))
 
+(define-minor-mode my/keycast-mode
+  "Show current command and its key binding in the mode line.
+See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
+  :global t
+  (let ((my/keycast-mode-line '("" keycast-mode-line " ")))
+    (if my/keycast-mode
+        (progn
+          (keycast-invisible-mode 1)
+          (add-to-list 'global-mode-string my/keycast-mode-line)
+          (add-hook 'pre-command-hook 'keycast--update t)
+          (add-hook 'minibuffer-exit-hook 'keycast--minibuffer-exit t))
+      (setopt global-mode-string (delete my/keycast-mode-line global-mode-string))
+      (remove-hook 'pre-command-hook 'keycast--update)
+      (remove-hook 'minibuffer-exit-hook 'keycast--minibuffer-exit)
+      (keycast-invisible-mode -1))))
+
 (autoload 'my/mood-line-hook "my-mood-line")
 (use-package mood-line
+  :disabled t
   :defer t
   :ensure t
   :vc (:url "https://gitlab.com/jessieh/mood-line")
@@ -1044,7 +1052,7 @@ Bound to \\`C-x p s'.")
                             "H-w" #'my/ace-window-prefix
                             "H-z" #'my/shell
                             "H-," #'my/customize-search
-                            "H-<f1>" #'keycast-invisible-mode
+                            "H-<f1>" #'my/keycast-mode
                             "H-;" #'my/matching-paren)))
   (apply #'my/emacs-key-bind global-map hyper-mappings)
   (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mappings))

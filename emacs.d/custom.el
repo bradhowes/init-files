@@ -109,7 +109,7 @@
  '(ns-right-control-modifier 'hyper)
  '(package-selected-packages
    '(accent ace-window cape char-menu cmake-mode consult-eglot consult-notes consult-zoxide corfu crux denote diff-hl
-            doom-modeline eldoc-box embark-consult esup exec-path-from-shell expand-region fancy-compilation
+            doom-modeline doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region fancy-compilation
             flymake-gradle flymake-shellcheck flyover git-timemachine go-mode gradle-mode helpful impatient-mode
             indent-bars js2-mode key-chord keycast kkp kotlin-ts-mode ligature magit marginalia mode-line-bell mood-line
             multiple-cursors nano-modeline nerd-icons nerd-icons-completion nerd-icons-corfu nerd-icons-dired
@@ -126,6 +126,7 @@
      (magit-project-status "Magit" 109) (project-eshell "Eshell" nil) (project-any-command "Other" nil)))
  '(python-indent-guess-indent-offset-verbose nil)
  '(pyvenv-workon ".")
+ '(quit-window-kill-buffer t)
  '(read-extended-command-predicate 'command-completion-default-include-p)
  '(recentf-max-menu-items 50)
  '(recentf-max-saved-items 50)
@@ -180,7 +181,8 @@
  '(hl-line ((t (:background "gray10" :extend t :inherit modus-themes-hl-line))))
  '(makefile-space ((t (:background "gray46"))))
  '(mode-line ((t (:inherit modus-themes-ui-variable-pitch :background "dark slate gray" :foreground "#ffffff" :box nil))))
- '(mode-line-inactive ((t (:inherit modus-themes-ui-variable-pitch :background "tomato4" :foreground "gray" :box nil))))
+ '(mode-line-active ((t (:inherit modus-themes-ui-variable-pitch :background "#505050" :foreground "#ffffff" :box (:line-width (1 . 1) :color "#959595")))))
+ '(mode-line-inactive ((t (:inherit modus-themes-ui-variable-pitch :background "gray10" :foreground "gray" :box (:line-width (1 . 1) :color "grey75" :style released-button)))))
  '(region ((t (:extend t :background "dark violet" :foreground "#ffffff"))))
  '(show-paren-match ((t (:background "#0d0d0d" :foreground "spring green" :underline nil :weight ultra-bold)))))
 
