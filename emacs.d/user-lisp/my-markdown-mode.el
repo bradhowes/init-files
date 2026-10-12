@@ -183,7 +183,8 @@ ends with the same `---' on its own line."
   "Initialization hook for `markdown-ts-mode'."
   (setq treesit-auto-install-grammar t
         treesit-enabled-modes t)
-  (markdown-ts-mode-install-parsers t))
+  (markdown-ts-mode-install-parsers t)
+  (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode)))
 
 (provide 'my-markdown-mode)
 ;;; my-markdown-mode.el ends here

@@ -581,6 +581,13 @@
   :hook ((markdown-ts-mode . my/markdown-ts-mode-hook))
          (after-init . my/markdown-ts-setup-hook))
 
+(autoload 'my/yaml-ts-mode-hook "my-yaml-mode")
+(autoload 'my/yaml-ts-setup-hook "my-yaml-mode")
+(use-package yaml-ts-mode
+  :defer t
+  :mode ("\\.yaml\\'" "\\.yml\\'")
+  :hook ((yaml-ts-mode . my/yaml-ts-mode-hook)))
+
 (use-package mode-line-bell
   :defer t
   :ensure t)

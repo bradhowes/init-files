@@ -907,6 +907,12 @@ disabled.
 ;;; Generated autoloads from my-modeline.el
 
 (register-definition-prefixes "my-modeline" '("prot-modeline-"))
+
+
+;;; Generated autoloads from my-yaml-mode.el
+
+(register-definition-prefixes "my-yaml-mode" '("my/yaml-ts-"))
+
 
 ;;; End of scraped data
 
