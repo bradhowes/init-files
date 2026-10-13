@@ -15,6 +15,15 @@
     (message "Copied buffer file name '%s' to the clipboard." filename)))
 
 ;;;###autoload
+(defun my/describe-symbol-at-point ()
+  "Immediately show help for symbol at point if it exists.
+If help buffer is visible and it is showing help for the
+symbol, then hide it."
+  (interactive)
+  (describe-symbol (symbol-at-point) (help-buffer))
+  (select-window (get-buffer-window (help-buffer))))
+
+;;;###autoload
 (defun my/display-prefix (arg)
   "Display the value of the raw prefix ARG.
 For debugging purposes."

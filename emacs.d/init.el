@@ -402,11 +402,11 @@
   :defer t
   :hook (dired-mode . my/dired-mode-hook))
 
+(autoload 'my/doom-modeline-setup "my-doom-modeline")
 (use-package doom-modeline
-  :commands (doom-modeline-mode)
   :defer t
   :ensure t
-  :hook ((after-init . (lambda () (doom-modeline-mode t)))))
+  :hook ((after-init . my/doom-modeline-setup)))
 
 (autoload 'my/lisp-mode-hook "my-lisp-mode")
 (autoload 'my/lisp-data-mode-hook "my-lisp-mode")
@@ -895,7 +895,7 @@ Bound to \\`C-x p s'.")
                    "H-k" #'my/kill-current-buffer)
 
 (my/emacs-key-bind help-map
-                   "C-h" #'my/describe-symbol-at-point
+                   "C-." #'my/describe-symbol-at-point
                    "C-j" #'popper-toggle
                    "a" #'describe-symbol
                    "c" #'describe-char

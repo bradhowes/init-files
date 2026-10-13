@@ -45,22 +45,24 @@ necessary."
 
 ;;;###autoload
 (defun my/find-user-lisp-file (filename)
-  "Visit FILENAME in `my/user-lisp' directory."
+  "Visit FILENAME in `my/user-lisp' directory.
+By default, the `user-lisp' directory is selected."
   (interactive
    (let* ((user-lisp-dir (file-name-concat user-emacs-directory "user-lisp"))
           (full-dir (file-name-as-directory user-lisp-dir))
           (short-dir (abbreviate-file-name full-dir)))
-     (list (read-file-name "File: " short-dir nil nil))))
+     (list (read-file-name "File: " short-dir short-dir))))
   (find-file filename))
 
 ;;;###autoload
 (defun my/find-elpa-directory (directory)
-  "Visit DIRECTORY in `elpa' directory in `user-emacs-directory'."
+  "Visit DIRECTORY in `elpa' directory in `user-emacs-directory'.
+By default, the `elpa' root is selected."
   (interactive
    (let* ((elpa-dir (file-name-concat user-emacs-directory "elpa"))
           (full-dir (file-name-as-directory elpa-dir))
           (short-dir (abbreviate-file-name full-dir)))
-     (list (read-file-name "Name: " short-dir nil t))))
+     (list (read-file-name "Name: " short-dir short-dir))))
   (dired directory))
 
 (provide 'my-finders)

@@ -304,6 +304,10 @@ If MODE is nil then apply to the current mode.
 
 (autoload 'my/copy-file-name-to-clipboard "my-functions"
 "Copy the current buffer file name to the clipboard." t)
+(autoload 'my/describe-symbol-at-point "my-functions"
+"Immediately show help for symbol at point if it exists.
+If help buffer is visible and it is showing help for the
+symbol, then hide it." t)
 (autoload 'my/display-prefix "my-functions"
 "Display the value of the raw prefix ARG.
 For debugging purposes.
@@ -913,6 +917,12 @@ disabled.
 
 (register-definition-prefixes "my-yaml-mode" '("my/yaml-ts-"))
 
+
+;;; Generated autoloads from my-doom-modeline.el
+
+(autoload 'my/doom-modeline-setup "my-doom-modeline"
+"Startup routine for mood-line.")
+(register-definition-prefixes "my-doom-modeline" '("my/mood-line-segment-keycast"))
 
 ;;; End of scraped data
 
