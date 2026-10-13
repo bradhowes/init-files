@@ -404,8 +404,6 @@
 (autoload 'my/dired-mode-hook "my-dired-mode")
 (use-package dired
   :defer t
-  :bind ( :map dired-mode-map
-          ("/" . dired-isearch-filenames))
   :hook (dired-mode . my/dired-mode-hook))
 
 (autoload 'my/doom-modeline-setup "my-doom-modeline")

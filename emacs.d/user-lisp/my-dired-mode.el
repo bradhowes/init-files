@@ -13,6 +13,12 @@
       (ediff-files (nth 0 marked-files)
                    (nth 1 marked-files)))))
 
+(defun my/dired-search ()
+  "Start regexp incremental search in current buffer."
+  (interactive)
+  (goto-char (point-min))
+  (dired-isearch-filenames))
+
 (defconst my/dired-exec-font-lock (list dired-re-exe '(".+" (dired-move-to-filename) nil (0 'sh-quoted-exec)))
   "Font-lock keyword specification to colorize executable in `dired' mode.")
 
@@ -39,9 +45,8 @@
 
   (keymap-local-unset "M-{")
   (keymap-local-unset "M-}")
-  (keymap-local-unset "l")
 
-  ;; (keymap-local-unset "q") ;; no idea where this is being set
+  (keymap-local-set "/" #'my/dired-search)
 
   (keymap-local-set "c" #'dired-do-copy)
   (keymap-local-set "C" #'dired-do-compress)
