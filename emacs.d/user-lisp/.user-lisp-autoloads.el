@@ -698,10 +698,12 @@ necessary.
 "Edit the `custom-file` if it exists." t)
 (autoload 'my/find-user-lisp-file "my-finders"
 "Visit FILENAME in `my/user-lisp' directory.
+By default, the `user-lisp' directory is selected.
 
 (fn FILENAME)" t)
 (autoload 'my/find-elpa-directory "my-finders"
 "Visit DIRECTORY in `elpa' directory in `user-emacs-directory'.
+By default, the `elpa' root is selected.
 
 (fn DIRECTORY)" t)
 
@@ -923,6 +925,7 @@ disabled.
 (autoload 'my/doom-modeline-setup "my-doom-modeline"
 "Startup routine for mood-line.")
 (register-definition-prefixes "my-doom-modeline" '("my/mood-line-segment-keycast"))
+
 
 ;;; End of scraped data
 
