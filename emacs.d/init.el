@@ -785,8 +785,12 @@ Bound to \\`C-x p s'.")
 
 (use-package whitespace
   :defer t
-  :hook ((after-init . global-whitespace-mode)
-         (prog-mode . (lambda () (add-hook 'before-save-hook #'whitespace-cleanup)))))
+  :hook ((after-init . global-whitespace-mode)))
+
+(use-package ws-butler
+  :defer t
+  :ensure t
+  :hook ((prog-mode . ws-butler-mode)))
 
 (use-package winner
   :defer t
