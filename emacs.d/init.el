@@ -204,66 +204,65 @@
   :defer t
   :ensure t
   :commands (consult--customize-put consult-flymake)
-  :bind (:map ctl-x-map ;; C-x
-              ("M-:" . consult-complex-command)
-              ("b" . consult-buffer)
-              ("f" . consult-recent-file)
-              ("4 b" . consult-buffer-other-window)
-              ("5 b" . consult-buffer-other-frame)
-              ("r b" . consult-bookmark)
-              ("r l" . consult-bookmark)
+  :bind ( :map ctl-x-map ;; C-x
+          ("M-:" . consult-complex-command)
+          ("b" . consult-buffer)
+          ("f" . consult-recent-file)
+          ("4 b" . consult-buffer-other-window)
+          ("5 b" . consult-buffer-other-frame)
+          ("r b" . consult-bookmark)
+          ("r l" . consult-bookmark)
 
-              ;; ("M-#" . consult-register-load)
-              ;; ("M-'" . consult-register-store)
-              ;; ("C-M-#" . consult-register)
+          ;; ("M-#" . consult-register-load)
+          ;; ("M-'" . consult-register-store)
+          ;; ("C-M-#" . consult-register)
 
-              ("M-y" . consult-yank-replace)
+          ("M-y" . consult-yank-replace)
 
-              :map goto-map ;; M-g
-              ("g" . consult-goto-line)
-              ("M-g" . consult-goto-line)
-              ("o" . consult-outline)
-              ("m" . consult-mark)
-              ("k" . consult-global-mark)
-              ("i" . consult-imenu)
-              ("I" . consult-imenu-multi)
+          :map goto-map ;; M-g
+          ("g" . consult-goto-line)
+          ("M-g" . consult-goto-line)
+          ("o" . consult-outline)
+          ("m" . consult-mark)
+          ("k" . consult-global-mark)
+          ("i" . consult-imenu)
+          ("I" . consult-imenu-multi)
 
-              :map search-map ;; M-s
-              ("d" . consult-find)
-              ("g" . consult-grep)
-              ("G" . consult-git-grep)
-              ("i" . consult-imenu)      ; Duplicate 'M-g i'
-              ("k" . consult-keep-lines)
-              ("l" . consult-line)
-              ("M-s" . my/consult-line-symbol-at-point)
-              ("L" . consult-line-multi)
-              ("r" . consult-ripgrep)
-              ("u" . consult-focus-lines)
-              ;; Isearch integration
-              ("e" . consult-isearch-history)
+          :map search-map ;; M-s
+          ("d" . consult-find)
+          ("g" . consult-grep)
+          ("G" . consult-git-grep)
+          ("i" . consult-imenu)      ; Duplicate 'M-g i'
+          ("k" . consult-keep-lines)
+          ("l" . consult-line)
+          ("M-s" . my/consult-line-symbol-at-point)
+          ("L" . consult-line-multi)
+          ("r" . consult-ripgrep)
+          ("u" . consult-focus-lines)
+          ;; Isearch integration
+          ("e" . consult-isearch-history)
 
-              :map my/hyper-c-map ;; H-c
-              ("M-x" . consult-mode-command)
-              ("h" . consult-history)
-              ;; ("C-h i" . consult-info)
-              ("k" . consult-kmacro)
-              ("m" . consult-man)
-              ("I" . consult-info)
+          :map my/hyper-c-map ;; H-c
+          ("M-x" . consult-mode-command)
+          ("h" . consult-history)
+          ;; ("C-h i" . consult-info)
+          ("k" . consult-kmacro)
+          ("m" . consult-man)
+          ("I" . consult-info)
 
-              :map isearch-mode-map
-              ("M-e" . consult-isearch-history)
-              ("M-s e" . consult-isearch-history)
-              ("M-s l" . consult-line)
-              ("M-s L" . consult-line-multi)
+          :map isearch-mode-map
+          ("M-e" . consult-isearch-history)
+          ("M-s e" . consult-isearch-history)
+          ("M-s l" . consult-line)
+          ("M-s L" . consult-line-multi)
 
-              :map minibuffer-local-map
-              ("C-s" . consult-history)
+          :map minibuffer-local-map
+          ("C-s" . consult-history)
 
-              :map project-prefix-map
-              ("b" . consult-project-buffer))
+          :map project-prefix-map
+          ("b" . consult-project-buffer))
 
   :commands (consult-register-format consult-register-window consult-xref consult-register-store consult-register-load)
-
   :hook ((after-init . (lambda ()
                          ;; Tweak the register preview for `consult-register-load',
                          ;; `consult-register-store', and the built-in commands. This improves the
@@ -296,28 +295,33 @@
   :defer t
   :hook ((after-init . dynamic-completion-mode)))
 
+(use-package consult-dir
+  :defer t
+  :ensure t
+  :bind (("C-x C-d" . consult-dir)))
+
 (use-package denote
   :defer t
   :ensure t
   :hook ((dired-mode . denote-dired-mode))
-  :bind (:map my/hyper-n-map
-              ("b" . denote-backlinks)
-              ("c" . denote)
-              ("d" . denote-dired)
-              ("g" . denote-grep)
-              ("l" . denote-link)
-              ;; ("n" . consult-notes) -- done below
-              ("r" . denote-rename-file)))
+  :bind ( :map my/hyper-n-map
+          ("b" . denote-backlinks)
+          ("c" . denote)
+          ("d" . denote-dired)
+          ("g" . denote-grep)
+          ("l" . denote-link)
+          ;; ("n" . consult-notes) -- done below
+          ("r" . denote-rename-file)))
 
 (use-package consult-notes
   :defer t
   :ensure t
   :custom
   (consult-notes-denote-display-id nil)
-  :bind (:map my/hyper-n-map
-         ("n" . consult-notes)
-         :map my/hyper-c-map
-         ("n" . consult-notes))
+  :bind ( :map my/hyper-n-map
+          ("n" . consult-notes)
+          :map my/hyper-c-map
+          ("n" . consult-notes))
   :hook (after-init . my/notes-consult-notes-hook))
 
 (use-package orderless
@@ -333,8 +337,8 @@
   :defer t
   :ensure t
   :commands (cape-dabbrev cape-file cape-elisp-block)
-  :bind (:map my/hyper-c-map
-              ("p" . cape-prefix-map))
+  :bind ( :map my/hyper-c-map
+          ("p" . cape-prefix-map))
   :hook (after-init . (lambda ()
                         (add-hook 'completion-at-point-functions #'cape-dabbrev)
                         (add-hook 'completion-at-point-functions #'cape-file)
@@ -344,8 +348,8 @@
   :defer t
   :ensure t
   :commands (global-corfu-mode corfu-popupinfo-mode)
-  :bind (:map corfu-map
-              ("C-SPC" . corfu-insert-separator))
+  :bind ( :map corfu-map
+          ("C-SPC" . corfu-insert-separator))
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-auto t)                 ;; Enable auto completion
@@ -366,16 +370,16 @@
 (use-package crux
   :defer t
   :ensure t
-  :commands (crux-find-current-directory-dir-locals-file)
-  :bind (:map my/hyper-c-map
-              ("d" . crux-duplicate-current-line-or-region)
-              ("C-i" . crux-indent-defun)
-              :map ctl-x-4-map
-              ("t" . crux-transpose-windows)
-              :map global-map
-              ("C-a" . crux-move-beginning-of-line)
-              ("C-k" . crux-smart-kill-line)
-              ("C-^" . crux-top-join-line)))
+  :commands (crux-find-current-directory-dir-locals-file crux-duplicate-current-line-or-region)
+  :bind ( :map my/hyper-c-map
+          ("d" . consult-dir)
+          ("C-i" . crux-indent-defun)
+          :map ctl-x-4-map
+          ("t" . crux-transpose-windows)
+          :map global-map
+          ("C-a" . crux-move-beginning-of-line)
+          ("C-k" . crux-smart-kill-line)
+          ("C-^" . crux-top-join-line)))
 
 (use-package dabbrev
   :defer t
@@ -400,6 +404,8 @@
 (autoload 'my/dired-mode-hook "my-dired-mode")
 (use-package dired
   :defer t
+  :bind ( :map dired-mode-map
+          ("/" . dired-isearch-filenames))
   :hook (dired-mode . my/dired-mode-hook))
 
 (autoload 'my/doom-modeline-setup "my-doom-modeline")
@@ -464,9 +470,9 @@
 (use-package flymake
   :defer t
   :hook ((prog-mode . flymake-mode))
-  :bind (:map flymake-mode-map
-              ("M-n" . flymake-goto-next-error)
-              ("M-p" . flymake-goto-prev-error)))
+  :bind ( :map flymake-mode-map
+          ("M-n" . flymake-goto-next-error)
+          ("M-p" . flymake-goto-prev-error)))
 
 (use-package flyover
   :defer t
@@ -481,14 +487,14 @@
 (use-package helpful
   :defer t
   :ensure t
-  :bind (:map help-map
-              ("a" . helpful-symbol)
-              ("f" . helpful-callable)
-              ("v" . helpful-variable)
-              ("k" . helpful-key)
-              ("." . helpful-at-point)
-              ("M-f" . helpful-function)
-              ("M-c" . helpful-command)))
+  :bind ( :map help-map
+          ("a" . helpful-symbol)
+          ("f" . helpful-callable)
+          ("v" . helpful-variable)
+          ("k" . helpful-key)
+          ("." . helpful-at-point)
+          ("M-f" . helpful-function)
+          ("M-c" . helpful-command)))
 
 (use-package hl-line
   :defer t
@@ -553,14 +559,14 @@
   :ensure t
   :commands (magit-status-setup-buffer magit-status magit-project-status)
   :hook ((magit-post-refresh . diff-hl-magit-post-refresh))
-  :bind (:map ctl-x-map
-              ("g" . magit-status)
-              ;; Take over vc-dir
-              ("p v" . magit-project-status)
-              ;; Take over vc-print-log
-              ("v l" . magit-log-buffer-file)
-              :map my/hyper-c-map
-              ("f" . magit-file-dispatch))
+  :bind ( :map ctl-x-map
+          ("g" . magit-status)
+          ;; Take over vc-dir
+          ("p v" . magit-project-status)
+          ;; Take over vc-print-log
+          ("v l" . magit-log-buffer-file)
+          :map my/hyper-c-map
+          ("f" . magit-file-dispatch))
   :custom
   (magit-process-find-password-functions '(my/read-gitlab-password)))
 
@@ -618,10 +624,10 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
 (use-package multiple-cursors
   :defer t
   :ensure t
-  :bind (("C->" . mc/mark-next-like-this)
-         ("C-<" . mc/mark-previous-like-this)
-         :map my/hyper-c-map
-         ("." . mc/mark-all-like-this)))
+  :bind ( ("C->" . mc/mark-next-like-this)
+          ("C-<" . mc/mark-previous-like-this)
+          :map my/hyper-c-map
+          ("." . mc/mark-all-like-this)))
 
 (use-package my-fontify-braces
   :defer t)
@@ -639,8 +645,8 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :defer t
   :ensure t
   :commands (marginalia-mode marginalia-cycle)
-  :bind (:map minibuffer-local-map
-              ("<f1>" . marginalia-cycle))
+  :bind ( :map minibuffer-local-map
+          ("<f1>" . marginalia-cycle))
   :hook ((after-init . (lambda ()
                          (marginalia-mode 1)
                          (nerd-icons-completion-mode 1)))))
@@ -712,12 +718,12 @@ Bound to \\`C-x p s'.")
 (use-package project
   :defer t
   :commands (project--switch-project-command) ;; used in my/show-project-menu
-  :bind (:map project-prefix-map
-              ("$" . #'project-shell)
-              ("m" . #'my/show-project-menu)
-              ;; Cannot do this here for some reason -- see note above.
-              ;; ("s" . my/project-search-map)))
-              ))
+  :bind ( :map project-prefix-map
+          ("$" . #'project-shell)
+          ("m" . #'my/show-project-menu)
+          ;; Cannot do this here for some reason -- see note above.
+          ;; ("s" . my/project-search-map)))
+          ))
 
 (use-package recentf
   :defer t
@@ -727,8 +733,8 @@ Bound to \\`C-x p s'.")
   :defer t
   :ensure t
   :commands (rg-enable-default-bindings rg-project)
-  :bind (:map my/project-search-map
-              ("r" . rg-project))
+  :bind ( :map my/project-search-map
+          ("r" . rg-project))
   :hook (after-init . rg-enable-default-bindings))
 
 (use-package savehist
@@ -776,6 +782,12 @@ Bound to \\`C-x p s'.")
   :defer t
   :ensure t
   :commands (vertico-mode)
+  :bind ( :map vertico-map
+          ("H-d" . consult-dir)
+          ("H-j" . consult-dir-jump-file)
+          :map minibuffer-local-completion-map
+          ("H-d" . consult-dir)
+          ("H-j" . consult-dir-jump-file))
   :hook ((after-init . vertico-mode)))
 
 (use-package which-key
@@ -994,6 +1006,7 @@ Bound to \\`C-x p s'.")
                      ;; 2 - the directory to jump to (if not absolute then prepend with value from `my/repos')
                      ;; 3 - the name to assign to the utility function (if nil make from directory)
                      `(("a" "auv3-support" nil)
+                       ("A" "AUv3Support" nil)
                        ("c" "AUv3Controls" nil)
                        ("i" "init-files" nil)
                        ("e" "init-files/emacs.d" "emacs.d")
@@ -1001,10 +1014,9 @@ Bound to \\`C-x p s'.")
                        ("l" my/find-elpa-directory nil)
                        ("L" ,(file-name-concat user-emacs-directory "elpa") "elpa")
                        ("p" "SoundFontsPlus" nil)
-                       ("s" "AUv3Support" nil)
+                       ("s" "init-files/shells" "shells")
                        ("u" my/find-user-lisp-file nil)
                        ("U" ,(my/user-lisp) "user-lisp")
-                       ("z" "init-files/shells" "shells")
                        ("2" "SF2Lib" nil)))
 
 (defvar my/point-jumps-map
@@ -1038,6 +1050,7 @@ Bound to \\`C-x p s'.")
                             "H-b" #'consult-buffer
                             "H-B" #'consult-project-buffer
                             "H-c" my/hyper-c-map
+                            "H-d" #'crux-duplicate-current-line-or-region
                             "H-f" #'consult-flymake
                             "H-g" #'magit-status
                             "H-h" #'my/describe-symbol-at-point
