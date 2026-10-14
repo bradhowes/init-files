@@ -25,11 +25,12 @@
 ;; upon startup but the elisp bytecompiler does not know about that when run in another Emacs process. I think flycheck
 ;; does the right thing here.
 ;;
+(autoload 'my/env-setup "my-env")
 (autoload 'my/is-graphical "my-env")
 (autoload 'my/is-terminal "my-env")
-(autoload 'my/user-lisp "my-env")
-(autoload 'my/env-setup "my-env")
+(autoload 'my/magit-init-files "my-env")
 (autoload 'my/tmp-dir "my-env")
+(autoload 'my/user-lisp "my-env")
 (autoload 'my/find-elpa-directory "my-finders")
 (autoload 'my/find-shell-init-file "my-finders")
 (autoload 'my/find-user-custom-file "my-finders")
@@ -227,6 +228,9 @@
           ("k" . consult-global-mark)
           ("i" . consult-imenu)
           ("I" . consult-imenu-multi)
+
+          :map help-map
+          ("C-m" . consult-man)
 
           :map search-map ;; M-s
           ("d" . consult-find)
@@ -891,12 +895,6 @@ Bound to \\`C-x p s'.")
 ;; ("magit-log" nil (inhibit-same-window . t))
 ;; ("magit-diff:" nil (inhibit-same-window . t))))))
 
-(autoload 'my/init-files "my-env")
-(defun my/magit-init-files ()
-  "Show magit buffer for `init-files' repo."
-  (interactive)
-  (magit-status (my/init-files)))
-
 ;;; --- Key Bindings
 (my/emacs-key-bind my/hyper-c-map
                    "g" #'my/magit-init-files
@@ -920,7 +918,6 @@ Bound to \\`C-x p s'.")
                    "F" #'apropos-function
                    "K" #'describe-keymap
                    "L" #'apropos-library
-                   "M" #'consult-man
                    "V" #'apropos-variable)
 
 (my/emacs-key-bind ctl-x-map
