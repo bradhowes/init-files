@@ -2,18 +2,18 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'my-customizations)
-(if my/use-c-ts-mode
-    (require 'c-ts-mode)
-  (require 'cc-mode))
-
-(require 'doxygen)
-(require 'eglot)
-;; (require 'eldoc-box)
-(require 'my-c-mode-common)
-(require 'my-insert-block-comment)
 (require 'flyspell)
 (require 'indent-bars)
+
+(require 'my-customizations)
+(require 'my-c-mode-common)
+(require 'my-insert-block-comment)
+
+(eval-when-compile
+  (require 'cc-mode)
+  (require 'c-ts-mode)
+  (require 'doxygen)
+  (require 'eglot))
 
 (define-skeleton my/c++-class-skeleton
   "Insert a C++ class skeleton."
@@ -411,7 +411,6 @@ Prohibits spell checking in '#include' strings."
       (my/c++-c-ts-mode-hook)
     (my/c++-cc-mode-hook))
 
-  ;; (eldoc-box-hover-mode)
   (indent-bars-mode 1)
   (local-set-key [(f1)] #'eldoc-doc-buffer)
   (local-set-key [(f7)] #'compile)

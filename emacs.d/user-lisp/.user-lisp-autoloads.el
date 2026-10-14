@@ -239,6 +239,10 @@ I originally had a macro, but that was sloooow." t)
 
 ;;; Generated autoloads from my-env.el
 
+(defconst my/is-interactive (not noninteractive)
+"Non-nil if Emacs is *not* in `batch' mode (interactive).")
+(defconst my/not-interactive noninteractive
+"Non-nil if Emacs is in `batch' mode (not interactive).")
 (autoload 'my/is-terminal "my-env"
 "T if running in a terminal.
 NOTE: can return false positives if called too early in startup.")
@@ -928,6 +932,17 @@ disabled.
 "Startup routine for mood-line.")
 (register-definition-prefixes "my-doom-modeline" '("my/mood-line-segment-keycast"))
 
+
+;;; Generated autoloads from my-consult-mode.el
+
+(autoload 'my/consult-mode-init "my-consult-mode"
+"Custom consult.")
+
+
+;;; Generated autoloads from my-consult.el
+
+(autoload 'my/consult-init "my-consult"
+"Custom consult.")
 
 ;;; End of scraped data
 

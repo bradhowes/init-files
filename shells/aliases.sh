@@ -13,6 +13,7 @@ alias refunc=". \${my_cfg}/functions.sh"
 #
 alias ls="ls -CF"
 alias ll="ls -CFl"
+alias lla="ls -CFla"
 alias llh="ls -CFlh"
 
 # Show only processes associated with my user ID.

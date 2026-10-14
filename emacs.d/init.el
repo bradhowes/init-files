@@ -25,12 +25,6 @@
 ;; upon startup but the elisp bytecompiler does not know about that when run in another Emacs process. I think flycheck
 ;; does the right thing here.
 ;;
-(autoload 'my/env-setup "my-env")
-(autoload 'my/is-graphical "my-env")
-(autoload 'my/is-terminal "my-env")
-(autoload 'my/magit-init-files "my-env")
-(autoload 'my/tmp-dir "my-env")
-(autoload 'my/user-lisp "my-env")
 (autoload 'my/find-elpa-directory "my-finders")
 (autoload 'my/find-shell-init-file "my-finders")
 (autoload 'my/find-user-custom-file "my-finders")
@@ -79,26 +73,25 @@
 (autoload 'ksh "my-shells")
 (autoload 'my/htop "my-tops")
 
+(require 'my-env)
+
 (my/env-setup)
-(add-hook 'emacs-startup-hook #'my/layout-screen-layout-changed 98)
-(add-hook 'emacs-startup-hook #'my/start-emacs-server 99)
+(add-hook 'emacs-startup-hook #'my/layout-screen-layout-changed 97)
+(add-hook 'emacs-startup-hook #'my/start-emacs-server 98)
 
 (defgroup my/customizations nil
   "The customization group for my settings."
   :prefix "my/"
   :group 'local)
 
-;;;###autoload
 (defvar my/dired-jumps-map
   (make-sparse-keymap)
   "Keymap for quick Dired jumps or file selection in directory.")
 
-;;;###autoload
 (defvar my/hyper-c-map
   (make-sparse-keymap)
   "Keymap for Hyper-c actions.")
 
-;;;###autoload
 (defvar my/hyper-n-map
   (make-sparse-keymap)
   "Keymap for Hyper-n actions.")
@@ -577,7 +570,7 @@
   :defer t
   :mode ("\\.md\\'" "\\.mdx\\'" "\\.markdown\\'")
   :hook ((markdown-ts-mode . my/markdown-ts-mode-hook))
-         (after-init . my/markdown-ts-setup-hook))
+  (after-init . my/markdown-ts-setup-hook))
 
 (autoload 'my/yaml-ts-mode-hook "my-yaml-mode")
 (autoload 'my/yaml-ts-setup-hook "my-yaml-mode")
@@ -585,18 +578,6 @@
   :defer t
   :mode ("\\.yaml\\'" "\\.yml\\'")
   :hook ((yaml-ts-mode . my/yaml-ts-mode-hook)))
-
-(use-package mode-line-bell
-  :defer t
-  :ensure t)
-
-(use-package keycast
-  :defer t
-  :ensure t
-  :commands (keycast-invisible-mode)
-  :vc (:url "https://github.com/tarsius/keycast")
-  :custom
-  (keycast-mode-line-format "%2s%k%c%r"))
 
 (define-minor-mode my/keycast-mode
   "Show current command and its key binding in the mode line.
@@ -613,6 +594,18 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
       (remove-hook 'pre-command-hook 'keycast--update)
       (remove-hook 'minibuffer-exit-hook 'keycast--minibuffer-exit)
       (keycast-invisible-mode -1))))
+
+(use-package mode-line-bell
+  :defer t
+  :ensure t)
+
+(use-package keycast
+  :defer t
+  :ensure t
+  :commands (keycast-invisible-mode)
+  :vc (:url "https://github.com/tarsius/keycast")
+  :custom
+  (keycast-mode-line-format "%2s%k%c%r"))
 
 (autoload 'my/mood-line-hook "my-mood-line")
 (use-package mood-line
@@ -677,7 +670,8 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles partial-completion))))
-  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
+  ;; Emacs 31: partial-completion behaves like substring
+  (completion-pcm-leading-wildcard t))
 
 (use-package org
   :defer t
@@ -855,31 +849,37 @@ Bound to \\`C-x p s'.")
 (use-package emacs
   :commands (my/crm-indicator)
   :config
-  (setq read-process-output-max (* 64 1024 1024)
-	process-adaptive-read-buffering nil
-        ;; debug-on-error t
-	frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
-                             (if (not (display-graphic-p))
-                                 (list (concat (system-name) " ") buffer-directory)
-                               buffer-directory))
-        load-path-filter-function #'load-path-filter-cache-directory-files)
-  (ffap-bindings)
-  (put 'narrow-to-region 'disabled nil)
-  (put 'scroll-left 'disabled nil)
-  (fset 'yes-or-no-p 'y-or-n-p)
-  (defun my/crm-indicator(args)
-    "Custom CRM indicator for ARGS."
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
+  (progn
+    (setq read-process-output-max (* 64 1024 1024)
+	  process-adaptive-read-buffering nil
+          ;; debug-on-error t
+          frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
+                               (if (not (display-graphic-p))
+                                   (list (concat (system-name) " ") buffer-directory)
+                                 buffer-directory))
+          load-path-filter-function #'load-path-filter-cache-directory-files)
+    (ffap-bindings)
+    (put 'narrow-to-region 'disabled nil)
+    (put 'scroll-left 'disabled nil)
+    (fset 'yes-or-no-p 'y-or-n-p)
+    (defun my/crm-indicator(args)
+      "Custom CRM indicator for ARGS."
+      (cons (format "[CRM%s] %s"
+                    (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
+                    (car args))
+            (cdr args)))
+    (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator))
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
          (after-init . (lambda ()
                          (abbrev-mode)
                          (when (file-exists-p custom-file)
                            (load custom-file 'noerror))))))
+
+(defun my/consult-info-emacs ()
+  "Search Emacs info."
+  (interactive)
+  (consult-info "emacs" "autotype" "cape" "corfu" "denote" "embark" "magit" "marginalia" "orderless" "vertico"))
 
 (use-package window
   :init
@@ -891,11 +891,12 @@ Bound to \\`C-x p s'.")
         display-buffer-alist `(("\\*help\\[R" (display-buffer-reuse-mode-window ace-display-buffer) (reusable-frames . nil))
                                ("\\*R" nil (reusable-frames . nil))
                                ,(cons "\\*helm" display-buffer-fallback-action))))
+
 ;; Show log buffer in something other than the current window
 ;; ("magit-log" nil (inhibit-same-window . t))
 ;; ("magit-diff:" nil (inhibit-same-window . t))))))
 
-;;; --- Key Bindings
+;; --- Key Bindings
 (my/emacs-key-bind my/hyper-c-map
                    "g" #'my/magit-init-files
                    "i" #'my/find-user-init-file
@@ -1088,11 +1089,6 @@ Bound to \\`C-x p s'.")
                      "vv" #'diff-hl-show-hunk
                      )
 
-(defun my/consult-info-emacs ()
-  "Search Emacs info."
-  (interactive)
-  (consult-info "emacs" "autotype" "cape" "corfu" "denote" "embark" "magit" "marginalia" "orderless" "vertico"))
-
 (defvar my/info-keys-map
   (let ((map (make-sparse-keymap)))
     (define-key map "c" #'consult-info)
@@ -1149,7 +1145,8 @@ Bound to \\`C-x p s'.")
   "Show the elapsed startup time."
   (message "Elapsed load time: %s" (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))))
 
-(add-hook 'emacs-startup-hook #'my/display-startup-time)
+(add-hook 'emacs-startup-hook #'my/display-startup-time -99)
+(add-hook 'emacs-startup-hook (lambda () (message "Hello!")) 99)
 
 (provide 'init)
 

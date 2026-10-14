@@ -12,6 +12,14 @@
 (require 'my-functions)
 
 ;;;###autoload
+(defconst my/is-interactive (not noninteractive)
+  "Non-nil if Emacs is *not* in `batch' mode (interactive).")
+
+;;;###autoload
+(defconst my/not-interactive noninteractive
+  "Non-nil if Emacs is in `batch' mode (not interactive).")
+
+;;;###autoload
 (defun my/is-terminal ()
   "T if running in a terminal.
 NOTE: can return false positives if called too early in startup."
