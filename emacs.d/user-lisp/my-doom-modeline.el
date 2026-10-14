@@ -28,19 +28,19 @@
 
   (doom-modeline-def-modeline 'special
     '(eldoc bar window-state buffer-info buffer-position)
-    '(compilation debug buffer-encoding major-mode process))
+    '(compilation debug buffer-encoding major-mode process vcs))
 
   (doom-modeline-def-modeline 'project
     '(bar buffer-default-directory buffer-position)
-    '(compilation debug buffer-encoding major-mode process))
+    '(compilation debug buffer-encoding major-mode process vcs))
 
   (doom-modeline-def-modeline 'dashboard
     '(bar buffer-default-directory-simple)
-    '(compilation debug buffer-encoding major-mode process))
+    '(compilation debug buffer-encoding major-mode process vcs))
 
   (doom-modeline-def-modeline 'vcs
     '(bar window-state buffer-info)
-    '(compilation debug buffer-encoding major-mode process))
+    '(compilation debug buffer-encoding major-mode vcs))
 
   (doom-modeline-def-modeline 'package
     '(bar package)
@@ -72,7 +72,7 @@
 
   (doom-modeline-def-modeline 'timemachine
     '(eldoc bar git-timemachine buffer-position)
-    '(buffer-encoding major-mode))
+    '(buffer-encoding major-mode vcs))
 
   (doom-modeline-def-modeline 'calculator
     '(calc buffer-position)
