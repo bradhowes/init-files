@@ -39,7 +39,7 @@
     '(compilation debug buffer-encoding major-mode process))
 
   (doom-modeline-def-modeline 'vcs
-    '(bar window-state buffer-info buffer-position)
+    '(bar window-state buffer-info)
     '(compilation debug buffer-encoding major-mode process))
 
   (doom-modeline-def-modeline 'package
