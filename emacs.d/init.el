@@ -204,7 +204,9 @@
   :defer t
   :ensure t
   :commands (consult--customize-put consult-flymake)
-  :bind ( :map ctl-x-map ;; C-x
+  :bind ( ("M-y" . consult-yank-replace)
+
+          :map ctl-x-map ;; C-x
           ("M-:" . consult-complex-command)
           ("b" . consult-buffer)
           ("f" . consult-recent-file)
@@ -216,8 +218,6 @@
           ;; ("M-#" . consult-register-load)
           ;; ("M-'" . consult-register-store)
           ;; ("C-M-#" . consult-register)
-
-          ("M-y" . consult-yank-replace)
 
           :map goto-map ;; M-g
           ("g" . consult-goto-line)
@@ -247,7 +247,6 @@
           ("h" . consult-history)
           ;; ("C-h i" . consult-info)
           ("k" . consult-kmacro)
-          ("m" . consult-man)
           ("I" . consult-info)
 
           :map isearch-mode-map
@@ -892,8 +891,15 @@ Bound to \\`C-x p s'.")
 ;; ("magit-log" nil (inhibit-same-window . t))
 ;; ("magit-diff:" nil (inhibit-same-window . t))))))
 
+(autoload 'my/init-files "my-env")
+(defun my/magit-init-files ()
+  "Show magit buffer for `init-files' repo."
+  (interactive)
+  (magit-status (my/init-files)))
+
 ;;; --- Key Bindings
 (my/emacs-key-bind my/hyper-c-map
+                   "g" #'my/magit-init-files
                    "i" #'my/find-user-init-file
                    "j" my/dired-jumps-map
                    "r" #'ielm
@@ -1055,7 +1061,6 @@ Bound to \\`C-x p s'.")
                             "H-j" my/point-jumps-map
                             "H-k" #'bury-buffer
                             "H-K" #'my/shell
-                            "H-m" #'consult-bookmark
                             "H-M-m" #'my/show-messages-buffer
                             "H-n" my/hyper-n-map
                             "H-p" project-prefix-map
