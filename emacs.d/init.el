@@ -470,10 +470,11 @@
                                                        "--attach-extern-c"
                                                        "--attach-closing-while"
                                                        "--keep-one-line-blocks"
-                                                       "--max-code-length=120"
+                                                       "--max-code-length=126"
                                                        "--indent-after-parens"
                                                        "--indent-continuation=1"
                                                        "--indent=spaces=2"))
+                                        ("CMake" (cmake-format))
                                         ("Python" (black))
                                         ("Shell" (shfmt "-i" "2" "-ci" "-bn")))))
 
