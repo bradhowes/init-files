@@ -33,10 +33,12 @@ done
 [[ -d "/opt/homebrew" ]] || curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
 
 # Install dependencies
-for what in aspell coreutils grep ispell rg shellcheck; do
+for what in aspell astyle coreutils grep ispell rg shellcheck shfmt; do
   echo "-- installing ${what}"
   brew install ${what}
 done
+
+pip3 install black cmakelang pyyaml
 
 # Install Emacs
 if [[ ! -d /Applications/Emacs.app ]]; then

@@ -456,6 +456,11 @@
   :hook ((flymake-mode . flyover-mode)
          (flyover-mode . my/flyover-mode-hook)))
 
+;; Requires:
+;; - astyle -- brew install astyle
+;; - cmakelang -- pip3 install cmakelang[YAML] (or pip3 install cmakelang pyyaml)
+;; - black -- pip3 install black
+;; - shfmt -- brew install shftm
 (use-package format-all
   :commands (format-all-mode)
   :defines (format-all-formatters)
