@@ -194,6 +194,7 @@
   (compilation-error-regexp-alist (cons '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2) ; from pyright?
                                         compilation-error-regexp-alist)))
 
+(autoload 'my/consult-init "my-consult")
 (use-package consult
   :defer t
   :ensure t
@@ -259,26 +260,7 @@
           ("b" . consult-project-buffer))
 
   :commands (consult-register-format consult-register-window consult-xref consult-register-store consult-register-load)
-  :hook ((after-init . (lambda ()
-                         ;; Tweak the register preview for `consult-register-load',
-                         ;; `consult-register-store', and the built-in commands. This improves the
-                         ;; register formatting, adds thin separate lines, register sorting and hides
-                         ;; the window mode line.
-                         (advice-add #'register-preview :override #'consult-register-window)
-                         (setq register-preview-delay 0.5)
-
-                         (defun my/consult-line-symbol-at-point ()
-                           "Start `consult-line' with symbol at point."
-                           (interactive)
-                           (consult-line (thing-at-point 'symbol)))
-
-                         (setq consult-narrow-key "<")
-                         (consult-customize consult-theme :preview-key '(:debounce 0.2 any)
-                                            consult-ripgrep consult-git-grep consult-grep consult-man
-                                            consult-bookmark consult-recent-file consult-xref
-                                            consult-source-bookmark consult-source-file-register
-                                            consult-source-recent-file consult-source-project-recent-file
-                                            :preview-key '(:debounce 0.4 any))))))
+  :hook ((after-init . my/consult-init)))
 
 ;; Use Consult to select xref locations with preview
 (use-package xref
@@ -473,6 +455,28 @@
   :ensure t
   :hook ((flymake-mode . flyover-mode)
          (flyover-mode . my/flyover-mode-hook)))
+
+(use-package format-all
+  :commands (format-all-mode)
+  :defines (format-all-formatters)
+  :hook (prog-mode . format-all-mode)
+  :config
+  (setq-default format-all-formatters '(("C" (astyle "--mode=c" "--style=1tbs" "--indent=spaces=2"))
+                                        ("C++" (astyle "--mode=c"
+                                                       "--style=1tbs"
+                                                       "--attach-namespaces"
+                                                       "--attach-classes"
+                                                       "--attach-inlines"
+                                                       "--attach-extern-c"
+                                                       "--attach-closing-while"
+                                                       "--keep-one-line-blocks"
+                                                       "--max-code-length=120"
+                                                       "--indent-after-parens"
+                                                       "--indent-continuation=1"
+                                                       "--indent=spaces=2"))
+                                        ("Python" (black))
+                                        ("Shell" (shfmt "-i" "2" "-ci" "-bn")))))
+
 
 (use-package git-timemachine
   :defer t

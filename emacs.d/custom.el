@@ -115,8 +115,8 @@
  '(package-selected-packages
    '(accent ace-window cape char-menu cmake-mode consult-dir consult-eglot consult-notes consult-zoxide corfu crux denote
             diff-hl doom-modeline doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region
-            fancy-compilation flymake-gradle flymake-shellcheck flyover git-timemachine go-mode gradle-mode helpful
-            impatient-mode indent-bars js2-mode key-chord keycast kkp kotlin-ts-mode ligature magit marginalia
+            fancy-compilation flymake-gradle flymake-shellcheck flyover format-all git-timemachine go-mode gradle-mode
+            helpful impatient-mode indent-bars js2-mode key-chord keycast kkp kotlin-ts-mode ligature magit marginalia
             mode-line-bell mood-line multiple-cursors nano-modeline nerd-icons nerd-icons-completion nerd-icons-corfu
             nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless osx-dictionary popper rg scratch simple-modeline
             sleek-modeline tempel tempel-collection timu-line treemacs-nerd-icons ultra-scroll vertico ws-butler xclip

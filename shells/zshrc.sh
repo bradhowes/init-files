@@ -54,8 +54,8 @@ export CLICOLOR=yes
 export TERM=xterm-256color
 export EDITOR="emacs"
 
-chpwd1 () { osc7_cwd; }
-chpwd2 () { esc0_cwd; }
+chpwd1() { osc7_cwd; }
+chpwd2() { esc0_cwd; }
 
 if [[ -n "${INSIDE_EMACS}" ]]; then
   if [[ -x "$(whence emacsclient)" ]]; then
@@ -72,11 +72,11 @@ elif [[ -n "${TERM}" ]]; then
 fi
 
 case "${TERM}" in
-  xterm*|rxvt|vt100)
+  xterm* | rxvt | vt100)
     stty erase '^?'
     ;;
 
-  emacs|dumb)
+  emacs | dumb)
     export TERM=xterm-256color
     export PAGER="${HOME}/bin/emacs-pager"
     ;;
@@ -117,7 +117,7 @@ export _ZO_RESOLVE_SYMLINKS=1
 [[ -x "/opt/homebrew/bin/fzf" ]] && . <(fzf --zsh)
 
 # Use current Java environment
-[[ -d "${HOME}/.jenv/bin" ]] &&  eval "$(jenv init -)"
+[[ -d "${HOME}/.jenv/bin" ]] && eval "$(jenv init -)"
 
 # Use brew completions
 [[ -x "/opt/homebrew/bin/brew" ]] && eval "$(brew shellenv)"
@@ -144,10 +144,10 @@ mise="/Users/bradhowes/.local/bin/mise"
 dx="/Users/bradhowes/.local/bin/dx"
 [[ -f "${dx}" ]] && eval "$(${dx} completion zsh)"
 
-# >>> dx ai-kit (managed — do not edit) >>>
-[ -f /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh ] && . /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh
+# shellcheck disable=SC1091
+[[ -f /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh ]] && . /Users/bradhowes/.traderepublic/ai-kit/ai-kit-env.sh
 # <<< dx ai-kit <<<
 
-# >>> dx docker (managed — do not edit) >>>
-[ -r /Users/bradhowes/.traderepublic/dx-docker/env.sh ] && . /Users/bradhowes/.traderepublic/dx-docker/env.sh
+# shellcheck disable=SC1091
+[[ -r /Users/bradhowes/.traderepublic/dx-docker/env.sh ]] && . /Users/bradhowes/.traderepublic/dx-docker/env.sh
 # <<< dx docker <<<

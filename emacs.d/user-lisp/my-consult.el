@@ -2,7 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'consult)
 (require 'consult-register)
 
 ;;;###autoload
@@ -31,4 +30,4 @@
 
 (provide 'my-consult)
 
-;;; my-consult-mode.el ends here
+;;; my-consult.el ends here

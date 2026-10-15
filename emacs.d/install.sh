@@ -2,13 +2,12 @@
 
 # set -x
 
-function fail()
-{
+fail() {
   echo "*** ${*}"
   exit 1
 }
 
-src=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+src=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 [[ -d "${src}" ]] || fail "failed to detect source directory"
 
 dst="${HOME}/.emacs.d"
@@ -21,7 +20,7 @@ fi
 
 cd "${dst}" || fail "'cd ${dst}' failed"
 for file in custom.el early-init.el init.el user-lisp; do
-  if [[ -h "${dst}/${file}" ]]; then
+  if [[ -L "${dst}/${file}" ]]; then
     echo "... file '${dst}/${file}' already exists"
   else
     ln -s "${src}/${file}" "${dst}/${file}" || fail "failed to link to '${file}'"

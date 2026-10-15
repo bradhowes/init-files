@@ -1,8 +1,8 @@
 #!/bin/bash
 
 my_file="$(mktemp)"
-cat - > "${my_file}"
+cat - >"${my_file}"
 echo "-- loading in Emacs..."
 
 log="${HOME}/emacs-pager.log"
-emacsclient ${EMACS_SERVER_FILE:+ -s ${EMACS_SERVER_FILE}} --eval "(emacs-pager \"${my_file}\")" > "${log}" 2>&1
+emacsclient ${EMACS_SERVER_FILE:+ -s ${EMACS_SERVER_FILE}} --eval "(emacs-pager \"${my_file}\")" >"${log}" 2>&1

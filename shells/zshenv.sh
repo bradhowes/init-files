@@ -45,7 +45,7 @@ PathAdd() {
     # shellcheck disable=SC2295
     if [[ "${check%%:${each}:*}" = "${check}" || -n "${force}" ]]; then
       if [[ -n "${append}" ]]; then
-	current="${current}${current:+:}${each}"
+        current="${current}${current:+:}${each}"
       else
         current="${each}${current:+:}${current}"
       fi
@@ -66,12 +66,13 @@ PathAdd() {
 # Setting up paths
 export PATH
 PathAdd PATH \
-        /opt/homebrew/opt/python@3.14/libexec/bin/ \
-        /opt/homebrew/opt/grep/libexec/gnubin \
-        /Applications/Emacs.app/Contents/MacOS/bin \
-        "${HOME}/bin" \
-        "${HOME}/.jenv/bin" \
-        /usr/local/bin
+  /opt/homebrew/opt/python@3.14/libexec/bin/ \
+  /opt/homebrew/opt/grep/libexec/gnubin \
+  /Applications/Emacs.app/Contents/MacOS/bin \
+  "${HOME}/Library/Python/3.9/bin" \
+  "${HOME}/bin" \
+  "${HOME}/.jenv/bin" \
+  /usr/local/bin
 
 # Prepend homebrew paths even if already in PATH. This is due to the fact that Homebrew's own policy is to not shadow
 # any Apple bits (wise), but this PATH is only being used in command-line entries, and I *want* to shadow Apple tools
