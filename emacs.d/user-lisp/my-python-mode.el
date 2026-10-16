@@ -2,6 +2,7 @@
 ;;; Commentary:
 
 (require 'python)
+(require 'pyvenv)
 (require 'font-lock)
 (require 'doxygen)
 (require 'my-fontify-braces)
@@ -96,7 +97,8 @@ The comment is indented with PREFIX."
   (yas-minor-mode 1)
   (my/fontify-braces)
   (keymap-local-set "C-M-;" #'my/python-insert-block-comment)
-  (keymap-local-set "C-c C-M-;" #'my/python-doxygen-insert-block-comment))
+  (keymap-local-set "C-c C-M-;" #'my/python-doxygen-insert-block-comment)
+  (pyvenv-mode 1))
 
 ;;;###autoload
 (defun my/inferior-python-mode-hook ()

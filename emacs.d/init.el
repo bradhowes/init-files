@@ -194,6 +194,15 @@
   (compilation-error-regexp-alist (cons '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2) ; from pyright?
                                         compilation-error-regexp-alist)))
 
+(use-package compile-multi
+  :defer t
+  :ensure t)
+
+(use-package consult-compile-multi
+  :defer t
+  :ensure t
+  :hook ((after-init . consult-compile-multi-mode)))
+
 (autoload 'my/consult-init "my-consult")
 (use-package consult
   :defer t
@@ -483,7 +492,6 @@
                                         ("Python" (black))
                                         ("Shell" (shfmt "-i" "2" "-ci" "-bn")))))
 
-
 (use-package git-timemachine
   :defer t
   :ensure t)
@@ -535,6 +543,11 @@
                        ;; For C-g aborting blocking subprocesses, see "C-g and blocking subprocesses" in the README.
                        (setq kkp-restore-legacy-keys-around-subprocesses t)
                        (global-kkp-mode 1))))
+
+(use-package kotlin-ts-mode
+  :defer t
+  :ensure t
+  :mode ("\\.kt\\'"))
 
 (use-package ligature
   :defer t
@@ -645,6 +658,10 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :ensure t
   :commands (nerd-icons-completion-mode))
 
+(use-package compile-multi-nerd-icons
+  :defer t
+  :ensure t)
+
 (use-package marginalia
   :defer t
   :ensure t
@@ -701,6 +718,16 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :ensure t
   :if my/is-macosx
   :bind (:map my/hyper-c-map ("l" . osx-dictionary-search-pointer)))
+
+(autoload 'my/python-mode-hook "my-python-mode")
+(autoload 'my/inferior-python-mode-hook "my-python-mode")
+(use-package python
+  :hook ((python-ts-mode . my/python-mode-hook)
+         (inferior-python-mode . my/inferior-python-mode-hook)))
+
+(use-package pyvenv
+  :defer t
+  :ensure t)
 
 (use-package popper
   :defer t

@@ -23,6 +23,8 @@
  '(comint-buffer-maximum-size 10000)
  '(compilation-auto-jump-to-first-error nil)
  '(compilation-scroll-output t)
+ '(compile-multi-config
+   '((python-ts-mode ("pytest" . "pytest") ("compile" . "pip3 install -U -e ."))))
  '(completion-cycle-threshold 3)
  '(completion-ignored-extensions
    '(".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".bzr/"
@@ -113,14 +115,16 @@
  '(ns-right-command-modifier 'super)
  '(ns-right-control-modifier 'hyper)
  '(package-selected-packages
-   '(accent ace-window cape char-menu cmake-mode consult-dir consult-eglot consult-notes consult-zoxide corfu crux denote
-            diff-hl doom-modeline doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region
-            fancy-compilation flymake-gradle flymake-shellcheck flyover format-all git-timemachine go-mode gradle-mode
-            helpful impatient-mode indent-bars js2-mode key-chord keycast kkp kotlin-ts-mode ligature magit marginalia
-            mode-line-bell mood-line multiple-cursors nano-modeline nerd-icons nerd-icons-completion nerd-icons-corfu
-            nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless osx-dictionary popper rg scratch simple-modeline
-            sleek-modeline tempel tempel-collection timu-line treemacs-nerd-icons ultra-scroll vertico ws-butler xclip
-            yaml yaml-mode yasnippet yasnippet-snippets zoxide))
+   '(accent ace-window cape char-menu cmake-mode compile-multi compile-multi-embark compile-multi-nerd-icons
+            consult-compile-multi consult-dir consult-eglot consult-multi-compile consult-notes consult-zoxide corfu
+            crux denote diff-hl doom-modeline doom-themes eldoc-box embark-consult esup exec-path-from-shell
+            expand-region fancy-compilation flymake-gradle flymake-shellcheck flyover format-all git-timemachine go-mode
+            gradle-mode helpful impatient-mode indent-bars inheritenv js2-mode key-chord keycast kkp kotlin-ts-mode
+            language-id ligature magit marginalia mode-line-bell mood-line multiple-cursors nano-modeline nerd-icons
+            nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless
+            osx-dictionary popper pyenv pyvenv pyvenv-auto rg scratch simple-modeline sleek-modeline tempel
+            tempel-collection timu-line treemacs-nerd-icons ultra-scroll vertico ws-butler xclip yaml yaml-mode
+            yasnippet yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
@@ -139,7 +143,19 @@
  '(resize-mini-windows t)
  '(ring-bell-function 'mode-line-bell-flash)
  '(safe-local-variable-directories '("/Users/howes/src/Mine/init-files"))
- '(safe-local-variable-values '((dired-omit-files . "*.elc") (checkdoc-minor-mode . t)))
+ '(safe-local-variable-values
+   '((compile-multi-default-directory lambda nil "~/src/python-project")
+     (compile-multi-default-directory lambda nil my/project-root)
+     (compile-multi-config
+      (python-ts-mode (#("pytest" 0 1 (compile-multi--task "pytest")) . "pytest")
+                      (#("compile" 0 1 (compile-multi--task "pip3 install -U -e .")) . "pip3 install -U -e .")))
+     (compile-multi-config quote ((python-ts-mode ("pytest" . "pytest") ("compile" . "pip3 install -U -e ."))))
+     (compile-multi-default-directory . my/project-root) (my/project-root . "~/src/python-project")
+     (compile-multi-config
+      '((python-mode ("make:build" . "pip install -U -e .") ("make:test" . "pytest")) (t ("make:test" . "pytest"))))
+     (compile-multi-config '((python-ts-mode ("make:build" . "pip install -U -e .") ("make:test" . "pytest"))))
+     (compile-multi-config '((t ("make:build" . "pip install -U -e .") ("make:test" . "pytest"))))
+     (dired-omit-files . "*.elc") (checkdoc-minor-mode . t)))
  '(save-interprogram-paste-before-kill t)
  '(savehist-additional-variables
    '(register-alist kill-ring project-regexp-history-variable corfu-history))

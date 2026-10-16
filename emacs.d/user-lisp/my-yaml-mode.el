@@ -7,7 +7,7 @@
 
 (defun my/yaml-ts-mode-hook ()
   "Customization hook for `yaml-ts-mode'."
-  (setopt yaml-ts-mode-yamllint-options '("-d" "relaxed"))
+  (setopt yaml-ts-mode-yamllint-options '("-d" "{extends: relaxed, rules: {line-length: disable}}"))
   (flymake-mode t))
 
 (defun my/yaml-ts-setup-hook ()
