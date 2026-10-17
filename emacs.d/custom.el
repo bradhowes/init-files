@@ -122,8 +122,8 @@
             helpful impatient-mode indent-bars inheritenv js2-mode key-chord keycast kkp kotlin-ts-mode language-id
             ligature magit marginalia mode-line-bell mood-line multiple-cursors nano-modeline nerd-icons
             nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless
-            osx-dictionary popper pyenv pyvenv pyvenv-auto rg scratch simple-modeline sleek-modeline tempel
-            tempel-collection timu-line treemacs-nerd-icons ultra-scroll vertico ws-butler xclip yaml yaml-mode
+            osx-dictionary popper pyenv pyvenv pyvenv-auto rg scratch simple-modeline sleek-modeline symbol-overlay
+            tempel tempel-collection timu-line treemacs-nerd-icons ultra-scroll vertico ws-butler xclip yaml yaml-mode
             yasnippet yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers

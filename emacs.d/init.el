@@ -96,6 +96,10 @@
   (make-sparse-keymap)
   "Keymap for Hyper-n actions.")
 
+(defvar my/hyper-y-map
+  (make-sparse-keymap)
+  "Keymap for Hyper-y actions.")
+
 ;; To keep this file small, we put all customizations in their own file.
 (setq custom-file (file-name-concat (expand-file-name user-emacs-directory) "custom.el"))
 
@@ -403,7 +407,6 @@
 (autoload 'my/doom-modeline-setup "my-doom-modeline")
 (use-package doom-modeline
   :defer t
-  :ensure t
   :hook ((after-init . my/doom-modeline-setup)))
 
 (autoload 'my/lisp-mode-hook "my-lisp-mode")
@@ -808,6 +811,16 @@ Bound to \\`C-x p s'.")
   :defer t
   :hook ((after-init . global-subword-mode)))
 
+(use-package symbol-overlay
+  :defer t
+  :ensure t
+  :bind (:map my/hyper-y-map
+              ("i" . symbol-overlay-put)
+              ("n" . symbol-overlay-switch-forward)
+              ("p" . symbol-overlay-switch-backward)
+              ("H-y" . symbol-overlay-mode)
+              ("c" . symbol-overlay-remove-all)))
+
 (use-package ultra-scroll
   :defer t
   :ensure t
@@ -1103,9 +1116,11 @@ Bound to \\`C-x p s'.")
                             "H-j" my/point-jumps-map
                             "H-k" #'bury-buffer
                             "H-K" #'my/shell
+                            "H-m" my/hyper-y-map
                             "H-M-m" #'my/show-messages-buffer
                             "H-n" my/hyper-n-map
                             "H-p" project-prefix-map
+                            "H-M-p" #'my/matching-paren
                             "H-r" #'speedbar
                             "H-s" #'my/shell
                             "H-t" #'my/htop
