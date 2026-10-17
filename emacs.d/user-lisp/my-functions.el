@@ -74,12 +74,16 @@ zero (0), so we detect that and report that as false."
 
 ;;;###autoload
 (defun my/matching-paren ()
-  "When point is on a paren-type character, jump to its twin."
+  "When point is on a paren-type character, jump to its twin.
+If just after closing paren move to it and then jump."
   (interactive)
-  (cond ((looking-at "[[({]")
+  (cond ((looking-at " ?[[({]" t)
 	 (forward-sexp 1)
 	 (forward-char -1))
-	((looking-at "[]})]")
+	((or (looking-at "[]})]" t)
+             (save-excursion            ; check one character back
+               (forward-char -1)
+               (looking-at "[]})]" t)))
 	 (forward-char 1)
 	 (forward-sexp -1))
 	(t
