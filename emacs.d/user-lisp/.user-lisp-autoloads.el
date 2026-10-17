@@ -338,7 +338,8 @@ zero (0), so we detect that and report that as false.
 
 (fn &optional ARG)" t)
 (autoload 'my/matching-paren "my-functions"
-"When point is on a paren-type character, jump to its twin." t)
+"When point is on a paren-type character, jump to its twin.
+If just after closing paren move to it and then jump." t)
 (autoload 'my/reload-buffer "my-functions"
 "Reload the current buffer from disk.
 Checks to see if buffer needs saving, aborting the reload if changes not saved.
@@ -930,7 +931,6 @@ disabled.
 
 (autoload 'my/doom-modeline-setup "my-doom-modeline"
 "Startup routine for mood-line.")
-(register-definition-prefixes "my-doom-modeline" '("my/mood-line-segment-keycast"))
 
 
 ;;; Generated autoloads from my-consult-mode.el
