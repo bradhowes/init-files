@@ -161,22 +161,23 @@
   "Use `c-ts-mode' when t."
   :type '(boolean))
 
-(autoload 'my/c++-mode-hook "my-c++-mode")
-(let ((mode (if my/use-c-ts-mode 'c++-ts-mode 'c++-mode)))
-  (add-to-list 'auto-mode-alist
-               `(,(concat "\\.\\(cc\\|hh\\|ii\\|inl\\|mm\\|"
-                          "\\([ch]\\(pp\\|xx\\|\\+\\+\\)\\)\\)\\'")
-                 . ,mode)))
+(unless noninteractive
+  (autoload 'my/c++-mode-hook "my-c++-mode")
+  (let ((mode (if my/use-c-ts-mode 'c++-ts-mode 'c++-mode)))
+    (add-to-list 'auto-mode-alist
+                 `(,(concat "\\.\\(cc\\|hh\\|ii\\|inl\\|mm\\|"
+                            "\\([ch]\\(pp\\|xx\\|\\+\\+\\)\\)\\)\\'")
+                   . ,mode)))
 
-(if my/use-c-ts-mode
-    (use-package c-ts-mode
-      :defer t
-      :hook ((c++-ts-mode . my/c++-mode-hook)
-             (after-init . (lambda ()
+  (if my/use-c-ts-mode
+      (use-package c-ts-mode
+        :defer t
+        :hook ((c++-ts-mode . my/c++-mode-hook)
+               (after-init . (lambda ()
                              (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))))))
-  (use-package cc-mode
-    :defer t
-    :hook ((c++-mode . my/c++-mode-hook))))
+    (use-package cc-mode
+      :defer t
+      :hook ((c++-mode . my/c++-mode-hook)))))
 
 (use-package char-menu
   :defer t
@@ -187,6 +188,12 @@
                ("Math" "≈" "≡" "≠" "∞" "×" "±" "∓" "÷" "√")
                ("Arrows" "←" "→" "↑" "↓" "⇐" "⇒" "⇑" "⇓")
                ("Greek" "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
+
+(autoload 'my/cmake-mode-hook "my-cmake-mode")
+(use-package cmake-mode
+  :defer t
+  :ensure t
+  :hook ((cmake-mode . my/cmake-mode-hook)))
 
 (use-package compile
   :defer t
@@ -485,8 +492,8 @@
                                                        "--attach-closing-while"
                                                        "--keep-one-line-blocks"
                                                        "--max-code-length=126"
-                                                       "--indent-after-parens"
-                                                       "--indent-continuation=1"
+                                                       ;; "--indent-after-parens"
+                                                       ;; "--indent-continuation=1"
                                                        "--indent=spaces=2"))
                                         ("CMake" (cmake-format))
                                         ("Python" (black))
@@ -630,13 +637,13 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :custom
   (keycast-mode-line-format "%2s%k%c%r"))
 
-(autoload 'my/mood-line-hook "my-mood-line")
-(use-package mood-line
-  :disabled t
-  :defer t
-  :ensure t
-  :vc (:url "https://gitlab.com/jessieh/mood-line")
-  :hook (after-init . my/mood-line-hook))
+;; (autoload 'my/mood-line-hook "my-mood-line")
+;; (use-package mood-line
+;;   :disabled t
+;;   :defer t
+;;   :ensure t
+;;   :vc (:url "https://gitlab.com/jessieh/mood-line")
+;;   :hook (after-init . my/mood-line-hook))
 
 (use-package multiple-cursors
   :defer t

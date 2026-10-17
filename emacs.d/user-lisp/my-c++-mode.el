@@ -3,6 +3,7 @@
 ;;; Code:
 
 (require 'flyspell)
+(require 'format-all)
 (require 'indent-bars)
 
 (require 'my-customizations)
@@ -10,6 +11,7 @@
 (require 'my-insert-block-comment)
 
 (eval-when-compile
+  (require 'cc-cmds)
   (require 'cc-mode)
   (require 'c-ts-mode)
   (require 'doxygen)
@@ -203,48 +205,57 @@ Setup a namespace with NAMESPACE name if non-nil."
 
     ;; Remove any previous copyright comment
     ;;
-    (my/c++-kill-copyright)
+    ;; (my/c++-kill-copyright)
 
     ;; Detect Doxygen tags (param, return) and make sure that they have a blank line before them so that
     ;; comment refill works properly. Also, if the tag starts with an '@' replace with a '\'
-    (goto-char (point-min))
-    (while (re-search-forward "[\\\\|@]\\(param\\|return\\)" nil t)
-      (save-excursion
-        (goto-char (match-beginning 0))
-        (when (eq (char-after) ?@)
-          (delete-char 1)
-          (insert ?\\))
-        (forward-line -1)
-        (when (not (looking-at "^\\s-*$"))
-          (end-of-line)
-          (open-line 1))))
+    ;; (goto-char (point-min))
+    ;; (while (re-search-forward "[\\\\|@]\\(param\\|return\\)" nil t)
+    ;;   (save-excursion
+    ;;     (goto-char (match-beginning 0))
+    ;;     (when (eq (char-after) ?@)
+    ;;       (delete-char 1)
+    ;;       (insert ?\\))
+    ;;     (forward-line -1)
+    ;;     (when (not (looking-at "^\\s-*$"))
+    ;;       (end-of-line)
+    ;;       (open-line 1))))
 
     ;; Remove any initial, standalone '//' in a comment block
-    (goto-char (point-min))
-    (while (re-search-forward "// *
-\\s-*// " nil t)
-      (replace-match "// ")
-      ;; (c-fill-paragraph))
-      )
+;;     (goto-char (point-min))
+;;     (while (re-search-forward "// *
+;; \\s-*// " nil t)
+;;       (replace-match "// ")
+;;       ;; (c-fill-paragraph))
+;;       )
 
-    ;; Refill any Doxygen comment block. This only refills the first text block
+    ;; Refill any Doxygen comment block.
+    ;; (format-all-buffer)
+
     (goto-char (point-min))
-    ;; (while (re-search-forward "/\\*\\*" nil t)
-    ;;   (c-fill-paragraph))
+    (insert-char ? )
+    (format-all-buffer)
+    (goto-char (point-min))
+    (while (re-search-forward "/\\*\\*" nil t)
+      (fill-paragraph))
+
+    (goto-char (point-min))
+    (while (re-search-forward "^.\\{127\\}" nil t)
+      (fill-paragraph)))
 
     ;; Remove space after '(' and '[' and before ')' and ']' -- old formatting style that I hate now
-    (goto-char (point-min))
-    (while (re-search-forward "\\(( \\)\\|\\( )\\)\\|\\(\\[ \\)\\|\\( \\]\\)" nil t)
-      (let ((found (match-string-no-properties 0)))
-        (if (eq (elt found 0) ?\s)
-            (replace-match (substring found 1))
-          (replace-match (substring found 0 1)))))
+    ;; (goto-char (point-min))
+    ;; (while (re-search-forward "\\(( \\)\\|\\( )\\)\\|\\(\\[ \\)\\|\\( \\]\\)" nil t)
+    ;;   (let ((found (match-string-no-properties 0)))
+    ;;     (if (eq (elt found 0) ?\s)
+    ;;         (replace-match (substring found 1))
+    ;;       (replace-match (substring found 0 1)))))
 
     ;; Convert system #include <...> statments for non-systemm libraries to be #include "..." instead
-    (goto-char (point-min))
-    (while (re-search-forward "#include <\\(\\(Qt\\|boost\\|ace\\).*\\)>" nil t)
-      (replace-match "#include \"\\1\""))
-    (indent-region (point-min) (point-max) nil))
+    ;; (goto-char (point-min))
+    ;; (while (re-search-forward "#include <\\(\\(Qt\\|boost\\|ace\\).*\\)>" nil t)
+    ;;   (replace-match "#include \"\\1\""))
+    ;; (indent-region (point-min) (point-max) nil))
   (basic-save-buffer))
 
 (defun my/c++-cleanup-file (path)

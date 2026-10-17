@@ -117,10 +117,10 @@
  '(package-selected-packages
    '(accent ace-window cape char-menu cmake-mode compile-multi compile-multi-embark compile-multi-nerd-icons
             consult-compile-multi consult-dir consult-eglot consult-multi-compile consult-notes consult-zoxide corfu
-            crux denote diff-hl doom-modeline doom-themes eldoc-box embark-consult esup exec-path-from-shell
-            expand-region fancy-compilation flymake-gradle flymake-shellcheck flyover format-all git-timemachine go-mode
-            gradle-mode helpful impatient-mode indent-bars inheritenv js2-mode key-chord keycast kkp kotlin-ts-mode
-            language-id ligature magit marginalia mode-line-bell mood-line multiple-cursors nano-modeline nerd-icons
+            crux denote diff-hl doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region
+            fancy-compilation flymake-gradle flymake-shellcheck flyover format-all git-timemachine go-mode gradle-mode
+            helpful impatient-mode indent-bars inheritenv js2-mode key-chord keycast kkp kotlin-ts-mode language-id
+            ligature magit marginalia mode-line-bell mood-line multiple-cursors nano-modeline nerd-icons
             nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless
             osx-dictionary popper pyenv pyvenv pyvenv-auto rg scratch simple-modeline sleek-modeline tempel
             tempel-collection timu-line treemacs-nerd-icons ultra-scroll vertico ws-butler xclip yaml yaml-mode
@@ -144,7 +144,10 @@
  '(ring-bell-function 'mode-line-bell-flash)
  '(safe-local-variable-directories '("/Users/howes/src/Mine/init-files"))
  '(safe-local-variable-values
-   '((compile-multi-default-directory lambda nil "~/src/python-project")
+   '((compile-multi-default-directory lambda nil "~/Developer/Mine/sidecar")
+     (compile-multi-config
+      (t ("cmake" . "rm -rf build && mkdir build && cd build && cmake ..") ("compile" . "cd build && make -j 8")))
+     (compile-multi-default-directory lambda nil "~/src/python-project")
      (compile-multi-default-directory lambda nil my/project-root)
      (compile-multi-config
       (python-ts-mode (#("pytest" 0 1 (compile-multi--task "pytest")) . "pytest")

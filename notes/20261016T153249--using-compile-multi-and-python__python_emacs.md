@@ -35,7 +35,7 @@ The `compile-multi` depends on the value found in `compile-multi-config` to pres
 execute. The best way to do this for a Python project is to put them in a `.dir-locals.el` file at the root of the
 Python project. For example, assume that there is a Python project at `~/src/python-project`. We wish to have two
 commands available whenever editing a file in the project -- in the root directory or any child directory of it. The
-following contents placed in `~/Src/python-project/.dir-locals.el` will define two tasks, "pytest" and "compile":
+following contents placed in `~/src/python-project/.dir-locals.el` will define two tasks, "pytest" and "compile":
 
 ```Emacs-Lisp
 ;; -*- no-byte-compile: t -*-
