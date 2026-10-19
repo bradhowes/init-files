@@ -433,5 +433,9 @@ Prohibits spell checking in '#include' strings."
   (when (project-current nil default-directory)
     (eglot-ensure)))
 
+(defun my/c++-mode-remap ()
+    "Remap c++-mode to c++-ts-mode."
+    (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode)))
+
 (provide 'my/c++-mode)
 ;;; my-c++-mode.el ends here

@@ -316,6 +316,8 @@ After calling `beginning-of-line' and ARG is 1 (or nil), call
 `beginning-of-line' to move to start of line.
 
 (fn ARG)" t)
+(autoload 'my/compile "my-functions"
+"Invoke `compile-multi' or `compile' depending on context." t)
 (autoload 'my/copy-file-name-to-clipboard "my-functions"
 "Copy the current buffer file name to the clipboard." t)
 (autoload 'my/describe-symbol-at-point "my-functions"
@@ -378,7 +380,23 @@ very small for me, and it remove the obnoxious message at startup about
 the buffer having untrusted content.
 
 (fn ORIGINAL-RESPONSE)")
-(register-definition-prefixes "my-functions" '("my/launch-ssh-emacs"))
+(autoload 'my/cape-initialize "my-functions"
+"Initialize cape.")
+(autoload 'my/corfu-initialize "my-functions"
+"Custom corfu initialize.")
+(autoload 'my/diff-hl-initialize "my-functions"
+"Custom diff-hl init.")
+(autoload 'my/ligature-initialize "my-functions"
+"Custom ligature init.")
+(autoload 'my/marginalia-initialize "my-functions"
+"Custom marginalia init.")
+(autoload 'my/nerd-icons-corfu-initialize "my-functions"
+"Custom nerd-icons-corfu init.")
+(autoload 'my/popper-initialize "my-functions"
+"Custom popper init.")
+(autoload 'my/ultra-scroll-initialize "my-functions"
+"Custom `ultra-scroll' init.")
+(register-definition-prefixes "my-functions" '("my/"))
 
 
 ;;; Generated autoloads from my-insert-block-comment.el

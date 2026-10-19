@@ -3,8 +3,20 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'cape)
 (require 'compile-multi)
+(require 'corfu)
+(require 'corfu-popupinfo)
+(require 'diff-hl)
+(require 'diff-hl-flydiff)
+(require 'diff-hl-show-hunk)
+(require 'ligature)
+(require 'marginalia)
+(require 'nerd-icons-completion)
+(require 'nerd-icons-corfu)
 (require 'popper)
+(require 'popper-echo)
+(require 'ultra-scroll)
 
 ;;;###autoload
 (defun my/beginning-of-line-text (arg)
@@ -196,6 +208,76 @@ the buffer having untrusted content."
    "-Y"
    host
    "exec /opt/homebrew/bin/emacs"))
+
+(defun my/after-init-emacs-init ()
+  "Custom Emacs init."
+  (abbrev-mode)
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror)))
+
+;;;###autoload
+(defun my/cape-initialize ()
+  "Initialize cape."
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block))
+
+;;;###autoload
+(defun my/corfu-initialize ()
+  "Custom corfu initialize."
+  (global-corfu-mode 1)
+  (corfu-popupinfo-mode 1))
+
+;;;###autoload
+(defun my/diff-hl-initialize()
+  "Custom diff-hl init."
+  (diff-hl-flydiff-mode t)
+  (global-diff-hl-mode t)
+  (global-diff-hl-show-hunk-mouse-mode t))
+
+;;;###autoload
+(defun my/ligature-initialize ()
+  "Custom ligature init."
+  (ligature-set-ligatures
+   'prog-mode
+   '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+     ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+     "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+     "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+     "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+     "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+     "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+     "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+     ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+     "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+     "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+     "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+     "\\\\" "://" "www"))
+  (global-ligature-mode t))
+
+;;;###autoload
+(defun my/marginalia-initialize ()
+  "Custom marginalia init."
+  (marginalia-mode 1)
+  (nerd-icons-completion-mode 1))
+
+;;;###autoload
+(defun my/nerd-icons-corfu-initialize ()
+  "Custom nerd-icons-corfu init."
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+;;;###autoload
+(defun my/popper-initialize ()
+  "Custom popper init."
+  (popper-mode)
+  (popper-echo-mode))
+
+;;;###autoload
+(defun my/ultra-scroll-initialize ()
+  "Custom `ultra-scroll' init."
+  (setq scroll-conservatively 3
+        scroll-margin 0)
+  (ultra-scroll-mode 1))
 
 (provide 'my-functions)
 

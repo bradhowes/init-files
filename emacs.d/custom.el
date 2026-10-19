@@ -120,11 +120,10 @@
             crux denote diff-hl doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region
             fancy-compilation flymake-gradle flymake-shellcheck flyover format-all git-timemachine go-mode gradle-mode
             helpful impatient-mode indent-bars inheritenv js2-mode key-chord keycast kkp kotlin-ts-mode language-id
-            ligature magit marginalia mode-line-bell mood-line multiple-cursors nano-modeline nerd-icons
-            nerd-icons-completion nerd-icons-corfu nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless
-            osx-dictionary popper pyenv pyvenv pyvenv-auto rg scratch simple-modeline sleek-modeline symbol-overlay
-            tempel tempel-collection timu-line treemacs-nerd-icons ultra-scroll vertico ws-butler xclip yaml yaml-mode
-            yasnippet yasnippet-snippets zoxide))
+            ligature magit marginalia mode-line-bell multiple-cursors nerd-icons nerd-icons-completion
+            nerd-icons-corfu nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless osx-dictionary popper pyenv
+            pyvenv pyvenv-auto rg scratch symbol-overlay tempel tempel-collection timu-line treemacs-nerd-icons
+            ultra-scroll vertico ws-butler xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode

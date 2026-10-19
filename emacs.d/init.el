@@ -166,8 +166,17 @@
   "Use `c-ts-mode' when t."
   :type '(boolean))
 
+;; (defmacro my/hook (name &rest body)
+;;   "Create a custom hook function with NAME and BODY."
+;;   `(progn
+;;      (defun ,name ()
+;;        "Custom hook function."
+;;        ,@body))
+;;   `(function ,name))
+
 (unless noninteractive
   (autoload 'my/c++-mode-hook "my-c++-mode")
+  (autoload 'my/c++-mode-remap "my-c++-mode")
   (let ((mode (if my/use-c-ts-mode 'c++-ts-mode 'c++-mode)))
     (add-to-list 'auto-mode-alist
                  `(,(concat "\\.\\(cc\\|hh\\|ii\\|inl\\|mm\\|"
@@ -178,8 +187,7 @@
       (use-package c-ts-mode
         :defer t
         :hook ((c++-ts-mode . my/c++-mode-hook)
-               (after-init . (lambda ()
-                             (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))))))
+               (after-init . my/c++-mmode-remap)))
     (use-package cc-mode
       :defer t
       :hook ((c++-mode . my/c++-mode-hook)))))
@@ -332,17 +340,16 @@
                                    (minibuffer (orderless initials basic))))
   (completion-category-defaults nil))
 
+(autoload 'my/cape-initialize "my-functions")
 (use-package cape
   :defer t
   :ensure t
   :commands (cape-dabbrev cape-file cape-elisp-block)
   :bind ( :map my/hyper-c-map
           ("p" . cape-prefix-map))
-  :hook (after-init . (lambda ()
-                        (add-hook 'completion-at-point-functions #'cape-dabbrev)
-                        (add-hook 'completion-at-point-functions #'cape-file)
-                        (add-hook 'completion-at-point-functions #'cape-elisp-block))))
+  :hook (after-init . my/cape-initialize))
 
+(autoload 'my/corfu-initialize "my-functions")
 (use-package corfu
   :defer t
   :ensure t
@@ -360,9 +367,7 @@
   ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
   ;; Enable Corfu only for certain modes.
-  :hook ((after-init . (lambda ()
-                         (global-corfu-mode 1)
-                         (corfu-popupinfo-mode 1)))))
+  :hook ((after-init . my/corfu-initialize)))
 
 (use-package crm)
 
@@ -389,14 +394,12 @@
   (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 
+(autoload 'my/diff-hl-initialize "my-functions")
 (use-package diff-hl
   :defer t
   :ensure t
   :commands (diff-hl-show-hunk diff-hl-flydiff-mode global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode)
-  :hook ((after-init . (lambda ()
-                         (diff-hl-flydiff-mode t)
-                         (global-diff-hl-mode t)
-                         (global-diff-hl-show-hunk-mouse-mode t)))))
+  :hook ((after-init . my/diff-hl-initialize)))
 
 (autoload 'my/dired-mode-hook "my-dired-mode")
 (use-package dired
@@ -558,27 +561,12 @@
   :ensure t
   :mode ("\\.kt\\'"))
 
+(autoload 'my/ligature-initialize "my-functions")
 (use-package ligature
   :defer t
   :ensure t
   :commands (ligature-set-ligatures global-ligature-mode)
-  :hook ((after-init . (lambda ()
-                         (ligature-set-ligatures
-                          'prog-mode
-                          '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
-                            ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
-                            "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
-                            "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
-                            "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
-                            "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
-                            "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
-                            "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
-                            ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
-                            "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
-                            "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
-                            "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
-                            "\\\\" "://" "www"))
-                         (global-ligature-mode t)))))
+  :hook ((after-init . my/ligature-initialize)))
 
 (use-package magit
   :defer t
@@ -639,14 +627,6 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :custom
   (keycast-mode-line-format "%2s%k%c%r"))
 
-;; (autoload 'my/mood-line-hook "my-mood-line")
-;; (use-package mood-line
-;;   :disabled t
-;;   :defer t
-;;   :ensure t
-;;   :vc (:url "https://gitlab.com/jessieh/mood-line")
-;;   :hook (after-init . my/mood-line-hook))
-
 (use-package multiple-cursors
   :defer t
   :ensure t
@@ -671,23 +651,21 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :defer t
   :ensure t)
 
+(autoload 'my/marginalia-initialize "my-functions")
 (use-package marginalia
   :defer t
   :ensure t
   :commands (marginalia-mode marginalia-cycle)
   :bind ( :map minibuffer-local-map
           ("<f1>" . marginalia-cycle))
-  :hook ((after-init . (lambda ()
-                         (marginalia-mode 1)
-                         (nerd-icons-completion-mode 1)))))
+  :hook ((after-init . my/marginalia-initialize)))
 
+(autoload 'my/nerd-icons-corfu-initialize "my-functions")
 (use-package nerd-icons-corfu
   :defer t
   :ensure t
   :commands (nerd-icons-corfu-formatter)
-  :hook (after-init . (lambda ()
-                        (require 'corfu)
-                        (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))))
+  :hook (after-init . my/nerd-icons-corfu-initialize))
 
 (use-package nerd-icons-dired
   :defer t
@@ -738,6 +716,7 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :defer t
   :ensure t)
 
+(autoload 'my/popper-initialize "my-functions")
 (use-package popper
   :defer t
   :ensure t
@@ -745,9 +724,7 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :functions (popper--delete-popup)
   :bind (("C-'" . popper-toggle)
          ("M-'" . popper-cycle))
-  :hook ((after-init . (lambda ()
-                         (popper-mode)
-                         (popper-echo-mode)))))
+  :hook ((after-init . my/popper-initialize)))
 
 (defvar my/project-search-map (make-sparse-keymap)
   "A prefix map like that found in projectile.
@@ -820,14 +797,12 @@ Bound to \\`C-x p s'.")
               ("p" . symbol-overlay-switch-backward)
               ("c" . symbol-overlay-remove-all)))
 
+(autoload 'my/ultra-scroll-initialize "my-functions")
 (use-package ultra-scroll
   :defer t
   :ensure t
   :commands (ultra-scroll-mode)
-  :hook ((after-init . (lambda ()
-                         (setq scroll-conservatively 3
-                               scroll-margin 0)
-                         (ultra-scroll-mode 1)))))
+  :hook ((after-init . my/ultra-scroll-initialize)))
 
 (use-package vertico
   :defer t
@@ -902,6 +877,7 @@ Bound to \\`C-x p s'.")
     (keymap-global-set "<remap> <list-directory>" #'ffap-list-directory))
   "List of binding forms evaluated by function `ffap-bindings'.")
 
+(autoload 'my/after-init-emacs-init "my-functions")
 (use-package emacs
   :commands (my/crm-indicator)
   :config
@@ -927,10 +903,7 @@ Bound to \\`C-x p s'.")
     (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator))
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
-         (after-init . (lambda ()
-                         (abbrev-mode)
-                         (when (file-exists-p custom-file)
-                           (load custom-file 'noerror))))))
+         (after-init . my/after-init-emacs-init)))
 
 (defun my/consult-info-emacs ()
   "Search Emacs info."
