@@ -308,6 +308,14 @@ If MODE is nil then apply to the current mode.
 
 ;;; Generated autoloads from my-functions.el
 
+(autoload 'my/beginning-of-line-text "my-functions"
+"Augment behavior of `beginning-of-line-text'.
+
+After calling `beginning-of-line' and ARG is 1 (or nil), call
+`beginning-of-line-text' again and see if point moved. If not, invoke
+`beginning-of-line' to move to start of line.
+
+(fn ARG)" t)
 (autoload 'my/copy-file-name-to-clipboard "my-functions"
 "Copy the current buffer file name to the clipboard." t)
 (autoload 'my/describe-symbol-at-point "my-functions"
@@ -1005,6 +1013,7 @@ disabled.
 ;;; Generated autoloads from doom-modeline/test/test-helper.el
 
 (register-definition-prefixes "doom-modeline/test/test-helper" '("ffip-get-project-root-directory" "project"))
+
 
 ;;; End of scraped data
 

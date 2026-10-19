@@ -5,6 +5,22 @@
 (require 'popper)
 
 ;;;###autoload
+(defun my/beginning-of-line-text (arg)
+  "Augment behavior of `beginning-of-line-text'.
+
+After calling `beginning-of-line' and ARG is 1 (or nil), call
+`beginning-of-line-text' again and see if point moved. If not, invoke
+`beginning-of-line' to move to start of line."
+  (interactive "^p")
+  (or arg (setq arg 1))
+  (when (/= arg 1)
+    (beginning-of-line-text arg))
+  (let ((orig (point)))
+    (beginning-of-line-text 1)
+    (when (= orig (point))
+      (beginning-of-line 1))))
+
+;;;###autoload
 (defun my/copy-file-name-to-clipboard ()
   "Copy the current buffer file name to the clipboard."
   (interactive)

@@ -30,6 +30,7 @@
 (autoload 'my/find-user-custom-file "my-finders")
 (autoload 'my/find-user-init-file "my-finders")
 (autoload 'my/find-user-lisp-file "my-finders")
+(autoload 'my/beginning-of-line-text "my-functions")
 (autoload 'my/copy-file-name-to-clipboard "my-functions")
 (autoload 'my/describe-symbol-at-point "my-functions")
 (autoload 'my/goto-mark "my-functions")
@@ -369,15 +370,13 @@
   :defer t
   :ensure t
   :commands (crux-find-current-directory-dir-locals-file crux-duplicate-current-line-or-region)
-  :bind ( :map my/hyper-c-map
+  :bind ( ("C-k" . crux-smart-kill-line)
+          ("C-^" . crux-top-join-line)
+          :map my/hyper-c-map
           ("d" . consult-dir)
           ("C-i" . crux-indent-defun)
           :map ctl-x-4-map
-          ("t" . crux-transpose-windows)
-          :map global-map
-          ("C-a" . crux-move-beginning-of-line)
-          ("C-k" . crux-smart-kill-line)
-          ("C-^" . crux-top-join-line)))
+          ("t" . crux-transpose-windows)))
 
 (use-package dabbrev
   :defer t
@@ -815,8 +814,8 @@ Bound to \\`C-x p s'.")
   :defer t
   :ensure t
   :bind (:map my/symbol-overlay-map
-              ("m" . symbol-overlay-put)
-              ("H-m" . symbol-overlay-put)
+              ("s" . symbol-overlay-put)
+              ("H-s" . symbol-overlay-put)
               ("n" . symbol-overlay-switch-forward)
               ("p" . symbol-overlay-switch-backward)
               ("c" . symbol-overlay-remove-all)))
@@ -1011,6 +1010,7 @@ Bound to \\`C-x p s'.")
                    "M-o" #'other-window
                    ;; "M-O" #'my/ace-window-always-dispatch
 
+                   "C-a" #'my/beginning-of-line-text
                    "C-o" #'aw-flip-window
 
                    ;; "C-s" #'isearch-forward-regexp
@@ -1116,12 +1116,12 @@ Bound to \\`C-x p s'.")
                             "H-j" my/point-jumps-map
                             "H-k" #'bury-buffer
                             "H-K" #'my/shell
-                            "H-m" my/symbol-overlay-map
                             "H-M-m" #'my/show-messages-buffer
                             "H-n" my/hyper-n-map
                             "H-p" project-prefix-map
                             "H-M-p" #'my/matching-paren
                             "H-r" #'speedbar
+                            "H-s" my/symbol-overlay-map
                             "H-t" #'my/htop
                             "H-u" #'undo
                             "H-v" #'my/reload-buffer
