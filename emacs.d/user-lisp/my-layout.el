@@ -1,4 +1,5 @@
 ;;; package -- my-layout -*- Mode: Emacs-Lisp; lexical-binding: t;-*-
+;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2------
 ;;; Commentary:
 ;;; Load personal layout definitions for various combinations of a laptop display + 1 or 2 4K displays in
 ;;; both horizontal and vertical orientations.
