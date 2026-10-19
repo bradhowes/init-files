@@ -3,6 +3,7 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'compile-multi)
 (require 'popper)
 
 ;;;###autoload
@@ -20,6 +21,15 @@ After calling `beginning-of-line' and ARG is 1 (or nil), call
     (beginning-of-line-text 1)
     (when (= orig (point))
       (beginning-of-line 1))))
+
+;;;###autoload
+(defun my/compile ()
+  "Invoke `compile-multi' or `compile' depending on context."
+  (interactive)
+  (if (and (fboundp 'compile-multi--config-tasks)
+           (compile-multi--config-tasks))
+      (call-interactively #'compile-multi)
+    (call-interactively #'compile)))
 
 ;;;###autoload
 (defun my/copy-file-name-to-clipboard ()
