@@ -7,6 +7,7 @@
 (require 'compile-multi)
 (require 'corfu)
 (require 'corfu-popupinfo)
+(require 'crm)
 (require 'diff-hl)
 (require 'diff-hl-flydiff)
 (require 'diff-hl-show-hunk)
@@ -85,6 +86,20 @@ For debugging purposes."
   "Move back to mark without enabling transient mode."
   (interactive)
   (set-mark-command 4))
+
+;;;###autoload
+(defmacro my/hook (name &rest code)
+  "Create a custom hook with NAME and CODE.
+Returns NAME as a function symbol.
+
+TODO: intent was to use this in a `:hook' feature of `use-package', but
+this does not work right now, and I suspect it is due to the internal
+machinery of `use-package'."
+  `(progn
+     (defun ,name ()
+       "Custom hook."
+       ,@code)
+     (function ,name)))
 
 ;;;###autoload
 (defun my/indent-buffer ()
@@ -209,8 +224,28 @@ the buffer having untrusted content."
    host
    "exec /opt/homebrew/bin/emacs"))
 
+(defun my/crm-indicator(args)
+  "Custom CRM indicator for ARGS."
+  (cons (format "[CRM%s] %s"
+                (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
+                (car args))
+        (cdr args)))
+
 (defun my/after-init-emacs-init ()
   "Custom Emacs init."
+  (setq read-process-output-max (* 64 1024 1024)
+	process-adaptive-read-buffering nil
+        ;; debug-on-error t
+        frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
+                             (if (not (display-graphic-p))
+                                 (list (concat (system-name) " ") buffer-directory)
+                               buffer-directory))
+        load-path-filter-function #'load-path-filter-cache-directory-files)
+  (ffap-bindings)
+  (put 'narrow-to-region 'disabled nil)
+  (put 'scroll-left 'disabled nil)
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
   (abbrev-mode)
   (when (file-exists-p custom-file)
     (load custom-file 'noerror)))

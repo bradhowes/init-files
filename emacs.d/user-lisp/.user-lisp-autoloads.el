@@ -335,6 +335,15 @@ For debugging purposes.
 (fn HASHTABLE)" t)
 (autoload 'my/goto-mark "my-functions"
 "Move back to mark without enabling transient mode." t)
+(autoload 'my/hook "my-functions"
+"Create a custom hook with NAME and CODE.
+Returns NAME as a function symbol.
+
+TODO: intent was to use this in a `:hook' feature of `use-package', but
+this does not work right now, and I suspect it is due to the internal
+machinery of `use-package'.
+
+(fn NAME &rest CODE)" nil t)
 (autoload 'my/indent-buffer "my-functions"
 "Reindent the whole buffer." t)
 (autoload 'my/is-valid-directory "my-functions"
@@ -1031,6 +1040,33 @@ disabled.
 ;;; Generated autoloads from doom-modeline/test/test-helper.el
 
 (register-definition-prefixes "doom-modeline/test/test-helper" '("ffip-get-project-root-directory" "project"))
+
+
+
+;;; Generated autoloads from esup/esup.el
+
+(autoload 'esup "esup/esup"
+"Profile the startup time of Emacs in the background.
+If INIT-FILE is non-nil, profile that instead of USER-INIT-FILE.
+ARGS is a list of extra command line arguments to pass to Emacs.
+
+(fn &optional INIT-FILE &rest ARGS)" t)
+(register-definition-prefixes "esup/esup" '("esup-"))
+
+
+;;; Generated autoloads from esup/esup-child.el
+
+(register-definition-prefixes "esup/esup-child" '("esup-" "with-esup-child-increasing-depth"))
+
+
+;;; Generated autoloads from esup/test/test-esup.el
+
+(register-definition-prefixes "esup/test/test-esup" '("esup-test/fake-port"))
+
+
+;;; Generated autoloads from esup/test/utils.el
+
+(register-definition-prefixes "esup/test/utils" '("esup-" "make-esup-result" "with-esup-mock"))
 
 
 ;;; End of scraped data

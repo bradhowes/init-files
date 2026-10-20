@@ -102,7 +102,11 @@
   "Keymap for symbol-overlay actions.")
 
 ;; To keep this file small, we put all customizations in their own file.
-(setq custom-file (file-name-concat (expand-file-name user-emacs-directory) "custom.el"))
+(setq-default custom-file (file-name-concat (expand-file-name user-emacs-directory) "custom.el")
+              ;; To keep this file small, minimize `use-package' content.
+              use-package-always-defer t
+              use-package-always-ensure nil ; change to `t' to force loading if not found.
+              use-package-expand-minimally t)
 
 (defalias 'repl 'my/repl
   "Legacy alias to start Elisp read/eval/print loop in current window.")
@@ -144,35 +148,22 @@
 ;; }
 
 (use-package accent
-  :defer t
-  :ensure t
   :bind (:map my/hyper-c-map ("a" . accent-menu)))
 
 ;;; ===== ace-window =====
 
 (use-package ace-window
-  :defer t
-  :ensure t
   :config
   (setq aw-make-frame-char ?n)
   (advice-add 'aw-make-frame :override #'my/layout-make-frame)
   :commands (ace-window aw-flip-window))
 
 (use-package bind-key
-  :defer t
   :bind (:map help-map ("y" . describe-personal-keybindings)))
 
 (defcustom my/use-c-ts-mode nil
   "Use `c-ts-mode' when t."
   :type '(boolean))
-
-;; (defmacro my/hook (name &rest body)
-;;   "Create a custom hook function with NAME and BODY."
-;;   `(progn
-;;      (defun ,name ()
-;;        "Custom hook function."
-;;        ,@body))
-;;   `(function ,name))
 
 (unless noninteractive
   (autoload 'my/c++-mode-hook "my-c++-mode")
@@ -185,15 +176,12 @@
 
   (if my/use-c-ts-mode
       (use-package c-ts-mode
-        :defer t
         :hook ((c++-ts-mode . my/c++-mode-hook)
                (after-init . my/c++-mmode-remap)))
     (use-package cc-mode
-      :defer t
       :hook ((c++-mode . my/c++-mode-hook)))))
 
 (use-package char-menu
-  :defer t
   :bind (("C-z" . char-menu))
   :custom
   (char-menu '("—" "‘’" "“”" "…" "«»" "–"
@@ -204,29 +192,20 @@
 
 (autoload 'my/cmake-mode-hook "my-cmake-mode")
 (use-package cmake-mode
-  :defer t
-  :ensure t
   :hook ((cmake-mode . my/cmake-mode-hook)))
 
 (use-package compile
-  :defer t
   :custom
   (compilation-error-regexp-alist (cons '("^  \\(.*\\):\\([0-9]+\\):\\([0-9]+\\) - \\(.*\\)$" 1 2 3 2) ; from pyright?
                                         compilation-error-regexp-alist)))
 
-(use-package compile-multi
-  :defer t
-  :ensure t)
+(use-package compile-multi)
 
 (use-package consult-compile-multi
-  :defer t
-  :ensure t
   :hook ((after-init . consult-compile-multi-mode)))
 
 (autoload 'my/consult-init "my-consult")
 (use-package consult
-  :defer t
-  :ensure t
   :commands (consult--customize-put consult-flymake)
   :bind ( ("M-y" . consult-yank-replace)
 
@@ -293,23 +272,17 @@
 
 ;; Use Consult to select xref locations with preview
 (use-package xref
-  :defer t
   :custom
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref))
 
 (use-package completion
-  :defer t
   :hook ((after-init . dynamic-completion-mode)))
 
 (use-package consult-dir
-  :defer t
-  :ensure t
   :bind (("C-x C-d" . consult-dir)))
 
 (use-package denote
-  :defer t
-  :ensure t
   :hook ((dired-mode . denote-dired-mode))
   :bind ( :map my/hyper-n-map
           ("b" . denote-backlinks)
@@ -321,8 +294,6 @@
           ("r" . denote-rename-file)))
 
 (use-package consult-notes
-  :defer t
-  :ensure t
   :custom
   (consult-notes-denote-display-id nil)
   :bind ( :map my/hyper-n-map
@@ -332,8 +303,6 @@
   :hook (after-init . my/notes-consult-notes-hook))
 
 (use-package orderless
-  :defer t
-  :ensure t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles partial-completion))
@@ -342,8 +311,6 @@
 
 (autoload 'my/cape-initialize "my-functions")
 (use-package cape
-  :defer t
-  :ensure t
   :commands (cape-dabbrev cape-file cape-elisp-block)
   :bind ( :map my/hyper-c-map
           ("p" . cape-prefix-map))
@@ -351,8 +318,6 @@
 
 (autoload 'my/corfu-initialize "my-functions")
 (use-package corfu
-  :defer t
-  :ensure t
   :commands (global-corfu-mode corfu-popupinfo-mode)
   :bind ( :map corfu-map
           ("C-SPC" . corfu-insert-separator))
@@ -369,11 +334,7 @@
   ;; Enable Corfu only for certain modes.
   :hook ((after-init . my/corfu-initialize)))
 
-(use-package crm)
-
 (use-package crux
-  :defer t
-  :ensure t
   :commands (crux-find-current-directory-dir-locals-file crux-duplicate-current-line-or-region)
   :bind ( ("C-k" . crux-smart-kill-line)
           ("C-^" . crux-top-join-line)
@@ -384,7 +345,6 @@
           ("t" . crux-transpose-windows)))
 
 (use-package dabbrev
-  :defer t
   :bind (("M-/" . dabbrev-completion)
          ("C-M-/" . dabbrev-expand))
   :config
@@ -396,25 +356,20 @@
 
 (autoload 'my/diff-hl-initialize "my-functions")
 (use-package diff-hl
-  :defer t
-  :ensure t
   :commands (diff-hl-show-hunk diff-hl-flydiff-mode global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode)
   :hook ((after-init . my/diff-hl-initialize)))
 
 (autoload 'my/dired-mode-hook "my-dired-mode")
 (use-package dired
-  :defer t
   :hook (dired-mode . my/dired-mode-hook))
 
 (autoload 'my/doom-modeline-setup "my-doom-modeline")
 (use-package doom-modeline
-  :defer t
   :hook ((after-init . my/doom-modeline-setup)))
 
 (autoload 'my/lisp-mode-hook "my-lisp-mode")
 (autoload 'my/lisp-data-mode-hook "my-lisp-mode")
 (use-package elisp-mode
-  :defer t
   :hook ((lisp-mode . my/lisp-mode-hook)
          (lisp-interaction-mode . my/lisp-mode-hook)
          (lisp-data-mode . my/lisp-data-mode-hook)
@@ -426,13 +381,10 @@
 ;; :hook (prog-mode . eldoc-box-hover-mode)))
 
 (use-package emacs-pager
-  :defer t
   :commands (emacs-pager emacs-pager-mode))
 
 ;; FYI: Embark's default action binding of "RET" fails if a mode binds to <return>.
 (use-package embark
-  :defer t
-  :ensure t
   :bind (("C-." . embark-act)
          ("C-;" . embark-dwim)
          ("C-h B" . embark-bindings))
@@ -442,16 +394,12 @@
                                        (window-parameters (mode-line-format . none)))))
 
 (use-package embark-consult
-  :defer t
-  :ensure t
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; (use-package esup
 ;;   :custom (esup-user-init-file (file-truename "~/.emacs.d/init.el")))
 
 (use-package exec-path-from-shell
-  :defer t
-  :ensure t
   :commands (exec-path-from-shell-initialize)
   :hook (after-init . exec-path-from-shell-initialize))
 
@@ -459,21 +407,16 @@
   :bind ("C-\\" . er/expand-region))
 
 (use-package fancy-compilation
-  :defer t
-  :ensure t
   :commands (fancy-compilation-mode)
   :hook ((compilation-mode . fancy-compilation-mode)))
 
 (use-package flymake
-  :defer t
   :hook ((prog-mode . flymake-mode))
   :bind ( :map flymake-mode-map
           ("M-n" . flymake-goto-next-error)
           ("M-p" . flymake-goto-prev-error)))
 
 (use-package flyover
-  :defer t
-  :ensure t
   :hook ((flymake-mode . flyover-mode)
          (flyover-mode . my/flyover-mode-hook)))
 
@@ -504,13 +447,9 @@
                                         ("Python" (black))
                                         ("Shell" (shfmt "-i" "2" "-ci" "-bn")))))
 
-(use-package git-timemachine
-  :defer t
-  :ensure t)
+(use-package git-timemachine)
 
 (use-package helpful
-  :defer t
-  :ensure t
   :bind ( :map help-map
           ("a" . helpful-symbol)
           ("f" . helpful-callable)
@@ -521,33 +460,25 @@
           ("M-c" . helpful-command)))
 
 (use-package hl-line
-  :defer t
   :hook ((after-init . global-hl-line-mode)))
 
 ;; Unbind the ibuffer use of "M-o" so as not to conflict with my global definition using `ace-window'
 (use-package ibuffer
-  :defer t
   :config
   (keymap-unset ibuffer-mode-map "M-o" t))
 
 (use-package indent-bars
-  :defer t
-  :ensure t
   :hook (prog-mode . indent-bars-mode))
 
 (use-package iso-transl
-  :defer t
   :bind-keymap ("H-8" . iso-transl-ctl-x-8-map)) ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
 
 (use-package key-chord
-  :defer t
   ;; :vc (:url "https://github.com/emacsorphanage/key-chord" :rev :newest)
   :commands (key-chord-define key-chord-mode)
   :config (key-chord-mode 1))
 
 (use-package kkp
-  :defer t
-  :ensure t
   :if (my/is-terminal)
   :commands (global-kkp-mode)
   :hook (tty-setup . (lambda ()
@@ -557,20 +488,14 @@
                        (global-kkp-mode 1))))
 
 (use-package kotlin-ts-mode
-  :defer t
-  :ensure t
   :mode ("\\.kt\\'"))
 
 (autoload 'my/ligature-initialize "my-functions")
 (use-package ligature
-  :defer t
-  :ensure t
   :commands (ligature-set-ligatures global-ligature-mode)
   :hook ((after-init . my/ligature-initialize)))
 
 (use-package magit
-  :defer t
-  :ensure t
   :commands (magit-status-setup-buffer magit-status magit-project-status)
   :hook ((magit-post-refresh . diff-hl-magit-post-refresh))
   :bind ( :map ctl-x-map
@@ -587,7 +512,6 @@
 (autoload 'my/markdown-ts-mode-hook "my-markdown-mode")
 (autoload 'my/markdown-ts-setup-hook "my-markdown-mode")
 (use-package markdown-ts-mode
-  :defer t
   :mode ("\\.md\\'" "\\.mdx\\'" "\\.markdown\\'")
   :hook ((markdown-ts-mode . my/markdown-ts-mode-hook))
   (after-init . my/markdown-ts-setup-hook))
@@ -595,7 +519,6 @@
 (autoload 'my/yaml-ts-mode-hook "my-yaml-mode")
 (autoload 'my/yaml-ts-setup-hook "my-yaml-mode")
 (use-package yaml-ts-mode
-  :defer t
   :mode ("\\.yaml\\'" "\\.yml\\'")
   :hook ((yaml-ts-mode . my/yaml-ts-mode-hook)))
 
@@ -615,46 +538,31 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
       (remove-hook 'minibuffer-exit-hook 'keycast--minibuffer-exit)
       (keycast-invisible-mode -1))))
 
-(use-package mode-line-bell
-  :defer t
-  :ensure t)
+(use-package mode-line-bell)
 
 (use-package keycast
-  :defer t
-  :ensure t
   :commands (keycast-invisible-mode)
   :vc (:url "https://github.com/tarsius/keycast")
   :custom
   (keycast-mode-line-format "%2s%k%c%r"))
 
 (use-package multiple-cursors
-  :defer t
-  :ensure t
   :bind ( ("C->" . mc/mark-next-like-this)
           ("C-<" . mc/mark-previous-like-this)
           :map my/hyper-c-map
           ("." . mc/mark-all-like-this)))
 
-(use-package my-fontify-braces
-  :defer t)
+(use-package my-fontify-braces)
 
-(use-package nerd-icons
-  :defer t
-  :ensure t)
+(use-package nerd-icons)
 
 (use-package nerd-icons-completion
-  :defer t
-  :ensure t
   :commands (nerd-icons-completion-mode))
 
-(use-package compile-multi-nerd-icons
-  :defer t
-  :ensure t)
+(use-package compile-multi-nerd-icons)
 
 (autoload 'my/marginalia-initialize "my-functions")
 (use-package marginalia
-  :defer t
-  :ensure t
   :commands (marginalia-mode marginalia-cycle)
   :bind ( :map minibuffer-local-map
           ("<f1>" . marginalia-cycle))
@@ -662,25 +570,16 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
 
 (autoload 'my/nerd-icons-corfu-initialize "my-functions")
 (use-package nerd-icons-corfu
-  :defer t
-  :ensure t
   :commands (nerd-icons-corfu-formatter)
-  :hook (after-init . my/nerd-icons-corfu-initialize))
+  :hook ((after-init . my/nerd-icons-corfu-initialize)))
 
 (use-package nerd-icons-dired
-  :defer t
-  :ensure t
-  :hook
-  (dired-mode . nerd-icons-dired-mode))
+  :hook ((dired-mode . nerd-icons-dired-mode)))
 
 (use-package nerd-icons-xref
-  :defer t
-  :ensure t
-  :hook (after-init . nerd-icons-xref-mode))
+  :hook ((after-init . nerd-icons-xref-mode)))
 
 (use-package orderless
-  :defer t
-  :ensure t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles partial-completion))))
@@ -688,7 +587,6 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   (completion-pcm-leading-wildcard t))
 
 (use-package org
-  :defer t
   :commands (org-store-link)
   :config
   (defvar my/org-key-map
@@ -701,8 +599,6 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :bind-keymap ("H-o" . my/org-key-map))
 
 (use-package osx-dictionary
-  :defer t
-  :ensure t
   :if my/is-macosx
   :bind (:map my/hyper-c-map ("l" . osx-dictionary-search-pointer)))
 
@@ -712,14 +608,10 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :hook ((python-ts-mode . my/python-mode-hook)
          (inferior-python-mode . my/inferior-python-mode-hook)))
 
-(use-package pyvenv
-  :defer t
-  :ensure t)
+(use-package pyvenv)
 
 (autoload 'my/popper-initialize "my-functions")
 (use-package popper
-  :defer t
-  :ensure t
   :commands (popper-kill-latest-popup popper-mode popper-echo-mode)
   :functions (popper--delete-popup)
   :bind (("C-'" . popper-toggle)
@@ -734,7 +626,6 @@ Bound to \\`C-x p s'.")
 (keymap-set project-prefix-map "s" my/project-search-map)
 
 (use-package project
-  :defer t
   :commands (project--switch-project-command) ;; used in my/show-project-menu
   :bind ( :map project-prefix-map
           ("$" . #'project-shell)
@@ -744,33 +635,25 @@ Bound to \\`C-x p s'.")
           ))
 
 (use-package recentf
-  :defer t
   :hook ((after-init . recentf-mode)))
 
 (use-package rg
-  :defer t
-  :ensure t
   :commands (rg-enable-default-bindings rg-project)
   :bind ( :map my/project-search-map
           ("r" . rg-project))
   :hook (after-init . rg-enable-default-bindings))
 
 (use-package savehist
-  :defer t
   :hook (after-init . savehist-mode))
 
 (use-package saveplace
-  :defer t
   :hook ((after-init . save-place-mode)))
 
 (use-package scratch
-  :defer t
-  :ensure t
   :bind (:map my/hyper-c-map ("s" . scratch)))
 
 (autoload 'my/sh-mode-hook "my-sh-mode")
 (use-package sh-script
-  :defer t
   :hook (sh-mode . my/sh-mode-hook))
 
 (defalias 'ksh #'shell
@@ -778,18 +661,14 @@ Bound to \\`C-x p s'.")
 
 (autoload 'my/shell-mode-hook "my-shell-mode")
 (use-package shell
-  :defer t
   :custom
   (explicit-bash-args '("--noediting" "-i"))
   :hook ((shell-mode . my/shell-mode-hook)))
 
 (use-package subword
-  :defer t
   :hook ((after-init . global-subword-mode)))
 
 (use-package symbol-overlay
-  :defer t
-  :ensure t
   :bind (:map my/symbol-overlay-map
               ("s" . symbol-overlay-put)
               ("H-s" . symbol-overlay-put)
@@ -799,14 +678,10 @@ Bound to \\`C-x p s'.")
 
 (autoload 'my/ultra-scroll-initialize "my-functions")
 (use-package ultra-scroll
-  :defer t
-  :ensure t
   :commands (ultra-scroll-mode)
   :hook ((after-init . my/ultra-scroll-initialize)))
 
 (use-package vertico
-  :defer t
-  :ensure t
   :commands (vertico-mode)
   :bind ( :map vertico-map
           ("H-d" . consult-dir)
@@ -817,21 +692,15 @@ Bound to \\`C-x p s'.")
   :hook ((after-init . vertico-mode)))
 
 (use-package which-key
-  :defer t
-  :ensure t
   :hook (after-init . which-key-mode))
 
 (use-package whitespace
-  :defer t
   :hook ((after-init . global-whitespace-mode)))
 
 (use-package ws-butler
-  :defer t
-  :ensure t
   :hook ((prog-mode . ws-butler-mode)))
 
 (use-package winner
-  :defer t
   :hook (after-init . winner-mode)
   :bind (("C-<left>" . winner-undo)
          ("C-<right>" . winner-redo)
@@ -841,26 +710,17 @@ Bound to \\`C-x p s'.")
          ("C-r" . winner-redo)))
 
 (use-package xclip
-  :defer t
-  :ensure t
+  :if (my/is-terminal)
   :commands (xclip-mode)
   :hook (tty-setup . (lambda () (xclip-mode 1))))
 
-(use-package yasnippet
-  :defer t
-  :ensure t)
+(use-package yasnippet)
 
-(use-package yasnippet-snippets
-  :defer t
-  :ensure t)
+(use-package yasnippet-snippets)
 
-(use-package zoxide
-  :defer t
-  :ensure t)
+(use-package zoxide)
 
-(use-package consult-zoxide
-  :defer t
-  :ensure t)
+(use-package consult-zoxide)
 
 ;; NOTE: this is setting a global variable, but we should really just do this when operating in an org buffer.
 (setq filter-buffer-substring-function #'my/org-filter-buffer-substring)
@@ -879,28 +739,6 @@ Bound to \\`C-x p s'.")
 
 (autoload 'my/after-init-emacs-init "my-functions")
 (use-package emacs
-  :commands (my/crm-indicator)
-  :config
-  (progn
-    (setq read-process-output-max (* 64 1024 1024)
-	  process-adaptive-read-buffering nil
-          ;; debug-on-error t
-          frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
-                               (if (not (display-graphic-p))
-                                   (list (concat (system-name) " ") buffer-directory)
-                                 buffer-directory))
-          load-path-filter-function #'load-path-filter-cache-directory-files)
-    (ffap-bindings)
-    (put 'narrow-to-region 'disabled nil)
-    (put 'scroll-left 'disabled nil)
-    (fset 'yes-or-no-p 'y-or-n-p)
-    (defun my/crm-indicator(args)
-      "Custom CRM indicator for ARGS."
-      (cons (format "[CRM%s] %s"
-                    (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
-                    (car args))
-            (cdr args)))
-    (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator))
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
          (after-init . my/after-init-emacs-init)))

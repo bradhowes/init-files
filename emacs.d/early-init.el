@@ -31,18 +31,22 @@
       ;; Load the newer of *.el/*.elc files without warning
       load-prefer-newer t)
 
-;; Increase GC threshold to reduce startup times. Restore threshold once emacs is running.
+;; Temporarily adjust some settings to reduce startup times. Restore threshold once emacs is running.
 (let* ((saved-gc-cons-threshold gc-cons-threshold)
        (saved-gc-cons-percentage gc-cons-percentage)
        (gc-cons-threshold most-positive-fixnum)
        (gc-cons-percentage 0.8)
-       (saved-file-name-handler-alist file-name-handler-alist))
-  (setq file-name-handler-alist nil)
-  ;; NOTE: needs lexical-binding for this to work and capture the value of `threshold'
-  (add-hook 'after-init-hook (lambda ()
-                               (setq gc-cons-threshold saved-gc-cons-threshold
-                                     gc-cons-percentage saved-gc-cons-percentage
-                                     file-name-handler-alist saved-file-name-handler-alist))))
+       (saved-file-name-handler-alist file-name-handler-alist)
+       (file-name-handler-alist nil)
+       (restorer (lambda ()
+                   ;; Something could have manipulated `file-name-handler-alist' -- add anything there to the saved
+                   ;; value, then restore from the updated value to have a complete set of handlers.
+                   (dolist (elt file-name-handler-alist)
+                     (add-to-list 'saved-file-name-handler-alist elt))
+                   (setq gc-cons-threshold saved-gc-cons-threshold
+                         gc-cons-percentage saved-gc-cons-percentage
+                         file-name-handler-alist saved-file-name-handler-alist))))
+  (add-hook 'after-init-hook restorer))
 
 ;; Stop Emacs from flashing a `white' screen when starting up
 (set-face-attribute 'default nil :background "#000000" :foreground "#ffffff")

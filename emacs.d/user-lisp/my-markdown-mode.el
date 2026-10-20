@@ -8,11 +8,11 @@
 (require 'markdown-ts-mode-x)
 (require 'my-functions)
 
-(use-package impatient-mode
-  :ensure t
-  :commands (impatient-mode imp-set-user-filter)
-  :config
-  (setq-default imp-user-filter #'my/markdown-to-html))
+;; (use-package impatient-mode
+;;   :ensure t
+;;   :commands (impatient-mode imp-set-user-filter)
+;;   :config
+;;   (setq-default imp-user-filter #'my/markdown-to-html))
 
 (defun my/point-min-after-front-matter ()
   "Skip any front matter in current buffer and return POINT.
@@ -174,8 +174,8 @@ ends with the same `---' on its own line."
 
 (defun my/markdown-ts-mode-hook ()
   "Customization hook for `markdown-ts-mode'."
-  (impatient-mode)
-  (imp-set-user-filter #'my/markdown-to-html)
+  ;; (impatient-mode)
+  ;; (imp-set-user-filter #'my/markdown-to-html)
   (keymap-local-set "C-c *" #'my/escape-last-word)
   (keymap-local-set "C-c `" #'my/codify-last-word)
   (keymap-local-set "C-c <space>" #'my/make-link))

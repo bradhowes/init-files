@@ -120,10 +120,10 @@
             crux denote diff-hl doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region
             fancy-compilation flymake-gradle flymake-shellcheck flyover format-all git-timemachine go-mode gradle-mode
             helpful impatient-mode indent-bars inheritenv js2-mode key-chord keycast kkp kotlin-ts-mode language-id
-            ligature magit marginalia mode-line-bell multiple-cursors nerd-icons nerd-icons-completion
-            nerd-icons-corfu nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless osx-dictionary popper pyenv
-            pyvenv pyvenv-auto rg scratch symbol-overlay tempel tempel-collection timu-line treemacs-nerd-icons
-            ultra-scroll vertico ws-butler xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
+            ligature magit marginalia mode-line-bell multiple-cursors nerd-icons nerd-icons-completion nerd-icons-corfu
+            nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless osx-dictionary popper pyenv pyvenv pyvenv-auto rg
+            scratch symbol-overlay tempel tempel-collection timu-line treemacs-nerd-icons ultra-scroll vertico ws-butler
+            xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
@@ -143,7 +143,7 @@
  '(ring-bell-function 'mode-line-bell-flash)
  '(safe-local-variable-directories '("/Users/howes/src/Mine/init-files"))
  '(safe-local-variable-values
-   '((compile-multi-default-directory lambda nil "~/Developer/Mine/sidecar")
+   '((no-byte-compile t) (compile-multi-default-directory lambda nil "~/Developer/Mine/sidecar")
      (compile-multi-config
       (t ("cmake" . "rm -rf build && mkdir build && cd build && cmake ..") ("compile" . "cd build && make -j 8")))
      (compile-multi-default-directory lambda nil "~/src/python-project")
@@ -175,7 +175,6 @@
  '(tramp-backup-directory-alist '((".*" . "/Users/bradhowes/tmp/emacs_backups")))
  '(truncate-string-ellipsis "…" t)
  '(uniquify-buffer-name-style 'forward nil (uniquify))
- '(use-package-always-defer t)
  '(user-mail-address "bradhowes@mac.com")
  '(vc-follow-symlinks t)
  '(vc-make-backup-files t)
