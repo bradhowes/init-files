@@ -1,23 +1,13 @@
 ;;; my-functions.el --- useful free functions -*- lexical-binding: t; -*-
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2------
 ;;; Commentary:
+;;;
+;;; Utility functions. For speed, minimize the number of `require' statements; use `autoload' as much as possible.
+;;;
 ;;; Code:
 
-(require 'cape)
-(require 'compile-multi)
 (require 'corfu)
-(require 'corfu-popupinfo)
 (require 'crm)
-(require 'diff-hl)
-(require 'diff-hl-flydiff)
-(require 'diff-hl-show-hunk)
-(require 'ligature)
-(require 'marginalia)
-(require 'nerd-icons-completion)
-(require 'nerd-icons-corfu)
-(require 'popper)
-(require 'popper-echo)
-(require 'ultra-scroll)
 
 ;;;###autoload
 (defun my/beginning-of-line-text (arg)
@@ -34,6 +24,8 @@ After calling `beginning-of-line' and ARG is 1 (or nil), call
     (beginning-of-line-text 1)
     (when (= orig (point))
       (beginning-of-line 1))))
+
+(autoload 'compile-multi "compile-multi")
 
 ;;;###autoload
 (defun my/compile ()
@@ -250,6 +242,10 @@ the buffer having untrusted content."
   (when (file-exists-p custom-file)
     (load custom-file 'noerror)))
 
+(autoload 'cape-dabbrev "cape")
+(autoload 'cape-file "cape")
+(autoload 'cape-elisp-block "cape")
+
 ;;;###autoload
 (defun my/cape-initialize ()
   "Initialize cape."
@@ -257,11 +253,18 @@ the buffer having untrusted content."
   (add-hook 'completion-at-point-functions #'cape-file)
   (add-hook 'completion-at-point-functions #'cape-elisp-block))
 
+(autoload 'global-corfu-mode "corfu")
+(autoload 'corfu-popupinfo-mode "corfu-popupinfo")
+
 ;;;###autoload
 (defun my/corfu-initialize ()
   "Custom corfu initialize."
   (global-corfu-mode 1)
   (corfu-popupinfo-mode 1))
+
+(autoload 'diff-hl-flydiff-mode "diff-hl-flydiff")
+(autoload 'global-diff-hl-mode "diff-hl")
+(autoload 'global-diff-hl-show-hunk-mouse-mode "diff-hl-show-hunk")
 
 ;;;###autoload
 (defun my/diff-hl-initialize()
@@ -269,6 +272,9 @@ the buffer having untrusted content."
   (diff-hl-flydiff-mode t)
   (global-diff-hl-mode t)
   (global-diff-hl-show-hunk-mouse-mode t))
+
+(autoload 'global-ligature-mode "ligature")
+(autoload 'ligature-set-ligatures "ligature")
 
 ;;;###autoload
 (defun my/ligature-initialize ()
@@ -290,22 +296,32 @@ the buffer having untrusted content."
      "\\\\" "://" "www"))
   (global-ligature-mode t))
 
+(autoload 'marginalia-mode "marginalia")
+(autoload 'nerd-icons-completion-mode "nerd-icons-completion")
+
 ;;;###autoload
 (defun my/marginalia-initialize ()
   "Custom marginalia init."
   (marginalia-mode 1)
   (nerd-icons-completion-mode 1))
 
+(autoload 'nerd-icons-corfu-formatter "nerd-icons-corfu")
+
 ;;;###autoload
 (defun my/nerd-icons-corfu-initialize ()
   "Custom nerd-icons-corfu init."
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+(autoload 'popper-mode "popper")
+(autoload 'popper-echo-mode "popper-echo")
 
 ;;;###autoload
 (defun my/popper-initialize ()
   "Custom popper init."
   (popper-mode)
   (popper-echo-mode))
+
+(autoload 'ultra-scroll-mode "ultra-scroll")
 
 ;;;###autoload
 (defun my/ultra-scroll-initialize ()

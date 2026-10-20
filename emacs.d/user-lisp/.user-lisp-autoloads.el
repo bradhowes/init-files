@@ -283,6 +283,8 @@ Creates the directory if it does not exist.")
 "The path to the Python executable to use for eglot.")
 (autoload 'my/env-setup "my-env"
 "Setup Emacs to utilize current environment.")
+(autoload 'my/magit-init-files "my-env"
+"Show magit buffer for `init-files' repo." t)
 
 
 ;;; Generated autoloads from my-find-known-bindings.el

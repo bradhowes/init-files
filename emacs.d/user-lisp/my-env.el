@@ -3,13 +3,13 @@
 ;;; Commentary:
 ;;;
 ;;; These are constants that are fixed and know at Emacs start up time. There are some that are not known until the
-;;; `init.el' file is being loaded -- those are found in `my-constants.el`.
+;;; `init.el' file is being loaded -- those are found in `my-constants.el`. Minimal number of `require' statements here
+;;; on purpose.
 ;;;
 ;;; Code:
 
 (require 'info)
 (require 'my-constants)
-(require 'my-functions)
 
 ;;;###autoload
 (defconst my/is-interactive (not noninteractive)
@@ -80,6 +80,8 @@ control."
   "Location of personal Emacs Lisp files."
   (file-name-as-directory (file-name-concat (my/emacs.d) "user-lisp")))
 
+(autoload 'my/is-valid-directory "my-functions")
+
 ;;;###autoload
 (defun my/tmp-dir ()
   "The directory to use for temporary purposes - usually $HOME/tmp.
@@ -141,6 +143,14 @@ Creates the directory if it does not exist."
   (setenv "PATH" (concat (string-join bin-paths ":") ":" (getenv "PATH")))
   (setenv "INFOPATH" (concat (string-join info-paths ":") ":" (getenv "INFOPATH")))
   (setenv "MANPATH" (concat (string-join man-paths ":") ":" (getenv "MANPATH")))))
+
+(autoload 'magit-status-setup-buffer "magit-status")
+
+;;;###autoload
+(defun my/magit-init-files ()
+  "Show magit buffer for `init-files' repo."
+  (interactive)
+  (magit-status-setup-buffer (my/init-files)))
 
 (provide 'my-env)
 
