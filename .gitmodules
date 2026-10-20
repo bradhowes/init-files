@@ -1,6 +1,3 @@
 [submodule "emacs.d/user-lisp/doom-modeline"]
 	path = emacs.d/user-lisp/doom-modeline
 	url = https://github.com/bradhowes/doom-modeline
-[submodule "emacs.d/user-lisp/esup"]
-	path = emacs.d/user-lisp/esup
-	url = https://github.com/jschaf/esup

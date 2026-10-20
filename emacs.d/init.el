@@ -25,20 +25,35 @@
 ;; upon startup but the elisp bytecompiler does not know about that when run in another Emacs process. I think flycheck
 ;; does the right thing here.
 ;;
+(autoload 'my/c++-mode-hook "my-c++-mode")
+(autoload 'my/c++-mode-remap "my-c++-mode")
+(autoload 'my/cmake-mode-hook "my-cmake-mode")
+(autoload 'my/consult-init "my-consult")
+(autoload 'my/dired-mode-hook "my-dired-mode")
+(autoload 'my/doom-modeline-setup "my-doom-modeline")
 (autoload 'my/find-elpa-directory "my-finders")
 (autoload 'my/find-shell-init-file "my-finders")
 (autoload 'my/find-user-custom-file "my-finders")
 (autoload 'my/find-user-init-file "my-finders")
 (autoload 'my/find-user-lisp-file "my-finders")
+(autoload 'my/after-init-emacs-init "my-functions")
 (autoload 'my/beginning-of-line-text "my-functions")
+(autoload 'my/cape-initialize "my-functions")
 (autoload 'my/copy-file-name-to-clipboard "my-functions")
+(autoload 'my/corfu-initialize "my-functions")
 (autoload 'my/describe-symbol-at-point "my-functions")
+(autoload 'my/diff-hl-initialize "my-functions")
 (autoload 'my/goto-mark "my-functions")
 (autoload 'my/indent-buffer "my-functions")
+(autoload 'my/ligature-initialize "my-functions")
+(autoload 'my/marginalia-initialize "my-functions")
 (autoload 'my/matching-paren "my-functions")
+(autoload 'my/popper-initialize "my-functions")
+(autoload 'my/nerd-icons-corfu-initialize "my-functions")
 (autoload 'my/reload-buffer "my-functions")
 (autoload 'my/set-mark-deactivate "my-functions")
 (autoload 'my/trusted-content-p "my-functions")
+(autoload 'my/ultra-scroll-initialize "my-functions")
 (autoload 'my/dired-jumps-bind "my-keymaps")
 (autoload 'my/emacs-chord-bind "my-keymaps")
 (autoload 'my/emacs-key-bind "my-keymaps")
@@ -50,6 +65,10 @@
 (autoload 'my/layout-normal-screen-font-size "my-layout")
 (autoload 'my/layout-screen-layout-changed "my-layout")
 (autoload 'my/layout-share-screen-font-size "my-layout")
+(autoload 'my/lisp-mode-hook "my-lisp-mode")
+(autoload 'my/lisp-data-mode-hook "my-lisp-mode")
+(autoload 'my/markdown-ts-mode-hook "my-markdown-mode")
+(autoload 'my/markdown-ts-setup-hook "my-markdown-mode")
 (autoload 'my/ace-window-always-dispatch "my-navigation")
 (autoload 'my/ace-window-next "my-navigation")
 (autoload 'my/ace-window-prefix "my-navigation")
@@ -66,13 +85,19 @@
 (autoload 'my/notes-denote-hook "my-notes")
 (autoload 'my/org-filter-buffer-substring "my-org")
 (autoload 'my/show-project-menu "my-project")
+(autoload 'my/python-mode-hook "my-python-mode")
+(autoload 'my/inferior-python-mode-hook "my-python-mode")
 (autoload 'my/start-emacs-server "my-server")
+(autoload 'my/sh-mode-hook "my-sh-mode")
+(autoload 'my/shell-mode-hook "my-shell-mode")
 (autoload 'my/repl-other-window "my-shells")
 (autoload 'my/shell "my-shells")
 (autoload 'my/shell-other-window "my-shells")
 (autoload 'my/shell-other-frame "my-shells")
 (autoload 'ksh "my-shells")
 (autoload 'my/htop "my-tops")
+(autoload 'my/yaml-ts-mode-hook "my-yaml-mode")
+(autoload 'my/yaml-ts-setup-hook "my-yaml-mode")
 
 (require 'my-env)
 
@@ -166,8 +191,6 @@
   :type '(boolean))
 
 (unless noninteractive
-  (autoload 'my/c++-mode-hook "my-c++-mode")
-  (autoload 'my/c++-mode-remap "my-c++-mode")
   (let ((mode (if my/use-c-ts-mode 'c++-ts-mode 'c++-mode)))
     (add-to-list 'auto-mode-alist
                  `(,(concat "\\.\\(cc\\|hh\\|ii\\|inl\\|mm\\|"
@@ -190,7 +213,6 @@
                ("Arrows" "←" "→" "↑" "↓" "⇐" "⇒" "⇑" "⇓")
                ("Greek" "α" "β" "Y" "δ" "ε" "ζ" "η" "θ" "ι" "κ" "λ" "μ" "ν" "ξ" "ο" "π" "ρ" "σ" "τ" "υ" "φ" "χ" "ψ" "ω"))))
 
-(autoload 'my/cmake-mode-hook "my-cmake-mode")
 (use-package cmake-mode
   :hook ((cmake-mode . my/cmake-mode-hook)))
 
@@ -204,7 +226,6 @@
 (use-package consult-compile-multi
   :hook ((after-init . consult-compile-multi-mode)))
 
-(autoload 'my/consult-init "my-consult")
 (use-package consult
   :commands (consult--customize-put consult-flymake)
   :bind ( ("M-y" . consult-yank-replace)
@@ -309,14 +330,12 @@
                                    (minibuffer (orderless initials basic))))
   (completion-category-defaults nil))
 
-(autoload 'my/cape-initialize "my-functions")
 (use-package cape
   :commands (cape-dabbrev cape-file cape-elisp-block)
   :bind ( :map my/hyper-c-map
           ("p" . cape-prefix-map))
   :hook (after-init . my/cape-initialize))
 
-(autoload 'my/corfu-initialize "my-functions")
 (use-package corfu
   :commands (global-corfu-mode corfu-popupinfo-mode)
   :bind ( :map corfu-map
@@ -354,21 +373,16 @@
   (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 
-(autoload 'my/diff-hl-initialize "my-functions")
 (use-package diff-hl
   :commands (diff-hl-show-hunk diff-hl-flydiff-mode global-diff-hl-mode global-diff-hl-show-hunk-mouse-mode)
   :hook ((after-init . my/diff-hl-initialize)))
 
-(autoload 'my/dired-mode-hook "my-dired-mode")
 (use-package dired
   :hook (dired-mode . my/dired-mode-hook))
 
-(autoload 'my/doom-modeline-setup "my-doom-modeline")
 (use-package doom-modeline
   :hook ((after-init . my/doom-modeline-setup)))
 
-(autoload 'my/lisp-mode-hook "my-lisp-mode")
-(autoload 'my/lisp-data-mode-hook "my-lisp-mode")
 (use-package elisp-mode
   :hook ((lisp-mode . my/lisp-mode-hook)
          (lisp-interaction-mode . my/lisp-mode-hook)
@@ -490,7 +504,6 @@
 (use-package kotlin-ts-mode
   :mode ("\\.kt\\'"))
 
-(autoload 'my/ligature-initialize "my-functions")
 (use-package ligature
   :commands (ligature-set-ligatures global-ligature-mode)
   :hook ((after-init . my/ligature-initialize)))
@@ -509,15 +522,11 @@
   :custom
   (magit-process-find-password-functions '(my/read-gitlab-password)))
 
-(autoload 'my/markdown-ts-mode-hook "my-markdown-mode")
-(autoload 'my/markdown-ts-setup-hook "my-markdown-mode")
 (use-package markdown-ts-mode
   :mode ("\\.md\\'" "\\.mdx\\'" "\\.markdown\\'")
   :hook ((markdown-ts-mode . my/markdown-ts-mode-hook))
   (after-init . my/markdown-ts-setup-hook))
 
-(autoload 'my/yaml-ts-mode-hook "my-yaml-mode")
-(autoload 'my/yaml-ts-setup-hook "my-yaml-mode")
 (use-package yaml-ts-mode
   :mode ("\\.yaml\\'" "\\.yml\\'")
   :hook ((yaml-ts-mode . my/yaml-ts-mode-hook)))
@@ -561,14 +570,12 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
 
 (use-package compile-multi-nerd-icons)
 
-(autoload 'my/marginalia-initialize "my-functions")
 (use-package marginalia
   :commands (marginalia-mode marginalia-cycle)
   :bind ( :map minibuffer-local-map
           ("<f1>" . marginalia-cycle))
   :hook ((after-init . my/marginalia-initialize)))
 
-(autoload 'my/nerd-icons-corfu-initialize "my-functions")
 (use-package nerd-icons-corfu
   :commands (nerd-icons-corfu-formatter)
   :hook ((after-init . my/nerd-icons-corfu-initialize)))
@@ -602,15 +609,12 @@ See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
   :if my/is-macosx
   :bind (:map my/hyper-c-map ("l" . osx-dictionary-search-pointer)))
 
-(autoload 'my/python-mode-hook "my-python-mode")
-(autoload 'my/inferior-python-mode-hook "my-python-mode")
 (use-package python
   :hook ((python-ts-mode . my/python-mode-hook)
          (inferior-python-mode . my/inferior-python-mode-hook)))
 
 (use-package pyvenv)
 
-(autoload 'my/popper-initialize "my-functions")
 (use-package popper
   :commands (popper-kill-latest-popup popper-mode popper-echo-mode)
   :functions (popper--delete-popup)
@@ -652,14 +656,12 @@ Bound to \\`C-x p s'.")
 (use-package scratch
   :bind (:map my/hyper-c-map ("s" . scratch)))
 
-(autoload 'my/sh-mode-hook "my-sh-mode")
 (use-package sh-script
   :hook (sh-mode . my/sh-mode-hook))
 
 (defalias 'ksh #'shell
   "Alias to satisfy habit from AIX days.")
 
-(autoload 'my/shell-mode-hook "my-shell-mode")
 (use-package shell
   :custom
   (explicit-bash-args '("--noediting" "-i"))
@@ -676,7 +678,6 @@ Bound to \\`C-x p s'.")
               ("p" . symbol-overlay-switch-backward)
               ("c" . symbol-overlay-remove-all)))
 
-(autoload 'my/ultra-scroll-initialize "my-functions")
 (use-package ultra-scroll
   :commands (ultra-scroll-mode)
   :hook ((after-init . my/ultra-scroll-initialize)))
@@ -737,7 +738,6 @@ Bound to \\`C-x p s'.")
     (keymap-global-set "<remap> <list-directory>" #'ffap-list-directory))
   "List of binding forms evaluated by function `ffap-bindings'.")
 
-(autoload 'my/after-init-emacs-init "my-functions")
 (use-package emacs
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
