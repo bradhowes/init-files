@@ -128,10 +128,6 @@
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
      compilation-mode))
- '(project-mode-line 'non-remote)
- '(project-switch-commands
-   '((project-find-file "Find file" nil) (project-find-regexp "Find regexp" nil) (project-find-dir "Find directory" nil)
-     (magit-project-status "Magit" 109) (project-eshell "Eshell" nil) (project-any-command "Other" nil)))
  '(python-indent-guess-indent-offset-verbose nil)
  '(pyvenv-workon ".")
  '(quit-window-kill-buffer t)

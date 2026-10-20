@@ -772,6 +772,9 @@ artifacts such as indentation bars.
 
 (autoload 'my/show-project-menu "my-project"
 "Show the menu that is shown when switching to a new project." t)
+(autoload 'my/project-initialize "my-project"
+"Custom `project' init.")
+(register-definition-prefixes "my-project" '("my/project-root"))
 
 
 ;;; Generated autoloads from my-tops.el

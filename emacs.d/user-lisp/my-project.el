@@ -4,13 +4,30 @@
 ;;; Code:
 
 (require 'project)
-(require 'mood-line)
+
+(defun my/project-root ()
+  "Run `dired' on the current project root."
+  (interactive)
+  ;; `project-current-directory-override' is set by `project-switch-project'.
+  (dired project-current-directory-override))
 
 ;;;###autoload
 (defun my/show-project-menu ()
   "Show the menu that is shown when switching to a new project."
   (interactive)
   (call-interactively (project--switch-project-command)))
+
+;;;###autoload
+(defun my/project-initialize ()
+  "Custom `project' init."
+  (setopt project-mode-line 'non-remote
+          project-switch-commands '((project-find-dir "Dired" ?d)
+                                    (project-eshell "Eshell" ?e)
+                                    (project-find-file "File" ?f)
+                                    (magit-project-status "Magit" ?g)
+                                    (project-find-regexp "Rg" ?r)
+                                    (my/project-root "Root" ?t)
+                                    (project-any-command "Other" ?z))))
 
 (provide 'my-project)
 

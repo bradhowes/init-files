@@ -3,7 +3,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'ansi-color)
+(autoload 'ansi-color-apply-on-region "ansi-color")
 
 (defvar emacs-pager-mode-map
   (let ((map (make-sparse-keymap)))

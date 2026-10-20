@@ -6,8 +6,10 @@
 (require 'c-ts-mode)
 (require 'doxygen)
 (require 'font-lock)
-(require 'my-fontify-braces)
-(require 'subword)
+
+(autoload 'my/fontify-braces "my-fontify-braces")
+(autoload 'subword-backward "subword")
+(autoload 'subword-forward "subword")
 
 (font-lock-add-keywords 'c++-mode
                         '(("\\<\\(constexpr\\|final\\|noexcept\\|nullptr\\)\\>" . 'font-lock-keyword-face)))

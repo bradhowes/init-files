@@ -69,6 +69,7 @@
 (autoload 'my/lisp-data-mode-hook "my-lisp-mode")
 (autoload 'my/markdown-ts-mode-hook "my-markdown-mode")
 (autoload 'my/markdown-ts-setup-hook "my-markdown-mode")
+(autoload 'my/project-initialize "my-project")
 (autoload 'my/ace-window-always-dispatch "my-navigation")
 (autoload 'my/ace-window-next "my-navigation")
 (autoload 'my/ace-window-prefix "my-navigation")
@@ -630,13 +631,13 @@ Bound to \\`C-x p s'.")
 (keymap-set project-prefix-map "s" my/project-search-map)
 
 (use-package project
-  :commands (project--switch-project-command) ;; used in my/show-project-menu
   :bind ( :map project-prefix-map
           ("$" . #'project-shell)
           ("m" . #'my/show-project-menu)
           ;; Cannot do this here for some reason -- see note above.
           ;; ("s" . my/project-search-map)))
-          ))
+          )
+  :hook ((after-init . my/project-initialize)))
 
 (use-package recentf
   :hook ((after-init . recentf-mode)))
