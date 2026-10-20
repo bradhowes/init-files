@@ -8,7 +8,6 @@
 ;;; Code:
 
 (require 'info)
-(require 'magit-status)
 (require 'my-constants)
 (require 'my-functions)
 
@@ -57,12 +56,6 @@ Hacky but for now it works since we are always starting up an initial xterm."
 (defun my/init-files ()
   "Location of configurations repo."
   (file-name-as-directory (file-name-concat (my/repos) "init-files")))
-
-;;;###autoload
-(defun my/magit-init-files ()
-  "Show magit buffer for `init-files' repo."
-  (interactive)
-  (magit-status-setup-buffer (my/init-files)))
 
 ;;;###autoload
 (defun my/denote-directory-personal ()

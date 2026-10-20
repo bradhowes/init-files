@@ -263,8 +263,6 @@ Hacky but for now it works since we are always starting up an initial xterm.")
 "LOCATION of root of personal source git repositories.")
 (autoload 'my/init-files "my-env"
 "Location of configurations repo.")
-(autoload 'my/magit-init-files "my-env"
-"Show magit buffer for `init-files' repo." t)
 (autoload 'my/denote-directory-personal "my-env"
 "Location of personal denote files.")
 (autoload 'my/denote-directory-work "my-env"
