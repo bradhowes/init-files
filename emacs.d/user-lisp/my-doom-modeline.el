@@ -20,63 +20,63 @@
   "Startup routine for mood-line."
 
   (doom-modeline-def-modeline 'main
-    '(eldoc bar window-state buffer-info buffer-position matches follow keycast)
+    '(depth eldoc bar window-state buffer-info buffer-position matches follow keycast)
     '(compilation repl lsp buffer-encoding major-mode process vcs check))
 
   (doom-modeline-def-modeline 'minimal
-    '(bar buffer-info-simple matches keycast)
+    '(depth bar buffer-info-simple matches keycast)
     '(major-mode))
 
   (doom-modeline-def-modeline 'special
-    '(eldoc bar window-state buffer-info buffer-position matches keycast)
+    '(depth eldoc bar window-state buffer-info buffer-position matches keycast)
     '(compilation debug buffer-encoding major-mode process vcs))
 
   (doom-modeline-def-modeline 'project
-    '(bar buffer-default-directory buffer-position matches keycast)
+    '(depth bar buffer-default-directory buffer-position matches keycast)
     '(compilation debug buffer-encoding major-mode process vcs))
 
   (doom-modeline-def-modeline 'dashboard
-    '(bar buffer-default-directory-simple keycast)
+    '(depth bar buffer-default-directory-simple keycast)
     '(compilation debug buffer-encoding major-mode process vcs))
 
   (doom-modeline-def-modeline 'vcs
-    '(bar window-state buffer-info matches keycast)
+    '(depth bar window-state buffer-info matches keycast)
     '(compilation debug buffer-encoding major-mode vcs))
 
   (doom-modeline-def-modeline 'package
-    '(bar package buffer-position matches keycast)
+    '(depth bar package buffer-position matches keycast)
     '(compilation major-mode process))
 
   (doom-modeline-def-modeline 'info
-    '(bar buffer-info info-nodes buffer-position matches keycast)
+    '(depth bar buffer-info info-nodes buffer-position matches keycast)
     '(compilation buffer-encoding major-mode))
 
   (doom-modeline-def-modeline 'media
-    '(bar buffer-info keycast)
+    '(depth bar buffer-info keycast)
     '(compilation media-info major-mode process vcs))
 
   (doom-modeline-def-modeline 'message
-    '(eldoc bar buffer-info-simple buffer-position keycast)
+    '(depth eldoc bar buffer-info-simple buffer-position keycast)
     '(compilation buffer-encoding major-mode))
 
   (doom-modeline-def-modeline 'pdf
-    '(bar buffer-info pdf-pages keycast)
+    '(depth bar buffer-info pdf-pages keycast)
     '(compilation major-mode process vcs))
 
   (doom-modeline-def-modeline 'org-src
-    '(eldoc bar window-state buffer-info buffer-position matches keycast)
+    '(depth eldoc bar window-state buffer-info buffer-position matches keycast)
     '(compilation debug lsp buffer-encoding major-mode process check))
 
   (doom-modeline-def-modeline 'helm
-    '(bar helm-buffer-id helm-number helm-follow helm-prefix-argument)
+    '(depth bar helm-buffer-id helm-number helm-follow helm-prefix-argument)
     '(helm-help time))
 
   (doom-modeline-def-modeline 'timemachine
-    '(eldoc bar git-timemachine buffer-position keycast)
+    '(depth eldoc bar git-timemachine buffer-position keycast)
     '(buffer-encoding major-mode vcs))
 
   (doom-modeline-def-modeline 'calculator
-    '(calc buffer-position keycast)
+    '(depth calc buffer-position keycast)
     '(misc-info major-mode process))
 
   (doom-modeline-mode 1))

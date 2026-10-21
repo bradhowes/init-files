@@ -783,6 +783,7 @@ Bound to \\`C-x p s'.")
                    "i" #'my/find-user-init-file
                    "j" my/dired-jumps-map
                    "r" #'ielm
+                   "t" #'top-level
                    "D" #'crux-find-current-directory-dir-locals-file
                    "S" #'my/find-shell-init-file
                    "H-l" #'my/find-user-init-file
