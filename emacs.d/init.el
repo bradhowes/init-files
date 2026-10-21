@@ -22,8 +22,8 @@
     (funcall p coding-system)))
 
 ;; Replicating much of what is in user-lisp-autoloads.el in order to silence warnings from flymake. The file is loaded
-;; upon startup but the elisp bytecompiler does not know about that when run in another Emacs process. I think flycheck
-;; does the right thing here.
+;; upon startup but the Elisp bytecompiler does not know about that when run in another Emacs process. I think flycheck
+;; does the right thing here…
 ;;
 (autoload 'my/c++-mode-hook "my-c++-mode")
 (autoload 'my/c++-mode-remap "my-c++-mode")
@@ -46,6 +46,7 @@
 (autoload 'my/goto-mark "my-functions")
 (autoload 'my/indent-buffer "my-functions")
 (autoload 'my/ligature-initialize "my-functions")
+(autoload 'my/magit-init-files "my-functions")
 (autoload 'my/marginalia-initialize "my-functions")
 (autoload 'my/matching-paren "my-functions")
 (autoload 'my/popper-initialize "my-functions")
@@ -100,11 +101,22 @@
 (autoload 'my/yaml-ts-mode-hook "my-yaml-mode")
 (autoload 'my/yaml-ts-setup-hook "my-yaml-mode")
 
+;; Load various environmental settings that can be safely determined at this time, and setup various Emacs variables to
+;; reflect the environment.
 (require 'my-env)
-
 (my/env-setup)
-(add-hook 'emacs-startup-hook #'my/layout-screen-layout-changed 97)
-(add-hook 'emacs-startup-hook #'my/start-emacs-server 98)
+
+;; Show how long it took to load the init.el file -- provides a rough guide when adding new packages. Should strive to stay
+;; below 1 second.
+(add-hook 'emacs-startup-hook #'my/display-startup-time -90)
+
+;; Adapt to current screen real estate.
+(add-hook 'emacs-startup-hook #'my/layout-screen-layout-changed 70)
+
+;; Fire up a companion emacs server
+(add-hook 'emacs-startup-hook #'my/start-emacs-server 80)
+
+;; (add-hook 'emacs-startup-hook (lambda () (message "Hello!")) 90)
 
 (defgroup my/customizations nil
   "The customization group for my settings."
@@ -634,6 +646,7 @@ Bound to \\`C-x p s'.")
   :bind ( :map project-prefix-map
           ("$" . #'project-shell)
           ("m" . #'my/show-project-menu)
+          ("H-p" . #'project-switch-project)
           ;; Cannot do this here for some reason -- see note above.
           ;; ("s" . my/project-search-map)))
           )
@@ -1010,13 +1023,6 @@ Bound to \\`C-x p s'.")
   "Blah."
   "Field name: "
   > str " = \"" _ "\"\n")
-
-(defun my/display-startup-time ()
-  "Show the elapsed startup time."
-  (message "Elapsed load time: %s" (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))))
-
-(add-hook 'emacs-startup-hook #'my/display-startup-time -99)
-(add-hook 'emacs-startup-hook (lambda () (message "Hello!")) 99)
 
 (provide 'init)
 

@@ -108,6 +108,15 @@ zero (0), so we detect that and report that as false."
        (file-directory-p dir)
        dir))
 
+(autoload 'magit-status-setup-buffer "magit-status")
+(autoload 'my/init-files "my-env")
+
+;;;###autoload
+(defun my/magit-init-files ()
+  "Show magit buffer for `init-files' repo."
+  (interactive)
+  (magit-status-setup-buffer (my/init-files)))
+
 ;;;###autoload
 (defun my/mark-line (&optional arg)
   "Blah blah ARG blah."

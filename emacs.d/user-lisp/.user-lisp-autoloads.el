@@ -283,8 +283,8 @@ Creates the directory if it does not exist.")
 "The path to the Python executable to use for eglot.")
 (autoload 'my/env-setup "my-env"
 "Setup Emacs to utilize current environment.")
-(autoload 'my/magit-init-files "my-env"
-"Show magit buffer for `init-files' repo." t)
+(autoload 'my/display-startup-time "my-env"
+"Show the elapsed startup time.")
 
 
 ;;; Generated autoloads from my-find-known-bindings.el
@@ -352,6 +352,8 @@ Note that `file-directory-p' returns t if the (string) length of DIR is
 zero (0), so we detect that and report that as false.
 
 (fn DIR)")
+(autoload 'my/magit-init-files "my-functions"
+"Show magit buffer for `init-files' repo." t)
 (autoload 'my/mark-line "my-functions"
 "Blah blah ARG blah.
 

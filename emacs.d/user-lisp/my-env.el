@@ -2,7 +2,7 @@
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2------
 ;;; Commentary:
 ;;;
-;;; These are constants that are fixed and know at Emacs start up time. There are some that are not known until the
+;;; These are constants that are fixed and known at Emacs start up time. There are some that are not known until the
 ;;; `init.el' file is being loaded -- those are found in `my-constants.el`. Minimal number of `require' statements here
 ;;; on purpose.
 ;;;
@@ -116,41 +116,33 @@ Creates the directory if it does not exist."
                          '()))
          ;; Collection of valid 'bin' paths
          (bin-paths (seq-filter #'file-directory-p (append common-paths macosx-paths)))
-       ;; Collection of parent paths from the `bin' paths (valid because the children are)
-       (root-paths (mapcar #'file-name-parent-directory bin-paths))
-       ;; Collection of valid `info' paths
-       (info-paths (append (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "info")) root-paths))
-                           (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "share/info")) root-paths))))
-       ;; Collection of valid `man' paths
-       (man-paths (append (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "man")) root-paths))
-                          (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "share/man")) root-paths)))))
-  ;; Set exec-path to contain the above paths
-  (setq exec-path (append bin-paths exec-path))
-  ;; (message "exec-path: %s" exec-path)
-  (setq Info-additional-directory-list '("/opt/homebrew/share/info"))
-  (setq Info-default-directory-list (append info-paths Info-default-directory-list))
-  ;; (message "Info-default-directory-list: %s" Info-default-directory-list)
+         ;; Collection of parent paths from the `bin' paths (valid because the children are)
+         (root-paths (mapcar #'file-name-parent-directory bin-paths))
+         ;; Collection of valid `info' paths
+         (info-paths (append (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "info")) root-paths))
+                             (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "share/info")) root-paths))))
+         ;; Collection of valid `man' paths
+         (man-paths (append (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "man")) root-paths))
+                            (seq-filter #'file-directory-p (mapcar (lambda (p) (file-name-concat p "share/man")) root-paths)))))
 
-  (my/add-trusted-content-directory (abbreviate-file-name (my/init-files)))
-  (push (abbreviate-file-name (my/emacs.d)) trusted-content)
-  (push (abbreviate-file-name (file-name-as-directory (file-name-concat (my/init-files) "shell/"))) trusted-content)
-  (push (abbreviate-file-name (my/user-lisp)) trusted-content)
-  (push "/Applications/Emacs.app/Contents/Resources/lisp/" trusted-content)
+    (setq exec-path (append bin-paths exec-path)
+          Info-additional-directory-list '("/opt/homebrew/share/info")
+          Info-default-directory-list (append info-paths Info-default-directory-list))
 
-  ;; (unless (null Info-directory-list)
-  ;;   (setq Info-directory-list (append Info-default-directory-list Info-directory-list)))
-  ;; Same for PATH environment variable
-  (setenv "PATH" (concat (string-join bin-paths ":") ":" (getenv "PATH")))
-  (setenv "INFOPATH" (concat (string-join info-paths ":") ":" (getenv "INFOPATH")))
-  (setenv "MANPATH" (concat (string-join man-paths ":") ":" (getenv "MANPATH")))))
+    (my/add-trusted-content-directory (abbreviate-file-name (my/init-files)))
+    (push (abbreviate-file-name (my/emacs.d)) trusted-content)
+    (push (abbreviate-file-name (file-name-as-directory (file-name-concat (my/init-files) "shell/"))) trusted-content)
+    (push (abbreviate-file-name (my/user-lisp)) trusted-content)
+    (push "/Applications/Emacs.app/Contents/Resources/lisp/" trusted-content)
 
-(autoload 'magit-status-setup-buffer "magit-status")
+    (setenv "PATH" (concat (string-join bin-paths ":") ":" (getenv "PATH")))
+    (setenv "INFOPATH" (concat (string-join info-paths ":") ":" (getenv "INFOPATH")))
+    (setenv "MANPATH" (concat (string-join man-paths ":") ":" (getenv "MANPATH")))))
 
 ;;;###autoload
-(defun my/magit-init-files ()
-  "Show magit buffer for `init-files' repo."
-  (interactive)
-  (magit-status-setup-buffer (my/init-files)))
+(defun my/display-startup-time ()
+  "Show the elapsed startup time."
+  (message "Elapsed load time: %s" (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))))
 
 (provide 'my-env)
 
