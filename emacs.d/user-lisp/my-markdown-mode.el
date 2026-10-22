@@ -178,6 +178,9 @@ ends with the same `---' on its own line."
   ;; (imp-set-user-filter #'my/markdown-to-html)
   (keymap-local-set "C-c *" #'my/escape-last-word)
   (keymap-local-set "C-c `" #'my/codify-last-word)
+  ;; Override markdown-ts-mode
+  (keymap-local-set "M-<left>" #'backward-word)
+  (keymap-local-set "M-<right>" #'forward-word)
   (keymap-local-set "C-c <space>" #'my/make-link))
 
 (defun my/markdown-ts-setup-hook ()

@@ -955,7 +955,10 @@ Bound to \\`C-x p s'.")
                             "H-z" #'my/shell
                             "H-," #'my/customize-search
                             "H-<f1>" #'my/keycast-mode
-                            "H-;" #'my/matching-paren)))
+                            "H-;" #'my/matching-paren
+                            "H-<left>" #'backward-word
+                            "H-<right>" #'forward-word)))
+
   (apply #'my/emacs-key-bind global-map hyper-mappings)
   (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mappings))
 
@@ -993,12 +996,19 @@ Bound to \\`C-x p s'.")
     (custom-set-variables
      '(frame-resize-pixelwise t))))
 
+(setopt ns-alternate-modifier 'alt
+        ns-command-modifier 'meta
+        ns-function-modifier 'hyper
+        ns-right-alternate-modifier 'hyper
+        ns-right-command-modifier 'super
+        ns-right-control-modifier 'hyper)
+
 ;; Hyper modifer on right side.
-(setopt mac-right-command-modifier 'hyper)
+;; (setopt mac-right-command-modifier 'hyper)
 ;; Default behavior is Alt (A-) I think. But the documentation is sparse.
-(setopt mac-left-option-modifier 'none)
+;; (setopt mac-left-option-modifier 'none)
 ;; Default behavior is macOS option
-(setopt mac-right-option-modifier 'none)
+;; (setopt mac-right-option-modifier 'none)
 
 ;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097 Basically, put backup and autosave files in their
 ;; own directories inside our own `~/tmp' directory.
