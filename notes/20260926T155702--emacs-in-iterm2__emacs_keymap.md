@@ -19,7 +19,7 @@ operation.
    iTerm2 `⌘` key, so ⌥-W will close the active window and ⌥-Q will quit the application.
 2. In _Profiles_ settings, _Keys_ tab, _General_ tab: set _Left option key_ to be `Esc+`.
 3. Make sure _Report keys using CSI u_ is unchecked.
-4. Set _Right control key_ to be `Hyper`.
+4. Set _Right control key_ to be `Hyper` (it's complicated…)
 
 That should be it. To recap, in the _Keys_ settings _Remap modifiers globally_ is not set, and in
 _Profiles_ >> _Keys_ >> _General_ settings,

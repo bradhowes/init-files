@@ -172,16 +172,30 @@ ends with the same `---' on its own line."
   (interactive)
   (my/sort-lines-by-integer-key "^\\s *[0-9]+="))
 
+(defun my/markdown-render ()
+  "Render to tmp file and show/update in `eww' buffer."
+  (interactive)
+  (markdown-ts-convert nil "~/Desktop/markdown_convert.html" '(html . pandoc) t t t))
+
+(defun my/markdown-render-display (file)
+  "Show the HTML in FILE."
+  (other-window-prefix)
+  (eww-open-file file))
+
 (defun my/markdown-ts-mode-hook ()
   "Customization hook for `markdown-ts-mode'."
   ;; (impatient-mode)
   ;; (imp-set-user-filter #'my/markdown-to-html)
+  (setopt markdown-ts-default-converter '(html . pandoc)
+          markdown-ts-convert-display-function #'my/markdown-render-display)
   (keymap-local-set "C-c *" #'my/escape-last-word)
   (keymap-local-set "C-c `" #'my/codify-last-word)
   ;; Override markdown-ts-mode
   (keymap-local-set "M-<left>" #'backward-word)
   (keymap-local-set "M-<right>" #'forward-word)
-  (keymap-local-set "C-c <space>" #'my/make-link))
+  (keymap-local-set "C-c <space>" #'my/make-link)
+  (keymap-local-set "C-c r" #'my/markdown-render)
+  (keymap-local-set "C-c C-c" #'my/markdown-render))
 
 (defun my/markdown-ts-setup-hook ()
   "Initialization hook for `markdown-ts-mode'."
