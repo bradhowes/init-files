@@ -20,7 +20,7 @@
   "Startup routine for mood-line."
 
   (doom-modeline-def-modeline 'main
-    '(depth eldoc bar window-state buffer-info buffer-position matches follow keycast)
+    '(depth eldoc bar window-state modals buffer-info buffer-position matches follow keycast)
     '(compilation repl lsp buffer-encoding major-mode process vcs check))
 
   (doom-modeline-def-modeline 'minimal
@@ -28,7 +28,7 @@
     '(major-mode))
 
   (doom-modeline-def-modeline 'special
-    '(depth eldoc bar window-state buffer-info buffer-position matches keycast)
+    '(depth eldoc bar window-state modals buffer-info buffer-position matches keycast)
     '(compilation debug buffer-encoding major-mode process vcs))
 
   (doom-modeline-def-modeline 'project
@@ -56,7 +56,7 @@
     '(compilation media-info major-mode process vcs))
 
   (doom-modeline-def-modeline 'message
-    '(depth eldoc bar buffer-info-simple buffer-position keycast)
+    '(depth eldoc bar modals buffer-info-simple buffer-position keycast)
     '(compilation buffer-encoding major-mode))
 
   (doom-modeline-def-modeline 'pdf
@@ -64,7 +64,7 @@
     '(compilation major-mode process vcs))
 
   (doom-modeline-def-modeline 'org-src
-    '(depth eldoc bar window-state buffer-info buffer-position matches keycast)
+    '(depth eldoc bar window-state modals buffer-info buffer-position matches keycast)
     '(compilation debug lsp buffer-encoding major-mode process check))
 
   (doom-modeline-def-modeline 'helm
