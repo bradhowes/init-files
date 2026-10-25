@@ -667,8 +667,18 @@ Bound to \\`C-x p s'.")
 (use-package saveplace
   :hook ((after-init . save-place-mode)))
 
-(use-package scratch
-  :bind (:map my/hyper-c-map ("s" . scratch)))
+(autoload 'my/show-scratch-buffer "my-scratch-plus-mode")
+
+(use-package scratch-plus
+  :custom
+  (scratch-plus-save-directory (file-name-concat user-emacs-directory "scratches"))
+  (scratch-plus-project-subdir ".scratches")
+  (scratch-plus-restore-type t)
+  (scratch-plus-force-restore t)
+  :bind ( :map my/hyper-c-map
+          ("s" . my/show-scratch-buffer))
+  :hook ((scratch-plus-mode . my/scratch-plus-mode-hook)
+         (after-init . scratch-plus-mode)))
 
 (use-package sh-script
   :hook (sh-mode . my/sh-mode-hook))
@@ -685,12 +695,12 @@ Bound to \\`C-x p s'.")
   :hook ((after-init . global-subword-mode)))
 
 (use-package symbol-overlay
-  :bind (:map my/symbol-overlay-map
-              ("s" . symbol-overlay-put)
-              ("H-s" . symbol-overlay-put)
-              ("n" . symbol-overlay-switch-forward)
-              ("p" . symbol-overlay-switch-backward)
-              ("c" . symbol-overlay-remove-all)))
+  :bind ( :map my/symbol-overlay-map
+          ("s" . symbol-overlay-put)
+          ("H-s" . symbol-overlay-put)
+          ("n" . symbol-overlay-switch-forward)
+          ("p" . symbol-overlay-switch-backward)
+          ("c" . symbol-overlay-remove-all)))
 
 (use-package ultra-scroll
   :commands (ultra-scroll-mode)

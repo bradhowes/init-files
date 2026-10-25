@@ -316,6 +316,11 @@ After calling `beginning-of-line' and ARG is 1 (or nil), call
 `beginning-of-line' to move to start of line.
 
 (fn ARG)" t)
+(autoload 'my/replace-regionw-with-calc-eval "my-functions"
+"Treat text in range START END as calc expression.
+Replace selection with evaluation result.
+
+(fn START END)" t)
 (autoload 'my/compile "my-functions"
 "Invoke `compile-multi' or `compile' depending on context." t)
 (autoload 'my/copy-file-name-to-clipboard "my-functions"
@@ -1072,6 +1077,15 @@ ARGS is a list of extra command line arguments to pass to Emacs.
 ;;; Generated autoloads from esup/test/utils.el
 
 (register-definition-prefixes "esup/test/utils" '("esup-" "make-esup-result" "with-esup-mock"))
+
+
+
+;;; Generated autoloads from my-scratch-plus-mode.el
+
+(autoload 'my/show-scratch-buffer "my-scratch-plus-mode"
+"Show scratch buffer." t)
+(autoload 'my/scratch-plus-mode-hook "my-scratch-plus-mode"
+"Custom hook for `scratch-plus-mode'.")
 
 
 ;;; End of scraped data

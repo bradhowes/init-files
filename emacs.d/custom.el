@@ -122,8 +122,8 @@
             helpful impatient-mode indent-bars inheritenv js2-mode key-chord keycast kkp kotlin-ts-mode language-id
             ligature magit marginalia mode-line-bell multiple-cursors nerd-icons nerd-icons-completion nerd-icons-corfu
             nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless osx-dictionary popper pyenv pyvenv pyvenv-auto rg
-            scratch symbol-overlay tempel tempel-collection timu-line treemacs-nerd-icons ultra-scroll vertico ws-butler
-            xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
+            scratch-plus shrink-path symbol-overlay tempel tempel-collection timu-line treemacs-nerd-icons ultra-scroll
+            vertico ws-butler xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
