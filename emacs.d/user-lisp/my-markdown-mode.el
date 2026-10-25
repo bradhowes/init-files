@@ -175,7 +175,18 @@ ends with the same `---' on its own line."
 (defun my/markdown-render ()
   "Render to tmp file and show/update in `eww' buffer."
   (interactive)
-  (markdown-ts-convert nil "~/Desktop/markdown_convert.html" '(html . pandoc) t t t))
+  (markdown-ts-convert nil ".markdown_convert.html" '(html . pandoc) t t t))
+
+(defun my/markdown-calc-eval (start end)
+  "Treat text in range START END as calc expression.
+Replace selection with evaluation result."
+  (interactive "r")
+  (when (and start end)
+    (let* ((eq (buffer-substring-no-properties start end))
+           (result (calc-eval eq)))
+      (if (stringp result)
+          (replace-region-contents start end result)
+        (message "%s" (cadr result))))))
 
 (defun my/markdown-render-display (file)
   "Show the HTML in FILE."
@@ -191,11 +202,12 @@ ends with the same `---' on its own line."
   (keymap-local-set "C-c *" #'my/escape-last-word)
   (keymap-local-set "C-c `" #'my/codify-last-word)
   ;; Override markdown-ts-mode
+  (keymap-local-set "H-c e" #'my/markdown-calc-eval)
   (keymap-local-set "M-<left>" #'backward-word)
   (keymap-local-set "M-<right>" #'forward-word)
   (keymap-local-set "C-c <space>" #'my/make-link)
-  (keymap-local-set "C-c r" #'my/markdown-render)
-  (keymap-local-set "C-c C-c" #'my/markdown-render))
+  (keymap-local-set "H-c r" #'my/markdown-render)
+  (keymap-local-set "H-c H-c" #'my/markdown-render))
 
 (defun my/markdown-ts-setup-hook ()
   "Initialization hook for `markdown-ts-mode'."

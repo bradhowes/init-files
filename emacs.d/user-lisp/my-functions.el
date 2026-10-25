@@ -79,6 +79,31 @@ For debugging purposes."
   (interactive)
   (set-mark-command 4))
 
+(defun my/hms-to-dec (lat-lon &optional allow-neg)
+  "Convert latitude and logitude LAT-LON into two decimal values.
+A latitude and longitude consists of three (3) components: degrees,
+minutes, and seconds. All are floating point values but they have
+different suffixes. Degrees end with `°', minutes end with `\'' and
+seconds end with `\"' followed by a direction indicator: `N/S' for
+latitude and `E/W' for longitude. If ALLOW-NEG is not nil, then
+direction indicators are not present; instead the sign of the degrees
+value indicates the direction.
+
+Examples:
+- (hms-to-dec \"37°26'36.42\"N 06°15'14.28\"W\") -> (37.44345 -6.25396666667).
+- (hms-to-dec \"37°26'36.42\" -06°15'14.28\"\", t) -> (37.44345 -6.25396666667)."
+  (let* ((args-len (if allow-neg 3 4))
+         (args-list (seq-partition (split-string lat-lon "[°'\" ]" t) args-len))
+         (len-list (mapcar 'length args-list)))
+    (when (or (/= (length len-list) 2)
+              (any (lambda (len) (/= len args-len)) len-list))
+      (error "Malformed lat-lon value %s" lat-lon))
+    (mapcar (lambda (args)
+              (seq-let (h m s d) args
+                (string-to-number (calc-eval (format "deg(%s@ %s' %s\")*%d" h m s
+                                                     (if (member d '("S" "W")) -1 1))))))
+            args-list)))
+
 ;;;###autoload
 (defmacro my/hook (name &rest code)
   "Create a custom hook with NAME and CODE.
