@@ -202,8 +202,10 @@ Useful for Elisp content or changes to mode settings."
 (defun my/remove-all-text-properties ()
   "Remove all text properties from the current buffer."
   (interactive)
-  (let ((inhibit-read-only t))
-    (set-text-properties (point-min) (point-max) nil)))
+  (let* ((inhibit-read-only t)
+         (start (or (region-beginning) (point-min)))
+         (end (or (region-end) (point-max))))
+    (set-text-properties start end nil)))
 
 ;;;###autoload
 (defun my/set-mark-no-activate ()
