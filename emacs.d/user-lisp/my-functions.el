@@ -28,6 +28,18 @@ After calling `beginning-of-line' and ARG is 1 (or nil), call
 (autoload 'compile-multi "compile-multi")
 
 ;;;###autoload
+(defun my/replace-regionw-with-calc-eval (start end)
+  "Treat text in range START END as calc expression.
+Replace selection with evaluation result."
+  (interactive "r")
+  (when (and start end)
+    (let* ((eq (buffer-substring-no-properties start end))
+           (result (calc-eval eq)))
+      (if (stringp result)
+          (replace-region-contents start end result)
+        (message "%s" (cadr result))))))
+
+;;;###autoload
 (defun my/compile ()
   "Invoke `compile-multi' or `compile' depending on context."
   (interactive)

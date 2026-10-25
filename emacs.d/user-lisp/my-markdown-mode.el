@@ -3,10 +3,8 @@
 ;;; Commentary:
 ;;; Code:
 
-(require 'font-lock)
 (require 'markdown-ts-mode)
 (require 'markdown-ts-mode-x)
-(require 'my-functions)
 
 ;; (use-package impatient-mode
 ;;   :ensure t
@@ -14,7 +12,7 @@
 ;;   :config
 ;;   (setq-default imp-user-filter #'my/markdown-to-html))
 
-(defun my/point-min-after-front-matter ()
+(defun my/markdown-point-min-after-front-matter ()
   "Skip any front matter in current buffer and return POINT.
 Front matter is defined as a set of lines in the buffer
 that start and end with lines containing only `---'."
@@ -41,7 +39,7 @@ ends with the same `---' on its own line."
  <script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\">
  </script>
 </html>" (buffer-substring-no-properties (save-excursion
-                                           (my/point-min-after-front-matter))
+                                           (my/markdown-point-min-after-front-matter))
                                          (point-max))))
          (current-buffer)))
 
@@ -63,7 +61,7 @@ ends with the same `---' on its own line."
          (s (my/markdown-is-spellcheckable f)))
     s))
 
-(defun my/escape-last-word ()
+(defun my/markdown-escape-last-word ()
   "Escape '_' and '*' characters in the word before point."
   (interactive)
   (let ((pos (point)))
@@ -71,7 +69,7 @@ ends with the same `---' on its own line."
       (re-search-forward "\\s " nil nil -1)
       (format-replace-strings '(("_" . "\\_") ("*" . "\\*")) nil (point) pos))))
 
-(defun my/codify-last-word ()
+(defun my/markdown-codify-last-word ()
   "Escape wrap the last word with backquotes."
   (interactive)
   (save-excursion
@@ -81,7 +79,7 @@ ends with the same `---' on its own line."
     (insert-char ?`))
   (insert-char ?`))
 
-(defun my/make-link ()
+(defun my/markdown-make-link ()
   "Make a link."
   (interactive)
   (let* ((bounds (bounds-of-thing-at-point 'symbol))
@@ -167,6 +165,7 @@ ends with the same `---' on its own line."
 ;;           (setq end (+ 2 end)))
 ;;         (goto-char (match-end 0))))))
 
+(autoload 'my/sort-lines-by-integer-key "my-functions")
 (defun my/sort-fixdropcopy ()
   "Sort FIX dropcopy lines in region BEG to END."
   (interactive)
@@ -177,35 +176,25 @@ ends with the same `---' on its own line."
   (interactive)
   (markdown-ts-convert nil ".markdown_convert.html" '(html . pandoc) t t t))
 
-(defun my/markdown-calc-eval (start end)
-  "Treat text in range START END as calc expression.
-Replace selection with evaluation result."
-  (interactive "r")
-  (when (and start end)
-    (let* ((eq (buffer-substring-no-properties start end))
-           (result (calc-eval eq)))
-      (if (stringp result)
-          (replace-region-contents start end result)
-        (message "%s" (cadr result))))))
-
 (defun my/markdown-render-display (file)
   "Show the HTML in FILE."
   (other-window-prefix)
   (eww-open-file file))
 
+(autoload 'my/replace-region-with-calc-eval "my-functions")
 (defun my/markdown-ts-mode-hook ()
   "Customization hook for `markdown-ts-mode'."
   ;; (impatient-mode)
   ;; (imp-set-user-filter #'my/markdown-to-html)
   (setopt markdown-ts-default-converter '(html . pandoc)
           markdown-ts-convert-display-function #'my/markdown-render-display)
-  (keymap-local-set "C-c *" #'my/escape-last-word)
-  (keymap-local-set "C-c `" #'my/codify-last-word)
+  (keymap-local-set "C-c *" #'my/markdown-escape-last-word)
+  (keymap-local-set "C-c `" #'my/markdown-codify-last-word)
   ;; Override markdown-ts-mode
-  (keymap-local-set "H-c e" #'my/markdown-calc-eval)
+  (keymap-local-set "H-c e" #'my/replace-region-with-calc-eval)
   (keymap-local-set "M-<left>" #'backward-word)
   (keymap-local-set "M-<right>" #'forward-word)
-  (keymap-local-set "C-c <space>" #'my/make-link)
+  (keymap-local-set "C-c <space>" #'my/markdown-make-link)
   (keymap-local-set "H-c r" #'my/markdown-render)
   (keymap-local-set "H-c H-c" #'my/markdown-render))
 
