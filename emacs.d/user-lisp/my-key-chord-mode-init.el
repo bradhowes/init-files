@@ -26,7 +26,10 @@
 ;;;###autoload
 (defun my/key-chord-mode-init (hyper-mappings)
   "Custom init of `key-chord' with HYPER-MAPPINGS."
-  (message "my/enable-key-chords: %s" my/enable-key-chords)
+  (if my/enable-key-chords
+      (message "Using key-chords")
+    (message ""))
+
   (when my/enable-key-chords
     (key-chord-mode 1)
     (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mappings)
