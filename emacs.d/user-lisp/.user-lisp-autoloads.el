@@ -228,6 +228,9 @@ I originally had a macro, but that was sloooow." t)
 (defvar my/use-c-ts-mode nil
 "Use `c-ts-mode' when t.")
 (custom-autoload 'my/use-c-ts-mode "my-customizations" t)
+(defvar my/enable-key-chords nil
+"Use `key-chord-mode' when t.")
+(custom-autoload 'my/enable-key-chords "my-customizations" t)
 
 
 ;;; Generated autoloads from my-dired-mode.el
@@ -1086,7 +1089,60 @@ ARGS is a list of extra command line arguments to pass to Emacs.
 "Show scratch buffer." t)
 (autoload 'my/scratch-plus-mode-hook "my-scratch-plus-mode"
 "Custom hook for `scratch-plus-mode'.")
+(autoload 'my/scratch-plus-mode-init "my-scratch-plus-mode"
+"Custom init for `scratch-plus-mode'.")
 
+
+
+;;; Generated autoloads from my-keycast-mode.el
+
+(defvar my/keycast-mode nil
+"Non-nil if My/Keycast mode is enabled.
+See the `my/keycast-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `my/keycast-mode'.")
+(custom-autoload 'my/keycast-mode "my-keycast-mode" nil)
+(autoload 'my/keycast-mode "my-keycast-mode"
+"Show current command and its key binding in the mode line.
+
+See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002.
+
+This is a global minor mode.  If called interactively, toggle the
+`My/Keycast mode' mode.  If the prefix argument is positive, enable the
+mode, and if it is zero or negative, disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
+mode if ARG is nil, omitted, or is a positive number.  Disable the mode
+if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate `(default-value \\='my/keycast-mode)'.
+
+The mode's hook is called both when the mode is enabled and when it is
+disabled.
+
+(fn &optional ARG)" t)
+
+
+
+;;; Generated autoloads from my-key-chord-init.el
+
+(autoload 'my/key-chord-mode-init "my-key-chord-init"
+"Custom init of `key-chord' with HYPER-MAPPINGS.
+
+(fn HYPER-MAPPINGS)")
+(register-definition-prefixes "my-key-chord-init" '("my/hyper-keys-map"))
+
+
+;;; Generated autoloads from my-key-chord-mode-init.el
+
+(autoload 'my/key-chord-mode-init "my-key-chord-mode-init"
+"Custom init of `key-chord' with HYPER-MAPPINGS.
+
+(fn HYPER-MAPPINGS)")
+(register-definition-prefixes "my-key-chord-mode-init" '("my/hyper-keys-map"))
 
 ;;; End of scraped data
 

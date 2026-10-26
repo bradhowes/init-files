@@ -108,6 +108,7 @@
  '(mode-line-compact 'long)
  '(mode-line-percent-position nil)
  '(mouse-yank-at-point t)
+ '(my/enable-key-chords nil)
  '(ns-alternate-modifier 'alt)
  '(ns-command-modifier 'meta)
  '(ns-function-modifier 'hyper)

@@ -103,6 +103,7 @@
 
 ;; Load various environmental settings that can be safely determined at this time, and setup various Emacs variables to
 ;; reflect the environment.
+(require 'my-customizations)
 (require 'my-env)
 (my/env-setup)
 
@@ -115,13 +116,6 @@
 
 ;; Fire up a companion emacs server
 (add-hook 'emacs-startup-hook #'my/start-emacs-server 80)
-
-;; (add-hook 'emacs-startup-hook (lambda () (message "Hello!")) 90)
-
-(defgroup my/customizations nil
-  "The customization group for my settings."
-  :prefix "my/"
-  :group 'local)
 
 (defvar my/dired-jumps-map
   (make-sparse-keymap)
@@ -199,23 +193,18 @@
 (use-package bind-key
   :bind (:map help-map ("y" . describe-personal-keybindings)))
 
-(defcustom my/use-c-ts-mode nil
-  "Use `c-ts-mode' when t."
-  :type '(boolean))
+(let ((mode (if my/use-c-ts-mode 'c++-ts-mode 'c++-mode)))
+  (add-to-list 'auto-mode-alist
+               `(,(concat "\\.\\(cc\\|hh\\|ii\\|inl\\|mm\\|"
+                          "\\([ch]\\(pp\\|xx\\|\\+\\+\\)\\)\\)\\'")
+                 . ,mode)))
 
-(unless noninteractive
-  (let ((mode (if my/use-c-ts-mode 'c++-ts-mode 'c++-mode)))
-    (add-to-list 'auto-mode-alist
-                 `(,(concat "\\.\\(cc\\|hh\\|ii\\|inl\\|mm\\|"
-                            "\\([ch]\\(pp\\|xx\\|\\+\\+\\)\\)\\)\\'")
-                   . ,mode)))
-
-  (if my/use-c-ts-mode
-      (use-package c-ts-mode
-        :hook ((c++-ts-mode . my/c++-mode-hook)
-               (after-init . my/c++-mmode-remap)))
-    (use-package cc-mode
-      :hook ((c++-mode . my/c++-mode-hook)))))
+(if my/use-c-ts-mode
+    (use-package c-ts-mode
+      :hook ((c++-ts-mode . my/c++-mode-hook)
+             (after-init . my/c++-mmode-remap)))
+  (use-package cc-mode
+    :hook ((c++-mode . my/c++-mode-hook))))
 
 (use-package char-menu
   :bind (("C-z" . char-menu))
@@ -500,11 +489,6 @@
 (use-package iso-transl
   :bind-keymap ("H-8" . iso-transl-ctl-x-8-map)) ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
 
-(use-package key-chord
-  ;; :vc (:url "https://github.com/emacsorphanage/key-chord" :rev :newest)
-  :commands (key-chord-define key-chord-mode)
-  :config (key-chord-mode 1))
-
 (use-package kkp
   :if (my/is-terminal)
   :commands (global-kkp-mode)
@@ -543,22 +527,6 @@
 (use-package yaml-ts-mode
   :mode ("\\.yaml\\'" "\\.yml\\'")
   :hook ((yaml-ts-mode . my/yaml-ts-mode-hook)))
-
-(define-minor-mode my/keycast-mode
-  "Show current command and its key binding in the mode line.
-See https://github.com/tarsius/keycast/issues/7#issuecomment-3985332002."
-  :global t
-  (let ((my/keycast-mode-line '("" keycast-mode-line " ")))
-    (if my/keycast-mode
-        (progn
-          (keycast-invisible-mode 1)
-          (add-to-list 'global-mode-string my/keycast-mode-line)
-          (add-hook 'pre-command-hook 'keycast--update t)
-          (add-hook 'minibuffer-exit-hook 'keycast--minibuffer-exit t))
-      (setopt global-mode-string (delete my/keycast-mode-line global-mode-string))
-      (remove-hook 'pre-command-hook 'keycast--update)
-      (remove-hook 'minibuffer-exit-hook 'keycast--minibuffer-exit)
-      (keycast-invisible-mode -1))))
 
 (use-package mode-line-bell)
 
@@ -668,6 +636,8 @@ Bound to \\`C-x p s'.")
   :hook ((after-init . save-place-mode)))
 
 (autoload 'my/show-scratch-buffer "my-scratch-plus-mode")
+(autoload 'my/scratch-plus-mode-hook "my-scratch-plus-mode")
+(autoload 'my/scratch-plus-mode-init "my-scratch-plus-mode")
 
 (use-package scratch-plus
   :custom
@@ -678,7 +648,7 @@ Bound to \\`C-x p s'.")
   :bind ( :map my/hyper-c-map
           ("s" . my/show-scratch-buffer))
   :hook ((scratch-plus-mode . my/scratch-plus-mode-hook)
-         (after-init . scratch-plus-mode)))
+         (after-init . my/scratch-plus-mode-init)))
 
 (use-package sh-script
   :hook (sh-mode . my/sh-mode-hook))
@@ -740,11 +710,8 @@ Bound to \\`C-x p s'.")
   :hook (tty-setup . (lambda () (xclip-mode 1))))
 
 (use-package yasnippet)
-
 (use-package yasnippet-snippets)
-
 (use-package zoxide)
-
 (use-package consult-zoxide)
 
 ;; NOTE: this is setting a global variable, but we should really just do this when operating in an org buffer.
@@ -928,13 +895,11 @@ Bound to \\`C-x p s'.")
                      "M-[" #'previous-buffer
                      "M-]" #'next-buffer))
 
-(defvar my/hyper-keys-map
-  (make-sparse-keymap)
-  "Keymap for terminal hyper actions.")
-
 ;; Populate two key maps with hyper-key definitions. The first -- global -- holds the mapping that uses the real `Hyper'
 ;; modifier. The second keymap -- `my/hyper-keys-map` -- holds the mapping that uses a keychord to activate which is
 ;; useful on terminals that do not offer a `Hyper' modifier.
+(autoload 'my/keycast-mode "my-keycast-mode")
+(autoload 'my/key-chord-mode-init "my-key-chord-mode-init")
 (let ((hyper-mappings (list "H-SPC" #'my/set-mark-deactivate
                             "H-." #'my/goto-mark
                             "H-1" #'delete-other-windows
@@ -954,13 +919,15 @@ Bound to \\`C-x p s'.")
                             "H-K" #'my/shell
                             "H-M-m" #'my/show-messages-buffer
                             "H-n" my/hyper-n-map
+                            "H-o" #'popper-kill-latest-popup
                             "H-p" project-prefix-map
                             "H-M-p" #'my/matching-paren
-                            "H-r" #'speedbar
+                            "H-r" #'my/reload-buffer
                             "H-s" my/symbol-overlay-map
+                            "H-S" #'speedbar
                             "H-t" #'my/htop
                             "H-u" #'undo
-                            "H-v" #'my/reload-buffer
+                            "H-v" #'diff-hl-show-hunk
                             "H-w" #'my/ace-window-prefix
                             "H-z" #'my/shell
                             "H-," #'my/customize-search
@@ -970,21 +937,11 @@ Bound to \\`C-x p s'.")
                             "H-<right>" #'forward-word)))
 
   (apply #'my/emacs-key-bind global-map hyper-mappings)
-  (apply #'my/emacs-make-key-bind my/hyper-keys-map (lambda (key) (substring key 2)) hyper-mappings))
 
-;; Rationale: pick character combinations that do not match sequences in English or programming, and that are easy to
-;; type with one or two hands. Not so sure about how useful this is -- I keep encountering issues.
-(my/emacs-chord-bind global-map
-                     "aa" #'my/ace-window-always-dispatch
-                     "hh" my/hyper-keys-map
-                     "HH" #'helpful-at-point
-                     "hb" #'popper-kill-latest-popup
-                     "jn" #'my/ace-window-next
-                     "jp" #'my/ace-window-previous
-                     "qq" #'undo
-                     "sb" #'speedbar
-                     "vv" #'diff-hl-show-hunk
-                     )
+  ;; Perform key-chord bindings later, after we know that they will be enabled.
+  (add-hook 'emacs-startup-hook (lambda ()
+                                  (my/key-chord-mode-init hyper-mappings))
+            90))
 
 (defvar my/info-keys-map
   (let ((map (make-sparse-keymap)))
@@ -1005,20 +962,6 @@ Bound to \\`C-x p s'.")
   (when (display-graphic-p)
     (custom-set-variables
      '(frame-resize-pixelwise t))))
-
-(setopt ns-alternate-modifier 'alt
-        ns-command-modifier 'meta
-        ns-function-modifier 'hyper
-        ns-right-alternate-modifier 'hyper
-        ns-right-command-modifier 'super
-        ns-right-control-modifier 'hyper)
-
-;; Hyper modifer on right side.
-;; (setopt mac-right-command-modifier 'hyper)
-;; Default behavior is Alt (A-) I think. But the documentation is sparse.
-;; (setopt mac-left-option-modifier 'none)
-;; Default behavior is macOS option
-;; (setopt mac-right-option-modifier 'none)
 
 ;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097 Basically, put backup and autosave files in their
 ;; own directories inside our own `~/tmp' directory.

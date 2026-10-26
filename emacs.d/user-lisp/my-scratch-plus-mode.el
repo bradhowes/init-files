@@ -18,5 +18,12 @@
     (make-directory scratch-plus-save-directory t))
   (my/show-scratch-buffer))
 
+;;;###autoload
+(defun my/scratch-plus-mode-init ()
+  "Custom init for `scratch-plus-mode'."
+  (unless (file-exists-p scratch-plus-save-directory)
+    (make-directory scratch-plus-save-directory t))
+  (scratch-plus-mode))
+
 (provide 'my-scratch-plus-mode)
 ;;; my-scratch-plus-mode.el ends here

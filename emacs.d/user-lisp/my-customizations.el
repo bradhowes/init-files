@@ -16,6 +16,12 @@
   :type '(boolean)
   :group 'my/customizations)
 
+;;;###autoload
+(defcustom my/enable-key-chords nil
+  "Use `key-chord-mode' when t."
+  :type '(boolean)
+  :group 'my/customizations)
+
 (provide 'my-customizations)
 
 ;;; my-customizations.el ends here
