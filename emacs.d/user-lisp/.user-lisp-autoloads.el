@@ -1092,7 +1092,6 @@ ARGS is a list of extra command line arguments to pass to Emacs.
 (autoload 'my/scratch-plus-mode-init "my-scratch-plus-mode"
 "Custom init for `scratch-plus-mode'.")
 
-
 
 ;;; Generated autoloads from my-keycast-mode.el
 
@@ -1124,7 +1123,6 @@ The mode's hook is called both when the mode is enabled and when it is
 disabled.
 
 (fn &optional ARG)" t)
-
 
 
 ;;; Generated autoloads from my-key-chord-init.el
