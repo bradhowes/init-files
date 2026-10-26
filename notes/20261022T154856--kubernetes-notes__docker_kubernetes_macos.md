@@ -31,3 +31,6 @@ Create a new Podman Machine via Settings >> Resources >> Podman "Create new…":
 
 ![](engine.png)
 
+Once there is a Podman Machine running, create a Kubernetes engine using the Minikube extension.
+
+![](minikube.png)
