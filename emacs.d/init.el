@@ -182,8 +182,6 @@
 (use-package accent
   :bind (:map my/hyper-c-map ("a" . accent-menu)))
 
-;;; ===== ace-window =====
-
 (use-package ace-window
   :config
   (setq aw-make-frame-char ?n)
@@ -856,6 +854,10 @@ Bound to \\`C-x p s'.")
                    "C-<mouse-5>" #'ignore
                    "C-<wheel-up>" #'ignore
                    "C-<wheel-down>" #'ignore
+
+                   "M-s-=" #'global-text-scale-adjust
+                   "M-s-0" #'global-text-scale-adjust
+                   "M-s--" #'global-text-scale-adjust
 
                    "C-M-<mouse-4>" #'ignore
                    "C-M-<mouse-5>" #'ignore
