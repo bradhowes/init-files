@@ -38,7 +38,10 @@
  '(consult-dir-sources
    '(consult-dir--source-default consult-dir--source-project consult-dir--source-recentf consult-dir--source-bookmark
                                  consult-dir--source-tramp-local))
- '(consult-notes-denote-files-function #'denote-directory-files)
+ '(consult-notes-denote-dir nil)
+ '(consult-notes-denote-display-id nil)
+ '(consult-notes-denote-display-keywords-width 10)
+ '(consult-notes-denote-title-width 10)
  '(consult-notes-use-rg t)
  '(context-menu-mode t)
  '(copyright-query nil)
