@@ -317,12 +317,12 @@
           ("r" . denote-rename-file)))
 
 (use-package consult-notes
-  :custom
-  (consult-notes-denote-display-id nil)
   :bind ( :map my/hyper-n-map
           ("n" . consult-notes)
+          ("H-n" . consult-notes)
           :map my/hyper-c-map
-          ("n" . consult-notes))
+          ("n" . consult-notes)
+          ("H-n" . consult-notes))
   :hook (after-init . my/notes-consult-notes-hook))
 
 (use-package orderless
@@ -343,7 +343,7 @@
   :bind ( :map corfu-map
           ("C-SPC" . corfu-insert-separator))
   :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-cycle t) ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-auto t)                 ;; Enable auto completion
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
