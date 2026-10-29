@@ -776,6 +776,9 @@ Useful when copying code into Org blocks so that the copy does not contain any
 artifacts such as indentation bars.
 
 (fn START END DELETE)")
+(autoload 'my/org-initialize "my-org"
+"Custom org initialization.")
+(register-definition-prefixes "my-org" '("my/org-mode-hook"))
 
 
 ;;; Generated autoloads from my-project.el

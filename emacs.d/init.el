@@ -572,17 +572,17 @@
   ;; Emacs 31: partial-completion behaves like substring
   (completion-pcm-leading-wildcard t))
 
+(defvar my/org-key-map
+  (make-sparse-keymap)
+  "Keymap for my org mode access.")
+
 (use-package org
   :commands (org-store-link)
-  :config
-  (defvar my/org-key-map
-    (let ((map (make-sparse-keymap)))
-      (define-key map "a" #'org-agenda)
-      (define-key map "c" #'org-capture)
-      (define-key map "l" #'org-store-link)
-      map)
-    "Keymap for my org mode access.")
-  :bind-keymap ("H-o" . my/org-key-map))
+  :bind( :map my/org-key-map
+         ("a" . org-agenda)
+         ("c" . org-capture)
+         ("l" . org-store-link))
+  :hook ((after-init . my/org-initialize)))
 
 (use-package osx-dictionary
   :if my/is-macosx
@@ -936,11 +936,12 @@ Bound to \\`C-x p s'.")
                             "H-<f1>" #'my/keycast-mode
                             "H-;" #'my/matching-paren
                             "H-<left>" #'backward-word
-                            "H-<right>" #'forward-word)))
+                            "H-<right>" #'forward-word
+                            "H-<return>" my/org-key-map)))
 
   (apply #'my/emacs-key-bind global-map hyper-mappings)
 
-  ;; Perform key-chord bindings later, after we know that they will be enabled.
+  ;; Perform key-chord bindings later, after we have loaded the `custom.el` file and we know that they are enabled.
   (add-hook 'emacs-startup-hook (lambda ()
                                   (my/key-chord-mode-init hyper-mappings))
             90))

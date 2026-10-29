@@ -119,15 +119,15 @@
  '(ns-right-command-modifier 'super)
  '(ns-right-control-modifier 'hyper)
  '(package-selected-packages
-   '(accent ace-window cape char-menu cmake-mode compile-multi compile-multi-embark compile-multi-nerd-icons
+   '(accent ace-window cape char-menu cmake-mode comment-tags compile-multi compile-multi-embark compile-multi-nerd-icons
             consult-compile-multi consult-dir consult-eglot consult-multi-compile consult-notes consult-zoxide corfu
             crux denote diff-hl doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region
             fancy-compilation flymake-gradle flymake-shellcheck flyover format-all git-timemachine go-mode gradle-mode
             helpful impatient-mode indent-bars inheritenv js2-mode key-chord keycast kkp kotlin-ts-mode language-id
             ligature magit marginalia mode-line-bell multiple-cursors nerd-icons nerd-icons-completion nerd-icons-corfu
-            nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless osx-dictionary popper pyenv pyvenv pyvenv-auto rg
-            scratch-plus shrink-path symbol-overlay tempel tempel-collection timu-line treemacs-nerd-icons ultra-scroll
-            vertico ws-butler xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
+            nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless org-super-agenda osx-dictionary popper pyenv
+            pyvenv pyvenv-auto rg scratch-plus shrink-path symbol-overlay tempel tempel-collection timu-line
+            treemacs-nerd-icons ultra-scroll vertico ws-butler xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
