@@ -192,7 +192,6 @@
  '(default ((t (:family "Berkeley Mono" :foundry "nil" :slant normal :weight regular :height 130 :width normal))))
  '(aw-leading-char-face ((t (:inherit (bold modus-themes-reset-soft) :foreground "light green" :height 1.5))))
  '(cursor ((t (:background "orange"))))
- '(doom-modeline-bar-inactive ((t nil)))
  '(eglot-highlight-symbol-face ((t (:background "orchid4" :inherit bold))))
  '(fixed-pitch ((t (:family "Berkeley Mono"))))
  '(font-lock-comment-delimiter-face ((t (:foreground "OliveDrab3" :inherit font-lock-comment-face))))

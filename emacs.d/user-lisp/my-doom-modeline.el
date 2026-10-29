@@ -8,7 +8,7 @@
 (require 'doom-modeline)
 
 (doom-modeline-def-segment keycast ()
-  "Keycast info when enabled."
+  "Show keycast info when enabled."
   (and (mode-line-window-selected-p)
        (featurep 'keycast)
        (fboundp 'keycast-invisible-mode)
@@ -78,6 +78,11 @@
   (doom-modeline-def-modeline 'calculator
     '(depth calc buffer-position keycast)
     '(misc-info major-mode process))
+
+  ;; Make prominent when file is modified.
+  (set-face-attribute 'doom-modeline-buffer-modified nil :foreground "yellow1" :weight 'bold)
+  ;; Always make prominent even if not active window.
+  (setopt doom-modeline-always-highlight-modified-buffer-file-name t)
 
   (doom-modeline-mode 1))
 
