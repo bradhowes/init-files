@@ -319,7 +319,7 @@ After calling `beginning-of-line' and ARG is 1 (or nil), call
 `beginning-of-line' to move to start of line.
 
 (fn ARG)" t)
-(autoload 'my/replace-regionw-with-calc-eval "my-functions"
+(autoload 'my/replace-region-with-calc-eval "my-functions"
 "Treat text in range START END as calc expression.
 Replace selection with evaluation result.
 
