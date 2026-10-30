@@ -73,7 +73,8 @@
   ;; Make prominent when file is modified.
   (set-face-attribute 'doom-modeline-buffer-modified nil :foreground "yellow1" :weight 'bold)
   ;; Always make prominent even if not active window.
-  (setopt doom-modeline-always-highlight-modified-buffer-file-name t)
+  (setopt doom-modeline-always-highlight-modified-buffer-file-name t
+          doom-modeline-check-segment-visible-all t)
 
   (doom-modeline-mode 1))
 
