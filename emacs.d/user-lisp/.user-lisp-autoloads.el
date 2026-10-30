@@ -404,7 +404,7 @@ the buffer having untrusted content.
 (autoload 'my/corfu-initialize "my-functions"
 "Custom corfu initialize.")
 (autoload 'my/diff-hl-initialize "my-functions"
-"Custom diff-hl init.")
+"Customize diff-hl.")
 (autoload 'my/ligature-initialize "my-functions"
 "Custom ligature init.")
 (autoload 'my/marginalia-initialize "my-functions"
@@ -1056,7 +1056,6 @@ disabled.
 ;;; Generated autoloads from doom-modeline/test/test-helper.el
 
 (register-definition-prefixes "doom-modeline/test/test-helper" '("ffip-get-project-root-directory" "project"))
-
 
 
 ;;; Generated autoloads from esup/esup.el

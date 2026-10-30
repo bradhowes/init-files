@@ -505,7 +505,8 @@
 
 (use-package magit
   :commands (magit-status-setup-buffer magit-status magit-project-status)
-  :hook ((magit-post-refresh . diff-hl-magit-post-refresh))
+  :custom
+  (magit-process-find-password-functions '(my/read-gitlab-password))
   :bind ( :map ctl-x-map
           ("g" . magit-status)
           ;; Take over vc-dir
@@ -514,8 +515,8 @@
           ("v l" . magit-log-buffer-file)
           :map my/hyper-c-map
           ("f" . magit-file-dispatch))
-  :custom
-  (magit-process-find-password-functions '(my/read-gitlab-password)))
+  :hook ((magit-post-refresh . diff-hl-magit-post-refresh)
+         (magit-mode-hook . my/diff-hl-initialize)))
 
 (use-package markdown-ts-mode
   :mode ("\\.md\\'" "\\.mdx\\'" "\\.markdown\\'")

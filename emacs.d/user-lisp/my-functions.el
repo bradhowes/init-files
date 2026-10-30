@@ -316,7 +316,7 @@ the buffer having untrusted content."
 
 ;;;###autoload
 (defun my/diff-hl-initialize()
-  "Custom diff-hl init."
+  "Customize diff-hl."
   (diff-hl-flydiff-mode t)
   (global-diff-hl-mode t)
   (global-diff-hl-show-hunk-mouse-mode t))
