@@ -28,7 +28,7 @@ After calling `beginning-of-line' and ARG is 1 (or nil), call
 (autoload 'compile-multi "compile-multi")
 
 ;;;###autoload
-(defun my/replace-regionw-with-calc-eval (start end)
+(defun my/replace-region-with-calc-eval (start end)
   "Treat text in range START END as calc expression.
 Replace selection with evaluation result."
   (interactive "r")
