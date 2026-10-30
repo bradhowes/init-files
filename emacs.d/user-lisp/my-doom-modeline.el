@@ -74,6 +74,7 @@
   (set-face-attribute 'doom-modeline-buffer-modified nil :foreground "yellow1" :weight 'bold)
   ;; Always make prominent even if not active window.
   (setopt doom-modeline-always-highlight-modified-buffer-file-name t
+          ;; Allow *all* segments to be removed if not in active mode-line
           doom-modeline-check-segment-visible-all t)
 
   (doom-modeline-mode 1))
