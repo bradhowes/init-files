@@ -196,7 +196,8 @@ ends with the same `---' on its own line."
   (keymap-local-set "M-<right>" #'forward-word)
   (keymap-local-set "C-c <space>" #'my/markdown-make-link)
   (keymap-local-set "H-c r" #'my/markdown-render)
-  (keymap-local-set "H-c H-c" #'my/markdown-render))
+  (keymap-local-set "H-c H-c" #'my/markdown-render)
+  (flyspell-mode t))
 
 (defun my/markdown-ts-setup-hook ()
   "Initialization hook for `markdown-ts-mode'."
