@@ -16,10 +16,13 @@ if [[ -z "${name}" ]]; then
 else
   # shellcheck disable=SC2046,SC2086
   set -- $(blueutil ${paired_args} | jq -r ".[] | select(.name | test(\"${name}\")).address")
-  if [[ -n "${1}" ]]; then
-    blueutil --connect "${1}"
-  else
-    echo "*** device ${name} is not paired"
-    exit 1
-  fi
+
+  # This bites -- for some reason we could have multiple entries. Assume the last one is what we want, but I do not know
+  # if that is sound (ha ha).
+  while (($# > 1)); do
+    shift 1
+  done
+  blueutil --connect "${1}" && exit 0
+  echo "*** device ${name} is not paired"
+  exit 1
 fi

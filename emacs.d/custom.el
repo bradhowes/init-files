@@ -121,7 +121,7 @@
  '(package-selected-packages
    '(accent ace-window cape char-menu cmake-mode comment-tags compile-multi compile-multi-embark compile-multi-nerd-icons
             consult-compile-multi consult-dir consult-eglot consult-multi-compile consult-notes consult-zoxide corfu
-            crux denote diff-hl doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region
+            crux deft denote diff-hl doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region
             fancy-compilation flymake-gradle flymake-shellcheck flyover format-all git-timemachine go-mode gradle-mode
             helpful impatient-mode indent-bars inheritenv js2-mode key-chord keycast kkp kotlin-ts-mode language-id
             ligature magit marginalia mode-line-bell multiple-cursors nerd-icons nerd-icons-completion nerd-icons-corfu
@@ -134,7 +134,6 @@
      compilation-mode))
  '(python-indent-guess-indent-offset-verbose nil)
  '(pyvenv-workon ".")
- '(quit-window-kill-buffer t)
  '(read-extended-command-predicate 'command-completion-default-include-p)
  '(recentf-max-menu-items 50)
  '(recentf-max-saved-items 50)

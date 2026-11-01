@@ -37,6 +37,10 @@ artifacts such as indentation bars."
 
 (defun my/org-mode-hook ()
   "Org mode setup."
+  (setopt org-M-RET-may-split-line '((default . nil))
+          org-insert-heading-respect-content t
+          org-log-done 'time
+          org-log-into-drawer t)
   (local-set-key "H-<up>" #'org-priority-up)
   (local-set-key "H-<down>" #'org-priority-down)
   (local-set-key "H-<right>" #'org-shiftmetaright))

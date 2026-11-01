@@ -1144,6 +1144,20 @@ disabled.
 (fn HYPER-MAPPINGS)")
 (register-definition-prefixes "my-key-chord-mode-init" '("my/hyper-keys-map"))
 
+
+
+;;; Generated autoloads from my-speedbar.el
+
+(autoload 'my/speedbar-show "my-speedbar"
+"Move into speedbar enabling if necessary." t)
+(autoload 'my/speedbar-hide "my-speedbar"
+"Hide any active speedbar." t)
+(autoload 'my/speedbar-mode-hook "my-speedbar"
+"Customize `speedbar-mode'.")
+(autoload 'my/speedbar-initialize "my-speedbar"
+"Customize speedbar.")
+(register-definition-prefixes "my-speedbar" '("my/speedbar-"))
+
 
 ;;; End of scraped data
 

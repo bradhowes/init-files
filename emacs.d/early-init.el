@@ -1,5 +1,6 @@
 ;;; package --- Summary -*- lexical-binding: t; -*-
 ;;; Commentary:
+;; This code runs early on in the startup phase. Stuff here is done to speedup startup.
 ;;; Code:
 
 ;; Do not show menu bar if running on TTY

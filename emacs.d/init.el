@@ -543,7 +543,11 @@
 
 (use-package my-fontify-braces)
 
-(use-package nerd-icons)
+;; NOTE: for proper use in iTerm2, make sure that the profile has "Use a different font for non-ASCII text" selected and that
+;; Symbols Nerd Font Mono 16 is chosen.
+(use-package nerd-icons
+  :custom
+  (nerd-icons-font-family "Symbols Nerd Font Mono"))
 
 (use-package nerd-icons-completion
   :commands (nerd-icons-completion-mode))
@@ -911,6 +915,7 @@ Bound to \\`C-x p s'.")
                             "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
                             "H-a" #'my/ace-window-always-dispatch
                             "H-b" #'consult-buffer
+                            "H-M-b" #'consult-bookmark
                             "H-B" #'consult-project-buffer
                             "H-c" my/hyper-c-map
                             "H-d" #'crux-duplicate-current-line-or-region
@@ -927,7 +932,6 @@ Bound to \\`C-x p s'.")
                             "H-M-p" #'my/matching-paren
                             "H-r" #'my/reload-buffer
                             "H-s" my/symbol-overlay-map
-                            "H-S" #'speedbar
                             "H-t" #'my/htop
                             "H-u" #'undo
                             "H-v" #'diff-hl-show-hunk
