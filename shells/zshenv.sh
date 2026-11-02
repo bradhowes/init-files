@@ -72,6 +72,7 @@ PathAdd PATH \
   "${HOME}/Library/Python/3.9/bin" \
   "${HOME}/bin" \
   "${HOME}/.jenv/bin" \
+  "${HOME}/.local/bin" \
   /usr/local/bin
 
 # Prepend homebrew paths even if already in PATH. This is due to the fact that Homebrew's own policy is to not shadow
