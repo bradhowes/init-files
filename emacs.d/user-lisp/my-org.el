@@ -85,6 +85,37 @@ artifacts such as indentation bars."
             org-hide-emphasis-markers t
             org-log-done 'time
             org-return-follows-link t
+            org-tag-alist '(
+                            ;; Team
+                            (:startgrouptag)
+                            ("People")
+                            (:grouptags)
+                            ("aleksej" . ?a)
+                            ("dima" . ?d)
+                            ("misha" . ?m)
+                            ("wojtec" . ?w)
+                            ("ME" . ?e)
+                            (:endgrouptag)
+                            ;; Meetings
+                            (:startgrouptag)
+                            ("MTG")
+                            (:grouptags)
+                            ("dsu" . ?d)
+                            ("planning" . ?p)
+                            ("retro" . ?r)
+                            ("1_1" . ?1)
+                            ("HR" . ?h)
+                            ("general" . ?l)
+                            ("meeting" . ?m)
+                            ("misc" . ?z)
+                            (:endgrouptag)
+                            ;; Special
+                            ("CRIT" . ?x)
+                            ("obstacle" . ?o)
+                            ;; Work log tags
+                            ("accomplishment" . ?a)
+                            ("jira" . ?j))
+
             org-todo-keywords '((sequence "TODO(t)"
                                           "PLANNING(p)"
                                           "IN-PROGRESS(i@/!)"
