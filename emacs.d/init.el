@@ -679,6 +679,9 @@ Bound to \\`C-x p s'.")
   :commands (ultra-scroll-mode)
   :hook ((after-init . my/ultra-scroll-initialize)))
 
+(use-package undo-tree
+  :hook ((after-init . global-undo-tree-mode)))
+
 (use-package vertico
   :commands (vertico-mode)
   :bind ( :map vertico-map

@@ -127,7 +127,8 @@
             ligature magit marginalia mode-line-bell multiple-cursors nerd-icons nerd-icons-completion nerd-icons-corfu
             nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless org-super-agenda osx-dictionary popper pyenv
             pyvenv pyvenv-auto rg scratch-plus shrink-path symbol-overlay tempel tempel-collection timu-line
-            treemacs-nerd-icons ultra-scroll vertico ws-butler xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
+            treemacs-nerd-icons ultra-scroll undo-tree vertico ws-butler xclip yaml yaml-mode yasnippet
+            yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
