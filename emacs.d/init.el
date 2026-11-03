@@ -181,9 +181,6 @@
 ;;   ]
 ;; }
 
-(use-package accent
-  :bind (:map my/hyper-c-map ("a" . accent-menu)))
-
 (use-package ace-window
   :config
   (setq aw-make-frame-char ?n)
@@ -683,9 +680,6 @@ Bound to \\`C-x p s'.")
 (use-package ultra-scroll
   :commands (ultra-scroll-mode)
   :hook ((after-init . my/ultra-scroll-initialize)))
-
-(use-package undo-tree
-  :hook ((after-init . global-undo-tree-mode)))
 
 (use-package vertico
   :commands (vertico-mode)
