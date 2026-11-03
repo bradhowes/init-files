@@ -465,13 +465,6 @@
 
 (use-package git-timemachine)
 
-(use-package grove
-  :commands (global-grove-mode)
-  :custom
-  (grove-directory "~/src/Mine/init-files/notes/")
-  :hook (after-init . (lambda ()
-                        (global-grove-mode 1))))
-
 (use-package helpful
   :bind ( :map help-map
           ("a" . helpful-symbol)
