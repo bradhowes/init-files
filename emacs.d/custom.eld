@@ -128,7 +128,7 @@
                 magit marginalia mode-line-bell multiple-cursors nerd-icons nerd-icons-completion nerd-icons-corfu
                 nerd-icons-dired nerd-icons-grep nerd-icons-xref orderless org-super-agenda osx-dictionary popper pyenv
                 pyvenv pyvenv-auto rg scratch-plus shrink-path symbol-overlay tempel tempel-collection ultra-scroll
-                vertico ws-butler xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
+                vertico vundo ws-butler xclip yaml yaml-mode yasnippet yasnippet-snippets zoxide))
  '(popper-display-control 'user)
  '(popper-reference-buffers
    '("\\*MESSAGES\\*" "Output\\*$" "\\*Async Shell Command\\*" "\\*Compile-Log\\*" "\\*Man .*\\*" "\\*eldoc\\*" help-mode
@@ -173,8 +173,8 @@
  '(speedbar-use-images nil)
  '(switch-to-prev-buffer-skip t)
  '(tab-always-indent 'complete)
- '(tramp-auto-save-directory "/Users/bradhowes/tmp/emacs_autosaves")
- '(tramp-backup-directory-alist '((".*" . "/Users/bradhowes/tmp/emacs_backups")))
+ '(tramp-auto-save-directory "/Users/bradhowes/tmp/emacs_autosaves" t)
+ '(tramp-backup-directory-alist '((".*" . "/Users/bradhowes/tmp/emacs_backups")) t)
  '(truncate-string-ellipsis "…" t)
  '(uniquify-buffer-name-style 'forward nil (uniquify))
  '(user-mail-address "bradhowes@mac.com")

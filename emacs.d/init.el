@@ -937,6 +937,7 @@ Bound to \\`C-x p s'.")
                             "H-s" my/symbol-overlay-map
                             "H-t" #'my/htop
                             "H-u" #'undo
+                            "H-M-u" #'vundo
                             "H-v" #'diff-hl-show-hunk
                             "H-w" #'my/ace-window-prefix
                             "H-z" #'my/shell

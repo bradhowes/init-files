@@ -8,7 +8,7 @@
 
 (require 'corfu)
 (require 'crm)
-(require 'undo-tree)
+;; (require 'undo-tree)
 
 (defvar my/horizontal-scroll-repeat-map
   (let ((map (make-sparse-keymap)))
@@ -69,8 +69,8 @@
             ;; Tramp as well but note slight change in pattern
             tramp-backup-directory-alist `((".*" . ,backup-dir))
             tramp-auto-save-directory auto-saves-dir
-            auto-save-list-file-prefix auto-saves-file-prefix
-            undo-tree-history-directory-alist `(("." . ,undo-tree-history-dir)))))
+            auto-save-list-file-prefix auto-saves-file-prefix)))
+            ;; undo-tree-history-directory-alist `(("." . ,undo-tree-history-dir)))))
 
 
 ;;;###autoload
