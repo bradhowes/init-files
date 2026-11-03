@@ -26,7 +26,8 @@
   "Custom Lisp-Data mode."
   (my/fontify-braces)
   (font-lock-mode t)
-  (show-paren-mode t))
+  (show-paren-mode t)
+  (flymake-mode 0))
 
 (defun my/noisy-check-parens ()
   "Execute `check-parens' and notify if OK."

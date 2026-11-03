@@ -8,6 +8,7 @@
 
 (require 'corfu)
 (require 'crm)
+(require 'undo-tree)
 
 (defvar my/horizontal-scroll-repeat-map
   (let ((map (make-sparse-keymap)))
@@ -20,6 +21,8 @@
 
 (put 'scroll-left 'repeat-map 'my/horizontal-scroll-repeat-map)
 (put 'scroll-right 'repeat-map 'my/horizontal-scroll-repeat-map)
+
+(autoload 'my/tmp-dir "my-env")
 
 ;;;###autoload
 (defun my/after-init-emacs-init ()
@@ -39,7 +42,36 @@
   (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
   (abbrev-mode)
   (when (file-exists-p custom-file)
-    (load custom-file 'noerror)))
+    (load custom-file 'noerror))
+
+  (when (eq system-type 'gnu/linux)
+    (set-face-background 'default "undefined"))
+
+  (when (eq system-type 'darwin)
+    (custom-set-variables
+     '(insert-directory-program "gls"))
+    (when (display-graphic-p)
+      (custom-set-variables
+       '(frame-resize-pixelwise t))))
+
+  ;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097 Basically, put backup and autosave files in their
+  ;; own directories inside our own `~/tmp' directory.
+  (let* ((tmp-dir (my/tmp-dir))
+         (backup-dir (file-name-as-directory (file-name-concat tmp-dir "emacs_backups")))
+         (auto-saves-dir (file-name-as-directory (file-name-concat tmp-dir "emacs_autosaves")))
+         (auto-saves-file-prefix (file-name-concat auto-saves-dir ".saves-"))
+         (undo-tree-history-dir (file-name-as-directory (file-name-concat tmp-dir "undo_trees"))))
+    (dolist (dir (list backup-dir auto-saves-dir undo-tree-history-dir))
+      (unless (file-directory-p dir)
+        (make-directory dir t)))
+    (setopt fbackup-directory-alist `(("." . ,backup-dir))
+            auto-save-file-name-transforms `((".*" ,auto-saves-dir t))
+            ;; Tramp as well but note slight change in pattern
+            tramp-backup-directory-alist `((".*" . ,backup-dir))
+            tramp-auto-save-directory auto-saves-dir
+            auto-save-list-file-prefix auto-saves-file-prefix
+            undo-tree-history-directory-alist `(("." . ,undo-tree-history-dir)))))
+
 
 ;;;###autoload
 (defun my/beginning-of-line-text (arg)

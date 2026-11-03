@@ -1,4 +1,4 @@
-;;; package -- custom.el  -*- lexical-binding: t; -*-
+;;; package -- custom.eld  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2------
@@ -95,6 +95,7 @@
  '(inhibit-startup-echo-area-message "howes")
  '(inhibit-startup-screen t)
  '(insert-directory-program "gls")
+ '(isearch-allow-motion t)
  '(isearch-lazy-count t)
  '(ispell-extra-args
    '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16" "--camel-case"))

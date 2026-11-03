@@ -136,7 +136,7 @@
   "Keymap for symbol-overlay actions.")
 
 ;; To keep this file small, we put all customizations in their own file.
-(setq-default custom-file (file-name-concat (expand-file-name user-emacs-directory) "custom.el")
+(setq-default custom-file (file-name-concat (expand-file-name user-emacs-directory) "custom.eld")
               ;; To keep this file small, minimize `use-package' content.
               use-package-always-defer t
               use-package-always-ensure nil ; change to `t' to force loading if not found.
@@ -949,7 +949,7 @@ Bound to \\`C-x p s'.")
 
   (apply #'my/emacs-key-bind global-map hyper-mappings)
 
-  ;; Perform key-chord bindings later, after we have loaded the `custom.el` file and we know that they are enabled.
+  ;; Perform key-chord bindings later, after we have loaded the `custom.eld' file and we know that they are enabled.
   (add-hook 'emacs-startup-hook (lambda ()
                                   (my/key-chord-mode-init hyper-mappings))
             90))
@@ -963,31 +963,6 @@ Bound to \\`C-x p s'.")
   "Keymap for canned info manual searches.")
 
 (keymap-set help-map "i" my/info-keys-map)
-
-(when (eq system-type 'gnu/linux)
-  (set-face-background 'default "undefined"))
-
-(when (eq system-type 'darwin)
-  (custom-set-variables
-   '(insert-directory-program "gls"))
-  (when (display-graphic-p)
-    (custom-set-variables
-     '(frame-resize-pixelwise t))))
-
-;; Backup strategy - from https://emacs.stackexchange.com/a/36/17097 Basically, put backup and autosave files in their
-;; own directories inside our own `~/tmp' directory.
-(let ((backup-dir (file-name-concat (my/tmp-dir) "emacs_backups"))
-      (auto-saves-dir (file-name-concat (my/tmp-dir) "emacs_autosaves")))
-  (dolist (dir (list backup-dir auto-saves-dir))
-    (unless (file-directory-p dir)
-      (make-directory dir t)))
-  (custom-set-variables
-   `(backup-directory-alist '(("." . ,backup-dir)))
-   `(auto-save-file-name-transforms '((".*" ,auto-saves-dir t)))
-   ;; Tramp as well but note slight change in pattern
-   `(tramp-backup-directory-alist '((".*" . ,backup-dir)))
-   `(tramp-auto-save-directory ,auto-saves-dir))
-  (setq auto-save-list-file-prefix (file-name-concat auto-saves-dir ".saves-")))
 
 (define-skeleton add-message-field
   "Blah."
