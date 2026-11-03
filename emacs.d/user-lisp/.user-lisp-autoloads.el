@@ -311,6 +311,8 @@ If MODE is nil then apply to the current mode.
 
 ;;; Generated autoloads from my-functions.el
 
+(autoload 'my/after-init-emacs-init "my-functions"
+"Custom Emacs init.")
 (autoload 'my/beginning-of-line-text "my-functions"
 "Augment behavior of `beginning-of-line-text'.
 
@@ -319,11 +321,10 @@ After calling `beginning-of-line' and ARG is 1 (or nil), call
 `beginning-of-line' to move to start of line.
 
 (fn ARG)" t)
-(autoload 'my/replace-region-with-calc-eval "my-functions"
-"Treat text in range START END as calc expression.
-Replace selection with evaluation result.
-
-(fn START END)" t)
+(autoload 'my/cape-initialize "my-functions"
+"Initialize cape.")
+(autoload 'my/corfu-initialize "my-functions"
+"Custom corfu initialize.")
 (autoload 'my/compile "my-functions"
 "Invoke `compile-multi' or `compile' depending on context." t)
 (autoload 'my/copy-file-name-to-clipboard "my-functions"
@@ -332,6 +333,8 @@ Replace selection with evaluation result.
 "Immediately show help for symbol at point if it exists.
 If help buffer is visible and it is showing help for the
 symbol, then hide it." t)
+(autoload 'my/diff-hl-initialize "my-functions"
+"Customize diff-hl.")
 (autoload 'my/display-prefix "my-functions"
 "Display the value of the raw prefix ARG.
 For debugging purposes.
@@ -360,8 +363,12 @@ Note that `file-directory-p' returns t if the (string) length of DIR is
 zero (0), so we detect that and report that as false.
 
 (fn DIR)")
+(autoload 'my/ligature-initialize "my-functions"
+"Custom ligature init.")
 (autoload 'my/magit-init-files "my-functions"
 "Show magit buffer for `init-files' repo." t)
+(autoload 'my/marginalia-initialize "my-functions"
+"Custom marginalia init.")
 (autoload 'my/mark-line "my-functions"
 "Blah blah ARG blah.
 
@@ -369,12 +376,21 @@ zero (0), so we detect that and report that as false.
 (autoload 'my/matching-paren "my-functions"
 "When point is on a paren-type character, jump to its twin.
 If just after closing paren move to it and then jump." t)
+(autoload 'my/nerd-icons-corfu-initialize "my-functions"
+"Custom nerd-icons-corfu init.")
+(autoload 'my/popper-initialize "my-functions"
+"Custom popper init.")
 (autoload 'my/reload-buffer "my-functions"
 "Reload the current buffer from disk.
 Checks to see if buffer needs saving, aborting the reload if changes not saved.
 Useful for Elisp content or changes to mode settings." t)
 (autoload 'my/remove-all-text-properties "my-functions"
 "Remove all text properties from the current buffer." t)
+(autoload 'my/replace-region-with-calc-eval "my-functions"
+"Treat text in range START END as calc expression.
+Replace selection with evaluation result.
+
+(fn START END)" t)
 (autoload 'my/set-mark-no-activate "my-functions"
 "Push `point' to `mark-ring' but does not activate the region." t)
 (autoload 'my/sort-lines-by-integer-key "my-functions"
@@ -399,20 +415,6 @@ very small for me, and it remove the obnoxious message at startup about
 the buffer having untrusted content.
 
 (fn ORIGINAL-RESPONSE)")
-(autoload 'my/cape-initialize "my-functions"
-"Initialize cape.")
-(autoload 'my/corfu-initialize "my-functions"
-"Custom corfu initialize.")
-(autoload 'my/diff-hl-initialize "my-functions"
-"Customize diff-hl.")
-(autoload 'my/ligature-initialize "my-functions"
-"Custom ligature init.")
-(autoload 'my/marginalia-initialize "my-functions"
-"Custom marginalia init.")
-(autoload 'my/nerd-icons-corfu-initialize "my-functions"
-"Custom nerd-icons-corfu init.")
-(autoload 'my/popper-initialize "my-functions"
-"Custom popper init.")
 (autoload 'my/ultra-scroll-initialize "my-functions"
 "Custom `ultra-scroll' init.")
 (register-definition-prefixes "my-functions" '("my/"))
@@ -1148,14 +1150,10 @@ disabled.
 
 ;;; Generated autoloads from my-speedbar.el
 
-(autoload 'my/speedbar-show "my-speedbar"
-"Move into speedbar enabling if necessary." t)
-(autoload 'my/speedbar-hide "my-speedbar"
-"Hide any active speedbar." t)
-(autoload 'my/speedbar-mode-hook "my-speedbar"
-"Customize `speedbar-mode'.")
-(autoload 'my/speedbar-initialize "my-speedbar"
-"Customize speedbar.")
+(autoload 'my/speedbar-toggle-view "my-speedbar"
+"Toggle the speedbar window appearance." t)
+(autoload 'my/speedbar-reconfigure-keymaps-hook "my-speedbar"
+"Customizing keymaps hook for `speedbar-mode'.")
 (register-definition-prefixes "my-speedbar" '("my/speedbar-"))
 
 

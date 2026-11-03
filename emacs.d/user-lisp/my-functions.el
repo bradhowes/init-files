@@ -9,6 +9,38 @@
 (require 'corfu)
 (require 'crm)
 
+(defvar my/horizontal-scroll-repeat-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "<" #'scroll-left)
+    (define-key map ">" #'scroll-right)
+    (define-key map "," #'scroll-left)
+    (define-key map "." #'scroll-right)
+    map)
+  "Custom keymap for horizontal scrolling repeat mode.")
+
+(put 'scroll-left 'repeat-map 'my/horizontal-scroll-repeat-map)
+(put 'scroll-right 'repeat-map 'my/horizontal-scroll-repeat-map)
+
+;;;###autoload
+(defun my/after-init-emacs-init ()
+  "Custom Emacs init."
+  (setq read-process-output-max (* 64 1024 1024)
+	process-adaptive-read-buffering nil
+        ;; debug-on-error t
+        frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
+                             (if (not (display-graphic-p))
+                                 (list (concat (system-name) " ") buffer-directory)
+                               buffer-directory))
+        load-path-filter-function #'load-path-filter-cache-directory-files)
+  (ffap-bindings)
+  (put 'narrow-to-region 'disabled nil)
+  (put 'scroll-left 'disabled nil)
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
+  (abbrev-mode)
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror)))
+
 ;;;###autoload
 (defun my/beginning-of-line-text (arg)
   "Augment behavior of `beginning-of-line-text'.
@@ -27,17 +59,36 @@ After calling `beginning-of-line' and ARG is 1 (or nil), call
 
 (autoload 'compile-multi "compile-multi")
 
+(defun my/crm-indicator(args)
+  "Custom CRM indicator for ARGS."
+  (cons (format "[CRM%s] %s"
+                (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
+                (car args))
+        (cdr args)))
+
+(autoload 'cape-dabbrev "cape")
+(autoload 'cape-file "cape")
+(autoload 'cape-elisp-block "cape")
+
 ;;;###autoload
-(defun my/replace-region-with-calc-eval (start end)
-  "Treat text in range START END as calc expression.
-Replace selection with evaluation result."
-  (interactive "r")
-  (when (and start end)
-    (let* ((eq (buffer-substring-no-properties start end))
-           (result (calc-eval eq)))
-      (if (stringp result)
-          (replace-region-contents start end result)
-        (message "%s" (cadr result))))))
+(defun my/cape-initialize ()
+  "Initialize cape."
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block))
+
+(autoload 'global-corfu-mode "corfu")
+(autoload 'corfu-popupinfo-mode "corfu-popupinfo")
+
+;;;###autoload
+(defun my/corfu-initialize ()
+  "Custom corfu initialize."
+  (global-corfu-mode 1)
+  (corfu-popupinfo-mode 1))
+
+(autoload 'diff-hl-flydiff-mode "diff-hl-flydiff")
+(autoload 'global-diff-hl-mode "diff-hl")
+(autoload 'global-diff-hl-show-hunk-mouse-mode "diff-hl-show-hunk")
 
 ;;;###autoload
 (defun my/compile ()
@@ -66,6 +117,13 @@ symbol, then hide it."
   (interactive)
   (describe-symbol (symbol-at-point) (help-buffer))
   (select-window (get-buffer-window (help-buffer))))
+
+;;;###autoload
+(defun my/diff-hl-initialize()
+  "Customize diff-hl."
+  (diff-hl-flydiff-mode t)
+  (global-diff-hl-mode t)
+  (global-diff-hl-show-hunk-mouse-mode t))
 
 ;;;###autoload
 (defun my/display-prefix (arg)
@@ -145,6 +203,41 @@ zero (0), so we detect that and report that as false."
        (file-directory-p dir)
        dir))
 
+(autoload 'global-ligature-mode "ligature")
+(autoload 'ligature-set-ligatures "ligature")
+
+(defun my/launch-ssh-emacs (host)
+  "Launch X11 Emacs on remote HOST."
+  (interactive)
+  (message "Starting Emacs on %s..." host)
+  (start-process
+   (concat "ssh-" host)
+   (concat " *ssh-" host "*")
+   "/usr/bin/ssh"
+   "-Y"
+   host
+   "exec /opt/homebrew/bin/emacs"))
+
+;;;###autoload
+(defun my/ligature-initialize ()
+  "Custom ligature init."
+  (ligature-set-ligatures
+   'prog-mode
+   '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+     ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+     "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+     "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+     "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+     "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+     "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+     "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+     ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+     "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+     "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+     "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+     "\\\\" "://" "www"))
+  (global-ligature-mode t))
+
 (autoload 'magit-status-setup-buffer "magit-status")
 (autoload 'my/init-files "my-env")
 
@@ -153,6 +246,15 @@ zero (0), so we detect that and report that as false."
   "Show magit buffer for `init-files' repo."
   (interactive)
   (magit-status-setup-buffer (my/init-files)))
+
+(autoload 'marginalia-mode "marginalia")
+(autoload 'nerd-icons-completion-mode "nerd-icons-completion")
+
+;;;###autoload
+(defun my/marginalia-initialize ()
+  "Custom marginalia init."
+  (marginalia-mode 1)
+  (nerd-icons-completion-mode 1))
 
 ;;;###autoload
 (defun my/mark-line (&optional arg)
@@ -181,6 +283,22 @@ If just after closing paren move to it and then jump."
 	(t
 	 nil)))
 
+(autoload 'nerd-icons-corfu-formatter "nerd-icons-corfu")
+
+;;;###autoload
+(defun my/nerd-icons-corfu-initialize ()
+  "Custom nerd-icons-corfu init."
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+(autoload 'popper-mode "popper")
+(autoload 'popper-echo-mode "popper-echo")
+
+;;;###autoload
+(defun my/popper-initialize ()
+  "Custom popper init."
+  (popper-mode)
+  (popper-echo-mode))
+
 ;;;###autoload
 (defun my/reload-buffer ()
   "Reload the current buffer from disk.
@@ -206,6 +324,18 @@ Useful for Elisp content or changes to mode settings."
          (start (or (region-beginning) (point-min)))
          (end (or (region-end) (point-max))))
     (set-text-properties start end nil)))
+
+;;;###autoload
+(defun my/replace-region-with-calc-eval (start end)
+  "Treat text in range START END as calc expression.
+Replace selection with evaluation result."
+  (interactive "r")
+  (when (and start end)
+    (let* ((eq (buffer-substring-no-properties start end))
+           (result (calc-eval eq)))
+      (if (stringp result)
+          (replace-region-contents start end result)
+        (message "%s" (cadr result))))))
 
 ;;;###autoload
 (defun my/set-mark-no-activate ()
@@ -251,123 +381,6 @@ very small for me, and it remove the obnoxious message at startup about
 the buffer having untrusted content."
   (or original-response
       (buffer-name "*scratch*")))
-
-(defun my/launch-ssh-emacs (host)
-  "Launch X11 Emacs on remote HOST."
-  (interactive)
-  (message "Starting Emacs on %s..." host)
-  (start-process
-   (concat "ssh-" host)
-   (concat " *ssh-" host "*")
-   "/usr/bin/ssh"
-   "-Y"
-   host
-   "exec /opt/homebrew/bin/emacs"))
-
-(defun my/crm-indicator(args)
-  "Custom CRM indicator for ARGS."
-  (cons (format "[CRM%s] %s"
-                (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
-                (car args))
-        (cdr args)))
-
-(defun my/after-init-emacs-init ()
-  "Custom Emacs init."
-  (setq read-process-output-max (* 64 1024 1024)
-	process-adaptive-read-buffering nil
-        ;; debug-on-error t
-        frame-title-format (let ((buffer-directory '(:eval (abbreviate-file-name default-directory))))
-                             (if (not (display-graphic-p))
-                                 (list (concat (system-name) " ") buffer-directory)
-                               buffer-directory))
-        load-path-filter-function #'load-path-filter-cache-directory-files)
-  (ffap-bindings)
-  (put 'narrow-to-region 'disabled nil)
-  (put 'scroll-left 'disabled nil)
-  (fset 'yes-or-no-p 'y-or-n-p)
-  (advice-add #'completing-read-multiple :filter-args #'my/crm-indicator)
-  (abbrev-mode)
-  (when (file-exists-p custom-file)
-    (load custom-file 'noerror)))
-
-(autoload 'cape-dabbrev "cape")
-(autoload 'cape-file "cape")
-(autoload 'cape-elisp-block "cape")
-
-;;;###autoload
-(defun my/cape-initialize ()
-  "Initialize cape."
-  (add-hook 'completion-at-point-functions #'cape-dabbrev)
-  (add-hook 'completion-at-point-functions #'cape-file)
-  (add-hook 'completion-at-point-functions #'cape-elisp-block))
-
-(autoload 'global-corfu-mode "corfu")
-(autoload 'corfu-popupinfo-mode "corfu-popupinfo")
-
-;;;###autoload
-(defun my/corfu-initialize ()
-  "Custom corfu initialize."
-  (global-corfu-mode 1)
-  (corfu-popupinfo-mode 1))
-
-(autoload 'diff-hl-flydiff-mode "diff-hl-flydiff")
-(autoload 'global-diff-hl-mode "diff-hl")
-(autoload 'global-diff-hl-show-hunk-mouse-mode "diff-hl-show-hunk")
-
-;;;###autoload
-(defun my/diff-hl-initialize()
-  "Customize diff-hl."
-  (diff-hl-flydiff-mode t)
-  (global-diff-hl-mode t)
-  (global-diff-hl-show-hunk-mouse-mode t))
-
-(autoload 'global-ligature-mode "ligature")
-(autoload 'ligature-set-ligatures "ligature")
-
-;;;###autoload
-(defun my/ligature-initialize ()
-  "Custom ligature init."
-  (ligature-set-ligatures
-   'prog-mode
-   '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
-     ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
-     "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
-     "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
-     "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
-     "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
-     "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
-     "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
-     ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
-     "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
-     "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
-     "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
-     "\\\\" "://" "www"))
-  (global-ligature-mode t))
-
-(autoload 'marginalia-mode "marginalia")
-(autoload 'nerd-icons-completion-mode "nerd-icons-completion")
-
-;;;###autoload
-(defun my/marginalia-initialize ()
-  "Custom marginalia init."
-  (marginalia-mode 1)
-  (nerd-icons-completion-mode 1))
-
-(autoload 'nerd-icons-corfu-formatter "nerd-icons-corfu")
-
-;;;###autoload
-(defun my/nerd-icons-corfu-initialize ()
-  "Custom nerd-icons-corfu init."
-  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
-
-(autoload 'popper-mode "popper")
-(autoload 'popper-echo-mode "popper-echo")
-
-;;;###autoload
-(defun my/popper-initialize ()
-  "Custom popper init."
-  (popper-mode)
-  (popper-echo-mode))
 
 (autoload 'ultra-scroll-mode "ultra-scroll")
 

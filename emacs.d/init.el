@@ -97,6 +97,8 @@
 (autoload 'my/shell-other-window "my-shells")
 (autoload 'my/shell-other-frame "my-shells")
 (autoload 'ksh "my-shells")
+(autoload 'my/speedbar-mode-hook "my-speedbar")
+(autoload 'my/speedbar-toggle-view "my-speedbar")
 (autoload 'my/htop "my-tops")
 (autoload 'my/yaml-ts-mode-hook "my-yaml-mode")
 (autoload 'my/yaml-ts-setup-hook "my-yaml-mode")
@@ -463,6 +465,13 @@
 
 (use-package git-timemachine)
 
+(use-package grove
+  :commands (global-grove-mode)
+  :custom
+  (grove-directory "~/src/Mine/init-files/notes/")
+  :hook (after-init . (lambda ()
+                        (global-grove-mode 1))))
+
 (use-package helpful
   :bind ( :map help-map
           ("a" . helpful-symbol)
@@ -664,6 +673,9 @@ Bound to \\`C-x p s'.")
   (explicit-bash-args '("--noediting" "-i"))
   :hook ((shell-mode . my/shell-mode-hook)))
 
+(use-package speedbar
+  :hook ((speedbar-reconfigure-keymaps . my/speedbar-reconfigure-keymaps-hook)))
+
 (use-package subword
   :hook ((after-init . global-subword-mode)))
 
@@ -750,7 +762,8 @@ Bound to \\`C-x p s'.")
   (setq switch-to-buffer-in-dedicated-window 'pop
         switch-to-buffer-obey-display-actions t
         window-resize-pixelwise t
-        window-sides-slots '(0 0 3 1)
+        ;; Enabling this causes speedbar to not work in window mode.
+        ;; window-sides-slots '(0 0 3 1)
         display-buffer-base-action '((display-buffer-reuse-window ace-display-buffer))
         display-buffer-alist `(("\\*help\\[R" (display-buffer-reuse-mode-window ace-display-buffer) (reusable-frames . nil))
                                ("\\*R" nil (reusable-frames . nil))
@@ -762,7 +775,6 @@ Bound to \\`C-x p s'.")
 
 ;;; --- Key Bindings
 (my/emacs-key-bind my/hyper-c-map
-                   "g" #'my/magit-init-files
                    "i" #'my/find-user-init-file
                    "j" my/dired-jumps-map
                    "r" #'ielm
@@ -922,7 +934,8 @@ Bound to \\`C-x p s'.")
                             "H-B" #'consult-project-buffer
                             "H-c" my/hyper-c-map
                             "H-d" #'crux-duplicate-current-line-or-region
-                            "H-f" #'consult-flymake
+                            "H-f" #'my/speedbar-toggle-view
+                            "H-M-f" #'consult-flymake
                             "H-g" #'magit-status
                             "H-h" #'my/describe-symbol-at-point
                             "H-j" my/point-jumps-map

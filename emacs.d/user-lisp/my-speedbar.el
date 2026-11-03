@@ -13,42 +13,27 @@
                                             "files")))
 
 ;;;###autoload
-(defun my/speedbar-show ()
-  "Move into speedbar enabling if necessary."
+(defun my/speedbar-toggle-view ()
+  "Toggle the speedbar window appearance."
   (interactive)
-  (if (speedbar-frame-or-window)
-      (speedbar-get-focus)
-    (speedbar)
+  (if (eq speedbar-buffer (current-buffer))
+      (speedbar)
     (speedbar-get-focus)))
 
-;;;###autoload
-(defun my/speedbar-hide ()
-  "Hide any active speedbar."
-  (interactive)
-  (when (speedbar-frame-or-window)
-      (speedbar)))
-
-(defun my/speedbar-edit-line ()
-  "Customized `speedbar-edit-line'."
+(defun my/speedbar-edit-line-and-close ()
+  "Perform `speedbar-edit-line' and then close speedbar view."
   (interactive)
   (speedbar-edit-line)
-  (my/speedbar-hide))
+  (my/speedbar-toggle-view))
 
 ;;;###autoload
-(defun my/speedbar-mode-hook ()
-  "Customize `speedbar-mode'."
-  ;; !!! Needs work
-  (keymap-set speedbar-mode-map "q" #'my/speedbar-hide)
-  (keymap-set speedbar-mode-map "b" #'my/speedbar-toggle-expansion-list)
-  (keymap-set speedbar-mode-map "f" #'my/speedbar-toggle-expansion-list)
-  (keymap-set speedbar-mode-map "RET" #'my/speedbar-edit-line)
-  (keymap-set speedbar-mode-map "e" #'my/speedbar-edit-line))
-
-;;;###autoload
-(defun my/speedbar-initialize ()
-  "Customize speedbar."
-  (setopt speedbar-prefer-window t
-          speedbar-use-images nil))
+(defun my/speedbar-reconfigure-keymaps-hook ()
+  "Customizing keymaps hook for `speedbar-mode'."
+  (keymap-local-set "RET" #'my/speedbar-edit-line-and-close)
+  (keymap-local-set "e" #'my/speedbar-edit-line-and-close)
+  (keymap-local-set "TAB" #'speedbar-toggle-line-expansion)
+  (keymap-local-set "/" #'isearch-forward)
+  (keymap-local-set "q" #'my/speedbar-toggle-view))
 
 (provide 'my-speedbar)
 ;;; my-speedbar.el ends here.
