@@ -135,7 +135,12 @@ export _ZO_RESOLVE_SYMLINKS=1
 [[ -f '/Users/howes/google-cloud-sdk/completion.zsh.inc' ]] && . '/Users/howes/google-cloud-sdk/completion.zsh.inc'
 
 # Work-related -- add GitHub SSL key
-[[ -f "${HOME}/.ssh/id_ed25519" ]] && ssh-add -q --apple-use-keychain "${HOME}/.ssh/id_ed25519"
+if [[ -f "${HOME}/.ssh/id_ed25519" ]]; then
+  # Startup ssh-agent.
+  eval "$(ssh-agent -s)"
+  # Add the Github key. Use Apple keychain which holds the password to decrypt the ssh private key.
+  ssh-add -q --apple-use-keychain "${HOME}/.ssh/id_ed25519"
+fi
 
 mise="/Users/bradhowes/.local/bin/mise"
 [[ -f "${mise}" ]] && eval "$(${mise} activate zsh)"
