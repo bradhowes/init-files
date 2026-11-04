@@ -75,8 +75,17 @@
   ;; Always make prominent even if not active window.
   (setopt doom-modeline-always-highlight-modified-buffer-file-name t
           ;; Allow *all* segments to be removed if not in active mode-line
-          doom-modeline-check-segment-visible-all t)
-
+          doom-modeline-check-segment-visible-all t
+          ;; Keep the following in a bar to minimize resizing and to give some hint at what the buffer contains
+          doom-modeline-always-visible-segments '(bar
+                                                  buffer-info
+                                                  buffer-info-simple
+                                                  buffer-default-directory
+                                                  buffer-default-directory-simple
+                                                  calc
+                                                  git-timemachine
+                                                  package
+                                                  speedbar-name))
   (doom-modeline-mode 1))
 
 (provide 'my/doom-modeline)
