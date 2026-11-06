@@ -691,6 +691,8 @@ Bound to \\`C-x p s'.")
           ("H-j" . consult-dir-jump-file))
   :hook ((after-init . vertico-mode)))
 
+(use-package vundo)
+
 (use-package which-key
   :hook (after-init . which-key-mode))
 
