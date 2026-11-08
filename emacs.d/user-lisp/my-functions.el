@@ -70,8 +70,6 @@
             tramp-backup-directory-alist `((".*" . ,backup-dir))
             tramp-auto-save-directory auto-saves-dir
             auto-save-list-file-prefix auto-saves-file-prefix)))
-            ;; undo-tree-history-directory-alist `(("." . ,undo-tree-history-dir)))))
-
 
 ;;;###autoload
 (defun my/beginning-of-line-text (arg)

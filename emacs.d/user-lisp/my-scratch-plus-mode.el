@@ -14,16 +14,19 @@
 ;;;###autoload
 (defun my/scratch-plus-mode-hook ()
   "Custom hook for `scratch-plus-mode'."
-  (unless (file-exists-p scratch-plus-save-directory)
-    (make-directory scratch-plus-save-directory t))
-  (my/show-scratch-buffer))
+  (when scratch-plus-mode
+    (unless (file-exists-p scratch-plus-save-directory)
+      (make-directory scratch-plus-save-directory t))
+    (my/show-scratch-buffer)))
 
 ;;;###autoload
 (defun my/scratch-plus-mode-init ()
   "Custom init for `scratch-plus-mode'."
+  (setopt scratch-plus-save-directory (file-name-concat user-emacs-directory "scratches")
+          scratch-plus-project-subdir ".scratches")
   (unless (file-exists-p scratch-plus-save-directory)
     (make-directory scratch-plus-save-directory t))
-  (scratch-plus-mode))
+  (scratch-plus-mode 1))
 
 (provide 'my-scratch-plus-mode)
 ;;; my-scratch-plus-mode.el ends here

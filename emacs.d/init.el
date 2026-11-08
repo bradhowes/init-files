@@ -55,6 +55,8 @@
 (autoload 'my/set-mark-deactivate "my-functions")
 (autoload 'my/trusted-content-p "my-functions")
 (autoload 'my/ultra-scroll-initialize "my-functions")
+(autoload 'my/keycast-mode "my-keycast-mode")
+(autoload 'my/key-chord-mode-init "my-key-chord-mode-init")
 (autoload 'my/dired-jumps-bind "my-keymaps")
 (autoload 'my/emacs-chord-bind "my-keymaps")
 (autoload 'my/emacs-key-bind "my-keymaps")
@@ -89,6 +91,9 @@
 (autoload 'my/show-project-menu "my-project")
 (autoload 'my/python-mode-hook "my-python-mode")
 (autoload 'my/inferior-python-mode-hook "my-python-mode")
+(autoload 'my/scratch-plus-mode-hook "my-scratch-plus-mode")
+(autoload 'my/scratch-plus-mode-init "my-scratch-plus-mode")
+(autoload 'my/show-scratch-buffer "my-scratch-plus-mode")
 (autoload 'my/start-emacs-server "my-server")
 (autoload 'my/sh-mode-hook "my-sh-mode")
 (autoload 'my/shell-mode-hook "my-shell-mode")
@@ -483,8 +488,8 @@
 (use-package indent-bars
   :hook (prog-mode . indent-bars-mode))
 
-(use-package iso-transl
-  :bind-keymap ("H-8" . iso-transl-ctl-x-8-map)) ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
+(use-package iso-transl                 ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
+  :bind-keymap ("H-8" . iso-transl-ctl-x-8-map))
 
 (use-package kkp
   :if (my/is-terminal)
@@ -637,16 +642,7 @@ Bound to \\`C-x p s'.")
 (use-package saveplace
   :hook ((after-init . save-place-mode)))
 
-(autoload 'my/show-scratch-buffer "my-scratch-plus-mode")
-(autoload 'my/scratch-plus-mode-hook "my-scratch-plus-mode")
-(autoload 'my/scratch-plus-mode-init "my-scratch-plus-mode")
-
 (use-package scratch-plus
-  :custom
-  (scratch-plus-save-directory (file-name-concat user-emacs-directory "scratches"))
-  (scratch-plus-project-subdir ".scratches")
-  (scratch-plus-restore-type t)
-  (scratch-plus-force-restore t)
   :bind ( :map my/hyper-c-map
           ("s" . my/show-scratch-buffer))
   :hook ((scratch-plus-mode . my/scratch-plus-mode-hook)
@@ -909,8 +905,6 @@ Bound to \\`C-x p s'.")
 ;; Populate two key maps with hyper-key definitions. The first -- global -- holds the mapping that uses the real `Hyper'
 ;; modifier. The second keymap -- `my/hyper-keys-map` -- holds the mapping that uses a keychord to activate which is
 ;; useful on terminals that do not offer a `Hyper' modifier.
-(autoload 'my/keycast-mode "my-keycast-mode")
-(autoload 'my/key-chord-mode-init "my-key-chord-mode-init")
 (let ((hyper-mappings (list "H-SPC" #'my/set-mark-deactivate
                             "H-." #'my/goto-mark
                             "H-1" #'delete-other-windows
@@ -956,6 +950,8 @@ Bound to \\`C-x p s'.")
   (add-hook 'emacs-startup-hook (lambda ()
                                   (my/key-chord-mode-init hyper-mappings))
             90))
+
+(keymap-set global-map "H-8 RET" #'insert-char)
 
 (defvar my/info-keys-map
   (let ((map (make-sparse-keymap)))
