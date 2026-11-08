@@ -59,7 +59,7 @@
  '(dired-auto-revert-buffer t)
  '(dired-dwim-target t)
  '(dired-isearch-filenames t)
- '(dired-listing-switches "-al --group-directories-first")
+ '(dired-listing-switches "-al")
  '(dired-recursive-copies 'always)
  '(dired-recursive-deletes 'always)
  '(doom-modeline-buffer-encoding 'nondefault)
@@ -122,7 +122,7 @@
  '(package-selected-packages
    '(ace-window cape char-menu cmake-mode comment-tags compile-multi compile-multi-embark compile-multi-nerd-icons
                 consult-compile-multi consult-dir consult-eglot consult-multi-compile consult-notes consult-zoxide corfu
-                crux denote diff-hl doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region
+                crux denote diff-hl dirvish doom-themes eldoc-box embark-consult esup exec-path-from-shell expand-region
                 fancy-compilation flymake-gradle flymake-shellcheck flyover format-all git-timemachine go-mode
                 gradle-mode helpful indent-bars inheritenv js2-mode keycast kkp kotlin-ts-mode language-id ligature
                 magit marginalia mode-line-bell multiple-cursors nerd-icons nerd-icons-completion nerd-icons-corfu
@@ -173,8 +173,6 @@
  '(speedbar-use-images nil)
  '(switch-to-prev-buffer-skip t)
  '(tab-always-indent 'complete)
- '(tramp-auto-save-directory "/Users/bradhowes/tmp/emacs_autosaves" t)
- '(tramp-backup-directory-alist '((".*" . "/Users/bradhowes/tmp/emacs_backups")) t)
  '(truncate-string-ellipsis "…" t)
  '(uniquify-buffer-name-style 'forward nil (uniquify))
  '(user-mail-address "bradhowes@mac.com")
