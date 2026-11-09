@@ -489,7 +489,8 @@
   :hook (prog-mode . indent-bars-mode))
 
 (use-package iso-transl                 ; Enter diacritics using "dead" keys after <H-8> or <C-X 8>
-  :bind-keymap ("H-8" . iso-transl-ctl-x-8-map))
+                                        ; NOTE: key bindings done in the `hyper-mappings' near the end of the file
+  :defer nil)                           ; NOTE: do this to get `iso-transl-ctl-x-8-map' (could do require instead)
 
 (use-package kkp
   :if (my/is-terminal)
@@ -587,10 +588,10 @@
 
 (use-package org
   :commands (org-store-link)
-  :bind( :map my/org-key-map
-         ("a" . org-agenda)
-         ("c" . org-capture)
-         ("l" . org-store-link))
+  :bind ( :map my/org-key-map
+          ("a" . org-agenda)
+          ("c" . org-capture)
+          ("l" . org-store-link))
   :hook ((after-init . my/org-initialize)))
 
 (use-package osx-dictionary
@@ -911,6 +912,8 @@ Bound to \\`C-x p s'.")
                             "H-2" #'split-window-below
                             "H-4" #'other-window-prefix ; was ctl-x-4-prefix
                             "H-5" #'other-frame-prefix  ; was ctl-x-5-prefix
+                            "H-8" iso-transl-ctl-x-8-map ; same as "C-x 8"
+                            "H-8 RET" #'insert-char      ; same as "C-x 8 RET"
                             "H-a" #'my/ace-window-always-dispatch
                             "H-b" #'consult-buffer
                             "H-M-b" #'consult-bookmark
@@ -951,7 +954,8 @@ Bound to \\`C-x p s'.")
                                   (my/key-chord-mode-init hyper-mappings))
             90))
 
-(keymap-set global-map "H-8 RET" #'insert-char)
+;; (keymap-set global-map "H-8 RET" #'insert-char)
+;; (keymap-set global-map "H-8 RET" #'insert-char)
 
 (defvar my/info-keys-map
   (let ((map (make-sparse-keymap)))
