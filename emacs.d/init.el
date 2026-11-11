@@ -826,6 +826,12 @@ Bound to \\`C-x p s'.")
                    "M-{" #'my/prev-buffer-current-window
                    "M-}" #'my/next-buffer-current-window
 
+                   "<f1>" #'my/layout-normal-screen-font-size
+                   "<f2>" #'my/layout-share-screen-font-size
+
+                   "S-<f12>" #'package-list-packages
+                   "S-<f11>" #'my/layout-screen-layout-changed
+
                    "M-<f1>" #'my/layout-frame-pos-left
                    "M-<f2>" #'my/layout-frame-pos-center
                    "M-<f3>" #'my/layout-frame-pos-right
@@ -835,8 +841,6 @@ Bound to \\`C-x p s'.")
                    "<home>" #'beginning-of-buffer
                    "<end>" #'end-of-buffer
                    "<delete>" #'delete-char
-                   "S-<f12>" #'package-list-packages
-                   "S-<f11>" #'my/layout-screen-layout-changed
 
                    "M-z" #'zap-up-to-char
                    "M-_" #'join-line
@@ -846,9 +850,6 @@ Bound to \\`C-x p s'.")
 
                    "C-S-p" #'my/ace-window-previous
                    "C-S-n" #'my/ace-window-next
-
-                   "<f1>" #'my/layout-normal-screen-font-size
-                   "<f2>" #'my/layout-share-screen-font-size
 
                    "<insert>" #'ignore  ; disable key for toggling overwrite-mode
                    "<insertchar>" #'ignore  ; disable key for toggling overwrite-mode
