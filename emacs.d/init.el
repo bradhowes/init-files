@@ -23,6 +23,7 @@
 (autoload 'my/after-init-emacs-init "my-functions")
 (autoload 'my/beginning-of-line-text "my-functions")
 (autoload 'my/cape-initialize "my-functions")
+(autoload 'my/consult-info-emacs "my-functions")
 (autoload 'my/copy-file-name-to-clipboard "my-functions")
 (autoload 'my/corfu-initialize "my-functions")
 (autoload 'my/describe-symbol-at-point "my-functions")
@@ -672,7 +673,8 @@ Bound to \\`C-x p s'.")
           ("H-j" . consult-dir-jump-file))
   :hook ((after-init . vertico-mode)))
 
-(use-package vundo)
+(use-package vundo
+  :commands (vundo))
 
 (use-package which-key
   :hook (after-init . which-key-mode))
@@ -721,11 +723,6 @@ Bound to \\`C-x p s'.")
   :hook ((minibuffer-setup . cursor-intangible-mode)
          (before-save . copyright-update)
          (after-init . my/after-init-emacs-init)))
-
-(defun my/consult-info-emacs ()
-  "Search Emacs info."
-  (interactive)
-  (consult-info "emacs" "autotype" "cape" "corfu" "denote" "embark" "magit" "marginalia" "orderless" "vertico"))
 
 (use-package window
   :init

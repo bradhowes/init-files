@@ -22,6 +22,7 @@
 (put 'scroll-left 'repeat-map 'my/horizontal-scroll-repeat-map)
 (put 'scroll-right 'repeat-map 'my/horizontal-scroll-repeat-map)
 
+(autoload 'consult-info "consult")
 (autoload 'my/tmp-dir "my-env")
 
 ;;;###autoload
@@ -103,6 +104,11 @@ After calling `beginning-of-line' and ARG is 1 (or nil), call
     (beginning-of-line-text 1)
     (when (= orig (point))
       (beginning-of-line 1))))
+
+(defun my/consult-info-emacs ()
+  "Search Emacs info."
+  (interactive)
+  (consult-info "emacs" "autotype" "cape" "corfu" "denote" "embark" "magit" "marginalia" "orderless" "vertico"))
 
 (autoload 'compile-multi "compile-multi")
 
