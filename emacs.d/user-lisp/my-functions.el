@@ -27,6 +27,23 @@
 ;;;###autoload
 (defun my/after-init-emacs-init ()
   "Custom Emacs init."
+
+  ;; Always work in the UTF-8 coding system.
+  (let ((coding-system 'utf-8))
+    (set-charset-priority 'unicode)
+    (prefer-coding-system coding-system)
+
+    (dolist (v (list 'locale-coding-system
+                     'coding-system-for-read
+                     'coding-system-for-write))
+      (set v coding-system))
+
+    (dolist (p (list #'set-terminal-coding-system
+                     #'set-keyboard-coding-system
+                     #'set-selection-coding-system
+                     #'prefer-coding-system))
+      (funcall p coding-system)))
+
   (setq read-process-output-max (* 64 1024 1024)
 	process-adaptive-read-buffering nil
         ;; debug-on-error t

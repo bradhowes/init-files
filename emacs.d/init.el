@@ -5,22 +5,6 @@
 
 ;; (setq debug-on-message "Unable to activate package 'lsp-mode'.")
 
-;; Always work in the UTF-8 coding system.
-(let ((coding-system 'utf-8))
-  (set-charset-priority 'unicode)
-  (prefer-coding-system coding-system)
-
-  (dolist (v (list 'locale-coding-system
-                   'coding-system-for-read
-                   'coding-system-for-write))
-    (set v coding-system))
-
-  (dolist (p (list #'set-terminal-coding-system
-                   #'set-keyboard-coding-system
-                   #'set-selection-coding-system
-                   #'prefer-coding-system))
-    (funcall p coding-system)))
-
 ;; Replicating much of what is in user-lisp-autoloads.el in order to silence warnings from flymake. The file is loaded
 ;; upon startup but the Elisp bytecompiler does not know about that when run in another Emacs process. I think flycheck
 ;; does the right thing here…
