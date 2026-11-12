@@ -48,6 +48,7 @@
   (font-lock-mode t)
   (show-paren-mode t)
   (yas-minor-mode 1)
+  (flymake-mode 1)
   (keymap-local-set "C-x C-e" #'my/eval-this-defun)
   (keymap-local-set "C-x M-e" #'eval-last-sexp)
   (keymap-local-set "C-M-;" #'my/lisp-insert-block-comment)
