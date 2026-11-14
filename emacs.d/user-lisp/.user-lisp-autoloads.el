@@ -1156,6 +1156,25 @@ disabled.
 "Customizing keymaps hook for `speedbar-mode'.")
 (register-definition-prefixes "my-speedbar" '("my/speedbar-"))
 
+
+
+;;; Generated autoloads from my-translate.el
+
+(autoload 'my/translate-en-fr "my-translate"
+"Translate text in region START to END from English to French.
+
+(fn START END)" t)
+(autoload 'my/translate-fr-en "my-translate"
+"Translate text in region START to END from French to English.
+
+(fn START END)" t)
+(register-definition-prefixes "my-translate" '("my/translate--do"))
+
+
+;;; Generated autoloads from my-gnus.el
+
+(autoload 'my/gnus-initialize "my-gnus"
+"Initialize gnus." t)
 
 ;;; End of scraped data
 
