@@ -16,4 +16,5 @@ echo "-- CMD: python3 scripts/bumpVersions.py '${ARG}' '${VAL}'"
 
 cd "${DIR}" || error "Invalid directory '${DIR}'"
 
+# shellcheck disable=SC2086
 python3 scripts/bumpVersions.py "${ARG}" ${VAL}

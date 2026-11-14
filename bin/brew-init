@@ -3,8 +3,8 @@
 # Install homebrew base
 [[ -d "/opt/homebrew" ]] || curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
 
-# Install dependencies
-for what in aspell coreutils gls ggrep ispell rg shellcheck; do
+# Install dependencies (probably wrong by now...)
+for what in aspell coreutils gls ggrep gnupg ispell rg shellcheck; do
   echo "-- installing ${what}"
   [[ -x "$(whence ${what})" ]] || brew install ${what}
 done
