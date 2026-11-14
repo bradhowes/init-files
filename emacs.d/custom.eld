@@ -76,6 +76,7 @@
  '(eldoc-echo-area-use-multiline-p 5)
  '(eldoc-help-at-pt t)
  '(enable-recursive-minibuffers t)
+ '(epa-pinentry-mode 'loopback)
  '(exchange-point-and-mark-highlight-region nil)
  '(exec-path-from-shell-arguments '("-l"))
  '(fill-column 120)
