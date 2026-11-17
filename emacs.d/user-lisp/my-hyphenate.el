@@ -14,12 +14,16 @@
 ;;; # Create venv + pyphen
 ;;; if [[ ! -d "${root}/venv" ]]; then
 ;;;   python3 -m venv venv
+;;;   # shellcheck disable=SC1091
 ;;;   source "${root}/venv/bin/activate"
 ;;;   pip install -U pip pyphen
+;;; else
+;;;   # shellcheck disable=SC1091
+;;;   source "${root}/venv/bin/activate"
 ;;; fi
 ;;;
-;;; source "${root}/venv/bin/activate"
 ;;; exec python3 "${root}/hyphenate.py" "${lang}" "${min_len}" 2>/dev/null
+;;; # END
 ;;;
 ;;; ## hyphenate.py Python script at `~/src/hyphenator/hyphenate.py'
 ;;;
@@ -51,6 +55,7 @@
 ;;; if __name__ == "__main__":
 ;;;     hyphenate_text(sys.stdin.read().strip(), sys.argv[1], sys.argv[2])
 ;;;     sys.exit(0)
+;;; # END
 
 (defcustom my/hyphenate-lang "en_US"
   "Language locale passed to Python's pyphen (e.g., \"en_US\", \"fr\", \"de_DE\")."
