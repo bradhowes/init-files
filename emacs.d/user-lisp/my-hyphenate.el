@@ -2,6 +2,55 @@
 ;;; -----1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2------
 ;;; Commentary:
 ;;; Code:
+;;;
+;;; ## hyphenate shell script at `~/src/hyphenator/hyphenate'
+;;; #!/bin/bash
+;;; # Trampoline to enter Python and execute the hyphenate.py script.
+;;; root=$(dirname "${BASH_SOURCE[0]}")
+;;;
+;;; lang="${1}"
+;;; min_len="${2}"
+;;;
+;;; # Create venv + pyphen
+;;; if [[ ! -d "${root}/venv" ]]; then
+;;;   python3 -m venv venv
+;;;   source "${root}/venv/bin/activate"
+;;;   pip install -U pip pyphen
+;;; fi
+;;;
+;;; source "${root}/venv/bin/activate"
+;;; exec python3 "${root}/hyphenate.py" "${lang}" "${min_len}" 2>/dev/null
+;;;
+;;; ## hyphenate.py Python script at `~/src/hyphenator/hyphenate.py'
+;;;
+;;; #!/Users/howes/src/hyphenator/venv/bin/python
+;;;
+;;; # Hyphenate the text from stdin.
+;;; #
+;;; # - first parameter is the source language (eg. 'fr')
+;;; # - the text to hyphenate is taken from stdin
+;;; # - the hyphenated text is written to stdout
+;;;
+;;; import pyphen
+;;; import re
+;;; import sys
+;;;
+;;;
+;;; def hyphenate_text(text: str, lang: str, min_len: int) -> str:
+;;;     dic = pyphen.Pyphen(lang=lang)
+;;;     pattern = rf"\b[A-Za-z]{{{min_len},}}\b"
+;;;     hyphen = "\u00ad"
+;;;     hyphen = "-"
+;;;
+;;;     def repl(match: re.Match) -> str:
+;;;         return dic.inserted(match.group(0), hyphen)
+;;;
+;;;     print(re.sub(pattern, repl, text))
+;;;
+;;;
+;;; if __name__ == "__main__":
+;;;     hyphenate_text(sys.stdin.read().strip(), sys.argv[1], sys.argv[2])
+;;;     sys.exit(0)
 
 (defcustom my/hyphenate-lang "en_US"
   "Language locale passed to Python's pyphen (e.g., \"en_US\", \"fr\", \"de_DE\")."
@@ -28,6 +77,9 @@
                          (format "%d" my/hyphenate-min-word-len))))
 
 (defun my/hyphenate--fill-region (from to &optional justify nosqueeze to-eop)
+  "Hyphenate region from FROM to TO then fill.
+The JUSTIFY, NOSQUEEZE, and TO-EOP optional arguments are the same as for
+`fill-region' -- they are not used by the hyphenate process."
   (interactive (progn
 		 (barf-if-buffer-read-only)
 		 (list (region-beginning) (region-end)
