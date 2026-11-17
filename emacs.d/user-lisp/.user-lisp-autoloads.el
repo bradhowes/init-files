@@ -1176,6 +1176,13 @@ disabled.
 (autoload 'my/gnus-initialize "my-gnus"
 "Initialize gnus." t)
 
+<<<<<<< HEAD
+=======
+
+;;; Generated autoloads from my-hyphenate.el
+
+(register-definition-prefixes "my-hyphenate" '("my/hyphenate-"))
+>>>>>>> 3dbba68 (WIP: hyphenate during fill region.)
 
 ;;; End of scraped data
 
