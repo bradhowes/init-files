@@ -57,12 +57,16 @@
 ;;;     sys.exit(0)
 ;;; # END
 
+(defconst my/hyphenate-soft-hyphen ?\u00ad
+  "The soft-hyphen character found in UTF8.
+If changed, similar change must be made in the Python code.")
+
 (defcustom my/hyphenate-lang "en_US"
   "Language locale passed to Python's pyphen (e.g., \"en_US\", \"fr\", \"de_DE\")."
   :type '(string)
   :group 'my/customizations)
 
-(defcustom my/hyphenate-min-word-len 6
+(defcustom my/hyphenate-min-word-len 5
   "Minimum word length required before considering hyphenation."
   :type '(integer)
   :group 'my/customizations)
@@ -81,46 +85,59 @@
                          my/hyphenate-lang
                          (format "%d" my/hyphenate-min-word-len))))
 
-;;;###autoload
-(define-minor-mode my/hyphenate-fill-mode
-  "Minor mode to enable Pyphen hyphenation.
-Affects `fill-paragraph' and `fill-region' operations."
-  :global nil
-  :lighter " HyF"
-  (modify-category-entry ?\u00ad ?|)
-  (set (make-local-variable fill-region-as-paragraph-function)
-       (if my/hyphenate-fill-mode
-           #'my/hyphenate--fill-region-as-paragraph-with-hyphenation
-         #'fill-region-as-paragraph-default)))
-
 (defun my/hyphenate--undo-past-hyphenation ()
-  "Remove hyphens at the end of lines."
+  "Remove any hard hyphens at the end of lines.
+This is done before attempting a new hyphenated fill."
   (goto-char (point-min))
   (while (re-search-forward "-\n" nil t)
     (replace-match "" t)))
 
+(defconst my/hyphenate--eol-soft-hyphen-re (concat "\n?" (list my/hyphenate-soft-hyphen) "\n?")
+  "A regular-expression that matches soft-hyphens at the end of a line.")
+
 (defun my/hyphenate--convert-soft-hyphens ()
-  "Convert soft-hyphens into hard ones at end of lines.
-Removes all others."
+  "Convert end-of-line soft-hyphens into hard ones, remove the rest.
+This is done after a hyphenated fill."
   (goto-char (point-min))
-  (while (re-search-forward "\n?\u00ad\n?" nil t)
+  (while (re-search-forward my/hyphenate--eol-soft-hyphen-re nil t)
     (if (> (- (match-end 0) (match-beginning 0)) 1)
         (replace-match "-\n" t)
       (replace-match "" t))))
 
-(defun my/hyphenate--fill-region-as-paragraph-with-hyphenation (from to &optional justify nosqueeze squeeze-after)
-  "Hyphenate region FROM to TO when filling.
-See documentation for `fill-region-as-paragraph-default' for documentation on
-the args JUSTIFY, NOSQUEEZE, SQUEEZE-AFTER."
+(defun my/hyphenate--fill-paragraph (from to &rest _)
+  "Perform a hyphenated fill in region FROM to TO.
+This is installed in `fill-region-as-paragraph-function' by
+`my/hyphenate-fill-paragraph' to do the hyphenation work."
   (save-excursion
     (save-restriction
-      (narrow-to-region from to)
+      (goto-char from)
+      (skip-chars-forward " \t\n")
+      (narrow-to-region (point) to)
       (my/hyphenate--undo-past-hyphenation)
       (my/hyphenate--insert-soft-hyphens)
-      (let ((prefix (fill-region-as-paragraph-default (point-min) (point-max) justify nosqueeze squeeze-after)))
-        (my/hyphenate--convert-soft-hyphens)
-        prefix))))
+      ;; TODO: we cannot rely on this to do the filling. It seems that it counts the soft hyphens, so
+      ;; the filling algorithm miscalculates when the line is filled.
+      (fill-region-as-paragraph-default (point-min) (point-max))
+      (my/hyphenate--convert-soft-hyphens))))
 
+(defun my/hyphenate--move-to-break-point (linebeg)
+  "Alternative to `fill-move-to-break-point' that hyphenates text.
+Uses text between LINEBEG and (point)."
+  (message "move-to-break-point: %d" linebeg))
+
+;;;###autoload
+(defun my/hyphenate-fill-paragraph ()
+  "Perform a hyphenated fill on the current paragraph.
+Relies on `fill-paragraph' to do the setup, and then
+`my/hyphenate-fill-paragraph' for the hyphenated filling."
+  (interactive)
+  ;; Enable splitting at soft-hyphen positions.
+  (let ((prev-category (aref (category-table) my/hyphenate-soft-hyphen))
+        (fill-region-as-paragraph-function #'my/hyphenate--fill-paragraph))
+    (modify-category-entry my/hyphenate-soft-hyphen ?|)
+    (unwind-protect
+        (fill-paragraph)
+      (aset (category-table) my/hyphenate-soft-hyphen prev-category))))
 
 (provide 'my-hyphenate)
 
