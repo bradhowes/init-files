@@ -67,13 +67,13 @@
   :type '(integer)
   :group 'my/customizations)
 
-(defun my/hyphenate--insert-soft-hyphens (beg end)
-  "Insert Unicode soft hyphens (U+00AD) into words between BEG and END via pyphen."
+(defun my/hyphenate--insert-soft-hyphens ()
+  "Insert Unicode soft hyphens (U+00AD) into words via pyphen."
   (let* ((cmd "~/src/hyphenator/hyphenate")
          (delete t)
          (buffer t)
          (display nil))
-    (call-process-region beg end
+    (call-process-region (point-min) (point-max)
                          cmd
                          delete
                          buffer
@@ -87,37 +87,40 @@
 Affects `fill-paragraph' and `fill-region' operations."
   :global nil
   :lighter " HyF"
-  (modify-category-entry ?\u00ad ?|))
+  (modify-category-entry ?\u00ad ?|)
+  (set (make-local-variable fill-region-as-paragraph-function)
+       (if my/hyphenate-fill-mode
+           #'my/hyphenate--fill-region-as-paragraph-with-hyphenation
+         #'fill-region-as-paragraph-default)))
 
-(defun my/hyphenate--fill-region (orig-fun from to &rest args)
+(defun my/hyphenate--undo-past-hyphenation ()
+  "Remove hyphens at the end of lines."
+  (goto-char (point-min))
+  (while (re-search-forward "-\n" nil t)
+    (replace-match "" t)))
+
+(defun my/hyphenate--convert-soft-hyphens ()
+  "Convert soft-hyphens into hard ones at end of lines.
+Removes all others."
+  (goto-char (point-min))
+  (while (re-search-forward "\n?\u00ad\n?" nil t)
+    (if (> (- (match-end 0) (match-beginning 0)) 1)
+        (replace-match "-\n" t)
+      (replace-match "" t))))
+
+(defun my/hyphenate--fill-region-as-paragraph-with-hyphenation (from to &optional justify nosqueeze squeeze-after)
   "Hyphenate region FROM to TO when filling.
-Invokes ORIG-FUN with ARGS."
-  (interactive (progn
-		 (barf-if-buffer-read-only)
-		 (list (region-beginning) (region-end)
-		       (if current-prefix-arg 'full))))
+See documentation for `fill-region-as-paragraph-default' for documentation on
+the args JUSTIFY, NOSQUEEZE, SQUEEZE-AFTER."
   (save-excursion
     (save-restriction
       (narrow-to-region from to)
-      (message "1 from: %d to: %d" (point-min) (point-max))
-      (if (not my/hyphenate-fill-mode)
-          (apply orig-fun (append (list (point-min) (point-max)) args))
-        (goto-char (point-min))
-        (while (re-search-forward "-\n" nil t)
-          (replace-match "" t))
-        (message "2 from: %d to: %d" (point-min) (point-max))
-        (my/hyphenate--insert-soft-hyphens (point-min) (point-max))
-        (message "3 from: %d to: %d" (point-min) (point-max))
-        (apply orig-fun (append (list (point-min) (point-max)) args))
-        (message "4 from: %d to: %d" (point-min) (point-max))
-        (goto-char (point-min))
-        (while (re-search-forward "\n?\u00ad\n?" nil t)
-          (if (> (- (match-end 0) (match-beginning 0)) 1)
-              (replace-match "-\n" t)
-            (replace-match "" t)))
-      ))))
+      (my/hyphenate--undo-past-hyphenation)
+      (my/hyphenate--insert-soft-hyphens)
+      (let ((prefix (fill-region-as-paragraph-default (point-min) (point-max) justify nosqueeze squeeze-after)))
+        (my/hyphenate--convert-soft-hyphens)
+        prefix))))
 
-(advice-add 'fill-region-as-paragraph :around #'my/hyphenate--fill-region)
 
 (provide 'my-hyphenate)
 
