@@ -596,6 +596,12 @@
          ("M-'" . popper-cycle))
   :hook ((after-init . my/popper-initialize)))
 
+;; Experimental integration of "native WebKit pages and Ghostty terminals inside macOS Emacs panes."
+;; It works, but not that useful for my work right now.
+;;
+;; (use-package portal
+;;   :vc (:url "https://github.com/xiaoxinghu/portal" :rev :newest))
+
 (defvar my/project-search-map (make-sparse-keymap)
   "A prefix map like that found in projectile.
 Bound to \\`C-x p s'.")
