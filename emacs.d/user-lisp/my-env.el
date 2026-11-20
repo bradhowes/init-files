@@ -108,7 +108,8 @@ Creates the directory if it does not exist."
   "Setup Emacs to utilize current environment."
   (setenv "WORKON_HOME" (my/venv))
   (let* ((common-paths (list (file-truename "~/bin")
-                             (file-name-concat (my/venv) "bin")))
+                             (file-name-concat (my/venv) "bin")
+                             (file-truename "~/.cargo/bin")))
          (macosx-paths (if my/is-macosx
                            (list "/opt/homebrew/sqlite/bin"
                                  "/opt/homebrew/opt/grep/libexec/gnubin"

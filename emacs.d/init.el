@@ -487,7 +487,8 @@
                        (global-kkp-mode 1))))
 
 (use-package kotlin-ts-mode
-  :mode ("\\.kt\\'"))
+  :mode ("\\.kt\\'")
+  :hook ((kotlin-ts-mode . my/kotlin-mode-hook)))
 
 (use-package ligature
   :commands (ligature-set-ligatures global-ligature-mode)
