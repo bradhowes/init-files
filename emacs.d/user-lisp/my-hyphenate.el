@@ -71,13 +71,14 @@ If changed, similar change must be made in the Python code.")
   :type '(integer)
   :group 'my/customizations)
 
-(defun my/hyphenate--insert-soft-hyphens ()
-  "Insert Unicode soft hyphens (U+00AD) into words via pyphen."
+(defun my/hyphenate--insert-soft-hyphens (from to)
+  "Insert Unicode soft hyphens (U+00AD) into words between FROM and TO.
+Uses pyphen to do this."
   (let* ((cmd "~/src/hyphenator/hyphenate")
          (delete t)
          (buffer t)
          (display nil))
-    (call-process-region (point-min) (point-max)
+    (call-process-region from to
                          cmd
                          delete
                          buffer
@@ -85,21 +86,22 @@ If changed, similar change must be made in the Python code.")
                          my/hyphenate-lang
                          (format "%d" my/hyphenate-min-word-len))))
 
-(defun my/hyphenate--undo-past-hyphenation ()
-  "Remove any hard hyphens at the end of lines.
+(defun my/hyphenate--undo-past-hyphenation (from to)
+  "Remove any hard hyphens at the end of lines between FROM and TO.
 This is done before attempting a new hyphenated fill."
-  (goto-char (point-min))
-  (while (re-search-forward "-\n" nil t)
+  (goto-char from)
+  (while (re-search-forward "-\n" to t)
     (replace-match "" t)))
 
 (defconst my/hyphenate--eol-soft-hyphen-re (concat "\n?" (list my/hyphenate-soft-hyphen) "\n?")
   "A regular-expression that matches soft-hyphens at the end of a line.")
 
-(defun my/hyphenate--convert-soft-hyphens ()
-  "Convert end-of-line soft-hyphens into hard ones, remove the rest.
+(defun my/hyphenate--convert-soft-hyphens (from to)
+  "Convert soft-hyphens into hard ones between FROM and TO.
+Those at end-of-line are changed to normal hyphen, the rest are removed.
 This is done after a hyphenated fill."
-  (goto-char (point-min))
-  (while (re-search-forward my/hyphenate--eol-soft-hyphen-re nil t)
+  (goto-char from)
+  (while (re-search-forward my/hyphenate--eol-soft-hyphen-re to t)
     (if (> (- (match-end 0) (match-beginning 0)) 1)
         (replace-match "-\n" t)
       (replace-match "" t))))
@@ -113,12 +115,12 @@ This is installed in `fill-region-as-paragraph-function' by
       (goto-char from)
       (skip-chars-forward " \t\n")
       (narrow-to-region (point) to)
-      (my/hyphenate--undo-past-hyphenation)
-      (my/hyphenate--insert-soft-hyphens)
+      (my/hyphenate--undo-past-hyphenation (point-min) (point-max))
+      (my/hyphenate--insert-soft-hyphens (point-min) (point-max))
       ;; TODO: we cannot rely on this to do the filling. It seems that it counts the soft hyphens, so
       ;; the filling algorithm miscalculates when the line is filled.
       (fill-region-as-paragraph-default (point-min) (point-max))
-      (my/hyphenate--convert-soft-hyphens))))
+      (my/hyphenate--convert-soft-hyphens (point-min) (point-max)))))
 
 (defun my/hyphenate--move-to-break-point (linebeg)
   "Alternative to `fill-move-to-break-point' that hyphenates text.
